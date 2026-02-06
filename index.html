@@ -141,6 +141,15 @@ button{font-family:inherit;cursor:pointer}
 .legend-dot.lg-unanswered{background:#fff}
 .legend-dot.lg-flagged{background:var(--orange);border-color:var(--orange)}
 
+/* === MINI PALETTE (shows ~5 around current) === */
+.palette-mini{display:flex;gap:4px;justify-content:center;align-items:center;margin-bottom:6px}
+.palette-mini .q-num{width:36px;height:32px;font-size:13px}
+.palette-mini .pm-ellipsis{color:var(--gray-500);font-size:14px;padding:0 4px}
+.palette-expand-btn{background:none;border:1px solid var(--gray-400);color:var(--gray-600);padding:4px 12px;border-radius:12px;font-size:11px;margin-bottom:6px}
+.palette-expand-btn:hover{background:var(--gray-100)}
+.question-palette.collapsed{display:none}
+.question-palette.expanded{display:flex}
+
 /* === MODAL === */
 .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:1000}
 .modal-overlay.active{display:flex;align-items:center;justify-content:center}
@@ -438,8 +447,10 @@ button{font-family:inherit;cursor:pointer}
             <button class="btn-nav btn-submit" id="btnSubmit" onclick="App.showSubmitModal()">Submit</button>
         </div>
         <div class="palette-wrap">
-            <div class="question-palette" id="questionPalette"></div>
-            <div class="palette-legend" id="paletteLegend">
+            <div class="palette-mini" id="paletteMini"></div>
+            <button class="palette-expand-btn" id="paletteExpandBtn" onclick="App.togglePalette()">Show All</button>
+            <div class="question-palette collapsed" id="questionPalette"></div>
+            <div class="palette-legend" id="paletteLegend" style="display:none">
                 <div class="legend-item"><div class="legend-dot lg-current"></div>Current</div>
                 <div class="legend-item"><div class="legend-dot lg-answered"></div>Answered</div>
                 <div class="legend-item"><div class="legend-dot lg-unanswered"></div>Not Visited</div>
@@ -671,6 +682,8 @@ const App = {
         document.getElementById('chatFab').classList.add('has-context');
     },
 
+    paletteExpanded: false,
+
     buildPalette() {
         const pal = document.getElementById('questionPalette');
         pal.innerHTML = '';
@@ -682,6 +695,55 @@ const App = {
             btn.id = 'qp-' + i;
             pal.appendChild(btn);
         }
+        this.paletteExpanded = false;
+        document.getElementById('questionPalette').className = 'question-palette collapsed';
+        document.getElementById('paletteLegend').style.display = 'none';
+        document.getElementById('paletteExpandBtn').textContent = 'Show All';
+    },
+
+    buildMiniPalette() {
+        const mini = document.getElementById('paletteMini');
+        const cur = this.currentQ;
+        const total = this.questions.length;
+        let html = '';
+
+        // Show: [1] ... [cur-1] [cur] [cur+1] ... [70]
+        const show = new Set();
+        show.add(0); // first
+        show.add(total - 1); // last
+        for (let i = Math.max(0, cur - 1); i <= Math.min(total - 1, cur + 1); i++) show.add(i);
+
+        const sorted = [...show].sort((a, b) => a - b);
+        let prev = -1;
+        for (const i of sorted) {
+            if (prev >= 0 && i - prev > 1) html += '<span class="pm-ellipsis">...</span>';
+            const cls = this._getPaletteClass(i);
+            html += `<div class="q-num ${cls}" onclick="App.goTo(${i})">${i + 1}</div>`;
+            prev = i;
+        }
+        mini.innerHTML = html;
+    },
+
+    _getPaletteClass(i) {
+        let cls = '';
+        if (this.mode === 'practice' && this.practiceResults[i]) {
+            cls = 'p-' + this.practiceResults[i];
+        } else if (i === this.currentQ) {
+            cls = 'current';
+        } else if (this.answers[i] !== undefined) {
+            cls = 'answered';
+        } else if (this.visited[i]) {
+            cls = 'visited';
+        }
+        if (this.bookmarked[i]) cls += ' flagged';
+        return cls;
+    },
+
+    togglePalette() {
+        this.paletteExpanded = !this.paletteExpanded;
+        document.getElementById('questionPalette').className = 'question-palette ' + (this.paletteExpanded ? 'expanded' : 'collapsed');
+        document.getElementById('paletteLegend').style.display = this.paletteExpanded ? '' : 'none';
+        document.getElementById('paletteExpandBtn').textContent = this.paletteExpanded ? 'Hide' : 'Show All';
     },
 
     renderQuestion() {
@@ -782,22 +844,14 @@ const App = {
     next() { if (this.currentQ < this.questions.length - 1) this.goTo(this.currentQ + 1); },
 
     updatePalette() {
+        // Update full palette
         for (let i = 0; i < this.questions.length; i++) {
             const el = document.getElementById('qp-' + i);
             if (!el) continue;
-            let cls = 'q-num';
-            if (this.mode === 'practice' && this.practiceResults[i]) {
-                cls += ' p-' + this.practiceResults[i];
-            } else if (i === this.currentQ) {
-                cls += ' current';
-            } else if (this.answers[i] !== undefined) {
-                cls += ' answered';
-            } else if (this.visited[i]) {
-                cls += ' visited';
-            }
-            if (this.bookmarked[i]) cls += ' flagged';
-            el.className = cls;
+            el.className = 'q-num ' + this._getPaletteClass(i);
         }
+        // Update mini palette
+        this.buildMiniPalette();
     },
 
     // Timer
