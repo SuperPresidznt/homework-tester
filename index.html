@@ -42,7 +42,7 @@ button{font-family:inherit;cursor:pointer}
 .timer-display{font-family:'Courier New',monospace;font-size:16px;font-weight:bold;color:var(--red);background:#fff;border:1px solid var(--gray-300);padding:3px 10px;border-radius:3px}
 .timer-display.warning{animation:flash .5s infinite alternate}
 @keyframes flash{from{background:#fff}to{background:#ffeaea;color:#c0392b}}
-.timer-toggle{color:var(--blue);cursor:pointer;font-size:12px}
+.timer-toggle{color:#1a5276;cursor:pointer;font-size:12px;font-weight:bold}
 
 /* === SCREENS === */
 .screen{display:none;max-width:960px;margin:0 auto;padding:20px;min-height:calc(100vh - 200px)}
@@ -80,7 +80,7 @@ button{font-family:inherit;cursor:pointer}
 
 .bank-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:20px;margin:16px 0;box-shadow:var(--shadow)}
 .bank-card h2{color:var(--navy);font-size:20px;margin-bottom:4px}
-.bank-card .bank-desc{color:var(--gray-600);font-size:13px;margin-bottom:16px}
+.bank-card .bank-desc{color:#555;font-size:13px;margin-bottom:16px}
 .bank-card .bank-meta{display:flex;gap:16px;font-size:12px;color:var(--gray-600);margin-bottom:16px;flex-wrap:wrap}
 
 .mode-buttons{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
@@ -98,7 +98,7 @@ button{font-family:inherit;cursor:pointer}
 .question-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--gray-100);flex-wrap:wrap;gap:8px}
 .question-number{font-weight:bold;color:var(--navy);font-size:14px}
 .question-actions{display:flex;gap:8px}
-.btn-bookmark,.btn-clear{padding:4px 14px;border:1px solid var(--gray-500);border-radius:3px;background:#f0f0f0;font-size:12px;color:var(--gray-700)}
+.btn-bookmark,.btn-clear{padding:4px 14px;border:1px solid var(--gray-500);border-radius:3px;background:#f0f0f0;font-size:12px;color:#333}
 .btn-bookmark:hover,.btn-clear:hover{background:#e0e0e0}
 .btn-bookmark.flagged{background:#fff3cd;border-color:var(--orange);color:#856404}
 .question-text{font-size:15px;line-height:1.7;margin-bottom:20px;color:var(--gray-900)}
@@ -217,7 +217,7 @@ button{font-family:inherit;cursor:pointer}
 .legend-dot{width:12px;height:12px;border-radius:2px;border:1px solid var(--gray-500)}
 .legend-dot.lg-current{background:var(--navy);border-color:var(--navy)}
 .legend-dot.lg-answered{background:var(--green);border-color:var(--green)}
-.legend-dot.lg-unanswered{background:#fff}
+.legend-dot.lg-unanswered{background:#fff;border:2px solid #666}
 .legend-dot.lg-flagged{background:var(--orange);border-color:var(--orange)}
 
 /* === MINI PALETTE (shows ~5 around current) === */
@@ -296,7 +296,7 @@ button{font-family:inherit;cursor:pointer}
 .review-q .rq-opt.rq-correct{background:#eafaf1;border:1px solid #c3e6cb;font-weight:bold}
 .review-q .rq-explanation{margin-top:10px;padding:10px;background:#f8f9fa;border-left:3px solid var(--yellow);font-size:13px;line-height:1.5;color:var(--gray-700)}
 .review-q .rq-meta{display:flex;gap:8px;margin-top:8px;font-size:11px}
-.review-q .rq-tag{background:var(--gray-100);padding:2px 6px;border-radius:3px;color:var(--gray-600)}
+.review-q .rq-tag{background:var(--gray-100);padding:2px 6px;border-radius:3px;color:#333}
 
 /* === SETTINGS === */
 .settings-panel{max-width:600px;margin:0 auto}
@@ -307,7 +307,7 @@ button{font-family:inherit;cursor:pointer}
 .setting-row label{display:block;font-size:13px;color:var(--gray-700);margin-bottom:4px}
 .setting-row input,.setting-row select{width:100%;padding:8px 12px;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:14px}
 .setting-row input[type="password"]{font-family:monospace}
-.setting-row .hint{font-size:11px;color:var(--gray-600);margin-top:4px}
+.setting-row .hint{font-size:11px;color:#555;margin-top:4px}
 .setting-row button{margin-top:8px}
 .btn-save-settings{padding:10px 24px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:bold}
 
@@ -503,11 +503,11 @@ button:focus-visible {
     body:not([data-theme="light"]) .score-big.pass { color: var(--green-light); }
     body:not([data-theme="light"]) .score-big.fail { color: var(--red-light); }
     body:not([data-theme="light"]) a { color: #60a5fa; }
-    body:not([data-theme="light"]) .hint { color: #9ca3af; }
+    body:not([data-theme="light"]) .hint { color: #d1d5db; }
     body:not([data-theme="light"]) .bank-desc,
     body:not([data-theme="light"]) .bank-meta,
     body:not([data-theme="light"]) .mode-btn p,
-    body:not([data-theme="light"]) .stat-card .stat-lbl { color: #9ca3af; }
+    body:not([data-theme="light"]) .stat-card .stat-lbl { color: #d1d5db; }
     body:not([data-theme="light"]) .palette-expand-btn { background: #1f2937; border-color: #4b5563; color: #9ca3af; }
     body:not([data-theme="light"]) .tool-btn { background: #374151; border-color: #4b5563; color: #d1d5db; }
     body:not([data-theme="light"]) .tool-btn:hover { background: #4b5563; }
@@ -524,6 +524,9 @@ button:focus-visible {
     body:not([data-theme="light"]) .daily-goal-card .goal-text { color: #d1d5db; }
     body:not([data-theme="light"]) .goal-celebration { background: #064e3b; color: #a7f3d0; }
     body:not([data-theme="light"]) .streak-banner.no-streak { background: #374151; color: #9ca3af; }
+    body:not([data-theme="light"]) .rq-tag { background: #374151; color: #d1d5db; }
+    body:not([data-theme="light"]) .timer-toggle { color: #60a5fa; }
+    body:not([data-theme="light"]) .legend-dot.lg-unanswered { background: #374151; border-color: #9ca3af; }
 }
 [data-theme="dark"] .test-name { color: #93c5fd; }
 [data-theme="dark"] .bank-card h2,
@@ -541,11 +544,11 @@ button:focus-visible {
 [data-theme="dark"] .score-big.pass { color: var(--green-light); }
 [data-theme="dark"] .score-big.fail { color: var(--red-light); }
 [data-theme="dark"] a { color: #60a5fa; }
-[data-theme="dark"] .hint { color: #9ca3af; }
+[data-theme="dark"] .hint { color: #d1d5db; }
 [data-theme="dark"] .bank-desc,
 [data-theme="dark"] .bank-meta,
 [data-theme="dark"] .mode-btn p,
-[data-theme="dark"] .stat-card .stat-lbl { color: #9ca3af; }
+[data-theme="dark"] .stat-card .stat-lbl { color: #d1d5db; }
 [data-theme="dark"] .palette-expand-btn { background: #1f2937; border-color: #4b5563; color: #9ca3af; }
 [data-theme="dark"] .tool-btn { background: #374151; border-color: #4b5563; color: #d1d5db; }
 [data-theme="dark"] .tool-btn:hover { background: #4b5563; }
@@ -563,6 +566,9 @@ button:focus-visible {
 [data-theme="dark"] .daily-goal-card .goal-text { color: #d1d5db; }
 [data-theme="dark"] .goal-celebration { background: #064e3b; color: #a7f3d0; }
 [data-theme="dark"] .streak-banner.no-streak { background: #374151; color: #9ca3af; }
+[data-theme="dark"] .rq-tag { background: #374151; color: #d1d5db; }
+[data-theme="dark"] .timer-toggle { color: #60a5fa; }
+[data-theme="dark"] .legend-dot.lg-unanswered { background: #374151; border-color: #9ca3af; }
 
 /* === PROGRESS DASHBOARD === */
 .progress-chart{margin:16px 0}
@@ -629,6 +635,33 @@ button:focus-visible {
     border-radius: 4px;
     color: #9ca3af;
     font-style: italic;
+}
+
+/* === PRINT STYLESHEET === */
+@media print {
+    /* Hide UI elements */
+    .main-header, .footer-nav, .chat-fab, .chat-panel,
+    .calc-panel, .modal-overlay, .toolbar,
+    .btn-bookmark, .btn-clear, .btn-check,
+    .palette-expand-btn, .palette-legend,
+    .score-actions, #helpModal { display: none !important; }
+
+    /* Reset backgrounds for printing */
+    body { background: white !important; color: black !important; }
+    .screen { display: block !important; max-width: 100% !important; }
+    .question-container, .bank-card, .score-screen,
+    .review-q, .progress-section {
+        background: white !important;
+        border: 1px solid #ccc !important;
+        page-break-inside: avoid;
+    }
+
+    /* Make content readable */
+    .question-text, .option-label { color: black !important; }
+    .option-item.correct-answer { background: #e8f5e9 !important; border: 2px solid #4caf50 !important; }
+
+    /* Remove shadows and transitions */
+    * { box-shadow: none !important; transition: none !important; }
 }
 </style>
 </head>
@@ -726,6 +759,7 @@ button:focus-visible {
             <button style="background:var(--blue)" onclick="App.startReview()">Review Answers</button>
             <button style="background:var(--red)" onclick="App.retakeTest()">Retake</button>
             <button style="background:var(--gray-700)" onclick="showScreen('home')">Home</button>
+            <button style="background:var(--gray-600)" onclick="window.print()">Print Results</button>
         </div>
     </div>
 </div>
