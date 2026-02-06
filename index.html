@@ -107,6 +107,16 @@ button{font-family:inherit;cursor:pointer}
 .btn-check:hover{background:var(--green-light)}
 .btn-check:disabled{background:var(--gray-500);cursor:not-allowed}
 
+/* === CONFIDENCE INDICATOR (Practice mode) === */
+.confidence-panel{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px;background:#f8f9fa;border-radius:var(--radius);flex-wrap:wrap}
+.confidence-label{font-size:13px;color:var(--gray-700);margin-right:4px}
+.confidence-btn{padding:6px 14px;border:1px solid var(--gray-300);border-radius:16px;background:#fff;font-size:12px;color:var(--gray-700);cursor:pointer;transition:all .15s}
+.confidence-btn:hover{border-color:var(--blue);color:var(--blue)}
+.confidence-btn.selected{background:var(--blue);color:#fff;border-color:var(--blue)}
+.confidence-btn.conf-maybe.selected{background:var(--orange);border-color:var(--orange)}
+.confidence-btn.conf-probably.selected{background:var(--blue);border-color:var(--blue)}
+.confidence-btn.conf-definitely.selected{background:var(--green);border-color:var(--green)}
+
 /* === TOOLBAR (Calculator, Audio, Timer) === */
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .tool-btn{background:var(--gray-100);border:1px solid var(--gray-300);border-radius:var(--radius);padding:6px 12px;font-size:12px;color:var(--gray-700);display:flex;align-items:center;gap:4px}
@@ -368,6 +378,12 @@ button{font-family:inherit;cursor:pointer}
         <div class="question-text" id="questionText"></div>
         <ul class="options-list" id="optionsList"></ul>
         <button class="btn-check" id="btnCheck" style="display:none" onclick="App.checkAnswer()">Check Answer</button>
+        <div class="confidence-panel" id="confidencePanel" style="display:none">
+            <span class="confidence-label">How confident?</span>
+            <button class="confidence-btn conf-maybe" onclick="App.setConfidence(1)">Maybe</button>
+            <button class="confidence-btn conf-probably" onclick="App.setConfidence(2)">Probably</button>
+            <button class="confidence-btn conf-definitely" onclick="App.setConfidence(3)">Definitely</button>
+        </div>
         <div class="explanation-panel" id="explanationPanel"></div>
     </div>
 </div>
@@ -508,7 +524,7 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <!-- TIMER ADJUST MODAL -->
-<div class="modal-overlay" id="timerModal">
+<div class="modal-overlay" id="timerModal" onclick="if(event.target===this)App.hideTimerModal()">
     <div class="modal" style="max-width:350px">
         <h2>Adjust Timer</h2>
         <div class="setting-row">
@@ -561,7 +577,7 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <!-- SUBMIT MODAL -->
-<div class="modal-overlay" id="submitModal">
+<div class="modal-overlay" id="submitModal" onclick="if(event.target===this)App.hideSubmitModal()">
     <div class="modal">
         <h2>Submit Test</h2>
         <p>Are you sure you want to submit?</p>
@@ -742,6 +758,8 @@ const App = {
     countdown: true,
     submitted: false,
     startTime: 0,
+    answerHistory: {},    // { qIndex: [firstAnswer, ...changesArray] }
+    confidence: {},       // { qIndex: 1|2|3 } (1=Maybe, 2=Probably, 3=Definitely)
 
     start(bankId, mode) {
         this.bank = BankManager.getBank(bankId);
@@ -756,6 +774,8 @@ const App = {
         this.practiceResults = {};
         this.submitted = false;
         this.startTime = Date.now();
+        this.answerHistory = {};
+        this.confidence = {};
 
         // Timer setup
         if (mode === 'test') {
@@ -896,6 +916,23 @@ const App = {
             btnCheck.style.display = 'none';
         }
 
+        // Confidence panel (Practice mode only, after selecting an answer)
+        const confPanel = document.getElementById('confidencePanel');
+        if (this.mode === 'practice' && this.answers[this.currentQ] !== undefined && !isChecked) {
+            confPanel.style.display = 'flex';
+            // Update selected state of buttons
+            const currentConf = this.confidence[this.currentQ] || 0;
+            confPanel.querySelectorAll('.confidence-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            if (currentConf > 0) {
+                const confClasses = ['conf-maybe', 'conf-probably', 'conf-definitely'];
+                confPanel.querySelector('.' + confClasses[currentConf - 1]).classList.add('selected');
+            }
+        } else {
+            confPanel.style.display = 'none';
+        }
+
         // Explanation panel
         const expPanel = document.getElementById('explanationPanel');
         if ((isChecked || isReview) && q.explanation) {
@@ -920,7 +957,19 @@ const App = {
 
     selectOption(i) {
         if (this.submitted || this.practiceChecked[this.currentQ]) return;
-        this.answers[this.currentQ] = i;
+        const qIdx = this.currentQ;
+        const prevAnswer = this.answers[qIdx];
+
+        // Track answer history
+        if (!this.answerHistory[qIdx]) {
+            // First selection for this question
+            this.answerHistory[qIdx] = [i];
+        } else if (prevAnswer !== undefined && prevAnswer !== i) {
+            // Answer changed (not just first selection)
+            this.answerHistory[qIdx].push(i);
+        }
+
+        this.answers[qIdx] = i;
         this.renderQuestion();
     },
 
@@ -941,6 +990,13 @@ const App = {
         this.practiceChecked[this.currentQ] = true;
         const q = this.questions[this.currentQ];
         this.practiceResults[this.currentQ] = this.answers[this.currentQ] === q.correctAnswer ? 'correct' : 'incorrect';
+        this.renderQuestion();
+    },
+
+    setConfidence(level) {
+        // level: 1 = Maybe, 2 = Probably, 3 = Definitely
+        if (this.mode !== 'practice' || this.answers[this.currentQ] === undefined) return;
+        this.confidence[this.currentQ] = level;
         this.renderQuestion();
     },
 
@@ -1089,6 +1145,8 @@ const App = {
     },
 
     startReview() {
+        this.stopTimer();
+        Audio.stop();
         this.mode = 'review-after';
         this.currentQ = 0;
         document.getElementById('btnSubmit').style.display = 'none';
@@ -1125,7 +1183,7 @@ const App = {
     },
 
     applyTimerChange() {
-        const mins = parseInt(document.getElementById('timerMinutes').value) || 90;
+        const mins = Math.max(1, Math.min(300, parseInt(document.getElementById('timerMinutes').value) || 90));
         this.timerSeconds = mins * 60;
         this.updateTimerDisplay();
         this.hideTimerModal();
@@ -1244,6 +1302,7 @@ const Drill = {
 
         this.current = this.queue.shift();
         this.showingAnswer = false;
+        this.selectedOption = null;
         this.questionStart = Date.now();
 
         const dueCount = this.queue.length + 1;
@@ -1676,6 +1735,11 @@ const Calc = {
             // Safe eval using Function constructor
             const sanitized = this.expr.replace(/[^0-9+\-*/().]/g, '');
             const result = Function('"use strict"; return (' + sanitized + ')')();
+            if (!isFinite(result)) {
+                document.getElementById('calcDisplay').textContent = 'Error';
+                this.expr = '';
+                return;
+            }
             const rounded = Math.round(result * 1000000) / 1000000;
             document.getElementById('calcDisplay').textContent = rounded;
             this.expr = String(rounded);
@@ -1835,11 +1899,110 @@ const Metrics = {
         return catStats;
     },
 
+    // Get answer change statistics
+    getAnswerChangeStats(questions, answers, answerHistory) {
+        let totalChanges = 0;
+        let changedQuestions = 0;
+        const changedFromCorrect = [];  // Questions where first answer was correct but final was wrong
+        const changedToCorrect = [];    // Questions where first answer was wrong but final was correct
+
+        for (const qIdx in answerHistory) {
+            const history = answerHistory[qIdx];
+            if (history.length > 1) {
+                changedQuestions++;
+                totalChanges += history.length - 1;
+
+                const q = questions[qIdx];
+                const firstAnswer = history[0];
+                const finalAnswer = answers[qIdx];
+
+                if (firstAnswer === q.correctAnswer && finalAnswer !== q.correctAnswer) {
+                    changedFromCorrect.push(parseInt(qIdx));
+                } else if (firstAnswer !== q.correctAnswer && finalAnswer === q.correctAnswer) {
+                    changedToCorrect.push(parseInt(qIdx));
+                }
+            }
+        }
+        return { totalChanges, changedQuestions, changedFromCorrect, changedToCorrect };
+    },
+
+    // Get first attempt accuracy statistics
+    getFirstAttemptStats(questions, answers, answerHistory) {
+        let firstAttemptCorrect = 0;
+        let finalCorrect = 0;
+        let answeredCount = 0;
+
+        for (const qIdx in answers) {
+            const q = questions[qIdx];
+            const finalAnswer = answers[qIdx];
+            answeredCount++;
+
+            if (finalAnswer === q.correctAnswer) {
+                finalCorrect++;
+            }
+
+            // Check first attempt
+            const history = answerHistory[qIdx];
+            if (history && history.length > 0) {
+                if (history[0] === q.correctAnswer) {
+                    firstAttemptCorrect++;
+                }
+            }
+        }
+
+        return {
+            firstAttemptCorrect,
+            finalCorrect,
+            answeredCount,
+            firstAccuracy: answeredCount > 0 ? Math.round((firstAttemptCorrect / answeredCount) * 100) : 0,
+            finalAccuracy: answeredCount > 0 ? Math.round((finalCorrect / answeredCount) * 100) : 0
+        };
+    },
+
+    // Get confidence vs accuracy correlation
+    getConfidenceStats(questions, answers, confidence) {
+        const stats = {
+            1: { correct: 0, total: 0, label: 'Maybe' },
+            2: { correct: 0, total: 0, label: 'Probably' },
+            3: { correct: 0, total: 0, label: 'Definitely' }
+        };
+
+        for (const qIdx in confidence) {
+            const level = confidence[qIdx];
+            if (answers[qIdx] !== undefined && stats[level]) {
+                stats[level].total++;
+                if (answers[qIdx] === questions[qIdx].correctAnswer) {
+                    stats[level].correct++;
+                }
+            }
+        }
+
+        return stats;
+    },
+
+    // Get questions with multiple revisits
+    getRevisitedQuestions() {
+        const revisited = [];
+        for (const qIdx in this.questionTimes) {
+            const visits = this.questionTimes[qIdx].visits;
+            if (visits > 1) {
+                revisited.push({ index: parseInt(qIdx), visits });
+            }
+        }
+        return revisited.sort((a, b) => b.visits - a.visits);
+    },
+
     // Build metrics summary HTML for score screen
     buildMetricsSummary(questions, answers) {
         const totalTime = this.getTotalTime();
         const avgTime = this.getAvgTimePerQuestion();
         const catStats = this.getCategoryStats(questions, answers);
+
+        // New metrics
+        const answerChangeStats = this.getAnswerChangeStats(questions, answers, App.answerHistory);
+        const firstAttemptStats = this.getFirstAttemptStats(questions, answers, App.answerHistory);
+        const confidenceStats = this.getConfidenceStats(questions, answers, App.confidence);
+        const revisitedQuestions = this.getRevisitedQuestions();
 
         // Find slowest and fastest questions
         const times = [];
@@ -1854,10 +2017,78 @@ const Metrics = {
         html += `<div class="metric-item"><div class="metric-val">${this._formatTime(totalTime)}</div><div class="metric-lbl">Total Time</div></div>`;
         html += `<div class="metric-item"><div class="metric-val">${this._formatTime(avgTime)}</div><div class="metric-lbl">Avg per Question</div></div>`;
         html += `<div class="metric-item"><div class="metric-val">${Object.keys(this.questionTimes).length}</div><div class="metric-lbl">Questions Viewed</div></div>`;
+        html += `<div class="metric-item"><div class="metric-val">${answerChangeStats.totalChanges}</div><div class="metric-lbl">Answer Changes</div></div>`;
         html += '</div>';
 
+        // First Attempt vs Final Accuracy
+        if (firstAttemptStats.answeredCount > 0) {
+            html += '<div class="time-per-q" style="margin-top:16px"><strong>First Attempt vs Final Accuracy:</strong>';
+            html += '<table><tr><th>Metric</th><th>Correct</th><th>Accuracy</th></tr>';
+            html += `<tr><td>First Attempt</td><td>${firstAttemptStats.firstAttemptCorrect}/${firstAttemptStats.answeredCount}</td><td>${firstAttemptStats.firstAccuracy}%</td></tr>`;
+            html += `<tr><td>Final Answer</td><td>${firstAttemptStats.finalCorrect}/${firstAttemptStats.answeredCount}</td><td>${firstAttemptStats.finalAccuracy}%</td></tr>`;
+            html += '</table>';
+
+            // Show if changing answers helped or hurt
+            if (answerChangeStats.changedQuestions > 0) {
+                const helpedCount = answerChangeStats.changedToCorrect.length;
+                const hurtCount = answerChangeStats.changedFromCorrect.length;
+                html += `<p style="font-size:12px;color:var(--gray-600);margin-top:8px">Changed answers on ${answerChangeStats.changedQuestions} questions: `;
+                html += `<span style="color:var(--green)">${helpedCount} helped</span>, `;
+                html += `<span style="color:var(--red)">${hurtCount} hurt</span></p>`;
+
+                if (answerChangeStats.changedFromCorrect.length > 0) {
+                    html += `<p style="font-size:11px;color:var(--red);margin-top:4px">Changed FROM correct: Q${answerChangeStats.changedFromCorrect.map(i => i + 1).join(', Q')}</p>`;
+                }
+            }
+            html += '</div>';
+        }
+
+        // Confidence vs Accuracy (only in Practice mode)
+        const totalConfidenceRatings = Object.values(confidenceStats).reduce((sum, s) => sum + s.total, 0);
+        if (totalConfidenceRatings > 0) {
+            html += '<div class="time-per-q" style="margin-top:16px"><strong>Confidence vs Accuracy:</strong>';
+            html += '<table><tr><th>Confidence</th><th>Correct</th><th>Accuracy</th></tr>';
+            for (const level of [1, 2, 3]) {
+                const s = confidenceStats[level];
+                if (s.total > 0) {
+                    const accuracy = Math.round((s.correct / s.total) * 100);
+                    const color = accuracy >= 70 ? 'var(--green)' : accuracy >= 50 ? 'var(--orange)' : 'var(--red)';
+                    html += `<tr><td>${s.label}</td><td>${s.correct}/${s.total}</td><td style="color:${color}">${accuracy}%</td></tr>`;
+                }
+            }
+            html += '</table>';
+
+            // Calculate calibration hint
+            const maybeAcc = confidenceStats[1].total > 0 ? confidenceStats[1].correct / confidenceStats[1].total : 0;
+            const defAcc = confidenceStats[3].total > 0 ? confidenceStats[3].correct / confidenceStats[3].total : 0;
+            if (confidenceStats[1].total >= 2 && confidenceStats[3].total >= 2) {
+                if (maybeAcc > defAcc + 0.1) {
+                    html += '<p style="font-size:11px;color:var(--orange);margin-top:4px">You perform better when unsure - trust your instincts more!</p>';
+                } else if (defAcc >= 0.8 && maybeAcc < 0.5) {
+                    html += '<p style="font-size:11px;color:var(--green);margin-top:4px">Good calibration! Your confidence matches your accuracy.</p>';
+                }
+            }
+            html += '</div>';
+        }
+
+        // Questions with multiple revisits
+        if (revisitedQuestions.length > 0) {
+            const topRevisited = revisitedQuestions.slice(0, 5);
+            html += '<div class="time-per-q" style="margin-top:16px"><strong>Most Revisited Questions:</strong>';
+            html += '<table><tr><th>Q#</th><th>Visits</th><th>Result</th></tr>';
+            topRevisited.forEach(r => {
+                const q = questions[r.index];
+                const isCorrect = answers[r.index] === q.correctAnswer;
+                const wasAnswered = answers[r.index] !== undefined;
+                const result = !wasAnswered ? 'Unanswered' : (isCorrect ? 'Correct' : 'Incorrect');
+                const resultColor = !wasAnswered ? 'var(--orange)' : (isCorrect ? 'var(--green)' : 'var(--red)');
+                html += `<tr><td>${r.index + 1}</td><td>${r.visits}</td><td style="color:${resultColor}">${result}</td></tr>`;
+            });
+            html += '</table></div>';
+        }
+
         if (slowest.length > 0) {
-            html += '<div class="time-per-q"><strong>Most Time Spent:</strong><table><tr><th>Q#</th><th>Time</th><th>Category</th></tr>';
+            html += '<div class="time-per-q" style="margin-top:16px"><strong>Most Time Spent:</strong><table><tr><th>Q#</th><th>Time</th><th>Category</th></tr>';
             slowest.forEach(s => {
                 const q = questions[s.index];
                 html += `<tr><td>${s.index + 1}</td><td>${this._formatTime(s.time)}</td><td>${q.category || 'General'}</td></tr>`;
