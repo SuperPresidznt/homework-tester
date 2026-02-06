@@ -101,8 +101,8 @@ button{font-family:inherit;cursor:pointer}
 .btn-bookmark,.btn-clear{padding:4px 14px;border:1px solid var(--gray-500);border-radius:3px;background:#f0f0f0;font-size:12px;color:#333}
 .btn-bookmark:hover,.btn-clear:hover{background:#e0e0e0}
 .btn-bookmark.flagged{background:#fff3cd;border-color:var(--orange);color:#856404}
-.question-text{font-size:15px;line-height:1.7;margin-bottom:20px;color:var(--gray-900)}
-.question-text p{margin-bottom:8px}
+.question-text{font-size:15px;line-height:1.7;margin-bottom:20px;color:var(--gray-900);word-break:normal;overflow-wrap:break-word;white-space:normal}
+.question-text p{margin-bottom:8px;word-break:normal;white-space:normal}
 
 /* === OPTIONS === */
 .options-list{list-style:none}
@@ -110,17 +110,18 @@ button{font-family:inherit;cursor:pointer}
 .option-item:hover{background:#f0f7ff;border-color:var(--blue)}
 .option-item.selected{background:#e3f0fc;border-color:var(--blue)}
 .option-item input[type="radio"]{margin-top:3px;accent-color:var(--blue)}
-.option-label{font-size:14px;line-height:1.6;color:var(--gray-800)}
+.option-label{font-size:14px;line-height:1.6;color:var(--gray-800);word-break:normal;overflow-wrap:break-word;white-space:normal}
 
 /* Practice/Review feedback on options */
 .option-item.correct-answer{border:2px solid var(--green);background:#eafaf1}
 .option-item.wrong-answer{border:2px solid var(--red);background:#fdf2f2}
 
 /* === EXPLANATION PANEL === */
-.explanation-panel{display:none;margin-top:15px;padding:16px;border-radius:var(--radius);background:#f0faf4;border:1px solid #c3e6cb;font-size:14px;line-height:1.6;color:#155724}
+.explanation-panel{display:none;margin-top:15px;padding:16px;border-radius:var(--radius);background:#f0faf4;border:1px solid #c3e6cb;font-size:14px;line-height:1.6;color:#155724;word-break:normal;overflow-wrap:break-word;white-space:normal}
 .explanation-panel.show{display:block}
 .explanation-panel.incorrect{background:#fdf2f2;border-color:#f5c6cb;color:#721c24}
 .explanation-panel h4{margin-bottom:6px}
+.explanation-panel p{margin:0;word-break:normal;white-space:normal}
 
 /* === NOTE PANEL === */
 .note-panel{margin-top:12px;display:none}
@@ -336,8 +337,9 @@ button{font-family:inherit;cursor:pointer}
     .header-top{padding:8px 12px}
     .logo-text{font-size:15px}
     .subheader{padding:6px 12px}
-    .screen{padding:12px}
-    .question-container{padding:16px}
+    .screen{padding:12px;max-width:100%;box-sizing:border-box}
+    .question-container{padding:16px;max-width:100%;box-sizing:border-box;overflow-x:hidden}
+    .question-text,.option-label,.explanation-panel,.explanation-panel p{word-break:normal;overflow-wrap:break-word;white-space:normal}
     .mode-buttons{grid-template-columns:1fr 1fr}
     .nav-controls{flex-direction:column;gap:8px}
     .nav-buttons{width:100%;justify-content:space-between;flex-wrap:wrap}
