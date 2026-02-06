@@ -832,6 +832,31 @@ button:focus-visible {
             <button class="btn-save-settings" onclick="Settings.save()">Save Settings</button>
         </div>
         <div class="setting-group">
+            <h3>Keyboard Shortcuts</h3>
+            <div class="setting-row">
+                <table style="width:100%;border-collapse:collapse;font-size:13px">
+                    <thead>
+                        <tr style="background:var(--navy);color:#fff">
+                            <th style="padding:8px 12px;text-align:left">Key</th>
+                            <th style="padding:8px 12px;text-align:left">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">?</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Show keyboard shortcuts help</td></tr>
+                        <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">&larr;</kbd> / <kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">P</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Previous question</td></tr>
+                        <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">&rarr;</kbd> / <kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">N</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Next question</td></tr>
+                        <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">1</kbd> - <kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">4</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Select answer option</td></tr>
+                        <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">B</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Bookmark question</td></tr>
+                        <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">T</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Toggle notes panel</td></tr>
+                        <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">C</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Toggle calculator</td></tr>
+                        <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">Enter</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Check answer (Practice mode)</td></tr>
+                        <tr><td style="padding:6px 12px"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">Esc</kbd></td><td style="padding:6px 12px">Close modals/calculator</td></tr>
+                    </tbody>
+                </table>
+                <div class="hint" style="margin-top:8px">Press <kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">?</kbd> anytime to see a quick reference overlay.</div>
+            </div>
+        </div>
+        <div class="setting-group">
             <h3>Data</h3>
             <div class="setting-row">
                 <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Notes.exportAll()">Export Notes</button>
@@ -844,6 +869,31 @@ button:focus-visible {
             <div class="setting-row">
                 <button class="btn-nav btn-home" onclick="showScreen('home')">Back to Home</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- KEYBOARD SHORTCUTS HELP MODAL -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target===this)document.getElementById('helpModal').classList.remove('active')">
+    <div class="modal" style="max-width:400px" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+        <h2 id="helpModalTitle">Keyboard Shortcuts</h2>
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+                <tr><th style="padding:8px 12px;text-align:left;background:var(--navy);color:#fff">Key</th><th style="padding:8px 12px;text-align:left;background:var(--navy);color:#fff">Action</th></tr>
+            </thead>
+            <tbody>
+                <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">&larr;</kbd> / <kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">P</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Previous question</td></tr>
+                <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">&rarr;</kbd> / <kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">N</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Next question</td></tr>
+                <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">1</kbd> - <kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">4</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Select answer option</td></tr>
+                <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">B</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Bookmark question</td></tr>
+                <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">T</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Toggle notes panel</td></tr>
+                <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">C</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Toggle calculator</td></tr>
+                <tr><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">Enter</kbd></td><td style="padding:6px 12px;border-bottom:1px solid var(--gray-200)">Check answer (Practice)</td></tr>
+                <tr><td style="padding:6px 12px"><kbd style="background:var(--gray-100);padding:2px 6px;border-radius:3px;font-family:monospace">Esc</kbd></td><td style="padding:6px 12px">Close modals</td></tr>
+            </tbody>
+        </table>
+        <div class="modal-actions" style="margin-top:16px">
+            <button class="btn-nav" onclick="document.getElementById('helpModal').classList.remove('active')">Close</button>
         </div>
     </div>
 </div>
@@ -982,6 +1032,38 @@ const Store = {
 };
 
 // =====================================================================
+// SESSION TIMER
+// =====================================================================
+const Session = {
+    startTime: 0,
+    start() {
+        this.startTime = Date.now();
+    },
+    end() {
+        if (!this.startTime) return;
+        const mins = Math.round((Date.now() - this.startTime) / 60000);
+        if (mins > 0) {
+            // Update globalStats.totalStudyMins
+            const stats = Store.get('globalStats', { totalStudyMins: 0 });
+            stats.totalStudyMins = (stats.totalStudyMins || 0) + mins;
+            Store.set('globalStats', stats);
+
+            // Update studyByDay for today
+            const today = new Date().toISOString().split('T')[0];
+            const studyByDay = Store.get('studyByDay', {});
+            studyByDay[today] = (studyByDay[today] || 0) + mins;
+            Store.set('studyByDay', studyByDay);
+        }
+        this.startTime = 0;
+    },
+    getTodayMins() {
+        const today = new Date().toISOString().split('T')[0];
+        const studyByDay = Store.get('studyByDay', {});
+        return studyByDay[today] || 0;
+    }
+};
+
+// =====================================================================
 // STREAK & DAILY GOAL SYSTEM
 // =====================================================================
 const DailyGoal = {
@@ -1035,6 +1117,11 @@ const BankManager = {
 // SCREEN ROUTER
 // =====================================================================
 function showScreen(name, showSubheader, showFooter) {
+    // End session timer when returning home
+    if (name === 'home') {
+        Session.end();
+    }
+
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     const el = document.getElementById('screen-' + name);
     if (el) el.classList.add('active');
@@ -1067,8 +1154,12 @@ const Home = {
         const totalQ = Object.keys(drillData).length;
         const mastered = Object.values(drillData).filter(d => d.ef >= 2.5 && d.reps >= 3).length;
         const masteryPct = totalQ > 0 ? Math.round((mastered / totalQ) * 100) : 0;
+        const todayMins = Session.getTodayMins();
+        const totalMins = stats.totalStudyMins || 0;
 
         document.getElementById('homeStats').innerHTML = `
+            <div class="stat-card"><div class="stat-val">${todayMins}m</div><div class="stat-lbl">Today</div></div>
+            <div class="stat-card"><div class="stat-val">${totalMins}m</div><div class="stat-lbl">Total Study</div></div>
             <div class="stat-card"><div class="stat-val">${stats.testsCompleted}</div><div class="stat-lbl">Tests Taken</div></div>
             <div class="stat-card"><div class="stat-val">${stats.avgScore || 0}%</div><div class="stat-lbl">Avg Score</div></div>
             <div class="stat-card"><div class="stat-val">${masteryPct}%</div><div class="stat-lbl">Mastery</div></div>
@@ -1139,6 +1230,7 @@ const App = {
     start(bankId, mode) {
         this.bank = BankManager.getBank(bankId);
         if (!this.bank) return;
+        Session.start(); // Start session timer
         this.questions = [...this.bank.questions];
         this.mode = mode;
         this.currentQ = 0;
@@ -1629,6 +1721,7 @@ const Drill = {
     start(bankId) {
         this.bank = BankManager.getBank(bankId);
         if (!this.bank) return;
+        Session.start(); // Start session timer
         this.sessionCount = 0;
         this.sessionCorrect = 0;
         this.buildQueue();
@@ -1843,6 +1936,7 @@ const Review = {
     start(bankId) {
         this.bank = BankManager.getBank(bankId);
         if (!this.bank) return;
+        Session.start(); // Start session timer
 
         // Populate category filter
         const cats = [...new Set(this.bank.questions.map(q => q.category || 'General'))];
@@ -2834,6 +2928,16 @@ const Metrics = {
 // KEYBOARD SHORTCUTS
 // =====================================================================
 document.addEventListener('keydown', (e) => {
+    // Help modal shortcut (? key) works globally
+    if ((e.key === '?' || (e.shiftKey && e.key === '/')) && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        document.getElementById('helpModal').classList.toggle('active');
+        return;
+    }
+    // Escape closes help modal
+    if (e.key === 'Escape' && document.getElementById('helpModal').classList.contains('active')) {
+        document.getElementById('helpModal').classList.remove('active');
+        return;
+    }
     // Calculator shortcut works globally
     if (e.key === 'c' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
         Calc.toggle();
