@@ -775,6 +775,7 @@ const App = {
         document.getElementById('modeTab').textContent = mode === 'test' ? 'Test Mode' : 'Practice Mode';
         document.getElementById('btnSubmit').style.display = mode === 'test' ? '' : 'none';
         document.getElementById('btnCheck').style.display = mode === 'practice' ? '' : 'none';
+        document.getElementById('btnTimerAdj').style.display = mode === 'test' ? '' : 'none';
 
         this.buildPalette();
         showScreen('exam', true, true);
