@@ -58,6 +58,26 @@ button{font-family:inherit;cursor:pointer}
 .stat-card .stat-val{font-size:28px;font-weight:bold;color:var(--navy)}
 .stat-card .stat-lbl{font-size:12px;color:var(--gray-600);margin-top:4px}
 
+/* === STREAK & DAILY GOAL === */
+.streak-banner{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0;padding:16px;background:linear-gradient(135deg,#ff6b35,#f7931e);border-radius:12px;color:#fff;font-weight:bold}
+.streak-banner .streak-flame{font-size:32px;line-height:1}
+.streak-banner .streak-info{text-align:left}
+.streak-banner .streak-count{font-size:24px}
+.streak-banner .streak-label{font-size:12px;opacity:.9;font-weight:normal}
+.streak-banner.no-streak{background:var(--gray-200);color:var(--gray-600)}
+.streak-banner.no-streak .streak-flame{opacity:.5}
+
+.daily-goal-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:16px;margin:12px 0}
+.daily-goal-card h3{font-size:14px;color:var(--navy);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.daily-goal-card .goal-progress{display:flex;align-items:center;gap:12px}
+.daily-goal-card .goal-bar{flex:1;height:12px;background:var(--gray-200);border-radius:6px;overflow:hidden}
+.daily-goal-card .goal-bar-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green-light));border-radius:6px;transition:width .3s ease}
+.daily-goal-card .goal-bar-fill.complete{background:linear-gradient(90deg,var(--green),#2ecc71)}
+.daily-goal-card .goal-text{font-size:14px;color:var(--gray-700);min-width:100px;text-align:right}
+.daily-goal-card .goal-text.complete{color:var(--green);font-weight:bold}
+.goal-celebration{text-align:center;padding:8px;margin-top:8px;background:#eafaf1;border-radius:6px;color:var(--green);font-weight:bold;animation:goalPulse .5s ease}
+@keyframes goalPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+
 .bank-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:20px;margin:16px 0;box-shadow:var(--shadow)}
 .bank-card h2{color:var(--navy);font-size:20px;margin-bottom:4px}
 .bank-card .bank-desc{color:var(--gray-600);font-size:13px;margin-bottom:16px}
@@ -101,6 +121,20 @@ button{font-family:inherit;cursor:pointer}
 .explanation-panel.show{display:block}
 .explanation-panel.incorrect{background:#fdf2f2;border-color:#f5c6cb;color:#721c24}
 .explanation-panel h4{margin-bottom:6px}
+
+/* === NOTE PANEL === */
+.note-panel{margin-top:12px;display:none}
+.note-panel.open{display:block}
+.note-textarea{width:100%;min-height:80px;padding:10px;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:13px;resize:vertical;font-family:inherit}
+.note-saved{font-size:11px;color:var(--green);margin-top:4px;opacity:0;transition:opacity .3s}
+.note-saved.show{opacity:1}
+.btn-note{padding:4px 14px;border:1px solid var(--gray-500);border-radius:3px;background:#f0f0f0;font-size:12px;color:var(--gray-700)}
+.btn-note:hover{background:#e0e0e0}
+.btn-note.has-note{background:#e8f4fd;border-color:var(--blue);color:var(--blue)}
+.q-num.has-note::before{content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:var(--blue);border-radius:50%}
+.q-num{position:relative}
+.review-q .rq-note{margin-top:10px;padding:10px;background:#e8f4fd;border-left:3px solid var(--blue);font-size:13px;line-height:1.5;color:var(--gray-700)}
+.review-q .rq-note-label{font-weight:bold;color:var(--blue);margin-bottom:4px;font-size:12px}
 
 /* === CHECK ANSWER BUTTON (Practice mode) === */
 .btn-check{padding:10px 24px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:bold;margin-top:10px}
@@ -479,7 +513,17 @@ button:focus-visible {
     body:not([data-theme="light"]) .tool-btn:hover { background: #4b5563; }
     body:not([data-theme="light"]) .btn-bookmark,
     body:not([data-theme="light"]) .btn-clear { background: #374151; border-color: #4b5563; color: #d1d5db; }
+    body:not([data-theme="light"]) .btn-note { background: #374151; border-color: #4b5563; color: #d1d5db; }
+    body:not([data-theme="light"]) .btn-note.has-note { background: #1e3a5f; border-color: var(--blue); color: #60a5fa; }
+    body:not([data-theme="light"]) .note-textarea { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+    body:not([data-theme="light"]) .review-q .rq-note { background: #1e3a5f; border-color: var(--blue); color: #d1d5db; }
     body:not([data-theme="light"]) .modal th { background: #1e3a5f; }
+    body:not([data-theme="light"]) .daily-goal-card { background: #16213e; border-color: #374151; }
+    body:not([data-theme="light"]) .daily-goal-card h3 { color: #93c5fd; }
+    body:not([data-theme="light"]) .daily-goal-card .goal-bar { background: #374151; }
+    body:not([data-theme="light"]) .daily-goal-card .goal-text { color: #d1d5db; }
+    body:not([data-theme="light"]) .goal-celebration { background: #064e3b; color: #a7f3d0; }
+    body:not([data-theme="light"]) .streak-banner.no-streak { background: #374151; color: #9ca3af; }
 }
 [data-theme="dark"] .test-name { color: #93c5fd; }
 [data-theme="dark"] .bank-card h2,
@@ -507,7 +551,61 @@ button:focus-visible {
 [data-theme="dark"] .tool-btn:hover { background: #4b5563; }
 [data-theme="dark"] .btn-bookmark,
 [data-theme="dark"] .btn-clear { background: #374151; border-color: #4b5563; color: #d1d5db; }
+[data-theme="dark"] .btn-note { background: #374151; border-color: #4b5563; color: #d1d5db; }
+[data-theme="dark"] .btn-note.has-note { background: #1e3a5f; border-color: var(--blue); color: #60a5fa; }
+[data-theme="dark"] .note-textarea { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+[data-theme="dark"] .note-panel { background: transparent; }
+[data-theme="dark"] .review-q .rq-note { background: #1e3a5f; border-color: var(--blue); color: #d1d5db; }
 [data-theme="dark"] .modal th { background: #1e3a5f; }
+[data-theme="dark"] .daily-goal-card { background: #16213e; border-color: #374151; }
+[data-theme="dark"] .daily-goal-card h3 { color: #93c5fd; }
+[data-theme="dark"] .daily-goal-card .goal-bar { background: #374151; }
+[data-theme="dark"] .daily-goal-card .goal-text { color: #d1d5db; }
+[data-theme="dark"] .goal-celebration { background: #064e3b; color: #a7f3d0; }
+[data-theme="dark"] .streak-banner.no-streak { background: #374151; color: #9ca3af; }
+
+/* === PROGRESS DASHBOARD === */
+.progress-chart{margin:16px 0}
+.chart-row{display:flex;align-items:center;margin:6px 0}
+.chart-label{width:140px;font-size:12px;color:var(--gray-700);flex-shrink:0}
+.chart-bar-bg{flex:1;height:20px;background:var(--gray-200);border-radius:10px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:10px;transition:width .5s}
+.chart-bar-fill.good{background:var(--green)}
+.chart-bar-fill.warn{background:var(--orange)}
+.chart-bar-fill.bad{background:var(--red)}
+.chart-value{width:50px;text-align:right;font-size:12px;font-weight:bold;color:var(--gray-700);margin-left:8px}
+
+.progress-section{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:16px;margin-bottom:16px}
+.progress-section h3{font-size:14px;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--gray-100)}
+
+.progress-table{width:100%;border-collapse:collapse;font-size:13px}
+.progress-table th,.progress-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--gray-100)}
+.progress-table th{background:var(--gray-50);color:var(--navy);font-weight:bold}
+.progress-table tr:hover{background:var(--gray-50)}
+
+.mastery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:12px}
+.mastery-item{text-align:center;padding:12px;background:var(--gray-50);border-radius:8px}
+.mastery-item .value{font-size:24px;font-weight:bold}
+.mastery-item .label{font-size:11px;color:var(--gray-600);margin-top:4px}
+.mastery-item.mastered .value{color:var(--green)}
+.mastery-item.learning .value{color:var(--orange)}
+.mastery-item.new .value{color:var(--blue)}
+
+.study-bars{display:flex;align-items:flex-end;gap:4px;height:80px;margin-top:12px}
+.study-day{flex:1;display:flex;flex-direction:column;align-items:center}
+.study-day .bar{width:100%;background:var(--blue);border-radius:4px 4px 0 0;transition:height .3s}
+.study-day .day-label{font-size:10px;color:var(--gray-600);margin-top:4px}
+
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .progress-section { background: #16213e; border-color: #374151; }
+    body:not([data-theme="light"]) .progress-table th { background: #1f2937; color: #93c5fd; }
+    body:not([data-theme="light"]) .mastery-item { background: #1f2937; }
+    body:not([data-theme="light"]) .progress-section h3 { color: #93c5fd; }
+}
+[data-theme="dark"] .progress-section { background: #16213e; border-color: #374151; }
+[data-theme="dark"] .progress-table th { background: #1f2937; color: #93c5fd; }
+[data-theme="dark"] .mastery-item { background: #1f2937; }
+[data-theme="dark"] .progress-section h3 { color: #93c5fd; }
 
 /* Graph/image placeholder styling for dark mode */
 @media (prefers-color-scheme: dark) {
@@ -569,7 +667,14 @@ button:focus-visible {
         <p>Choose a question bank and study mode</p>
     </div>
 
+    <div id="streakBanner"></div>
+    <div id="dailyGoalCard"></div>
+
     <div class="stats-row" id="homeStats"></div>
+
+    <div style="text-align:center;margin:16px 0">
+        <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Progress.show()">View Progress</button>
+    </div>
 
     <div id="bankList"></div>
 </div>
@@ -581,6 +686,7 @@ button:focus-visible {
             <span class="question-number" id="questionNumber">Question 1 of 70</span>
             <div class="question-actions">
                 <button class="btn-bookmark" id="btnBookmark" onclick="App.toggleBookmark()" aria-label="Bookmark this question">Bookmark</button>
+                <button class="btn-note" id="btnNote" onclick="Notes.toggle()" aria-label="Add note to this question">Notes</button>
                 <button class="btn-clear" onclick="App.clearAnswer()">Clear</button>
             </div>
         </div>
@@ -594,6 +700,10 @@ button:focus-visible {
             <button class="confidence-btn conf-definitely" onclick="App.setConfidence(3)">Definitely</button>
         </div>
         <div class="explanation-panel" id="explanationPanel"></div>
+        <div class="note-panel" id="notePanel">
+            <textarea class="note-textarea" id="noteTextarea" placeholder="Add your notes here..." oninput="Notes.onInput()" onblur="Notes.save()"></textarea>
+            <div class="note-saved" id="noteSaved">Note saved</div>
+        </div>
     </div>
 </div>
 
@@ -640,6 +750,13 @@ button:focus-visible {
     <div id="reviewContent"></div>
 </div>
 
+<!-- ========== PROGRESS SCREEN ========== -->
+<div class="screen" id="screen-progress">
+    <h2 style="color:var(--navy);margin-bottom:16px">Progress Dashboard</h2>
+    <button class="btn-nav btn-home" onclick="showScreen('home')" style="margin-bottom:16px">Back to Home</button>
+    <div id="progressContent"></div>
+</div>
+
 <!-- ========== SETTINGS SCREEN ========== -->
 <div class="screen" id="screen-settings">
     <div class="settings-panel">
@@ -654,6 +771,20 @@ button:focus-visible {
                     <option value="dark">Dark</option>
                 </select>
                 <div class="hint">Choose your preferred color scheme. "System" follows your device settings.</div>
+            </div>
+        </div>
+        <div class="setting-group">
+            <h3>Daily Goal</h3>
+            <div class="setting-row">
+                <label>Questions per day</label>
+                <select id="settingDailyGoal" onchange="DailyGoal.setGoal(parseInt(this.value))">
+                    <option value="5">5 questions</option>
+                    <option value="10" selected>10 questions</option>
+                    <option value="15">15 questions</option>
+                    <option value="20">20 questions</option>
+                    <option value="30">30 questions</option>
+                </select>
+                <div class="hint">Set a daily study goal. Build a streak by reaching your goal each day!</div>
             </div>
         </div>
         <div class="setting-group">
@@ -702,6 +833,10 @@ button:focus-visible {
         </div>
         <div class="setting-group">
             <h3>Data</h3>
+            <div class="setting-row">
+                <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Notes.exportAll()">Export Notes</button>
+                <div class="hint">Download all your notes as a JSON file.</div>
+            </div>
             <div class="setting-row">
                 <button class="btn-nav" style="background:var(--orange);border-color:var(--orange)" onclick="Settings.clearProgress()">Clear All Progress</button>
                 <div class="hint">Removes all test history, drill progress, and stats.</div>
@@ -847,6 +982,23 @@ const Store = {
 };
 
 // =====================================================================
+// STREAK & DAILY GOAL SYSTEM
+// =====================================================================
+const DailyGoal = {
+    getTodayStr() { return new Date().toISOString().split('T')[0]; },
+    getDefaultStats() { return { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0, streak: 0, lastStudyDate: null, dailyGoal: 10, questionsToday: 0, todayDate: null }; },
+    getStats() { const defaults = this.getDefaultStats(); const stats = Store.get('globalStats', defaults); return { ...defaults, ...stats }; },
+    saveStats(stats) { Store.set('globalStats', stats); },
+    checkDateReset(stats) { const today = this.getTodayStr(); if (stats.todayDate !== today) { stats.questionsToday = 0; stats.todayDate = today; } return stats; },
+    updateStreak(stats) { const today = this.getTodayStr(); const lastDate = stats.lastStudyDate; if (!lastDate) { stats.streak = 1; } else if (lastDate !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); const yesterdayStr = yesterday.toISOString().split('T')[0]; stats.streak = (lastDate === yesterdayStr) ? stats.streak + 1 : 1; } stats.lastStudyDate = today; return stats; },
+    recordQuestion() { let stats = this.getStats(); stats = this.checkDateReset(stats); const wasGoalMet = stats.questionsToday >= stats.dailyGoal; stats.questionsToday++; const isGoalMet = stats.questionsToday >= stats.dailyGoal; if (!wasGoalMet && isGoalMet) { stats = this.updateStreak(stats); } this.saveStats(stats); return !wasGoalMet && isGoalMet; },
+    setGoal(goal) { let stats = this.getStats(); stats.dailyGoal = goal; this.saveStats(stats); },
+    checkStreakOnLoad() { let stats = this.getStats(); stats = this.checkDateReset(stats); const today = this.getTodayStr(); const lastDate = stats.lastStudyDate; if (lastDate && lastDate !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); const yesterdayStr = yesterday.toISOString().split('T')[0]; if (lastDate !== yesterdayStr) { stats.streak = 0; this.saveStats(stats); } } return stats; },
+    renderStreakBanner() { const stats = this.checkStreakOnLoad(); const el = document.getElementById('streakBanner'); if (!el) return; const streak = stats.streak || 0; const hasStreak = streak > 0; el.innerHTML = '<div class="streak-banner ' + (hasStreak ? '' : 'no-streak') + '"><span class="streak-flame">\uD83D\uDD25</span><div class="streak-info"><div class="streak-count">' + streak + ' day' + (streak !== 1 ? 's' : '') + '</div><div class="streak-label">' + (hasStreak ? 'Study Streak' : 'Start your streak today!') + '</div></div></div>'; },
+    renderDailyGoalCard() { const stats = this.getStats(); const el = document.getElementById('dailyGoalCard'); if (!el) return; const today = this.getTodayStr(); let questionsToday = stats.questionsToday || 0; if (stats.todayDate !== today) { questionsToday = 0; } const goal = stats.dailyGoal || 10; const pct = Math.round((Math.min(questionsToday, goal) / goal) * 100); const isComplete = questionsToday >= goal; el.innerHTML = '<div class="daily-goal-card"><h3>\uD83C\uDFAF Daily Goal</h3><div class="goal-progress"><div class="goal-bar"><div class="goal-bar-fill ' + (isComplete ? 'complete' : '') + '" style="width:' + pct + '%"></div></div><div class="goal-text ' + (isComplete ? 'complete' : '') + '">' + questionsToday + '/' + goal + ' questions</div></div>' + (isComplete ? '<div class="goal-celebration">Goal reached! Great job today!</div>' : '') + '</div>'; }
+};
+
+// =====================================================================
 // BANK MANAGER
 // =====================================================================
 const BankManager = {
@@ -903,12 +1055,14 @@ function showScreen(name, showSubheader, showFooter) {
 // =====================================================================
 const Home = {
     render() {
+        DailyGoal.renderStreakBanner();
+        DailyGoal.renderDailyGoalCard();
         this.renderStats();
         this.renderBanks();
     },
 
     renderStats() {
-        const stats = Store.get('globalStats', { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0 });
+        const stats = DailyGoal.getStats();
         const drillData = Store.get('drillProgress', {});
         const totalQ = Object.keys(drillData).length;
         const mastered = Object.values(drillData).filter(d => d.ef >= 2.5 && d.reps >= 3).length;
@@ -1172,6 +1326,10 @@ const App = {
         // Nav buttons
         document.getElementById('btnPrev').disabled = this.currentQ === 0;
 
+        // Load note for current question
+        Notes.load();
+        Notes.close(); // Close note panel when navigating
+
         this.updatePalette();
         this.renderMath();
     },
@@ -1211,6 +1369,7 @@ const App = {
         this.practiceChecked[this.currentQ] = true;
         const q = this.questions[this.currentQ];
         this.practiceResults[this.currentQ] = this.answers[this.currentQ] === q.correctAnswer ? 'correct' : 'incorrect';
+        DailyGoal.recordQuestion();
         this.renderQuestion();
     },
 
@@ -1357,10 +1516,15 @@ const App = {
         Store.set('testHistory_' + this.bank.bankId, history);
 
         // Update global stats
-        const stats = Store.get('globalStats', { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0 });
+        const stats = DailyGoal.getStats();
         stats.testsCompleted++;
         stats.avgScore = Math.round(((stats.avgScore * (stats.testsCompleted - 1)) + pct) / stats.testsCompleted);
-        Store.set('globalStats', stats);
+        DailyGoal.saveStats(stats);
+
+        // Record all answered questions for daily goal (test mode)
+        for (let i = 0; i < answered; i++) {
+            DailyGoal.recordQuestion();
+        }
 
         showScreen('score', false, false);
     },
@@ -1613,11 +1777,14 @@ const Drill = {
         this.sessionCount++;
         if (this.selectedOption === q.correctAnswer) this.sessionCorrect++;
 
-        // Update streak
-        const stats = Store.get('globalStats', { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0 });
+        // Update drill streak
+        const stats = DailyGoal.getStats();
         if (quality >= 3) stats.drillStreak++;
         else stats.drillStreak = 0;
-        Store.set('globalStats', stats);
+        DailyGoal.saveStats(stats);
+
+        // Record question for daily goal
+        DailyGoal.recordQuestion();
 
         this.nextCard();
     },
@@ -1711,6 +1878,7 @@ const Review = {
 
         const drillData = Store.get('drillProgress', {});
         const diffLabels = { 1: 'Easy', 2: 'Medium', 3: 'Hard' };
+        const notesData = Store.get(`notes_${this.bank.bankId}`, {});
 
         let html = '';
         Object.entries(groups).forEach(([cat, questions]) => {
@@ -1723,12 +1891,14 @@ const Review = {
             questions.forEach(q => {
                 const mastery = drillData[q.id];
                 const masteryLabel = mastery ? (mastery.ef >= 2.5 && mastery.reps >= 3 ? 'Mastered' : mastery.reps > 0 ? 'Learning' : 'New') : 'New';
+                const note = notesData[q.id] || '';
                 html += `<div class="review-q">
                     <div class="rq-text"><strong>Q${q.id}.</strong> ${q.text.replace(/\n/g, '<br>')}</div>
                     <ul class="rq-options">
                         ${q.options.map((opt, i) => `<li class="rq-opt ${i === q.correctAnswer ? 'rq-correct' : ''}">${String.fromCharCode(65+i)}. ${opt}</li>`).join('')}
                     </ul>
                     ${q.explanation ? `<div class="rq-explanation">${q.explanation}</div>` : ''}
+                    ${note ? `<div class="rq-note"><div class="rq-note-label">Your Note:</div>${note.replace(/\n/g, '<br>')}</div>` : ''}
                     <div class="rq-meta">
                         <span class="rq-tag">${diffLabels[q.difficulty] || 'Medium'}</span>
                         <span class="rq-tag">${masteryLabel}</span>
@@ -1809,6 +1979,114 @@ const Theme = {
     }
 };
 
+
+// =====================================================================
+// PROGRESS DASHBOARD
+// =====================================================================
+const Progress = {
+    show() {
+        showScreen('progress');
+        this.render();
+    },
+
+    render() {
+        const content = document.getElementById('progressContent');
+        content.innerHTML = this.renderTestHistory() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
+    },
+
+    renderTestHistory() {
+        let allHistory = [];
+        for (const bank of BankManager.banks) {
+            const history = Store.get('testHistory_' + bank.bankId, []);
+            allHistory = allHistory.concat(history.map(h => ({ ...h, bankTitle: bank.title })));
+        }
+        allHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const recent = allHistory.slice(0, 10);
+
+        if (recent.length === 0) {
+            return '<div class="progress-section"><h3>Test History</h3><p style="color:var(--gray-600)">No tests completed yet.</p></div>';
+        }
+
+        const rows = recent.map(h => {
+            const date = new Date(h.date);
+            const dateStr = date.toLocaleDateString();
+            const scoreClass = h.pct >= 70 ? 'good' : h.pct >= 50 ? 'warn' : 'bad';
+            const colorVar = scoreClass === 'good' ? 'green' : scoreClass === 'warn' ? 'orange' : 'red';
+            return '<tr><td>' + dateStr + '</td><td><span style="color:var(--' + colorVar + ')">' + h.pct + '%</span></td><td>' + (h.mode || 'test') + '</td><td>' + (h.time || '-') + '</td></tr>';
+        }).join('');
+
+        return '<div class="progress-section"><h3>Test History (Last 10)</h3><table class="progress-table"><thead><tr><th>Date</th><th>Score</th><th>Mode</th><th>Time</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+    },
+
+    renderCategoryPerformance() {
+        const catStats = {};
+        const drillData = Store.get('drillProgress', {});
+        for (const bank of BankManager.banks) {
+            for (const q of bank.questions) {
+                const cat = q.category || 'General';
+                if (!catStats[cat]) catStats[cat] = { correct: 0, total: 0 };
+                const prog = drillData[q.id];
+                if (prog && prog.reps > 0) {
+                    catStats[cat].total++;
+                    if (prog.ef >= 2.5) catStats[cat].correct++;
+                }
+            }
+        }
+
+        const cats = Object.keys(catStats).filter(c => catStats[c].total > 0);
+        if (cats.length === 0) {
+            return '<div class="progress-section"><h3>Category Performance</h3><p style="color:var(--gray-600)">Complete some drills to see category performance.</p></div>';
+        }
+
+        const bars = cats.map(cat => {
+            const pct = Math.round((catStats[cat].correct / catStats[cat].total) * 100);
+            const colorClass = pct >= 70 ? 'good' : pct >= 50 ? 'warn' : 'bad';
+            return '<div class="chart-row"><span class="chart-label">' + cat + '</span><div class="chart-bar-bg"><div class="chart-bar-fill ' + colorClass + '" style="width:' + pct + '%"></div></div><span class="chart-value">' + pct + '%</span></div>';
+        }).join('');
+
+        return '<div class="progress-section"><h3>Category Performance</h3><div class="progress-chart">' + bars + '</div></div>';
+    },
+
+    renderMasteryProgress() {
+        const drillData = Store.get('drillProgress', {});
+        let totalQ = 0;
+        for (const bank of BankManager.banks) {
+            totalQ += bank.questions.length;
+        }
+
+        const entries = Object.values(drillData);
+        const mastered = entries.filter(d => d.ef >= 2.5 && d.reps >= 3).length;
+        const learning = entries.filter(d => d.reps > 0 && !(d.ef >= 2.5 && d.reps >= 3)).length;
+        const newQ = totalQ - mastered - learning;
+
+        return '<div class="progress-section"><h3>Mastery Progress</h3><div class="mastery-grid"><div class="mastery-item mastered"><div class="value">' + mastered + '</div><div class="label">Mastered</div></div><div class="mastery-item learning"><div class="value">' + learning + '</div><div class="label">Learning</div></div><div class="mastery-item new"><div class="value">' + newQ + '</div><div class="label">New</div></div></div></div>';
+    },
+
+    renderStudyTime() {
+        const stats = Store.get('globalStats', { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0 });
+        const studyByDay = Store.get('studyByDay', {});
+
+        const days = [];
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const key = d.toISOString().split('T')[0];
+            const dayName = dayNames[d.getDay()];
+            days.push({ key: key, dayName: dayName, mins: studyByDay[key] || 0 });
+        }
+
+        const maxMins = Math.max(...days.map(d => d.mins), 1);
+
+        const bars = days.map(d => {
+            const height = Math.round((d.mins / maxMins) * 70);
+            return '<div class="study-day"><div class="bar" style="height:' + height + 'px" title="' + d.mins + ' min"></div><span class="day-label">' + d.dayName + '</span></div>';
+        }).join('');
+
+        return '<div class="progress-section"><h3>Study Time (Last 7 Days)</h3><div class="study-bars">' + bars + '</div><p style="text-align:center;font-size:12px;color:var(--gray-600);margin-top:8px">Total: ' + (stats.totalStudyMins || 0) + ' minutes</p></div>';
+    }
+};
+
 const Settings = {
     load() {
         document.getElementById('settingAnthropicKey').value = Store.get('anthropicKey', '');
@@ -1818,6 +2096,9 @@ const Settings = {
         document.getElementById('settingProvider').value = Store.get('provider', 'anthropic');
         // Load theme setting
         document.getElementById('settingTheme').value = Store.get('theme', 'system');
+        // Load daily goal setting
+        const stats = DailyGoal.getStats();
+        document.getElementById('settingDailyGoal').value = stats.dailyGoal || 10;
     },
     save() {
         Store.set('anthropicKey', document.getElementById('settingAnthropicKey').value.trim());
@@ -1845,6 +2126,166 @@ const Settings = {
         Store.set('provider', document.getElementById('settingProvider').value);
         alert('All progress cleared.');
         Home.render();
+    }
+};
+
+// =====================================================================
+// NOTES
+// =====================================================================
+const Notes = {
+    saveTimeout: null,
+    isOpen: false,
+
+    // Get storage key for current bank
+    _getKey() {
+        return App.bank ? `notes_${App.bank.bankId}` : null;
+    },
+
+    // Get all notes for current bank
+    getAll() {
+        const key = this._getKey();
+        return key ? Store.get(key, {}) : {};
+    },
+
+    // Get note for specific question
+    get(questionId) {
+        const notes = this.getAll();
+        return notes[questionId] || '';
+    },
+
+    // Save note for current question
+    save() {
+        const key = this._getKey();
+        if (!key || !App.questions) return;
+
+        const q = App.questions[App.currentQ];
+        if (!q) return;
+
+        const textarea = document.getElementById('noteTextarea');
+        const text = textarea.value.trim();
+        const notes = this.getAll();
+
+        if (text) {
+            notes[q.id] = text;
+        } else {
+            delete notes[q.id];
+        }
+
+        Store.set(key, notes);
+        this._showSaved();
+        this._updateUI();
+    },
+
+    // Debounced auto-save on input
+    onInput() {
+        if (this.saveTimeout) clearTimeout(this.saveTimeout);
+        this.saveTimeout = setTimeout(() => this.save(), 1000);
+    },
+
+    // Show "Note saved" indicator
+    _showSaved() {
+        const el = document.getElementById('noteSaved');
+        el.classList.add('show');
+        setTimeout(() => el.classList.remove('show'), 2000);
+    },
+
+    // Toggle note panel visibility
+    toggle() {
+        this.isOpen = !this.isOpen;
+        document.getElementById('notePanel').classList.toggle('open', this.isOpen);
+        if (this.isOpen) {
+            document.getElementById('noteTextarea').focus();
+        }
+    },
+
+    // Close note panel
+    close() {
+        this.isOpen = false;
+        document.getElementById('notePanel').classList.remove('open');
+    },
+
+    // Load note for current question
+    load() {
+        if (!App.questions) return;
+        const q = App.questions[App.currentQ];
+        if (!q) return;
+
+        const note = this.get(q.id);
+        document.getElementById('noteTextarea').value = note;
+        this._updateUI();
+    },
+
+    // Update note button and palette indicators
+    _updateUI() {
+        if (!App.questions) return;
+        const q = App.questions[App.currentQ];
+        const hasNote = q && this.get(q.id);
+
+        // Update note button
+        const btn = document.getElementById('btnNote');
+        if (btn) {
+            btn.classList.toggle('has-note', !!hasNote);
+            btn.textContent = hasNote ? 'Notes *' : 'Notes';
+        }
+
+        // Update palette indicators
+        this._updatePaletteIndicators();
+    },
+
+    // Update palette buttons to show note indicators
+    _updatePaletteIndicators() {
+        if (!App.questions) return;
+        const notes = this.getAll();
+
+        for (let i = 0; i < App.questions.length; i++) {
+            const q = App.questions[i];
+            const el = document.getElementById('qp-' + i);
+            if (el) {
+                el.classList.toggle('has-note', !!notes[q.id]);
+            }
+        }
+    },
+
+    // Check if a question has a note
+    hasNote(questionId) {
+        return !!this.get(questionId);
+    },
+
+    // Export all notes as JSON
+    exportAll() {
+        const allNotes = {};
+        let hasNotes = false;
+
+        // Collect notes from all banks
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('wgu_notes_')) {
+                try {
+                    const bankId = key.replace('wgu_notes_', '');
+                    const notes = JSON.parse(localStorage.getItem(key));
+                    if (Object.keys(notes).length > 0) {
+                        allNotes[bankId] = notes;
+                        hasNotes = true;
+                    }
+                } catch {}
+            }
+        }
+
+        if (!hasNotes) {
+            alert('No notes to export.');
+            return;
+        }
+
+        // Create and download JSON file
+        const blob = new Blob([JSON.stringify(allNotes, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `wgu-notes-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
 };
 
@@ -2411,6 +2852,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowRight' || e.key === 'n') App.next();
     if (e.key === 'ArrowLeft' || e.key === 'p') App.prev();
     if (e.key === 'b') App.toggleBookmark();
+    if (e.key === 't') Notes.toggle();
     if (e.key >= '1' && e.key <= '4' && !App.submitted && !App.practiceChecked[App.currentQ]) {
         App.selectOption(parseInt(e.key) - 1);
     }
