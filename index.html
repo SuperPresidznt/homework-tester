@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WGU Practice Platform</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
@@ -308,20 +308,229 @@ button{font-family:inherit;cursor:pointer}
     .nav-controls{flex-direction:column;gap:8px}
     .nav-buttons{width:100%;justify-content:space-between;flex-wrap:wrap}
     .toolbar{width:100%;justify-content:center;margin-bottom:6px!important;margin-right:0!important}
-    .tool-btn{flex:1;justify-content:center;padding:8px 6px;font-size:11px}
+    .tool-btn{flex:1;justify-content:center;padding:10px 12px;font-size:11px;min-height:44px}
     .tool-btn svg{width:16px;height:16px}
-    .question-palette{max-width:100%}
+    .question-palette{max-width:100%;gap:6px}
     .calc-panel{width:calc(100vw - 24px);max-width:320px}
-    .q-num{width:28px;height:24px;font-size:11px}
+    .q-num{width:44px;height:44px;font-size:12px}
+    .palette-mini .q-num{width:44px;height:44px}
+    .option-item{padding:14px 16px;min-height:48px}
+    .btn-nav{padding:12px 16px;min-height:44px}
+    .drill-btn{padding:14px 20px;min-height:48px}
+    .confidence-btn{min-height:44px;padding:10px 12px}
     .score-big{font-size:48px}
     .chat-panel{width:calc(100vw - 24px);right:12px;bottom:70px;height:calc(100vh - 100px)}
-    .chat-fab{bottom:70px;right:12px}
+    .chat-fab{bottom:70px;right:12px;min-width:44px;min-height:44px}
     .stats-row{grid-template-columns:repeat(2,1fr)}
     .home-hero h1{font-size:22px}
 }
 @media(max-width:400px){
     .mode-buttons{grid-template-columns:1fr}
-    .q-num{width:24px;height:22px;font-size:10px}
+    .q-num{width:40px;height:40px;font-size:11px}
+}
+
+/* === ACCESSIBILITY - FOCUS STATES === */
+button:focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 2px;
+}
+.option-item:focus-within {
+    outline: 2px solid var(--blue);
+}
+
+/* === DARK MODE === */
+/* System preference detection */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg: #1a1a2e;
+        --white: #16213e;
+        --gray-50: #1f2937;
+        --gray-100: #374151;
+        --gray-200: #4b5563;
+        --gray-300: #6b7280;
+        --gray-500: #9ca3af;
+        --gray-600: #d1d5db;
+        --gray-700: #e5e7eb;
+        --gray-800: #e5e7eb;
+        --gray-900: #f3f4f6;
+    }
+    body:not([data-theme="light"]) { color: #e5e7eb; }
+}
+
+/* Manual dark mode via data-theme attribute */
+:root[data-theme="dark"] {
+    --bg: #1a1a2e;
+    --white: #16213e;
+    --gray-50: #1f2937;
+    --gray-100: #374151;
+    --gray-200: #4b5563;
+    --gray-300: #6b7280;
+    --gray-500: #9ca3af;
+    --gray-600: #d1d5db;
+    --gray-700: #e5e7eb;
+    --gray-800: #e5e7eb;
+    --gray-900: #f3f4f6;
+}
+[data-theme="dark"] body, body[data-theme="dark"] { color: #e5e7eb; }
+
+/* Dark mode component overrides */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .question-container,
+    body:not([data-theme="light"]) .bank-card,
+    body:not([data-theme="light"]) .modal,
+    body:not([data-theme="light"]) .chat-panel,
+    body:not([data-theme="light"]) .calc-panel,
+    body:not([data-theme="light"]) .drill-card,
+    body:not([data-theme="light"]) .review-q,
+    body:not([data-theme="light"]) .setting-group,
+    body:not([data-theme="light"]) .stat-card,
+    body:not([data-theme="light"]) .mode-btn {
+        background: #16213e;
+        border-color: #374151;
+    }
+    body:not([data-theme="light"]) .option-item { background: #1f2937; border-color: #374151; }
+    body:not([data-theme="light"]) .option-item:hover { background: #1e3a5f; border-color: var(--blue); }
+    body:not([data-theme="light"]) .option-item.selected { background: #1e3a5f; }
+    body:not([data-theme="light"]) .option-item.correct-answer { background: #064e3b; border-color: var(--green); }
+    body:not([data-theme="light"]) .option-item.wrong-answer { background: #7f1d1d; border-color: var(--red); }
+    body:not([data-theme="light"]) .explanation-panel { background: #064e3b; border-color: #065f46; color: #a7f3d0; }
+    body:not([data-theme="light"]) .explanation-panel.incorrect { background: #7f1d1d; border-color: #991b1b; color: #fecaca; }
+    body:not([data-theme="light"]) .subheader { background: #1f2937; border-color: #374151; }
+    body:not([data-theme="light"]) .footer-nav { background: #1f2937; border-color: #374151; }
+    body:not([data-theme="light"]) .q-num { background: #1f2937; border-color: #6b7280; color: #9ca3af; }
+    body:not([data-theme="light"]) .timer-display { background: #1f2937; border-color: #374151; }
+    body:not([data-theme="light"]) .calc-btn { background: #374151; color: #e5e7eb; }
+    body:not([data-theme="light"]) .calc-btn:hover { background: #4b5563; }
+    body:not([data-theme="light"]) .chat-msg.assistant { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+    body:not([data-theme="light"]) .chat-input-area input { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+    body:not([data-theme="light"]) .review-controls select,
+    body:not([data-theme="light"]) .review-controls input { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+    body:not([data-theme="light"]) .setting-row input,
+    body:not([data-theme="light"]) .setting-row select { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+    body:not([data-theme="light"]) .rq-explanation { background: #1f2937; border-color: var(--yellow); color: #d1d5db; }
+    body:not([data-theme="light"]) .rq-opt.rq-correct { background: #064e3b; border-color: #065f46; color: #a7f3d0; }
+    body:not([data-theme="light"]) .confidence-btn { background: #1f2937; border-color: #374151; color: #d1d5db; }
+    body:not([data-theme="light"]) .metrics-summary { background: #1f2937; border-color: #374151; }
+}
+
+/* Manual dark mode component overrides */
+[data-theme="dark"] .question-container,
+[data-theme="dark"] .bank-card,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .chat-panel,
+[data-theme="dark"] .calc-panel,
+[data-theme="dark"] .drill-card,
+[data-theme="dark"] .review-q,
+[data-theme="dark"] .setting-group,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .mode-btn {
+    background: #16213e;
+    border-color: #374151;
+}
+[data-theme="dark"] .option-item { background: #1f2937; border-color: #374151; }
+[data-theme="dark"] .option-item:hover { background: #1e3a5f; border-color: var(--blue); }
+[data-theme="dark"] .option-item.selected { background: #1e3a5f; }
+[data-theme="dark"] .option-item.correct-answer { background: #064e3b; border-color: var(--green); }
+[data-theme="dark"] .option-item.wrong-answer { background: #7f1d1d; border-color: var(--red); }
+[data-theme="dark"] .explanation-panel { background: #064e3b; border-color: #065f46; color: #a7f3d0; }
+[data-theme="dark"] .explanation-panel.incorrect { background: #7f1d1d; border-color: #991b1b; color: #fecaca; }
+[data-theme="dark"] .subheader { background: #1f2937; border-color: #374151; }
+[data-theme="dark"] .footer-nav { background: #1f2937; border-color: #374151; }
+[data-theme="dark"] .q-num { background: #1f2937; border-color: #6b7280; color: #9ca3af; }
+[data-theme="dark"] .timer-display { background: #1f2937; border-color: #374151; }
+[data-theme="dark"] .calc-btn { background: #374151; color: #e5e7eb; }
+[data-theme="dark"] .calc-btn:hover { background: #4b5563; }
+[data-theme="dark"] .chat-msg.assistant { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+[data-theme="dark"] .chat-input-area input { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+[data-theme="dark"] .review-controls select,
+[data-theme="dark"] .review-controls input { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+[data-theme="dark"] .setting-row input,
+[data-theme="dark"] .setting-row select { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+[data-theme="dark"] .rq-explanation { background: #1f2937; border-color: var(--yellow); color: #d1d5db; }
+[data-theme="dark"] .rq-opt.rq-correct { background: #064e3b; border-color: #065f46; color: #a7f3d0; }
+[data-theme="dark"] .confidence-btn { background: #1f2937; border-color: #374151; color: #d1d5db; }
+[data-theme="dark"] .metrics-summary { background: #1f2937; border-color: #374151; }
+
+/* Additional dark mode text and element overrides */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .test-name { color: #93c5fd; }
+    body:not([data-theme="light"]) .bank-card h2,
+    body:not([data-theme="light"]) .home-hero h1,
+    body:not([data-theme="light"]) .settings-panel h2,
+    body:not([data-theme="light"]) .setting-group h3,
+    body:not([data-theme="light"]) .question-number,
+    body:not([data-theme="light"]) .stat-card .stat-val,
+    body:not([data-theme="light"]) .mode-btn h3,
+    body:not([data-theme="light"]) .metrics-summary h3,
+    body:not([data-theme="light"]) .drill-session-done h2,
+    body:not([data-theme="light"]) .review-category h3,
+    body:not([data-theme="light"]) .category-breakdown h3,
+    body:not([data-theme="light"]) .score-screen .score-big { color: #93c5fd; }
+    body:not([data-theme="light"]) .score-big.pass { color: var(--green-light); }
+    body:not([data-theme="light"]) .score-big.fail { color: var(--red-light); }
+    body:not([data-theme="light"]) a { color: #60a5fa; }
+    body:not([data-theme="light"]) .hint { color: #9ca3af; }
+    body:not([data-theme="light"]) .bank-desc,
+    body:not([data-theme="light"]) .bank-meta,
+    body:not([data-theme="light"]) .mode-btn p,
+    body:not([data-theme="light"]) .stat-card .stat-lbl { color: #9ca3af; }
+    body:not([data-theme="light"]) .palette-expand-btn { background: #1f2937; border-color: #4b5563; color: #9ca3af; }
+    body:not([data-theme="light"]) .tool-btn { background: #374151; border-color: #4b5563; color: #d1d5db; }
+    body:not([data-theme="light"]) .tool-btn:hover { background: #4b5563; }
+    body:not([data-theme="light"]) .btn-bookmark,
+    body:not([data-theme="light"]) .btn-clear { background: #374151; border-color: #4b5563; color: #d1d5db; }
+    body:not([data-theme="light"]) .modal th { background: #1e3a5f; }
+}
+[data-theme="dark"] .test-name { color: #93c5fd; }
+[data-theme="dark"] .bank-card h2,
+[data-theme="dark"] .home-hero h1,
+[data-theme="dark"] .settings-panel h2,
+[data-theme="dark"] .setting-group h3,
+[data-theme="dark"] .question-number,
+[data-theme="dark"] .stat-card .stat-val,
+[data-theme="dark"] .mode-btn h3,
+[data-theme="dark"] .metrics-summary h3,
+[data-theme="dark"] .drill-session-done h2,
+[data-theme="dark"] .review-category h3,
+[data-theme="dark"] .category-breakdown h3,
+[data-theme="dark"] .score-screen .score-big { color: #93c5fd; }
+[data-theme="dark"] .score-big.pass { color: var(--green-light); }
+[data-theme="dark"] .score-big.fail { color: var(--red-light); }
+[data-theme="dark"] a { color: #60a5fa; }
+[data-theme="dark"] .hint { color: #9ca3af; }
+[data-theme="dark"] .bank-desc,
+[data-theme="dark"] .bank-meta,
+[data-theme="dark"] .mode-btn p,
+[data-theme="dark"] .stat-card .stat-lbl { color: #9ca3af; }
+[data-theme="dark"] .palette-expand-btn { background: #1f2937; border-color: #4b5563; color: #9ca3af; }
+[data-theme="dark"] .tool-btn { background: #374151; border-color: #4b5563; color: #d1d5db; }
+[data-theme="dark"] .tool-btn:hover { background: #4b5563; }
+[data-theme="dark"] .btn-bookmark,
+[data-theme="dark"] .btn-clear { background: #374151; border-color: #4b5563; color: #d1d5db; }
+[data-theme="dark"] .modal th { background: #1e3a5f; }
+
+/* Graph/image placeholder styling for dark mode */
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .question-text em[data-graph],
+    body:not([data-theme="light"]) .question-text .graph-placeholder {
+        display: inline-block;
+        background: #374151;
+        border: 1px dashed #6b7280;
+        padding: 8px 12px;
+        border-radius: 4px;
+        color: #9ca3af;
+        font-style: italic;
+    }
+}
+[data-theme="dark"] .question-text em[data-graph],
+[data-theme="dark"] .question-text .graph-placeholder {
+    display: inline-block;
+    background: #374151;
+    border: 1px dashed #6b7280;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: #9ca3af;
+    font-style: italic;
 }
 </style>
 </head>
@@ -349,7 +558,7 @@ button{font-family:inherit;cursor:pointer}
     </div>
     <div class="timer-area">
         <span class="timer-toggle" id="timerToggle" onclick="App.toggleTimer()">Hide Timer</span>
-        <span class="timer-display" id="timerDisplay">01:30:00</span>
+        <span class="timer-display" id="timerDisplay" aria-live="polite">01:30:00</span>
     </div>
 </div>
 
@@ -371,7 +580,7 @@ button{font-family:inherit;cursor:pointer}
         <div class="question-header">
             <span class="question-number" id="questionNumber">Question 1 of 70</span>
             <div class="question-actions">
-                <button class="btn-bookmark" id="btnBookmark" onclick="App.toggleBookmark()">Bookmark</button>
+                <button class="btn-bookmark" id="btnBookmark" onclick="App.toggleBookmark()" aria-label="Bookmark this question">Bookmark</button>
                 <button class="btn-clear" onclick="App.clearAnswer()">Clear</button>
             </div>
         </div>
@@ -391,7 +600,7 @@ button{font-family:inherit;cursor:pointer}
 <!-- ========== SCORE SCREEN ========== -->
 <div class="screen" id="screen-score">
     <div class="score-screen">
-        <div class="score-big" id="scoreBig">0%</div>
+        <div class="score-big" id="scoreBig" aria-live="polite">0%</div>
         <div class="score-label" id="scoreLabel">Score</div>
         <div class="score-details">
             <table>
@@ -435,6 +644,18 @@ button{font-family:inherit;cursor:pointer}
 <div class="screen" id="screen-settings">
     <div class="settings-panel">
         <h2>Settings</h2>
+        <div class="setting-group">
+            <h3>Appearance</h3>
+            <div class="setting-row">
+                <label>Theme</label>
+                <select id="settingTheme" onchange="Theme.apply(this.value)">
+                    <option value="system">System (Auto)</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                </select>
+                <div class="hint">Choose your preferred color scheme. "System" follows your device settings.</div>
+            </div>
+        </div>
         <div class="setting-group">
             <h3>AI Chat - Anthropic (Claude)</h3>
             <div class="setting-row">
@@ -493,9 +714,9 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <!-- CALCULATOR PANEL -->
-<div class="calc-panel" id="calcPanel">
+<div class="calc-panel" id="calcPanel" role="dialog" aria-modal="true" aria-labelledby="calcPanelTitle">
     <div class="calc-header">
-        <h4>Calculator</h4>
+        <h4 id="calcPanelTitle">Calculator</h4>
         <button class="calc-close" onclick="Calc.toggle()">&times;</button>
     </div>
     <div class="calc-display" id="calcDisplay">0</div>
@@ -525,8 +746,8 @@ button{font-family:inherit;cursor:pointer}
 
 <!-- TIMER ADJUST MODAL -->
 <div class="modal-overlay" id="timerModal" onclick="if(event.target===this)App.hideTimerModal()">
-    <div class="modal" style="max-width:350px">
-        <h2>Adjust Timer</h2>
+    <div class="modal" style="max-width:350px" role="dialog" aria-modal="true" aria-labelledby="timerModalTitle">
+        <h2 id="timerModalTitle">Adjust Timer</h2>
         <div class="setting-row">
             <label>Test Duration (minutes)</label>
             <input type="number" id="timerMinutes" min="1" max="300" value="90">
@@ -544,16 +765,16 @@ button{font-family:inherit;cursor:pointer}
     <div class="nav-controls">
         <div class="nav-buttons">
             <div class="toolbar" style="margin-right:8px">
-                <button class="tool-btn" id="btnCalc" onclick="Calc.toggle()" title="Calculator">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V9h2v4zm4 4h-2v-6h2v6zm0-8h-2V7h2v2zm-8 8H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2z"/></svg>
+                <button class="tool-btn" id="btnCalc" onclick="Calc.toggle()" title="Calculator" aria-label="Open Calculator">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V9h2v4zm4 4h-2v-6h2v6zm0-8h-2V7h2v2zm-8 8H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2z"/></svg>
                     Calc
                 </button>
-                <button class="tool-btn" id="btnAudio" onclick="Audio.speak()" title="Read question aloud">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                <button class="tool-btn" id="btnAudio" onclick="Audio.speak()" title="Read question aloud" aria-label="Read question aloud">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                     Audio
                 </button>
-                <button class="tool-btn" id="btnTimerAdj" onclick="App.showTimerModal()" title="Adjust timer">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                <button class="tool-btn" id="btnTimerAdj" onclick="App.showTimerModal()" title="Adjust timer" aria-label="Adjust timer">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
                     Timer
                 </button>
             </div>
@@ -578,8 +799,8 @@ button{font-family:inherit;cursor:pointer}
 
 <!-- SUBMIT MODAL -->
 <div class="modal-overlay" id="submitModal" onclick="if(event.target===this)App.hideSubmitModal()">
-    <div class="modal">
-        <h2>Submit Test</h2>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="submitModalTitle">
+        <h2 id="submitModalTitle">Submit Test</h2>
         <p>Are you sure you want to submit?</p>
         <table>
             <thead><tr><th>Status</th><th>Count</th></tr></thead>
@@ -597,13 +818,13 @@ button{font-family:inherit;cursor:pointer}
 </div>
 
 <!-- AI CHAT -->
-<button class="chat-fab" id="chatFab" onclick="Chat.toggle()" title="Ask AI about this question" style="display:none">?</button>
-<div class="chat-panel" id="chatPanel">
+<button class="chat-fab" id="chatFab" onclick="Chat.toggle()" title="Ask AI about this question" aria-label="Open AI tutor chat" style="display:none">?</button>
+<div class="chat-panel" id="chatPanel" role="dialog" aria-modal="true" aria-labelledby="chatPanelTitle">
     <div class="chat-header">
-        <h3>AI Tutor</h3>
+        <h3 id="chatPanelTitle">AI Tutor</h3>
         <button class="chat-close" onclick="Chat.toggle()">&times;</button>
     </div>
-    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-messages" id="chatMessages" aria-live="polite"></div>
     <div class="chat-input-area">
         <input type="text" id="chatInput" placeholder="Ask about this question..." onkeydown="if(event.key==='Enter')Chat.send()">
         <button onclick="Chat.send()">&#9654;</button>
@@ -1540,6 +1761,54 @@ const Review = {
 // =====================================================================
 // SETTINGS
 // =====================================================================
+// =====================================================================
+// THEME MANAGEMENT
+// =====================================================================
+const Theme = {
+    // Apply theme: 'system', 'light', or 'dark'
+    apply(theme) {
+        const root = document.documentElement;
+        const body = document.body;
+
+        // Remove any existing theme attribute
+        root.removeAttribute('data-theme');
+        body.removeAttribute('data-theme');
+
+        if (theme === 'light') {
+            root.setAttribute('data-theme', 'light');
+            body.setAttribute('data-theme', 'light');
+        } else if (theme === 'dark') {
+            root.setAttribute('data-theme', 'dark');
+            body.setAttribute('data-theme', 'dark');
+        }
+        // 'system' = no data-theme attribute, CSS handles it via prefers-color-scheme
+
+        // Save preference
+        Store.set('theme', theme);
+
+        // Update select if it exists (may not on initial load)
+        const select = document.getElementById('settingTheme');
+        if (select && select.value !== theme) {
+            select.value = theme;
+        }
+    },
+
+    // Load and apply saved theme preference
+    load() {
+        const saved = Store.get('theme', 'system');
+        this.apply(saved);
+        return saved;
+    },
+
+    // Get current effective theme (for components that need to know)
+    getCurrent() {
+        const saved = Store.get('theme', 'system');
+        if (saved !== 'system') return saved;
+        // Check system preference
+        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+};
+
 const Settings = {
     load() {
         document.getElementById('settingAnthropicKey').value = Store.get('anthropicKey', '');
@@ -1547,6 +1816,8 @@ const Settings = {
         document.getElementById('settingOpenaiKey').value = Store.get('openaiKey', '');
         document.getElementById('settingOpenaiModel').value = Store.get('openaiModel', 'gpt-4o-mini');
         document.getElementById('settingProvider').value = Store.get('provider', 'anthropic');
+        // Load theme setting
+        document.getElementById('settingTheme').value = Store.get('theme', 'system');
     },
     save() {
         Store.set('anthropicKey', document.getElementById('settingAnthropicKey').value.trim());
@@ -1554,6 +1825,7 @@ const Settings = {
         Store.set('openaiKey', document.getElementById('settingOpenaiKey').value.trim());
         Store.set('openaiModel', document.getElementById('settingOpenaiModel').value);
         Store.set('provider', document.getElementById('settingProvider').value);
+        // Theme is already saved on change via Theme.apply()
         alert('Settings saved!');
     },
     clearProgress() {
@@ -2151,6 +2423,8 @@ document.addEventListener('keydown', (e) => {
 // INIT
 // =====================================================================
 async function init() {
+    // Load theme early to prevent flash of wrong theme
+    Theme.load();
     Settings.load();
 
     // Try loading the embedded fallback
