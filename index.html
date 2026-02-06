@@ -707,20 +707,26 @@ const App = {
         const total = this.questions.length;
         let html = '';
 
-        // Show: [1] ... [cur-1] [cur] [cur+1] ... [70]
-        const show = new Set();
-        show.add(0); // first
-        show.add(total - 1); // last
-        for (let i = Math.max(0, cur - 1); i <= Math.min(total - 1, cur + 1); i++) show.add(i);
+        // Show: current + next 5, then ... [70]
+        const show = [];
+        for (let i = cur; i < Math.min(cur + 6, total); i++) show.push(i);
 
-        const sorted = [...show].sort((a, b) => a - b);
-        let prev = -1;
-        for (const i of sorted) {
-            if (prev >= 0 && i - prev > 1) html += '<span class="pm-ellipsis">...</span>';
-            const cls = this._getPaletteClass(i);
-            html += `<div class="q-num ${cls}" onclick="App.goTo(${i})">${i + 1}</div>`;
-            prev = i;
+        // Add last question if not already shown
+        const lastIdx = total - 1;
+        const showsLast = show.includes(lastIdx);
+
+        for (let i = 0; i < show.length; i++) {
+            const idx = show[i];
+            const cls = this._getPaletteClass(idx);
+            html += `<div class="q-num ${cls}" onclick="App.goTo(${idx})">${idx + 1}</div>`;
         }
+
+        if (!showsLast) {
+            html += '<span class="pm-ellipsis">...</span>';
+            const cls = this._getPaletteClass(lastIdx);
+            html += `<div class="q-num ${cls}" onclick="App.goTo(${lastIdx})">${total}</div>`;
+        }
+
         mini.innerHTML = html;
     },
 
