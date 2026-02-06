@@ -107,6 +107,41 @@ button{font-family:inherit;cursor:pointer}
 .btn-check:hover{background:var(--green-light)}
 .btn-check:disabled{background:var(--gray-500);cursor:not-allowed}
 
+/* === TOOLBAR (Calculator, Audio, Timer) === */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tool-btn{background:var(--gray-100);border:1px solid var(--gray-300);border-radius:var(--radius);padding:6px 12px;font-size:12px;color:var(--gray-700);display:flex;align-items:center;gap:4px}
+.tool-btn:hover{background:var(--gray-200)}
+.tool-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.tool-btn svg{width:14px;height:14px}
+
+/* === CALCULATOR === */
+.calc-panel{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:400;width:280px}
+.calc-panel.open{display:block}
+.calc-header{background:var(--navy);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-radius:8px 8px 0 0}
+.calc-header h4{font-size:14px;margin:0}
+.calc-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer}
+.calc-display{background:#222;color:#0f0;font-family:monospace;font-size:24px;padding:12px;text-align:right;min-height:50px;word-break:break-all}
+.calc-buttons{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:8px}
+.calc-btn{padding:14px;font-size:16px;border:none;background:var(--gray-100);cursor:pointer}
+.calc-btn:hover{background:var(--gray-200)}
+.calc-btn.op{background:var(--orange);color:#fff}
+.calc-btn.op:hover{background:#e67e22}
+.calc-btn.eq{background:var(--green);color:#fff}
+.calc-btn.clear{background:var(--red);color:#fff}
+
+/* === METRICS PANEL === */
+.metrics-summary{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;padding:16px;margin-top:20px}
+.metrics-summary h3{font-size:14px;color:var(--navy);margin-bottom:12px}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.metric-item{text-align:center}
+.metric-val{font-size:20px;font-weight:bold;color:var(--navy)}
+.metric-lbl{font-size:11px;color:var(--gray-600)}
+.time-per-q{margin-top:12px;font-size:12px;color:var(--gray-600)}
+.time-per-q table{width:100%;margin-top:8px;font-size:11px}
+.time-per-q th,.time-per-q td{padding:4px 8px;text-align:left;border-bottom:1px solid var(--gray-200)}
+.time-bar{height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;margin-top:2px}
+.time-bar-fill{height:100%;background:var(--blue);border-radius:4px}
+
 /* === FOOTER NAV === */
 .footer-nav{background:var(--gray-50);border-top:1px solid var(--gray-300);padding:10px 20px;position:sticky;bottom:0;z-index:50}
 .nav-controls{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto;gap:10px;flex-wrap:wrap}
@@ -261,8 +296,12 @@ button{font-family:inherit;cursor:pointer}
     .question-container{padding:16px}
     .mode-buttons{grid-template-columns:1fr 1fr}
     .nav-controls{flex-direction:column;gap:8px}
-    .nav-buttons{width:100%;justify-content:space-between}
+    .nav-buttons{width:100%;justify-content:space-between;flex-wrap:wrap}
+    .toolbar{width:100%;justify-content:center;margin-bottom:6px!important;margin-right:0!important}
+    .tool-btn{flex:1;justify-content:center;padding:8px 6px;font-size:11px}
+    .tool-btn svg{width:16px;height:16px}
     .question-palette{max-width:100%}
+    .calc-panel{width:calc(100vw - 24px);max-width:320px}
     .q-num{width:28px;height:24px;font-size:11px}
     .score-big{font-size:48px}
     .chat-panel{width:calc(100vw - 24px);right:12px;bottom:70px;height:calc(100vh - 100px)}
@@ -437,10 +476,71 @@ button{font-family:inherit;cursor:pointer}
     </div>
 </div>
 
+<!-- CALCULATOR PANEL -->
+<div class="calc-panel" id="calcPanel">
+    <div class="calc-header">
+        <h4>Calculator</h4>
+        <button class="calc-close" onclick="Calc.toggle()">&times;</button>
+    </div>
+    <div class="calc-display" id="calcDisplay">0</div>
+    <div class="calc-buttons">
+        <button class="calc-btn clear" onclick="Calc.clear()">C</button>
+        <button class="calc-btn" onclick="Calc.input('(')">(</button>
+        <button class="calc-btn" onclick="Calc.input(')')">)</button>
+        <button class="calc-btn op" onclick="Calc.input('/')">&divide;</button>
+        <button class="calc-btn" onclick="Calc.input('7')">7</button>
+        <button class="calc-btn" onclick="Calc.input('8')">8</button>
+        <button class="calc-btn" onclick="Calc.input('9')">9</button>
+        <button class="calc-btn op" onclick="Calc.input('*')">&times;</button>
+        <button class="calc-btn" onclick="Calc.input('4')">4</button>
+        <button class="calc-btn" onclick="Calc.input('5')">5</button>
+        <button class="calc-btn" onclick="Calc.input('6')">6</button>
+        <button class="calc-btn op" onclick="Calc.input('-')">-</button>
+        <button class="calc-btn" onclick="Calc.input('1')">1</button>
+        <button class="calc-btn" onclick="Calc.input('2')">2</button>
+        <button class="calc-btn" onclick="Calc.input('3')">3</button>
+        <button class="calc-btn op" onclick="Calc.input('+')">+</button>
+        <button class="calc-btn" onclick="Calc.input('0')">0</button>
+        <button class="calc-btn" onclick="Calc.input('.')">.</button>
+        <button class="calc-btn" onclick="Calc.backspace()">&larr;</button>
+        <button class="calc-btn eq" onclick="Calc.equals()">=</button>
+    </div>
+</div>
+
+<!-- TIMER ADJUST MODAL -->
+<div class="modal-overlay" id="timerModal">
+    <div class="modal" style="max-width:350px">
+        <h2>Adjust Timer</h2>
+        <div class="setting-row">
+            <label>Test Duration (minutes)</label>
+            <input type="number" id="timerMinutes" min="1" max="300" value="90">
+            <div class="hint">Default: 90 minutes (1.5 hours)</div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-nav" style="background:var(--gray-500);border-color:var(--gray-500)" onclick="App.hideTimerModal()">Cancel</button>
+            <button class="btn-nav" style="background:var(--green);border-color:var(--green)" onclick="App.applyTimerChange()">Apply</button>
+        </div>
+    </div>
+</div>
+
 <!-- FOOTER NAV (exam/practice/review-after-test) -->
 <div class="footer-nav" id="footerNav" style="display:none">
     <div class="nav-controls">
         <div class="nav-buttons">
+            <div class="toolbar" style="margin-right:8px">
+                <button class="tool-btn" id="btnCalc" onclick="Calc.toggle()" title="Calculator">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V9h2v4zm4 4h-2v-6h2v6zm0-8h-2V7h2v2zm-8 8H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2z"/></svg>
+                    Calc
+                </button>
+                <button class="tool-btn" id="btnAudio" onclick="Audio.speak()" title="Read question aloud">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    Audio
+                </button>
+                <button class="tool-btn" id="btnTimerAdj" onclick="App.showTimerModal()" title="Adjust timer">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+                    Timer
+                </button>
+            </div>
             <button class="btn-nav btn-home" onclick="App.exitToHome()">Exit</button>
             <button class="btn-nav" id="btnPrev" onclick="App.prev()" disabled>&laquo; Prev</button>
             <button class="btn-nav" id="btnNext" onclick="App.next()">Next &raquo;</button>
@@ -666,6 +766,10 @@ const App = {
             this.timerSeconds = 0;
         }
 
+        // Reset metrics and start tracking first question
+        Metrics.reset();
+        Metrics.startQuestion(0);
+
         // UI
         document.getElementById('testNameBar').innerHTML = this.bank.title;
         document.getElementById('modeTab').textContent = mode === 'test' ? 'Test Mode' : 'Practice Mode';
@@ -840,8 +944,12 @@ const App = {
     },
 
     goTo(idx) {
+        // Track time on current question before switching
+        Metrics.endQuestion(this.currentQ);
         this.currentQ = idx;
         this.visited[idx] = true;
+        // Start tracking time on new question
+        Metrics.startQuestion(idx);
         this.renderQuestion();
         document.getElementById('questionContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
     },
@@ -923,6 +1031,8 @@ const App = {
         this.hideSubmitModal();
         this.submitted = true;
         this.stopTimer();
+        Audio.stop();
+        Metrics.endQuestion(this.currentQ);
 
         let correct = 0;
         const catScores = {};
@@ -961,7 +1071,7 @@ const App = {
             const cls = p >= 70 ? 'good' : p >= 50 ? 'warn' : 'bad';
             return `<div class="cat-row"><span style="min-width:160px">${cat}</span><div class="cat-bar"><div class="cat-fill ${cls}" style="width:${p}%"></div></div><span style="min-width:60px;text-align:right">${d.correct}/${d.total} (${p}%)</span></div>`;
         }).join('');
-        document.getElementById('categoryBreakdown').innerHTML = '<h3>Category Breakdown</h3>' + catHtml;
+        document.getElementById('categoryBreakdown').innerHTML = '<h3>Category Breakdown</h3>' + catHtml + Metrics.buildMetricsSummary(this.questions, this.answers);
 
         // Save history
         const history = Store.get('testHistory_' + this.bank.bankId, []);
@@ -993,11 +1103,31 @@ const App = {
 
     exitToHome() {
         this.stopTimer();
+        Audio.stop();
+        Metrics.endQuestion(this.currentQ);
         if (!this.submitted && this.mode === 'test' && Object.keys(this.answers).length > 0) {
             if (!confirm('Leave without submitting? Your progress will be lost.')) return;
         }
         showScreen('home');
         Home.render();
+    },
+
+    // Timer adjustment modal
+    showTimerModal() {
+        const mins = Math.floor(this.timerSeconds / 60);
+        document.getElementById('timerMinutes').value = mins;
+        document.getElementById('timerModal').classList.add('active');
+    },
+
+    hideTimerModal() {
+        document.getElementById('timerModal').classList.remove('active');
+    },
+
+    applyTimerChange() {
+        const mins = parseInt(document.getElementById('timerMinutes').value) || 90;
+        this.timerSeconds = mins * 60;
+        this.updateTimerDisplay();
+        this.hideTimerModal();
     },
 
     formatTime(s) {
@@ -1513,9 +1643,263 @@ const Chat = {
 };
 
 // =====================================================================
+// CALCULATOR
+// =====================================================================
+const Calc = {
+    isOpen: false,
+    expr: '',
+
+    toggle() {
+        this.isOpen = !this.isOpen;
+        document.getElementById('calcPanel').classList.toggle('open', this.isOpen);
+        document.getElementById('btnCalc').classList.toggle('active', this.isOpen);
+    },
+
+    clear() {
+        this.expr = '';
+        document.getElementById('calcDisplay').textContent = '0';
+    },
+
+    input(val) {
+        this.expr += val;
+        document.getElementById('calcDisplay').textContent = this.expr || '0';
+    },
+
+    backspace() {
+        this.expr = this.expr.slice(0, -1);
+        document.getElementById('calcDisplay').textContent = this.expr || '0';
+    },
+
+    equals() {
+        try {
+            // Safe eval using Function constructor
+            const sanitized = this.expr.replace(/[^0-9+\-*/().]/g, '');
+            const result = Function('"use strict"; return (' + sanitized + ')')();
+            const rounded = Math.round(result * 1000000) / 1000000;
+            document.getElementById('calcDisplay').textContent = rounded;
+            this.expr = String(rounded);
+        } catch {
+            document.getElementById('calcDisplay').textContent = 'Error';
+            this.expr = '';
+        }
+    }
+};
+
+// =====================================================================
+// AUDIO (Text-to-Speech)
+// =====================================================================
+const Audio = {
+    speaking: false,
+
+    speak() {
+        if (!('speechSynthesis' in window)) {
+            alert('Text-to-speech not supported in this browser.');
+            return;
+        }
+
+        if (this.speaking) {
+            speechSynthesis.cancel();
+            this.speaking = false;
+            document.getElementById('btnAudio').classList.remove('active');
+            return;
+        }
+
+        // Get current question text
+        let text = '';
+        const screen = document.getElementById('screen-exam');
+        if (screen.classList.contains('active')) {
+            const q = App.questions[App.currentQ];
+            if (q) {
+                text = `Question ${App.currentQ + 1}. ${this._cleanText(q.text)}. `;
+                text += 'Options: ';
+                q.options.forEach((opt, i) => {
+                    text += `${String.fromCharCode(65 + i)}: ${this._cleanText(opt)}. `;
+                });
+            }
+        } else if (document.getElementById('screen-drill').classList.contains('active') && Drill.current) {
+            const q = Drill.current.question;
+            text = `${this._cleanText(q.text)}. Options: `;
+            q.options.forEach((opt, i) => {
+                text += `${String.fromCharCode(65 + i)}: ${this._cleanText(opt)}. `;
+            });
+        }
+
+        if (!text) {
+            alert('No question to read.');
+            return;
+        }
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.95;
+        utterance.pitch = 1;
+        utterance.onend = () => {
+            this.speaking = false;
+            document.getElementById('btnAudio').classList.remove('active');
+        };
+        utterance.onerror = () => {
+            this.speaking = false;
+            document.getElementById('btnAudio').classList.remove('active');
+        };
+
+        this.speaking = true;
+        document.getElementById('btnAudio').classList.add('active');
+        speechSynthesis.speak(utterance);
+    },
+
+    _cleanText(text) {
+        // Remove HTML tags and simplify for speech
+        return text
+            .replace(/<[^>]*>/g, '')
+            .replace(/\[Graph[^\]]*\]/gi, 'See the graph provided.')
+            .replace(/\$/g, ' dollars ')
+            .replace(/\n/g, '. ')
+            .trim();
+    },
+
+    stop() {
+        if (this.speaking) {
+            speechSynthesis.cancel();
+            this.speaking = false;
+            const btn = document.getElementById('btnAudio');
+            if (btn) btn.classList.remove('active');
+        }
+    }
+};
+
+// =====================================================================
+// METRICS TRACKING
+// =====================================================================
+const Metrics = {
+    questionTimes: {},  // { qIndex: { start, end, total } }
+    currentStart: 0,
+
+    startQuestion(qIndex) {
+        if (!this.questionTimes[qIndex]) {
+            this.questionTimes[qIndex] = { total: 0, visits: 0 };
+        }
+        this.currentStart = Date.now();
+        this.questionTimes[qIndex].visits++;
+    },
+
+    endQuestion(qIndex) {
+        if (this.currentStart && this.questionTimes[qIndex]) {
+            this.questionTimes[qIndex].total += Date.now() - this.currentStart;
+        }
+        this.currentStart = 0;
+    },
+
+    getTimeSpent(qIndex) {
+        const data = this.questionTimes[qIndex];
+        if (!data) return 0;
+        let time = data.total;
+        if (this.currentStart && App.currentQ === qIndex) {
+            time += Date.now() - this.currentStart;
+        }
+        return time;
+    },
+
+    getTotalTime() {
+        let total = 0;
+        for (const qIndex in this.questionTimes) {
+            total += this.getTimeSpent(parseInt(qIndex));
+        }
+        return total;
+    },
+
+    getAvgTimePerQuestion() {
+        const visited = Object.keys(this.questionTimes).length;
+        return visited > 0 ? this.getTotalTime() / visited : 0;
+    },
+
+    reset() {
+        this.questionTimes = {};
+        this.currentStart = 0;
+    },
+
+    // Get stats by category
+    getCategoryStats(questions, answers) {
+        const catStats = {};
+        questions.forEach((q, i) => {
+            const cat = q.category || 'General';
+            if (!catStats[cat]) {
+                catStats[cat] = { correct: 0, total: 0, time: 0, answered: 0 };
+            }
+            catStats[cat].total++;
+            if (answers[i] !== undefined) {
+                catStats[cat].answered++;
+                if (answers[i] === q.correctAnswer) catStats[cat].correct++;
+            }
+            catStats[cat].time += this.getTimeSpent(i);
+        });
+        return catStats;
+    },
+
+    // Build metrics summary HTML for score screen
+    buildMetricsSummary(questions, answers) {
+        const totalTime = this.getTotalTime();
+        const avgTime = this.getAvgTimePerQuestion();
+        const catStats = this.getCategoryStats(questions, answers);
+
+        // Find slowest and fastest questions
+        const times = [];
+        for (let i = 0; i < questions.length; i++) {
+            times.push({ index: i, time: this.getTimeSpent(i) });
+        }
+        times.sort((a, b) => b.time - a.time);
+        const slowest = times.slice(0, 3).filter(t => t.time > 0);
+
+        let html = '<div class="metrics-summary"><h3>Performance Metrics</h3>';
+        html += '<div class="metrics-grid">';
+        html += `<div class="metric-item"><div class="metric-val">${this._formatTime(totalTime)}</div><div class="metric-lbl">Total Time</div></div>`;
+        html += `<div class="metric-item"><div class="metric-val">${this._formatTime(avgTime)}</div><div class="metric-lbl">Avg per Question</div></div>`;
+        html += `<div class="metric-item"><div class="metric-val">${Object.keys(this.questionTimes).length}</div><div class="metric-lbl">Questions Viewed</div></div>`;
+        html += '</div>';
+
+        if (slowest.length > 0) {
+            html += '<div class="time-per-q"><strong>Most Time Spent:</strong><table><tr><th>Q#</th><th>Time</th><th>Category</th></tr>';
+            slowest.forEach(s => {
+                const q = questions[s.index];
+                html += `<tr><td>${s.index + 1}</td><td>${this._formatTime(s.time)}</td><td>${q.category || 'General'}</td></tr>`;
+            });
+            html += '</table></div>';
+        }
+
+        // Category time breakdown
+        html += '<div class="time-per-q" style="margin-top:16px"><strong>Time by Category:</strong><table><tr><th>Category</th><th>Time</th><th>Avg/Q</th></tr>';
+        Object.entries(catStats).sort((a, b) => b[1].time - a[1].time).forEach(([cat, data]) => {
+            const avgCatTime = data.total > 0 ? data.time / data.total : 0;
+            html += `<tr><td>${cat}</td><td>${this._formatTime(data.time)}</td><td>${this._formatTime(avgCatTime)}</td></tr>`;
+        });
+        html += '</table></div>';
+
+        html += '</div>';
+        return html;
+    },
+
+    _formatTime(ms) {
+        const secs = Math.round(ms / 1000);
+        if (secs < 60) return secs + 's';
+        const mins = Math.floor(secs / 60);
+        const remainSecs = secs % 60;
+        return mins + 'm ' + remainSecs + 's';
+    }
+};
+
+// =====================================================================
 // KEYBOARD SHORTCUTS
 // =====================================================================
 document.addEventListener('keydown', (e) => {
+    // Calculator shortcut works globally
+    if (e.key === 'c' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+        Calc.toggle();
+        return;
+    }
+    // Escape closes calculator
+    if (e.key === 'Escape' && Calc.isOpen) {
+        Calc.toggle();
+        return;
+    }
+
     // Only in exam screen
     if (!document.getElementById('screen-exam').classList.contains('active')) return;
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
