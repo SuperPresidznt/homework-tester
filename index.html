@@ -489,6 +489,27 @@ button{font-family:inherit;cursor:pointer}
     .q-num{width:40px;height:40px;font-size:11px}
 }
 
+/* === AI PRACTICE MOBILE === */
+@media(max-width:768px){
+    .ai-practice-container{padding:0 8px}
+    .ai-card{padding:16px}
+    .ai-card .question-text{font-size:15px}
+    .ai-card .option-item{padding:10px 12px}
+    .ai-card .option-label{font-size:13px}
+    .ai-buttons{flex-direction:column;gap:8px}
+    .ai-btn{width:100%;min-width:unset}
+    .ai-progress .session-stats{gap:12px}
+    .ai-progress .session-stat .val{font-size:18px}
+    .ai-session-summary{padding:20px 12px}
+    .ai-session-summary .summary-score{font-size:36px}
+}
+@media(max-width:400px){
+    .ai-card{padding:12px}
+    .ai-progress{padding:12px}
+    .ai-progress .weak-areas .weak-cat{padding:2px 6px;font-size:10px;margin:2px}
+    .ai-card .ai-difficulty{font-size:11px}
+}
+
 /* === ACCESSIBILITY - FOCUS STATES === */
 button:focus-visible {
     outline: 2px solid var(--blue);
@@ -1200,6 +1221,19 @@ const Store = {
 };
 
 // =====================================================================
+// HTML ESCAPING (XSS protection for AI-generated content)
+// =====================================================================
+function escapeHtml(str) {
+    if (typeof str !== 'string') return '';
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// =====================================================================
 // SESSION STATE PERSISTENCE (survives page refresh)
 // =====================================================================
 const SessionState = {
@@ -1236,9 +1270,26 @@ const SessionState = {
                     selectedOption: Drill.selectedOption,
                     currentQuestionId: Drill.current ? Drill.current.question.id : null,
                     queueIds: Drill.queue.map(item => item.question.id)
+                },
+                // AI Practice state
+                aiPractice: {
+                    bankId: AIPractice.bank ? AIPractice.bank.bankId : null,
+                    currentQuestion: AIPractice.currentQuestion,
+                    selectedOption: AIPractice.selectedOption,
+                    isChecked: AIPractice.isChecked,
+                    sessionStats: AIPractice.sessionStats,
+                    weakCategories: AIPractice.weakCategories,
+                    currentCategory: AIPractice.currentCategory,
+                    currentDifficulty: AIPractice.currentDifficulty,
+                    startingWeakness: AIPractice.startingWeakness
+                },
+                // Metrics state
+                metrics: {
+                    questionTimes: Metrics.questionTimes,
+                    currentStart: Metrics.currentStart
                 }
             };
-            sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
         } catch (e) {
             console.warn('SessionState.save failed:', e);
         }
@@ -1247,7 +1298,7 @@ const SessionState = {
     // Get saved session state
     get() {
         try {
-            const data = sessionStorage.getItem(this.STORAGE_KEY);
+            const data = localStorage.getItem(this.STORAGE_KEY);
             if (!data) return null;
             const state = JSON.parse(data);
             // Check if state is too old (e.g., > 4 hours)
@@ -1266,15 +1317,16 @@ const SessionState = {
     hasSavedSession() {
         const state = this.get();
         if (!state) return false;
-        // Must have either app or drill state with a valid bank
+        // Must have either app, drill, or ai-practice state with a valid bank
         return (state.app && state.app.bankId && state.app.screen !== 'home') ||
-               (state.drill && state.drill.bankId && state.app && state.app.screen === 'drill');
+               (state.drill && state.drill.bankId && state.app && state.app.screen === 'drill') ||
+               (state.aiPractice && state.aiPractice.bankId && state.app && state.app.screen === 'ai-practice');
     },
 
     // Clear saved session state
     clear() {
         try {
-            sessionStorage.removeItem(this.STORAGE_KEY);
+            localStorage.removeItem(this.STORAGE_KEY);
         } catch (e) {
             console.warn('SessionState.clear failed:', e);
         }
@@ -1302,6 +1354,12 @@ const SessionState = {
             App.startTime = state.app.startTime || Date.now();
             App.answerHistory = state.app.answerHistory || {};
             App.confidence = state.app.confidence || {};
+
+            // Restore Metrics
+            if (state.metrics) {
+                Metrics.questionTimes = state.metrics.questionTimes || {};
+                Metrics.currentStart = state.metrics.currentStart || 0;
+            }
 
             // Restore UI
             document.getElementById('testNameBar').innerHTML = bank.title;
@@ -1379,18 +1437,18 @@ const SessionState = {
 
                 const q = Drill.current.question;
                 document.getElementById('drillCard').innerHTML = `
-                    <div class="question-text">${q.text.replace(/\n/g, '<br>')}</div>
+                    <div class="question-text">${escapeHtml(q.text).replace(/\n/g, '<br>')}</div>
                     <ul class="options-list" id="drillOptions">
                         ${q.options.map((opt, i) => `
                             <li class="option-item${Drill.selectedOption === i ? ' selected' : ''}${Drill.showingAnswer && i === q.correctAnswer ? ' correct-answer' : ''}${Drill.showingAnswer && Drill.selectedOption === i && i !== q.correctAnswer ? ' wrong-answer' : ''}" onclick="Drill.selectOption(${i})" id="dropt-${i}">
                                 <input type="radio" name="drill" value="${i}"${Drill.selectedOption === i ? ' checked' : ''}>
-                                <span class="option-label">${opt}</span>
+                                <span class="option-label">${escapeHtml(opt)}</span>
                             </li>
                         `).join('')}
                     </ul>
                     <div class="drill-answer${Drill.showingAnswer ? ' show' : ''}" id="drillAnswer">
                         <div class="correct-label" id="drillResultLabel"${Drill.showingAnswer ? ` style="color:${Drill.selectedOption === q.correctAnswer ? 'var(--green)' : 'var(--red)'}">` + (Drill.selectedOption === q.correctAnswer ? 'Correct!' : (Drill.selectedOption !== null ? 'Incorrect' : 'Not answered')) + '</div>' : '>'}
-                        <div class="explanation">${q.explanation || ''}</div>
+                        <div class="explanation">${escapeHtml(q.explanation || '')}</div>
                         <div class="drill-buttons">
                             <button class="drill-btn btn-missed" onclick="Drill.rate(1)">Missed it (1)</button>
                             <button class="drill-btn btn-struggled" onclick="Drill.rate(3)">Struggled (3)</button>
@@ -1421,6 +1479,44 @@ const SessionState = {
         }
     },
 
+    // Restore AI Practice state from saved session
+    restoreAIPractice(state) {
+        if (!state || !state.aiPractice || !state.aiPractice.bankId) return false;
+
+        const bank = BankManager.getBank(state.aiPractice.bankId);
+        if (!bank) return false;
+
+        try {
+            AIPractice.bank = bank;
+            AIPractice.currentQuestion = state.aiPractice.currentQuestion || null;
+            AIPractice.selectedOption = state.aiPractice.selectedOption;
+            AIPractice.isChecked = state.aiPractice.isChecked || false;
+            AIPractice.isGenerating = false;
+            AIPractice.sessionStats = state.aiPractice.sessionStats || { total: 0, correct: 0, byCategory: {} };
+            AIPractice.weakCategories = state.aiPractice.weakCategories || [];
+            AIPractice.currentCategory = state.aiPractice.currentCategory || null;
+            AIPractice.currentDifficulty = state.aiPractice.currentDifficulty || 2;
+            AIPractice.startingWeakness = state.aiPractice.startingWeakness || {};
+
+            showScreen('ai-practice', false, false);
+            document.getElementById('chatFab').style.display = '';
+            Chat.clearHistory();
+            document.getElementById('chatFab').classList.add('has-context');
+
+            AIPractice.renderProgress();
+            if (AIPractice.currentQuestion) {
+                AIPractice.renderQuestion();
+            } else {
+                AIPractice.generateNext();
+            }
+
+            return true;
+        } catch (e) {
+            console.warn('SessionState.restoreAIPractice failed:', e);
+            return false;
+        }
+    },
+
     // Get the current active screen name
     _getCurrentScreen() {
         const activeScreen = document.querySelector('.screen.active');
@@ -1429,7 +1525,7 @@ const SessionState = {
         return id.replace('screen-', '');
     },
 
-    // Show resume prompt and handle user choice
+    // Auto-resume saved session (no prompt)
     showResumePrompt() {
         return new Promise((resolve) => {
             const state = this.get();
@@ -1437,32 +1533,8 @@ const SessionState = {
                 resolve(false);
                 return;
             }
-
-            let description = '';
-            if (state.app && state.app.bankId && state.app.screen !== 'home') {
-                const bank = BankManager.getBank(state.app.bankId);
-                const bankName = bank ? bank.title : 'Unknown';
-                const mode = state.app.mode || 'test';
-                const answered = Object.keys(state.app.answers || {}).length;
-                const total = bank ? bank.questions.length : '?';
-                description = `${mode === 'test' ? 'Test' : 'Practice'}: ${bankName}\n${answered}/${total} questions answered`;
-                if (state.app.screen === 'drill' && state.drill && state.drill.bankId) {
-                    description = `Drill: ${bankName}\n${state.drill.sessionCount || 0} questions completed`;
-                }
-            } else if (state.drill && state.drill.bankId) {
-                const bank = BankManager.getBank(state.drill.bankId);
-                const bankName = bank ? bank.title : 'Unknown';
-                description = `Drill: ${bankName}\n${state.drill.sessionCount || 0} questions completed`;
-            }
-
-            const resume = confirm(`Resume previous session?\n\n${description}\n\nClick OK to resume or Cancel to start fresh.`);
-
-            if (resume) {
-                resolve(true);
-            } else {
-                this.clear();
-                resolve(false);
-            }
+            // Auto-resume without asking
+            resolve(true);
         });
     }
 };
@@ -1786,7 +1858,7 @@ const App = {
     renderQuestion() {
         const q = this.questions[this.currentQ];
         document.getElementById('questionNumber').textContent = `Question ${this.currentQ + 1} of ${this.questions.length}`;
-        document.getElementById('questionText').innerHTML = q.text.replace(/\n/g, '<br>');
+        document.getElementById('questionText').innerHTML = escapeHtml(q.text).replace(/\n/g, '<br>');
 
         const list = document.getElementById('optionsList');
         list.innerHTML = '';
@@ -1806,7 +1878,7 @@ const App = {
             li.className = cls;
             const disabled = this.submitted || isChecked || isReview;
             li.innerHTML = `<input type="radio" name="q${this.currentQ}" value="${i}" ${this.answers[this.currentQ]===i?'checked':''} ${disabled?'disabled':''}>
-                <span class="option-label">${opt}</span>`;
+                <span class="option-label">${escapeHtml(opt)}</span>`;
             if (!disabled) {
                 li.onclick = () => this.selectOption(i);
             }
@@ -1844,7 +1916,7 @@ const App = {
         if ((isChecked || isReview) && q.explanation) {
             const isCorrect = this.answers[this.currentQ] === q.correctAnswer;
             expPanel.className = 'explanation-panel show' + (isCorrect ? '' : ' incorrect');
-            expPanel.innerHTML = `<h4>${isCorrect ? 'Correct!' : (this.answers[this.currentQ] !== undefined ? 'Incorrect' : 'Not answered')}</h4><p>${q.explanation}</p>`;
+            expPanel.innerHTML = `<h4>${isCorrect ? 'Correct!' : (this.answers[this.currentQ] !== undefined ? 'Incorrect' : 'Not answered')}</h4><p>${escapeHtml(q.explanation)}</p>`;
         } else {
             expPanel.className = 'explanation-panel';
         }
@@ -2238,18 +2310,18 @@ const Drill = {
 
         const q = this.current.question;
         document.getElementById('drillCard').innerHTML = `
-            <div class="question-text">${q.text.replace(/\n/g, '<br>')}</div>
+            <div class="question-text">${escapeHtml(q.text).replace(/\n/g, '<br>')}</div>
             <ul class="options-list" id="drillOptions">
                 ${q.options.map((opt, i) => `
                     <li class="option-item" onclick="Drill.selectOption(${i})" id="dropt-${i}">
                         <input type="radio" name="drill" value="${i}">
-                        <span class="option-label">${opt}</span>
+                        <span class="option-label">${escapeHtml(opt)}</span>
                     </li>
                 `).join('')}
             </ul>
             <div class="drill-answer" id="drillAnswer">
                 <div class="correct-label" id="drillResultLabel"></div>
-                <div class="explanation">${q.explanation || ''}</div>
+                <div class="explanation">${escapeHtml(q.explanation || '')}</div>
                 <div class="drill-buttons">
                     <button class="drill-btn btn-missed" onclick="Drill.rate(1)">Missed it (1)</button>
                     <button class="drill-btn btn-struggled" onclick="Drill.rate(3)">Struggled (3)</button>
@@ -2394,7 +2466,7 @@ const Review = {
         // Populate category filter
         const cats = [...new Set(this.bank.questions.map(q => q.category || 'General'))];
         const catSelect = document.getElementById('reviewCatFilter');
-        catSelect.innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        catSelect.innerHTML = '<option value="">All Categories</option>' + cats.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
         document.getElementById('reviewSearch').value = '';
         document.getElementById('reviewDiffFilter').value = '';
 
@@ -2431,7 +2503,7 @@ const Review = {
         Object.entries(groups).forEach(([cat, questions]) => {
             html += `<div class="review-category">
                 <h3 onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none';this.querySelector('.toggle-arrow').classList.toggle('collapsed')">
-                    ${cat} (${questions.length})
+                    ${escapeHtml(cat)} (${questions.length})
                     <span class="toggle-arrow">&#9660;</span>
                 </h3>
                 <div>`;
@@ -2440,16 +2512,16 @@ const Review = {
                 const masteryLabel = mastery ? (mastery.ef >= 2.5 && mastery.reps >= 3 ? 'Mastered' : mastery.reps > 0 ? 'Learning' : 'New') : 'New';
                 const note = notesData[q.id] || '';
                 html += `<div class="review-q">
-                    <div class="rq-text"><strong>Q${q.id}.</strong> ${q.text.replace(/\n/g, '<br>')}</div>
+                    <div class="rq-text"><strong>Q${q.id}.</strong> ${escapeHtml(q.text).replace(/\n/g, '<br>')}</div>
                     <ul class="rq-options">
-                        ${q.options.map((opt, i) => `<li class="rq-opt ${i === q.correctAnswer ? 'rq-correct' : ''}">${String.fromCharCode(65+i)}. ${opt}</li>`).join('')}
+                        ${q.options.map((opt, i) => `<li class="rq-opt ${i === q.correctAnswer ? 'rq-correct' : ''}">${String.fromCharCode(65+i)}. ${escapeHtml(opt)}</li>`).join('')}
                     </ul>
-                    ${q.explanation ? `<div class="rq-explanation">${q.explanation}</div>` : ''}
-                    ${note ? `<div class="rq-note"><div class="rq-note-label">Your Note:</div>${note.replace(/\n/g, '<br>')}</div>` : ''}
+                    ${q.explanation ? `<div class="rq-explanation">${escapeHtml(q.explanation)}</div>` : ''}
+                    ${note ? `<div class="rq-note"><div class="rq-note-label">Your Note:</div>${escapeHtml(note).replace(/\n/g, '<br>')}</div>` : ''}
                     <div class="rq-meta">
                         <span class="rq-tag">${diffLabels[q.difficulty] || 'Medium'}</span>
                         <span class="rq-tag">${masteryLabel}</span>
-                        ${(q.tags || []).map(t => `<span class="rq-tag">${t}</span>`).join('')}
+                        ${(q.tags || []).map(t => `<span class="rq-tag">${escapeHtml(t)}</span>`).join('')}
                     </div>
                 </div>`;
             });
@@ -2580,14 +2652,21 @@ const AIPractice = {
         const testHistory = Store.get('testHistory_' + this.bank.bankId, []);
         const catScores = {};
 
+        // Guard against empty or missing questions
+        const questions = this.bank?.questions || [];
+        if (questions.length === 0) {
+            this.weakCategories = [{ category: 'General', score: 50, questionCount: 0 }];
+            return;
+        }
+
         // Initialize categories from bank
-        const categories = [...new Set(this.bank.questions.map(q => q.category || 'General'))];
+        const categories = [...new Set(questions.map(q => q.category || 'General'))];
         categories.forEach(cat => {
             catScores[cat] = { drillEF: [], testScores: [], questionCount: 0 };
         });
 
         // Gather drill EF scores per category
-        this.bank.questions.forEach(q => {
+        questions.forEach(q => {
             const cat = q.category || 'General';
             catScores[cat].questionCount++;
             const prog = drillData[q.id];
@@ -2707,6 +2786,7 @@ const AIPractice = {
             } else {
                 throw new Error('Failed to generate question');
             }
+            SessionState.save();
         } catch (err) {
             console.error('AI Practice error:', err);
             this.renderError(err.message || 'Failed to generate question. Please try again.');
@@ -2774,12 +2854,22 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
                 throw new Error('Invalid response format from AI');
             }
 
-            const parsed = JSON.parse(jsonMatch[0]);
+            let parsed;
+            try {
+                parsed = JSON.parse(jsonMatch[0]);
+            } catch (jsonErr) {
+                throw new Error('AI returned malformed JSON. Please try again.');
+            }
 
             // Validate response structure
             if (!parsed.question || !Array.isArray(parsed.options) || parsed.options.length < 2 ||
                 typeof parsed.correctAnswer !== 'number' || !parsed.explanation) {
                 throw new Error('Incomplete question generated');
+            }
+
+            // Validate correctAnswer is within bounds
+            if (parsed.correctAnswer < 0 || parsed.correctAnswer >= parsed.options.length) {
+                throw new Error('Invalid correct answer index from AI');
             }
 
             return {
@@ -2854,6 +2944,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         if (this.isChecked || this.isGenerating) return;
         this.selectedOption = i;
         this.renderQuestion();
+        SessionState.save();
     },
 
     checkAnswer() {
@@ -2887,6 +2978,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
 
         this.renderProgress();
         this.renderQuestion();
+        SessionState.save();
     },
 
     saveSessionStats() {
@@ -2915,6 +3007,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
 
     endSession() {
         this.saveSessionStats();
+        SessionState.clear();
         this.renderSummary();
     },
 
@@ -2926,7 +3019,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         let weakCatsHtml = '<div class="weak-areas"><strong>Targeting weak areas:</strong> ';
         this.weakCategories.slice(0, 5).forEach(wc => {
             const isCurrent = wc.category === this.currentCategory;
-            weakCatsHtml += `<span class="weak-cat${isCurrent ? ' current' : ''}">${wc.category}</span>`;
+            weakCatsHtml += `<span class="weak-cat${isCurrent ? ' current' : ''}">${escapeHtml(wc.category)}</span>`;
         });
         weakCatsHtml += '</div>';
 
@@ -2955,7 +3048,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         el.innerHTML = `
             <div class="ai-loading">
                 <div class="spinner"></div>
-                <p>Generating a new question about <strong>${this.currentCategory}</strong>...</p>
+                <p>Generating a new question about <strong>${escapeHtml(this.currentCategory)}</strong>...</p>
                 <p style="font-size:12px;color:var(--gray-500);margin-top:8px">
                     Difficulty: ${this.currentDifficulty === 1 ? 'Easy' : this.currentDifficulty === 2 ? 'Medium' : 'Hard'}
                 </p>
@@ -2989,7 +3082,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
             optionsHtml += `
                 <li class="${cls}" onclick="AIPractice.selectOption(${i})">
                     <input type="radio" name="aiopt" value="${i}" ${this.selectedOption === i ? 'checked' : ''} ${this.isChecked ? 'disabled' : ''}>
-                    <span class="option-label">${opt}</span>
+                    <span class="option-label">${escapeHtml(opt)}</span>
                 </li>
             `;
         });
@@ -3002,7 +3095,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
             explanationHtml = `
                 <div class="ai-explanation${isCorrect ? '' : ' incorrect'}">
                     <h4>${isCorrect ? 'Correct!' : 'Incorrect'}</h4>
-                    <p>${q.explanation}</p>
+                    <p>${escapeHtml(q.explanation)}</p>
                 </div>
             `;
         }
@@ -3033,7 +3126,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
 
         el.innerHTML = `
             ${diffHtml}
-            <div class="question-text">${q.question.replace(/\n/g, '<br>')}</div>
+            <div class="question-text">${escapeHtml(q.question).replace(/\n/g, '<br>')}</div>
             ${optionsHtml}
             ${explanationHtml}
             ${buttonsHtml}
@@ -3059,7 +3152,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         el.innerHTML = `
             <div class="ai-error">
                 <h3>Generation Failed</h3>
-                <p>${message}</p>
+                <p>${escapeHtml(message)}</p>
                 <div class="ai-buttons">
                     <button class="ai-btn btn-next" onclick="AIPractice.generateNext()">Try Again</button>
                     <button class="ai-btn btn-end" onclick="showScreen('home');Home.render()">Back to Home</button>
@@ -4072,6 +4165,10 @@ async function init() {
                 } else if (screen === 'exam') {
                     if (SessionState.restoreApp(state)) {
                         return; // Successfully restored app session
+                    }
+                } else if (screen === 'ai-practice') {
+                    if (SessionState.restoreAIPractice(state)) {
+                        return; // Successfully restored AI Practice session
                     }
                 }
             }
