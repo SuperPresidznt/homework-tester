@@ -1490,6 +1490,7 @@ button:focus-visible {
                 <label><input type="checkbox" id="gamifyPet" checked onchange="Gamification.updateSettings()"> Study Buddy</label>
                 <label><input type="checkbox" id="gamifyGarden" checked onchange="Gamification.updateSettings()"> Garden System</label>
                 <label><input type="checkbox" id="gamifyCoinPopups" checked onchange="Gamification.updateSettings()"> Coin Popups</label>
+                <label><input type="checkbox" id="gamifyPixelArt" onchange="Gamification.updateSettings()"> Pixel Art Mode</label>
                 <div class="volume-row">
                     <label>Volume:</label>
                     <input type="range" id="gamifyVolume" min="0" max="100" value="50" onchange="Gamification.updateSettings()">
@@ -1880,6 +1881,7 @@ const Gamification = {
                 pet: true,
                 garden: true,
                 coinPopups: true,
+                pixelArt: false,
                 volume: 50
             },
             stats: {
@@ -2365,7 +2367,7 @@ const Gamification = {
             const item = this.SHOP?.cosmetics?.[a];
             return item ? item.icon : '';
         }).join('');
-        document.getElementById('buddySprite').textContent = stage.emoji;
+        document.getElementById('buddySprite').innerHTML = Sprites.petSprite(buddy.stage, stage.emoji, 36);
         document.getElementById('buddyName').textContent = buddy.name + (accessories ? ' ' + accessories : '');
         const moodStr = buddy.mood || 'content';
         document.getElementById('buddyMood').textContent = moodStr.charAt(0).toUpperCase() + moodStr.slice(1);
@@ -2448,7 +2450,7 @@ const Gamification = {
                     <div class="xp-title">${state.currentTitle}</div>
                 </div>
                 <span class="coin-display" title="Coins">&#x1FA99; ${coins.toLocaleString()}</span>
-                <span class="buddy-mini" onclick="event.stopPropagation();Gamification.showBuddyInfo()">${stage.emoji}</span>
+                <span class="buddy-mini" onclick="event.stopPropagation();Gamification.showBuddyInfo()">${Sprites.petSprite(state.studyBuddy.stage, stage.emoji, 24)}</span>
             </div>
         `;
     },
@@ -2571,6 +2573,7 @@ const Gamification = {
         state.settings.pet = document.getElementById('gamifyPet')?.checked ?? true;
         state.settings.garden = document.getElementById('gamifyGarden')?.checked ?? true;
         state.settings.coinPopups = document.getElementById('gamifyCoinPopups')?.checked ?? true;
+        state.settings.pixelArt = document.getElementById('gamifyPixelArt')?.checked ?? false;
         state.settings.volume = parseInt(document.getElementById('gamifyVolume')?.value ?? 50);
 
         const volumeLabel = document.getElementById('gamifyVolumeLabel');
@@ -2588,6 +2591,9 @@ const Gamification = {
         const btnShop = document.getElementById('btnShop');
         if (btnGarden) btnGarden.style.display = state.settings.garden ? '' : 'none';
         if (btnShop) btnShop.style.display = state.settings.garden ? '' : 'none';
+
+        // Clear sprite cache when pixel art toggled
+        Sprites._cache = {};
     },
 
     // Load settings into UI
@@ -2614,6 +2620,9 @@ const Gamification = {
 
         const el5c = document.getElementById('gamifyCoinPopups');
         if (el5c) el5c.checked = state.settings.coinPopups !== false;
+
+        const el5d = document.getElementById('gamifyPixelArt');
+        if (el5d) el5d.checked = !!state.settings.pixelArt;
 
         const el6 = document.getElementById('gamifyVolume');
         if (el6) el6.value = state.settings.volume;
@@ -2680,6 +2689,322 @@ const Gamification = {
         this.renderXpBar();
         this.updateBuddyWidget();
         this.updateComboDisplay();
+    }
+};
+
+// =====================================================================
+// SPRITE SYSTEM — Inline SVG pixel art for pet + plants
+// =====================================================================
+const Sprites = {
+    _cache: {},
+
+    // Returns pixel art if enabled, otherwise emoji
+    petSprite(stageNum, emoji, size) {
+        if (Gamification.getState().settings.pixelArt) return this.get('pet', stageNum, size || 48);
+        return `<span style="font-size:${size ? size+'px' : 'inherit'}">${emoji}</span>`;
+    },
+
+    plantSprite(seedType, stageIdx, emoji, size) {
+        if (Gamification.getState().settings.pixelArt) return this.get('plant', seedType + '_' + stageIdx, size || 48);
+        return `<span style="font-size:${size ? size+'px' : 'inherit'}">${emoji}</span>`;
+    },
+
+    // Returns an <svg> HTML string at the requested size
+    get(type, id, size) {
+        const key = type + '_' + id + '_' + size;
+        if (this._cache[key]) return this._cache[key];
+        const svg = this._build(type, id, size);
+        this._cache[key] = svg;
+        return svg;
+    },
+
+    // Helper: render a pixel grid into an SVG. grid = 2D array of hex colors (null = transparent)
+    _gridToSvg(grid, size) {
+        const rows = grid.length;
+        const cols = grid[0].length;
+        const px = Math.floor(size / Math.max(rows, cols));
+        const w = cols * px;
+        const h = rows * px;
+        let rects = '';
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < cols; x++) {
+                const c = grid[y][x];
+                if (c) rects += `<rect x="${x*px}" y="${y*px}" width="${px}" height="${px}" fill="${c}"/>`;
+            }
+        }
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" style="image-rendering:pixelated">${rects}</svg>`;
+    },
+
+    _build(type, id, size) {
+        if (type === 'pet') return this._pet(id, size);
+        if (type === 'plant') return this._plant(id, size);
+        return '';
+    },
+
+    // Pet sprites — 12x12 pixel grids
+    _pet(stageNum, size) {
+        const _ = null;
+        const W = '#fff', K = '#222', B = '#3b82f6', Y = '#fbbf24', O = '#f97316', Br = '#92400e', G = '#6b7280', Gy = '#9ca3af';
+        const grids = {
+            1: [ // Egg
+                [_,_,_,_,W,W,W,W,_,_,_,_],
+                [_,_,_,W,W,W,W,W,W,_,_,_],
+                [_,_,W,W,W,W,W,W,W,W,_,_],
+                [_,W,W,W,W,W,W,W,W,W,W,_],
+                [_,W,W,W,W,W,W,W,W,W,W,_],
+                [_,W,Y,Y,W,W,W,W,Y,Y,W,_],
+                [_,W,W,W,W,W,W,W,W,W,W,_],
+                [_,W,W,W,Y,Y,Y,Y,W,W,W,_],
+                [_,_,W,W,W,W,W,W,W,W,_,_],
+                [_,_,W,W,W,W,W,W,W,W,_,_],
+                [_,_,_,W,W,W,W,W,W,_,_,_],
+                [_,_,_,_,W,W,W,W,_,_,_,_]
+            ],
+            2: [ // Hatchling — cracked egg with eyes
+                [_,_,_,_,_,Y,Y,_,_,_,_,_],
+                [_,_,_,_,Y,Y,Y,Y,_,_,_,_],
+                [_,_,_,Y,Y,Y,Y,Y,Y,_,_,_],
+                [_,_,Y,Y,K,Y,Y,K,Y,Y,_,_],
+                [_,_,Y,Y,Y,Y,Y,Y,Y,Y,_,_],
+                [_,_,Y,Y,Y,O,O,Y,Y,Y,_,_],
+                [_,_,_,Y,Y,Y,Y,Y,Y,_,_,_],
+                [_,_,W,W,Gy,Gy,Gy,Gy,W,W,_,_],
+                [_,W,W,W,W,W,W,W,W,W,W,_],
+                [_,W,W,W,W,W,W,W,W,W,W,_],
+                [_,_,W,W,W,W,W,W,W,W,_,_],
+                [_,_,_,_,W,W,W,W,_,_,_,_]
+            ],
+            3: [ // Chick — round yellow bird
+                [_,_,_,_,Y,Y,Y,Y,_,_,_,_],
+                [_,_,_,Y,Y,Y,Y,Y,Y,_,_,_],
+                [_,_,Y,Y,Y,Y,Y,Y,Y,Y,_,_],
+                [_,Y,Y,K,Y,Y,Y,K,Y,Y,Y,_],
+                [_,Y,Y,Y,Y,Y,Y,Y,Y,Y,Y,_],
+                [_,Y,Y,Y,Y,O,O,Y,Y,Y,Y,_],
+                [_,_,Y,Y,Y,Y,Y,Y,Y,Y,_,_],
+                [_,_,_,Y,Y,Y,Y,Y,Y,_,_,_],
+                [_,_,Y,Y,Y,Y,Y,Y,Y,Y,_,_],
+                [_,_,Y,Y,Y,Y,Y,Y,Y,Y,_,_],
+                [_,_,_,_,O,_,_,O,_,_,_,_],
+                [_,_,_,O,O,_,_,O,O,_,_,_]
+            ],
+            4: [ // Bird — sleeker, has wings
+                [_,_,_,_,B,B,B,_,_,_,_,_],
+                [_,_,_,B,B,B,B,B,_,_,_,_],
+                [_,_,B,B,W,B,W,B,B,_,_,_],
+                [_,_,B,B,K,B,K,B,B,_,_,_],
+                [_,_,B,B,B,O,B,B,B,_,_,_],
+                [_,_,_,B,B,B,B,B,_,_,_,_],
+                [_,B,B,B,B,B,B,B,B,B,_,_],
+                [B,B,B,B,B,B,B,B,B,B,B,_],
+                [_,_,_,B,B,B,B,B,_,_,_,_],
+                [_,_,_,B,B,B,B,B,_,_,_,_],
+                [_,_,_,_,O,_,O,_,_,_,_,_],
+                [_,_,_,O,O,_,O,O,_,_,_,_]
+            ],
+            5: [ // Eagle — majestic, spread wings
+                [_,_,_,_,_,Br,Br,_,_,_,_,_],
+                [_,_,_,_,Br,Br,Br,Br,_,_,_,_],
+                [_,_,_,Br,W,Br,W,Br,Br,_,_,_],
+                [_,_,_,Br,K,Br,K,Br,Br,_,_,_],
+                [_,_,_,Br,Br,Y,Br,Br,Br,_,_,_],
+                [Br,Br,Br,Br,Br,Br,Br,Br,Br,Br,Br,_],
+                [_,Br,Br,Br,Br,Br,Br,Br,Br,Br,_,Br],
+                [_,_,Br,Br,Br,Br,Br,Br,Br,_,_,_],
+                [_,_,_,Br,Br,Br,Br,Br,_,_,_,_],
+                [_,_,_,Br,Br,Br,Br,Br,_,_,_,_],
+                [_,_,_,_,Y,_,_,Y,_,_,_,_],
+                [_,_,_,Y,Y,_,_,Y,Y,_,_,_]
+            ]
+        };
+        const grid = grids[stageNum] || grids[1];
+        return this._gridToSvg(grid, size || 48);
+    },
+
+    // Plant sprites — 10x12 pixel grids per stage
+    _plant(key, size) {
+        // key = "seedType_stageIdx" e.g. "sunflower_0"
+        const [seedType, stageStr] = key.split('_');
+        const stageIdx = parseInt(stageStr) || 0;
+        const _ = null;
+        const G = '#22c55e', DG = '#15803d', Br = '#92400e', Y = '#fbbf24', O = '#f97316';
+        const LG = '#86efac', P = '#a855f7', LP = '#c084fc', Pk = '#ec4899', R = '#ef4444';
+        const Cy = '#06b6d4', LB = '#7dd3fc', W = '#fff', Gy = '#6b7280';
+
+        const plants = {
+            sunflower: [
+                [ // seed
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,Br,Br,_,_,_,_],
+                    [_,_,_,Br,Br,Br,Br,_,_,_],
+                    [_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // sprout
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],
+                    [_,_,_,G,G,G,G,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],
+                    [_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // stem with leaves
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],
+                    [_,_,_,G,G,G,G,_,_,_],
+                    [_,_,G,G,G,G,G,G,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],
+                    [_,G,G,_,G,G,_,_,_,_],
+                    [_,_,G,G,G,G,_,_,_,_],
+                    [_,_,_,_,G,G,_,G,G,_],
+                    [_,_,_,_,G,G,G,G,_,_],
+                    [_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // bloom
+                    [_,_,_,Y,Y,Y,Y,_,_,_],
+                    [_,_,Y,Y,Y,Y,Y,Y,_,_],
+                    [_,Y,Y,Y,Br,Br,Y,Y,Y,_],
+                    [_,Y,Y,Br,Br,Br,Br,Y,Y,_],
+                    [_,_,Y,Y,Br,Br,Y,Y,_,_],
+                    [_,_,_,Y,Y,Y,Y,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],
+                    [_,G,G,_,G,G,_,_,_,_],
+                    [_,_,G,G,G,G,_,_,_,_],
+                    [_,_,_,_,G,G,_,G,G,_],
+                    [_,_,_,_,G,G,G,G,_,_],
+                    [_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ]
+            ],
+            cactus: [
+                [ // seed
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,Br,Br,Br,Br,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // sprout
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],
+                    [_,_,_,DG,DG,DG,DG,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // small cactus
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],
+                    [_,_,_,_,DG,DG,_,_,_,_],[_,DG,DG,_,DG,DG,_,_,_,_],[_,_,DG,DG,DG,DG,_,_,_,_],[_,_,_,_,DG,DG,_,DG,DG,_],
+                    [_,_,_,_,DG,DG,DG,DG,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // full cactus with flower
+                    [_,_,_,_,Pk,Pk,_,_,_,_],[_,_,_,Pk,Y,Pk,Pk,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],
+                    [_,_,_,_,DG,DG,_,_,_,_],[_,DG,DG,_,DG,DG,_,_,_,_],[_,_,DG,DG,DG,DG,_,_,_,_],[_,_,_,_,DG,DG,_,DG,DG,_],
+                    [_,_,_,_,DG,DG,DG,DG,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,_,_,DG,DG,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ]
+            ],
+            bonsai: [
+                [ // seed
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,Br,Br,Br,Br,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // sprout
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,_,G,G,G,G,_,_,_],
+                    [_,_,_,_,Br,Br,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // small tree
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,G,G,G,G,G,_,_],[_,_,G,G,G,G,G,G,G,_],
+                    [_,_,_,G,G,G,G,G,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,Br,Br,Br,Br,_,_,_],
+                    [_,_,Br,_,Br,Br,_,Br,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // medium tree
+                    [_,_,_,G,G,G,G,_,_,_],[_,_,G,G,DG,G,DG,G,_,_],[_,G,G,DG,G,G,G,DG,G,_],[_,_,G,G,G,G,G,G,G,_],
+                    [_,_,_,G,G,G,G,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,Br,Br,Br,Br,_,_,_],
+                    [_,_,Br,_,Br,Br,_,Br,_,_],[_,Br,_,_,Br,Br,_,_,Br,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // full bonsai
+                    [_,G,G,G,G,G,G,G,G,_],[G,G,DG,G,DG,G,DG,G,DG,G],[G,DG,G,G,G,G,G,G,DG,G],[_,G,G,G,G,G,G,G,G,_],
+                    [_,_,G,G,G,G,G,G,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,Br,Br,Br,Br,_,_,_],
+                    [_,_,Br,_,Br,Br,_,Br,_,_],[_,Br,_,_,Br,Br,_,_,Br,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ]
+            ],
+            crystal: [
+                [ // seed
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,Gy,Gy,_,_,_,_],[_,_,_,Gy,Gy,Gy,Gy,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // sprout
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,_,Cy,LB,Cy,Cy,_,_,_],
+                    [_,_,_,_,Cy,Cy,_,_,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // growing crystal
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,Cy,_,_,_,_,_],[_,_,_,Cy,LB,Cy,_,_,_,_],
+                    [_,_,_,Cy,LB,Cy,_,_,_,_],[_,_,Cy,LB,W,LB,Cy,_,_,_],[_,_,_,Cy,LB,Cy,_,Cy,_,_],[_,_,_,_,Cy,_,Cy,LB,Cy,_],
+                    [_,_,_,_,Cy,_,_,Cy,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // large crystal
+                    [_,_,_,_,Cy,_,_,_,_,_],[_,_,_,Cy,LB,Cy,_,_,Cy,_],[_,_,Cy,LB,W,LB,Cy,Cy,LB,_],[_,_,Cy,W,W,W,LB,LB,Cy,_],
+                    [_,_,_,Cy,W,LB,Cy,Cy,_,_],[_,_,_,Cy,LB,Cy,_,_,_,_],[_,_,Cy,LB,W,LB,Cy,_,_,_],[_,_,_,Cy,LB,Cy,_,_,_,_],
+                    [_,_,_,_,Cy,Cy,_,_,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // crystal bloom (glowing)
+                    [_,_,W,_,Cy,W,_,_,W,_],[_,_,_,Cy,W,Cy,_,Cy,LB,_],[_,Cy,Cy,W,W,W,Cy,LB,W,Cy],[_,Cy,W,W,W,W,W,W,Cy,_],
+                    [_,_,Cy,W,W,W,Cy,Cy,_,_],[_,_,_,Cy,W,Cy,_,_,_,_],[_,_,Cy,W,W,W,Cy,_,_,_],[_,_,_,Cy,LB,Cy,_,_,_,_],
+                    [_,_,_,_,Cy,Cy,_,_,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,_,_,Cy,Cy,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ]
+            ],
+            rainbow: [
+                [ // seed
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,Br,Br,_,_,_,_],[_,_,_,Br,Br,Br,Br,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // sprout
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,_,G,LG,G,G,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // stem
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,_,_,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],
+                    [_,_,_,G,LG,G,G,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,G,G,_,G,G,_,_,_,_],
+                    [_,_,G,G,G,G,_,_,_,_],[_,_,_,_,G,G,_,G,G,_],[_,_,_,_,G,G,G,G,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // bud
+                    [_,_,_,_,_,_,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,_,G,Pk,G,G,_,_,_],[_,_,_,G,Pk,Pk,G,_,_,_],
+                    [_,_,_,_,G,G,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,G,G,_,G,G,_,_,_,_],
+                    [_,_,G,G,G,G,_,_,_,_],[_,_,_,_,G,G,_,G,G,_],[_,_,_,_,G,G,G,G,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // rose
+                    [_,_,_,R,R,R,R,_,_,_],[_,_,R,Pk,R,R,Pk,R,_,_],[_,R,Pk,R,R,R,R,Pk,R,_],[_,R,R,R,Pk,Pk,R,R,R,_],
+                    [_,_,R,R,R,R,R,R,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,G,G,_,G,G,_,_,_,_],
+                    [_,_,G,G,G,G,_,_,_,_],[_,_,_,_,G,G,_,G,G,_],[_,_,_,_,G,G,G,G,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ],
+                [ // rainbow bloom
+                    [_,_,R,O,Y,G,B,P,_,_],[_,R,O,Y,G,B,P,Pk,R,_],[R,O,Y,G,W,W,B,P,Pk,R],[R,O,Y,W,W,W,W,P,Pk,R],
+                    [_,R,O,Y,G,B,P,Pk,_,_],[_,_,_,_,G,G,_,_,_,_],[_,_,_,_,G,G,_,_,_,_],[_,G,G,_,G,G,_,_,_,_],
+                    [_,_,G,G,G,G,_,_,_,_],[_,_,_,_,G,G,_,G,G,_],[_,_,_,_,G,G,G,G,_,_],[_,_,Br,Br,Br,Br,Br,Br,_,_]
+                ]
+            ]
+        };
+
+        const stages = plants[seedType];
+        if (!stages) return '';
+        const grid = stages[Math.min(stageIdx, stages.length - 1)];
+        if (!grid) return '';
+        return this._gridToSvg(grid, size || 48);
     }
 };
 
@@ -2909,7 +3234,7 @@ const Shop = {
             const canAfford = coins >= price;
             html += `
                 <div class="shop-item${!canAfford ? ' cant-afford' : ''}">
-                    <div class="shop-item-icon">${item.icon}</div>
+                    <div class="shop-item-icon">${this.currentTab === 'seeds' ? Sprites.plantSprite(id, (item.stages || 4) - 1, item.icon, 36) : item.icon}</div>
                     <div class="shop-item-name">${item.name}</div>
                     ${item.desc ? `<div class="shop-item-desc">${item.desc}</div>` : ''}
                     ${owned !== null ? `<div class="shop-item-owned">Owned: ${owned}</div>` : ''}
@@ -3014,7 +3339,7 @@ const Garden = {
                 const stageIdx = Math.min(plot.currentStage || 0, seed.emojis.length - 1);
                 const isReady = plot.currentStage >= seed.stages - 1;
                 html += `<div class="garden-plot planted${isReady ? ' harvestable' : ''}" onclick="${isReady ? `Garden.harvest(${i})` : `Garden.showPlotInfo(${i})`}">
-                    <span class="plot-plant${isReady ? ' glow-bounce' : ''}">${seed.emojis[stageIdx]}</span>
+                    <span class="plot-plant${isReady ? ' glow-bounce' : ''}">${Sprites.plantSprite(plot.seedType, stageIdx, seed.emojis[stageIdx], 40)}</span>
                     ${!isReady ? `<div class="plot-progress-bar"><div class="plot-progress-fill" style="width:${Math.floor(((plot.growthPoints || 0) / seed.gpNeeded) * 100)}%"></div></div>` : '<div class="plot-ready">Harvest!</div>'}
                     <div class="plot-label">${seed.name}</div>
                     ${plot.fertilized ? '<span class="plot-fertilized" title="Fertilized">🧪</span>' : ''}
@@ -3044,7 +3369,7 @@ const Garden = {
         const accessories = buddy.accessories || [];
         el.innerHTML = `
             <div class="garden-pet-sprite">
-                <span class="garden-pet-emoji">${stage.emoji}</span>
+                <span class="garden-pet-emoji">${Sprites.petSprite(buddy.stage, stage.emoji, 48)}</span>
                 ${accessories.map(a => {
                     const item = Gamification.SHOP.cosmetics[a];
                     return item ? `<span class="pet-accessory">${item.icon}</span>` : '';
@@ -3339,7 +3664,7 @@ const PetModal = {
             <div class="pet-modal-content">
                 <button class="pet-modal-close" onclick="PetModal.close()">&times;</button>
                 <div class="pet-modal-sprite">
-                    <span class="pet-modal-emoji">${stage.emoji}</span>
+                    <span class="pet-modal-emoji">${Sprites.petSprite(buddy.stage, stage.emoji, 64)}</span>
                     ${accessories.map(a => { const it = Gamification.SHOP.cosmetics[a]; return it ? `<span class="pet-modal-acc">${it.icon}</span>` : ''; }).join('')}
                 </div>
                 <div class="pet-modal-name" onclick="PetModal.rename()">${buddy.name} ✏️</div>
