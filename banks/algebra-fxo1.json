@@ -31,7 +31,28 @@
         "interpret-output",
         "franchise"
       ],
-      "difficulty": 1
+      "difficulty": 1,
+      "tableData": {
+        "caption": "Employees Hired vs Dismissed (2007-2017)",
+        "columns": [
+          { "key": "year", "label": "Year" },
+          { "key": "hired", "label": "Hired" },
+          { "key": "dismissed", "label": "Dismissed" }
+        ],
+        "rows": [
+          { "year": 2007, "hired": 50, "dismissed": 10 },
+          { "year": 2008, "hired": 20, "dismissed": 10 },
+          { "year": 2009, "hired": 30, "dismissed": 5 },
+          { "year": 2010, "hired": 21, "dismissed": 17 },
+          { "year": 2011, "hired": 60, "dismissed": 30 },
+          { "year": 2012, "hired": 70, "dismissed": 15 },
+          { "year": 2013, "hired": 40, "dismissed": 20 },
+          { "year": 2014, "hired": 15, "dismissed": 5 },
+          { "year": 2015, "hired": 20, "dismissed": 6 },
+          { "year": 2016, "hired": 10, "dismissed": 2 },
+          { "year": 2017, "hired": 10, "dismissed": 7 }
+        ]
+      }
     },
     {
       "id": 2,
@@ -645,7 +666,7 @@
     },
     {
       "id": 13,
-      "text": "The following table compares the number of employees hired and the number of employees dismissed over an 11-year period for a certain business.\n Year: 2007-2017, Hired vs Dismissed data provided.\n What can be concluded from this table?",
+      "text": "The following table compares the number of employees hired and the number of employees dismissed over an 11-year period for a certain business.\n [Table: Employees Hired vs Dismissed 2007-2017]\n What can be concluded from this table?",
       "options": [
         "Fewer employees were hired than dismissed each year.",
         "More employees were hired in 2007 and 2008 than in 2010 and 2011.",
