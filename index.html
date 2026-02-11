@@ -800,7 +800,7 @@ button:focus-visible {
 
 /* Inline chart container */
 .inline-chart-wrap{margin:12px 0;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:#fff;max-width:100%}
-.inline-chart-wrap canvas{display:block;width:100%;height:auto;max-height:360px}
+.inline-chart-wrap canvas{display:block;width:100%;height:clamp(180px,35vw,320px);max-height:320px}
 [data-theme="dark"] .inline-chart-wrap{background:#16213e;border-color:#374151}
 @media(prefers-color-scheme:dark){body:not([data-theme="light"]) .inline-chart-wrap{background:#16213e;border-color:#374151}}
 
