@@ -26,7 +26,11 @@
       "correctAnswer": 2,
       "explanation": "F(5) = 10 means when Y = 5 (the input, years), F = 10 (the output, franchises). This reads as: in 5 years, there will be 10 open stores. The other options either swap the input/output or misinterpret function notation as a rate.",
       "category": "Function Notation",
-      "tags": ["function-notation", "interpret-output", "franchise"],
+      "tags": [
+        "function-notation",
+        "interpret-output",
+        "franchise"
+      ],
       "difficulty": 1
     },
     {
@@ -41,7 +45,11 @@
       "correctAnswer": 2,
       "explanation": "G is a function of M (months). After 5 months, $50 is given away each month, so the total is $50 x 5 = $250. The correct notation places the input (5 months) inside the parentheses and the output ($250) on the right: G(5) = 250.",
       "category": "Function Notation",
-      "tags": ["function-notation", "evaluate", "money"],
+      "tags": [
+        "function-notation",
+        "evaluate",
+        "money"
+      ],
       "difficulty": 1
     },
     {
@@ -56,7 +64,11 @@
       "correctAnswer": 0,
       "explanation": "In the ordered pair (6, 8), the first value is the input h = 6 (hours after opening) and the second value is the output V = 8 (number of calls). So there were 8 calls 6 hours after opening.",
       "category": "Function Notation",
-      "tags": ["function-notation", "ordered-pair", "interpret"],
+      "tags": [
+        "function-notation",
+        "ordered-pair",
+        "interpret"
+      ],
       "difficulty": 1
     },
     {
@@ -71,7 +83,11 @@
       "correctAnswer": 2,
       "explanation": "L(2) = 3,000 gives the least revenue in February and M(2) = 5,000 gives the most. Therefore, actual revenue in February will fall between these bounds: between $3,000 and $5,000.",
       "category": "Function Notation",
-      "tags": ["function-notation", "bounds", "revenue"],
+      "tags": [
+        "function-notation",
+        "bounds",
+        "revenue"
+      ],
       "difficulty": 1
     },
     {
@@ -86,7 +102,11 @@
       "correctAnswer": 1,
       "explanation": "T(h) = X means the input is h (hours worked) and the output is X (dollar amount of tips). So if the server works h hours, the tips will be $X. The function T takes hours as input and returns tip dollars as output.",
       "category": "Function Notation",
-      "tags": ["function-notation", "interpret", "real-world"],
+      "tags": [
+        "function-notation",
+        "interpret",
+        "real-world"
+      ],
       "difficulty": 1
     },
     {
@@ -101,7 +121,11 @@
       "correctAnswer": 0,
       "explanation": "Commission C is a function of sales s. With 8 sales (input) producing $1,600 commission (output), the correct notation is C(8) = 1600. The function name is C, the input is the number of sales, and the output is the commission amount.",
       "category": "Function Notation",
-      "tags": ["function-notation", "write-notation", "commission"],
+      "tags": [
+        "function-notation",
+        "write-notation",
+        "commission"
+      ],
       "difficulty": 1
     },
     {
@@ -116,8 +140,94 @@
       "correctAnswer": 3,
       "explanation": "Between 2012 and 2014, the gross growth line trends upward while the net growth line trends downward. This means the company's total revenue grew, but after expenses, the net growth actually declined.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "compare-trends", "growth"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "compare-trends",
+        "growth"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "line",
+        "title": "Business Growth 2010-2016",
+        "xLabel": "Year",
+        "yLabel": "Growth (%)",
+        "xMin": 2010,
+        "xMax": 2016,
+        "yMin": -5,
+        "yMax": 25,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 2010,
+                "y": 5
+              },
+              {
+                "x": 2011,
+                "y": 8
+              },
+              {
+                "x": 2012,
+                "y": 10
+              },
+              {
+                "x": 2013,
+                "y": 14
+              },
+              {
+                "x": 2014,
+                "y": 18
+              },
+              {
+                "x": 2015,
+                "y": 20
+              },
+              {
+                "x": 2016,
+                "y": 22
+              }
+            ],
+            "label": "Gross Growth",
+            "type": "line"
+          },
+          {
+            "data": [
+              {
+                "x": 2010,
+                "y": 3
+              },
+              {
+                "x": 2011,
+                "y": 6
+              },
+              {
+                "x": 2012,
+                "y": 8
+              },
+              {
+                "x": 2013,
+                "y": 6
+              },
+              {
+                "x": 2014,
+                "y": 4
+              },
+              {
+                "x": 2015,
+                "y": 5
+              },
+              {
+                "x": 2016,
+                "y": 7
+              }
+            ],
+            "label": "Net Growth",
+            "type": "line",
+            "dashed": true
+          }
+        ]
+      }
     },
     {
       "id": 8,
@@ -131,8 +241,90 @@
       "correctAnswer": 1,
       "explanation": "Reading the graph carefully, the real total pay growth outturn line stays within the range of -2% to 2% throughout the 2010-2016 period. It never exceeds 3%, and the OBR forecast does not consistently stay above 1%.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "range", "pay-growth"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "range",
+        "pay-growth"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "line",
+        "title": "Real Total Pay Growth",
+        "xLabel": "Year",
+        "yLabel": "Growth (%)",
+        "xMin": 2010,
+        "xMax": 2021,
+        "yMin": -3,
+        "yMax": 3,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 2010,
+                "y": -1.5
+              },
+              {
+                "x": 2011,
+                "y": -0.8
+              },
+              {
+                "x": 2012,
+                "y": 0.2
+              },
+              {
+                "x": 2013,
+                "y": 1.2
+              },
+              {
+                "x": 2014,
+                "y": 1.8
+              },
+              {
+                "x": 2015,
+                "y": 1.5
+              },
+              {
+                "x": 2016,
+                "y": 0.8
+              }
+            ],
+            "label": "Outturn",
+            "type": "line"
+          },
+          {
+            "data": [
+              {
+                "x": 2016,
+                "y": 0.8
+              },
+              {
+                "x": 2017,
+                "y": 1.2
+              },
+              {
+                "x": 2018,
+                "y": 2.2
+              },
+              {
+                "x": 2019,
+                "y": 1.8
+              },
+              {
+                "x": 2020,
+                "y": 0.5
+              },
+              {
+                "x": 2021,
+                "y": 1.5
+              }
+            ],
+            "label": "OBR Forecast",
+            "type": "line",
+            "dashed": true
+          }
+        ]
+      }
     },
     {
       "id": 9,
@@ -146,8 +338,83 @@
       "correctAnswer": 3,
       "explanation": "Reading the graph, the profits approximately doubled from around $1 million to $1.8 million over the year. The percentage increase is roughly (1.8 - 1.0)/1.0 = 80%. This is closest to 80% among the choices.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "percent-change", "profit"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "percent-change",
+        "profit"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Company Profits",
+        "xLabel": "Month",
+        "yLabel": "Profit ($ millions)",
+        "xMin": 0,
+        "xMax": 12,
+        "yMin": 0.8,
+        "yMax": 2.0,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 1.0
+              },
+              {
+                "x": 1,
+                "y": 1.05
+              },
+              {
+                "x": 2,
+                "y": 1.12
+              },
+              {
+                "x": 3,
+                "y": 1.22
+              },
+              {
+                "x": 4,
+                "y": 1.3
+              },
+              {
+                "x": 5,
+                "y": 1.38
+              },
+              {
+                "x": 6,
+                "y": 1.45
+              },
+              {
+                "x": 7,
+                "y": 1.52
+              },
+              {
+                "x": 8,
+                "y": 1.6
+              },
+              {
+                "x": 9,
+                "y": 1.68
+              },
+              {
+                "x": 10,
+                "y": 1.74
+              },
+              {
+                "x": 11,
+                "y": 1.78
+              },
+              {
+                "x": 12,
+                "y": 1.8
+              }
+            ],
+            "label": "Profit",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 10,
@@ -161,8 +428,68 @@
       "correctAnswer": 2,
       "explanation": "If f(1) = June 1987, then f(2) = July, f(3) = August, f(4) = September, and f(5) = October. Since Black Monday occurred in October 1987, the answer is f(5).",
       "category": "Function Notation",
-      "tags": ["function-notation", "counting", "historical"],
-      "difficulty": 2
+      "tags": [
+        "function-notation",
+        "counting",
+        "historical"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "line",
+        "title": "Dow Jones Average 1987",
+        "xLabel": "f(x) (month index)",
+        "yLabel": "Dow Jones Average",
+        "xMin": 1,
+        "xMax": 7,
+        "yMin": 1500,
+        "yMax": 2700,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 1,
+                "y": 2400
+              },
+              {
+                "x": 2,
+                "y": 2500
+              },
+              {
+                "x": 3,
+                "y": 2600
+              },
+              {
+                "x": 4,
+                "y": 2550
+              },
+              {
+                "x": 5,
+                "y": 1800
+              },
+              {
+                "x": 6,
+                "y": 1950
+              },
+              {
+                "x": 7,
+                "y": 2100
+              }
+            ],
+            "label": "Dow Jones",
+            "type": "line"
+          }
+        ],
+        "annotations": [
+          {
+            "x": 5,
+            "y": 1800,
+            "text": "Black Monday",
+            "dx": 0,
+            "dy": -15
+          }
+        ]
+      }
     },
     {
       "id": 11,
@@ -176,8 +503,79 @@
       "correctAnswer": 0,
       "explanation": "Reading the graph, the unemployment rate hits its lowest points (troughs) around 1998 and 2008. These two years represent the local minimums on the graph, making them the two lowest unemployment rates in the period shown.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "minimum", "unemployment"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "minimum",
+        "unemployment"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Poland Unemployment Rate 1990-2012",
+        "xLabel": "Year",
+        "yLabel": "Unemployment Rate (%)",
+        "xMin": 1990,
+        "xMax": 2012,
+        "yMin": 0,
+        "yMax": 25,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 1990,
+                "y": 12
+              },
+              {
+                "x": 1992,
+                "y": 18
+              },
+              {
+                "x": 1994,
+                "y": 16
+              },
+              {
+                "x": 1996,
+                "y": 14
+              },
+              {
+                "x": 1998,
+                "y": 8
+              },
+              {
+                "x": 2000,
+                "y": 12
+              },
+              {
+                "x": 2002,
+                "y": 20
+              },
+              {
+                "x": 2004,
+                "y": 19
+              },
+              {
+                "x": 2006,
+                "y": 15
+              },
+              {
+                "x": 2008,
+                "y": 7
+              },
+              {
+                "x": 2010,
+                "y": 10
+              },
+              {
+                "x": 2012,
+                "y": 11
+              }
+            ],
+            "label": "Unemployment",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 12,
@@ -186,13 +584,64 @@
         "C(2015) represents 68 coal miners in 2015.",
         "C(1990) represents 140,000 coal miners in 1990.",
         "C(1995) represents 100 coal miners in 1995.",
-        "C(2000) represents 70,000 coal miners in 2000."
+        "C(2000) represents 100,000 coal miners in 2000."
       ],
       "correctAnswer": 1,
       "explanation": "Reading the graph at year 1990, the value is approximately 140,000 coal miners. The graph measures in thousands, so C(1990) = 140,000 is correct. The other options either misread the scale or confuse units.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "scale", "interpret-value"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "scale",
+        "interpret-value"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "line",
+        "title": "US Coal Miners 1985-2015",
+        "xLabel": "Year",
+        "yLabel": "Coal Miners (thousands)",
+        "xMin": 1985,
+        "xMax": 2015,
+        "yMin": 50,
+        "yMax": 180,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 1985,
+                "y": 170
+              },
+              {
+                "x": 1990,
+                "y": 140
+              },
+              {
+                "x": 1995,
+                "y": 100
+              },
+              {
+                "x": 2000,
+                "y": 70
+              },
+              {
+                "x": 2005,
+                "y": 78
+              },
+              {
+                "x": 2010,
+                "y": 86
+              },
+              {
+                "x": 2015,
+                "y": 68
+              }
+            ],
+            "label": "Coal Miners",
+            "type": "line"
+          }
+        ]
+      }
     },
     {
       "id": 13,
@@ -206,7 +655,11 @@
       "correctAnswer": 3,
       "explanation": "Checking each year: 2007 (50>10), 2008 (20>10), 2009 (30>5), 2010 (21>17), 2011 (60>30), 2012 (70>15), 2013 (40>20), 2014 (15>5), 2015 (20>6), 2016 (10>2), 2017 (10>7). In every year, more employees were hired than dismissed.",
       "category": "Graph Reading",
-      "tags": ["table-reading", "compare", "employees"],
+      "tags": [
+        "table-reading",
+        "compare",
+        "employees"
+      ],
       "difficulty": 1
     },
     {
@@ -221,7 +674,11 @@
       "correctAnswer": 3,
       "explanation": "Average rate of change = (333 - 303)/(9 - 7) = 30/2 = 15 thousand dollars per month. Since sales are in thousands, this is $15,000 per month. The rate is calculated over the entire interval from July (month 7) to September (month 9).",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "average", "sales"],
+      "tags": [
+        "rate-of-change",
+        "average",
+        "sales"
+      ],
       "difficulty": 1
     },
     {
@@ -236,7 +693,11 @@
       "correctAnswer": 1,
       "explanation": "Computing the rate of change between consecutive rows: (21.99-12.40)/10 = 0.959, (30.74-21.99)/10 = 0.875, (36.01-30.74)/10 = 0.527, (38.43-36.01)/10 = 0.242. Each successive rate is smaller, meaning revenue increases at slower and slower rates.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "decreasing-rate", "revenue"],
+      "tags": [
+        "rate-of-change",
+        "decreasing-rate",
+        "revenue"
+      ],
       "difficulty": 2
     },
     {
@@ -251,7 +712,11 @@
       "correctAnswer": 0,
       "explanation": "The altitude drops by 6,000 feet every 10 minutes: (39000 - 33000)/10 = 600 ft/min. This is a constant descent rate. At minute 60 the plane is still at 3,000 feet (not landed), and 6,000 ft/min would be far too fast.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "constant", "descent"],
+      "tags": [
+        "rate-of-change",
+        "constant",
+        "descent"
+      ],
       "difficulty": 1
     },
     {
@@ -266,7 +731,11 @@
       "correctAnswer": 3,
       "explanation": "Profit = Revenue - Expenses. For October: R(10) - E(10) = $12,337 - $927 = $11,410. Checking other months confirms this is the highest profit. February actually had a loss ($3,220 - $3,957 = -$737), and November had a profit ($10,234 - $3,786 = $6,448).",
       "category": "Rate of Change",
-      "tags": ["table-reading", "profit", "compute"],
+      "tags": [
+        "table-reading",
+        "profit",
+        "compute"
+      ],
       "difficulty": 2
     },
     {
@@ -281,7 +750,11 @@
       "correctAnswer": 0,
       "explanation": "From 2006 to 2007: $22,800 - $18,240 = $4,560 decrease. From 2007 to 2008: $18,240 - $15,504 = $2,736. Each subsequent year's decrease is smaller than $4,560, so the largest single-year decrease is from 2006 to 2007.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "depreciation", "maximum-change"],
+      "tags": [
+        "rate-of-change",
+        "depreciation",
+        "maximum-change"
+      ],
       "difficulty": 2
     },
     {
@@ -296,7 +769,11 @@
       "correctAnswer": 1,
       "explanation": "V(3) = 58,000 - 4,000(3) = 58,000 - 12,000 = $46,000. Plugging t = 3 into the function gives the truck's value after 3 years. The truck depreciates by $4,000 each year.",
       "category": "Linear Functions",
-      "tags": ["linear", "evaluate", "depreciation"],
+      "tags": [
+        "linear",
+        "evaluate",
+        "depreciation"
+      ],
       "difficulty": 1
     },
     {
@@ -311,7 +788,11 @@
       "correctAnswer": 0,
       "explanation": "C(50) = 21.25 + 0.25(50) = 21.25 + 12.50 = $33.75. The base fare is $21.25, plus $0.25 per mile for 50 miles adds $12.50 to the total.",
       "category": "Linear Functions",
-      "tags": ["linear", "evaluate", "cost"],
+      "tags": [
+        "linear",
+        "evaluate",
+        "cost"
+      ],
       "difficulty": 1
     },
     {
@@ -326,7 +807,11 @@
       "correctAnswer": 1,
       "explanation": "The y-intercept occurs when x = 0. C(0) = 11,000 + 550(0) = $11,000. This represents the fixed monthly cost when no items are produced. The $550 is the slope (cost per additional unit), not the y-intercept.",
       "category": "Linear Functions",
-      "tags": ["linear", "y-intercept", "fixed-cost"],
+      "tags": [
+        "linear",
+        "y-intercept",
+        "fixed-cost"
+      ],
       "difficulty": 1
     },
     {
@@ -341,7 +826,11 @@
       "correctAnswer": 2,
       "explanation": "The cost per additional channel is the slope of each linear function. Cable = $3/channel, Satellite = $4/channel, Streaming = $5/channel. The streaming service has the highest slope at $5 per channel, making it the most expensive per additional channel.",
       "category": "Linear Functions",
-      "tags": ["linear", "slope", "compare"],
+      "tags": [
+        "linear",
+        "slope",
+        "compare"
+      ],
       "difficulty": 1
     },
     {
@@ -356,7 +845,11 @@
       "correctAnswer": 3,
       "explanation": "In N(x) = 100 + 11x, the slope is 11, meaning the number of members increases by 11 each month. The 100 is the y-intercept (starting members). A positive slope of 11 means 11 new members join per month.",
       "category": "Linear Functions",
-      "tags": ["linear", "slope-interpretation", "membership"],
+      "tags": [
+        "linear",
+        "slope-interpretation",
+        "membership"
+      ],
       "difficulty": 1
     },
     {
@@ -371,7 +864,11 @@
       "correctAnswer": 3,
       "explanation": "The hourly rate is the slope (coefficient of t) in each function. A = $20/hr, B = $25/hr, C = $35/hr, D = $25/hr. Contractor A has the lowest hourly rate at $20 per hour, even though their flat fee ($100) is the highest.",
       "category": "Linear Functions",
-      "tags": ["linear", "slope", "compare-rates"],
+      "tags": [
+        "linear",
+        "slope",
+        "compare-rates"
+      ],
       "difficulty": 1
     },
     {
@@ -386,8 +883,79 @@
       "correctAnswer": 1,
       "explanation": "Reading the graph at P(x) = $80,000 on the y-axis and tracing horizontally to the curve, then down to the x-axis, the value lands at approximately 130 dishwashers. This is where the profit function reaches $80,000.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "find-input", "profit"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "find-input",
+        "profit"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Profit vs Dishwashers Produced",
+        "xLabel": "Dishwashers (x)",
+        "yLabel": "Profit ($ thousands)",
+        "xMin": 0,
+        "xMax": 200,
+        "yMin": 0,
+        "yMax": 120,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 20,
+                "y": 15
+              },
+              {
+                "x": 40,
+                "y": 28
+              },
+              {
+                "x": 60,
+                "y": 40
+              },
+              {
+                "x": 80,
+                "y": 52
+              },
+              {
+                "x": 100,
+                "y": 63
+              },
+              {
+                "x": 120,
+                "y": 72
+              },
+              {
+                "x": 130,
+                "y": 80
+              },
+              {
+                "x": 140,
+                "y": 85
+              },
+              {
+                "x": 160,
+                "y": 95
+              },
+              {
+                "x": 180,
+                "y": 103
+              },
+              {
+                "x": 200,
+                "y": 110
+              }
+            ],
+            "label": "Profit",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 26,
@@ -401,8 +969,79 @@
       "correctAnswer": 3,
       "explanation": "The company stops being profitable when P(x) = 0 (the graph crosses the x-axis from positive to negative). Reading the graph, this zero-crossing occurs at approximately x = 4.5 (in thousands), which is about 4,500 items.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "zero", "break-even"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "zero",
+        "break-even"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Company Profit Function",
+        "xLabel": "Products (thousands)",
+        "yLabel": "Profit ($ millions)",
+        "xMin": 0,
+        "xMax": 6,
+        "yMin": -5,
+        "yMax": 10,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": -2
+              },
+              {
+                "x": 0.5,
+                "y": 1
+              },
+              {
+                "x": 1,
+                "y": 4
+              },
+              {
+                "x": 1.5,
+                "y": 6
+              },
+              {
+                "x": 2,
+                "y": 7.5
+              },
+              {
+                "x": 2.5,
+                "y": 8
+              },
+              {
+                "x": 3,
+                "y": 7.5
+              },
+              {
+                "x": 3.5,
+                "y": 6
+              },
+              {
+                "x": 4,
+                "y": 3
+              },
+              {
+                "x": 4.5,
+                "y": 0
+              },
+              {
+                "x": 5,
+                "y": -3
+              },
+              {
+                "x": 5.5,
+                "y": -5
+              }
+            ],
+            "label": "Profit",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 27,
@@ -416,8 +1055,75 @@
       "correctAnswer": 0,
       "explanation": "Reading the graph: C(8) = 1 thousand and C(10) = 3 thousand. Average rate of change = (3 - 1)/(10 - 8) = 2/2 = 1 thousand customers per hour. Since the values are in thousands, this means 1,000 more customers per hour on average.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "average", "customers"],
-      "difficulty": 2
+      "tags": [
+        "rate-of-change",
+        "average",
+        "customers"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Store Customers on Saturday",
+        "xLabel": "Time (hours since midnight)",
+        "yLabel": "Customers (thousands)",
+        "xMin": 0,
+        "xMax": 24,
+        "yMin": 0,
+        "yMax": 5,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 0.1
+              },
+              {
+                "x": 4,
+                "y": 0.2
+              },
+              {
+                "x": 8,
+                "y": 1.0
+              },
+              {
+                "x": 10,
+                "y": 3.0
+              },
+              {
+                "x": 12,
+                "y": 4.2
+              },
+              {
+                "x": 14,
+                "y": 4.5
+              },
+              {
+                "x": 16,
+                "y": 3.8
+              },
+              {
+                "x": 18,
+                "y": 2.5
+              },
+              {
+                "x": 20,
+                "y": 1.2
+              },
+              {
+                "x": 22,
+                "y": 0.5
+              },
+              {
+                "x": 24,
+                "y": 0.1
+              }
+            ],
+            "label": "Customers",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 28,
@@ -431,7 +1137,11 @@
       "correctAnswer": 2,
       "explanation": "P(4) = -4(64) + 12(16) + 16(4) = -256 + 192 + 64 = 0. P(8) = -4(512) + 12(64) + 16(8) = -2048 + 768 + 128 = -1152. Average rate = (-1152 - 0)/(8 - 4) = -1152/4 = -288 thousand dollars per thousand items. Profit decreases by $288,000 per 1,000 items.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "polynomial", "compute"],
+      "tags": [
+        "rate-of-change",
+        "polynomial",
+        "compute"
+      ],
       "difficulty": 3
     },
     {
@@ -446,8 +1156,83 @@
       "correctAnswer": 1,
       "explanation": "The fund is increasing most rapidly where the graph has its steepest positive slope. Looking at the graph, the steepest upward section occurs around t = 7 (approximately year 2007), where the curve is rising most sharply before it begins to flatten and eventually decline.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "steepest-slope", "social-security"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "steepest-slope",
+        "social-security"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Social Security Trust Fund Assets",
+        "xLabel": "Years since 2000",
+        "yLabel": "Assets ($ trillions)",
+        "xMin": 0,
+        "xMax": 50,
+        "yMin": 0,
+        "yMax": 4,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 1.0
+              },
+              {
+                "x": 3,
+                "y": 1.4
+              },
+              {
+                "x": 5,
+                "y": 1.8
+              },
+              {
+                "x": 7,
+                "y": 2.4
+              },
+              {
+                "x": 10,
+                "y": 2.8
+              },
+              {
+                "x": 15,
+                "y": 3.2
+              },
+              {
+                "x": 20,
+                "y": 3.4
+              },
+              {
+                "x": 25,
+                "y": 3.5
+              },
+              {
+                "x": 30,
+                "y": 3.3
+              },
+              {
+                "x": 35,
+                "y": 2.8
+              },
+              {
+                "x": 40,
+                "y": 2.0
+              },
+              {
+                "x": 45,
+                "y": 1.0
+              },
+              {
+                "x": 50,
+                "y": 0.2
+              }
+            ],
+            "label": "Assets",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 30,
@@ -461,8 +1246,107 @@
       "correctAnswer": 2,
       "explanation": "Since t = 0 is 5:00 a.m., t = 5.5 is 10:30 a.m. and t = 9 is 2:00 p.m. The graph shows an S-shaped increase in this region: first concave up (increasing faster and faster), then an inflection point, then concave down (increasing slower and slower).",
       "category": "Concavity & Curvature",
-      "tags": ["concavity", "inflection", "interpret-graph"],
-      "difficulty": 3
+      "tags": [
+        "concavity",
+        "inflection",
+        "interpret-graph"
+      ],
+      "difficulty": 3,
+      "graphData": {
+        "type": "curve",
+        "title": "Coffee Shop Customers",
+        "xLabel": "Hours since 5:00 AM",
+        "yLabel": "Number of Customers",
+        "xMin": 0,
+        "xMax": 14,
+        "yMin": 0,
+        "yMax": 200,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 5
+              },
+              {
+                "x": 1,
+                "y": 10
+              },
+              {
+                "x": 2,
+                "y": 18
+              },
+              {
+                "x": 3,
+                "y": 28
+              },
+              {
+                "x": 4,
+                "y": 40
+              },
+              {
+                "x": 5,
+                "y": 55
+              },
+              {
+                "x": 5.5,
+                "y": 65
+              },
+              {
+                "x": 6,
+                "y": 77
+              },
+              {
+                "x": 6.5,
+                "y": 92
+              },
+              {
+                "x": 7,
+                "y": 110
+              },
+              {
+                "x": 7.5,
+                "y": 128
+              },
+              {
+                "x": 8,
+                "y": 145
+              },
+              {
+                "x": 8.5,
+                "y": 158
+              },
+              {
+                "x": 9,
+                "y": 168
+              },
+              {
+                "x": 10,
+                "y": 180
+              },
+              {
+                "x": 11,
+                "y": 185
+              },
+              {
+                "x": 12,
+                "y": 187
+              },
+              {
+                "x": 13,
+                "y": 188
+              },
+              {
+                "x": 14,
+                "y": 189
+              }
+            ],
+            "label": "Customers",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 31,
@@ -476,8 +1360,75 @@
       "correctAnswer": 2,
       "explanation": "Reading the graph, the maximum profit occurs at approximately x = 10. Since x is measured in thousands of laptops, x = 10 means 10,000 laptops. The peak of the profit curve is at this production level.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "maximum", "units"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "maximum",
+        "units"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Laptop Profit Function",
+        "xLabel": "Laptops (thousands)",
+        "yLabel": "Profit ($ thousands)",
+        "xMin": 5,
+        "xMax": 15,
+        "yMin": 0,
+        "yMax": 800,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 5,
+                "y": 400
+              },
+              {
+                "x": 6,
+                "y": 500
+              },
+              {
+                "x": 7,
+                "y": 580
+              },
+              {
+                "x": 8,
+                "y": 640
+              },
+              {
+                "x": 9,
+                "y": 680
+              },
+              {
+                "x": 10,
+                "y": 700
+              },
+              {
+                "x": 11,
+                "y": 680
+              },
+              {
+                "x": 12,
+                "y": 640
+              },
+              {
+                "x": 13,
+                "y": 580
+              },
+              {
+                "x": 14,
+                "y": 500
+              },
+              {
+                "x": 15,
+                "y": 400
+              }
+            ],
+            "label": "Profit",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 32,
@@ -491,8 +1442,83 @@
       "correctAnswer": 3,
       "explanation": "Reading the graph, the peak (maximum) of the revenue curve occurs at approximately t = 6 years, with R approximately equal to 1.6 million dollars ($1,600,000). The revenue rises to this peak and then declines afterward.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "maximum", "revenue"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "maximum",
+        "revenue"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Department Store Annual Revenue",
+        "xLabel": "Years since opening",
+        "yLabel": "Revenue ($ millions)",
+        "xMin": 0,
+        "xMax": 16,
+        "yMin": 0,
+        "yMax": 1.8,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 0.5
+              },
+              {
+                "x": 1,
+                "y": 0.8
+              },
+              {
+                "x": 2,
+                "y": 1.1
+              },
+              {
+                "x": 3,
+                "y": 1.3
+              },
+              {
+                "x": 4,
+                "y": 1.5
+              },
+              {
+                "x": 5,
+                "y": 1.58
+              },
+              {
+                "x": 6,
+                "y": 1.6
+              },
+              {
+                "x": 7,
+                "y": 1.58
+              },
+              {
+                "x": 8,
+                "y": 1.5
+              },
+              {
+                "x": 10,
+                "y": 1.3
+              },
+              {
+                "x": 12,
+                "y": 1.0
+              },
+              {
+                "x": 14,
+                "y": 0.7
+              },
+              {
+                "x": 16,
+                "y": 0.5
+              }
+            ],
+            "label": "Revenue",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 33,
@@ -506,7 +1532,11 @@
       "correctAnswer": 2,
       "explanation": "Since t = 0 is the year 2000, t = -2 is two years before 2000, which is 1998. P(-2) = 282(1.01)^(-2) = 282/1.0201 = approximately 276 million people. Negative t values go backward in time from the reference year.",
       "category": "Exponential & Logistic",
-      "tags": ["exponential", "negative-input", "population"],
+      "tags": [
+        "exponential",
+        "negative-input",
+        "population"
+      ],
       "difficulty": 2
     },
     {
@@ -521,7 +1551,11 @@
       "correctAnswer": 3,
       "explanation": "L(d) calculates late fees for d days overdue. L(67) = 100e^(0.02 x 67) = 100e^(1.34) = 100 x 3.819 = approximately $381.90. This is the late fee amount when the payment is 67 days overdue.",
       "category": "Exponential & Logistic",
-      "tags": ["exponential", "evaluate", "late-fees"],
+      "tags": [
+        "exponential",
+        "evaluate",
+        "late-fees"
+      ],
       "difficulty": 2
     },
     {
@@ -536,7 +1570,11 @@
       "correctAnswer": 2,
       "explanation": "A(2) = 1000(1.023)^2 = 1046.53. A(12) = 1000(1.023)^12 = 1313.74. Average rate of change = (1313.74 - 1046.53)/(12 - 2) = 267.21/10 = $26.72 per year. The account balance increases on average by $26.72 each year over this period.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "exponential", "banking"],
+      "tags": [
+        "rate-of-change",
+        "exponential",
+        "banking"
+      ],
       "difficulty": 2
     },
     {
@@ -551,8 +1589,75 @@
       "correctAnswer": 0,
       "explanation": "The average rate of change = (y(700) - y(100))/(700 - 100), which gives the annual change in grams of carbon-14 over this 600-year interval. Since carbon-14 decays over time (decreasing function), y(700) < y(100), making the rate negative.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "decay", "sign"],
-      "difficulty": 2
+      "tags": [
+        "rate-of-change",
+        "decay",
+        "sign"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Carbon-14 Decay",
+        "xLabel": "Time (years)",
+        "yLabel": "Amount (grams)",
+        "xMin": 0,
+        "xMax": 1000,
+        "yMin": 0,
+        "yMax": 120,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 100
+              },
+              {
+                "x": 100,
+                "y": 88
+              },
+              {
+                "x": 200,
+                "y": 78
+              },
+              {
+                "x": 300,
+                "y": 68
+              },
+              {
+                "x": 400,
+                "y": 60
+              },
+              {
+                "x": 500,
+                "y": 53
+              },
+              {
+                "x": 600,
+                "y": 46
+              },
+              {
+                "x": 700,
+                "y": 41
+              },
+              {
+                "x": 800,
+                "y": 36
+              },
+              {
+                "x": 900,
+                "y": 32
+              },
+              {
+                "x": 1000,
+                "y": 28
+              }
+            ],
+            "label": "Carbon-14",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 37,
@@ -566,8 +1671,81 @@
       "correctAnswer": 0,
       "explanation": "As n approaches infinity, e^(-n) approaches 0, so C = 15(0) + 10 = 10. The horizontal asymptote is C = 10, meaning as more toys are produced, the average cost per toy approaches $10 but never quite reaches it.",
       "category": "Exponential & Logistic",
-      "tags": ["asymptote", "exponential", "cost"],
-      "difficulty": 2
+      "tags": [
+        "asymptote",
+        "exponential",
+        "cost"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Average Cost per Toy",
+        "xLabel": "Number of toys (n)",
+        "yLabel": "Cost per toy ($)",
+        "xMin": 0,
+        "xMax": 50,
+        "yMin": 8,
+        "yMax": 28,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 25
+              },
+              {
+                "x": 5,
+                "y": 21
+              },
+              {
+                "x": 10,
+                "y": 17
+              },
+              {
+                "x": 15,
+                "y": 14.5
+              },
+              {
+                "x": 20,
+                "y": 13
+              },
+              {
+                "x": 25,
+                "y": 12
+              },
+              {
+                "x": 30,
+                "y": 11.2
+              },
+              {
+                "x": 35,
+                "y": 10.8
+              },
+              {
+                "x": 40,
+                "y": 10.4
+              },
+              {
+                "x": 45,
+                "y": 10.2
+              },
+              {
+                "x": 50,
+                "y": 10.1
+              }
+            ],
+            "label": "Cost",
+            "type": "curve"
+          }
+        ],
+        "asymptotes": [
+          {
+            "y": 10,
+            "label": "y = $10"
+          }
+        ]
+      }
     },
     {
       "id": 38,
@@ -581,8 +1759,102 @@
       "correctAnswer": 1,
       "explanation": "Reading the graph, Operation 2 (dashed curve) has its infection rate leveling off at approximately 10% by around the year 2000, which is lower than Operation 1's steady rate of approximately 15%. Lower infection rate means a better operation.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "asymptote", "compare"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "asymptote",
+        "compare"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Infection Rates After Operation",
+        "xLabel": "Years since 1950",
+        "yLabel": "Infection Rate (%)",
+        "xMin": 0,
+        "xMax": 70,
+        "yMin": 0,
+        "yMax": 50,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 45
+              },
+              {
+                "x": 10,
+                "y": 38
+              },
+              {
+                "x": 20,
+                "y": 32
+              },
+              {
+                "x": 30,
+                "y": 26
+              },
+              {
+                "x": 40,
+                "y": 21
+              },
+              {
+                "x": 50,
+                "y": 17
+              },
+              {
+                "x": 60,
+                "y": 15.5
+              },
+              {
+                "x": 70,
+                "y": 15
+              }
+            ],
+            "label": "Operation 1",
+            "type": "curve"
+          },
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 42
+              },
+              {
+                "x": 10,
+                "y": 34
+              },
+              {
+                "x": 20,
+                "y": 27
+              },
+              {
+                "x": 30,
+                "y": 20
+              },
+              {
+                "x": 40,
+                "y": 15
+              },
+              {
+                "x": 50,
+                "y": 11.5
+              },
+              {
+                "x": 60,
+                "y": 10.3
+              },
+              {
+                "x": 70,
+                "y": 10
+              }
+            ],
+            "label": "Operation 2",
+            "type": "curve",
+            "dashed": true
+          }
+        ]
+      }
     },
     {
       "id": 39,
@@ -596,7 +1868,11 @@
       "correctAnswer": 1,
       "explanation": "Set A(w) = 50: 50 = 100/(1 + 25e^(-0.06w)) - 4, so 54 = 100/(1 + 25e^(-0.06w)). Then 1 + 25e^(-0.06w) = 100/54 = 1.852, so 25e^(-0.06w) = 0.852, e^(-0.06w) = 0.0341, -0.06w = ln(0.0341) = -3.378, w = 56.3, approximately 57 workers.",
       "category": "Exponential & Logistic",
-      "tags": ["logistic", "solve", "factory"],
+      "tags": [
+        "logistic",
+        "solve",
+        "factory"
+      ],
       "difficulty": 3
     },
     {
@@ -611,7 +1887,11 @@
       "correctAnswer": 3,
       "explanation": "At t = 3, P(3) = 103 and at t = 4, P(4) = 150. Since 110 falls between 103 and 150, the population reaches 110 sometime between t = 3 and t = 4. Since t = 3 corresponds to year 2003, the population reaches 110 during 2003.",
       "category": "Exponential & Logistic",
-      "tags": ["logistic", "table", "interpolate"],
+      "tags": [
+        "logistic",
+        "table",
+        "interpolate"
+      ],
       "difficulty": 2
     },
     {
@@ -626,7 +1906,11 @@
       "correctAnswer": 2,
       "explanation": "The instantaneous rate of change at w = 50 is 1, meaning the derivative A'(50) = 1. This means at exactly 50 workers, each additional worker adds approximately 1 more automobile per week to production.",
       "category": "Exponential & Logistic",
-      "tags": ["logistic", "instantaneous-rate", "interpret"],
+      "tags": [
+        "logistic",
+        "instantaneous-rate",
+        "interpret"
+      ],
       "difficulty": 2
     },
     {
@@ -641,7 +1925,11 @@
       "correctAnswer": 2,
       "explanation": "2020 is t = 10 and 2040 is t = 30. P(10) = 117/(1 + 5e^(-2)) = 117/(1 + 0.677) = 69.79. P(30) = 117/(1 + 5e^(-6)) = 117/(1 + 0.0124) = 115.57. Average rate = (115.57 - 69.79)/20 = 45.78/20 = approximately 2.29 rabbits per year.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "logistic", "population"],
+      "tags": [
+        "rate-of-change",
+        "logistic",
+        "population"
+      ],
       "difficulty": 2
     },
     {
@@ -656,8 +1944,87 @@
       "correctAnswer": 1,
       "explanation": "Between 10 and 40 workers on a logistic curve, we are in the early growth phase (before the inflection point). In this region, the curve is concave up, meaning production increases at an accelerating rate -- faster and faster with each additional worker.",
       "category": "Concavity & Curvature",
-      "tags": ["concavity", "logistic", "concave-up"],
-      "difficulty": 2
+      "tags": [
+        "concavity",
+        "logistic",
+        "concave-up"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Automobile Production",
+        "xLabel": "Number of Workers",
+        "yLabel": "Automobiles per Week",
+        "xMin": 0,
+        "xMax": 100,
+        "yMin": 0,
+        "yMax": 100,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 2
+              },
+              {
+                "x": 10,
+                "y": 5
+              },
+              {
+                "x": 15,
+                "y": 8
+              },
+              {
+                "x": 20,
+                "y": 13
+              },
+              {
+                "x": 25,
+                "y": 20
+              },
+              {
+                "x": 30,
+                "y": 30
+              },
+              {
+                "x": 35,
+                "y": 42
+              },
+              {
+                "x": 40,
+                "y": 55
+              },
+              {
+                "x": 50,
+                "y": 72
+              },
+              {
+                "x": 60,
+                "y": 82
+              },
+              {
+                "x": 70,
+                "y": 88
+              },
+              {
+                "x": 80,
+                "y": 92
+              },
+              {
+                "x": 90,
+                "y": 94
+              },
+              {
+                "x": 100,
+                "y": 95
+              }
+            ],
+            "label": "Production",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 44,
@@ -671,23 +2038,171 @@
       "correctAnswer": 3,
       "explanation": "In a decreasing logistic model, the region from x = 100 to x = 300 is past the inflection point. The cost is still decreasing but the curve is flattening out (concave up for a decreasing function), meaning the cost decreases slower and slower as it approaches its lower asymptote.",
       "category": "Concavity & Curvature",
-      "tags": ["concavity", "logistic", "decreasing"],
-      "difficulty": 2
+      "tags": [
+        "concavity",
+        "logistic",
+        "decreasing"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Cell Phone Cost vs Supply",
+        "xLabel": "Number of phones available",
+        "yLabel": "Cost ($)",
+        "xMin": 0,
+        "xMax": 500,
+        "yMin": 0,
+        "yMax": 1000,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 950
+              },
+              {
+                "x": 50,
+                "y": 800
+              },
+              {
+                "x": 100,
+                "y": 650
+              },
+              {
+                "x": 150,
+                "y": 500
+              },
+              {
+                "x": 200,
+                "y": 380
+              },
+              {
+                "x": 250,
+                "y": 290
+              },
+              {
+                "x": 300,
+                "y": 230
+              },
+              {
+                "x": 350,
+                "y": 190
+              },
+              {
+                "x": 400,
+                "y": 165
+              },
+              {
+                "x": 450,
+                "y": 150
+              },
+              {
+                "x": 500,
+                "y": 140
+              }
+            ],
+            "label": "Cost",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 45,
       "text": "A factory with an assembly line can produce more automobiles per week as more employees are working at a given time, limited by the capacity of the assembly line. The model follows the function A(w) = 100/(1 + 25e^(-0.06w)) - 4.\n [Graph: Automobile Production]\n How should the upper horizontal asymptote be interpreted?",
       "options": [
         "The factory can produce a maximum of approximately 140 automobiles per week.",
-        "The factory can produce a maximum of approximately 95 automobiles per week.",
+        "The factory can produce a maximum of approximately 96 automobiles per week.",
         "The upper asymptote has no real world meaning in this scenario.",
         "If there is a negative number of workers, then the number of automobiles produced is negative."
       ],
       "correctAnswer": 1,
-      "explanation": "As w approaches infinity, e^(-0.06w) approaches 0, so A = 100/(1 + 0) - 4 = 100 - 4 = 96, which is approximately 95. The upper asymptote represents the maximum production capacity of the assembly line, regardless of how many workers are added.",
+      "explanation": "As w approaches infinity, e^(-0.06w) approaches 0, so A = 100/(1 + 0) - 4 = 100 - 4 = 96. The upper asymptote represents the maximum production capacity of the assembly line, regardless of how many workers are added.",
       "category": "Exponential & Logistic",
-      "tags": ["logistic", "asymptote", "capacity"],
-      "difficulty": 2
+      "tags": [
+        "logistic",
+        "asymptote",
+        "capacity"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Automobile Production Capacity",
+        "xLabel": "Number of Workers (w)",
+        "yLabel": "Automobiles per Week",
+        "xMin": 0,
+        "xMax": 150,
+        "yMin": -10,
+        "yMax": 100,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 10,
+                "y": 5
+              },
+              {
+                "x": 20,
+                "y": 15
+              },
+              {
+                "x": 30,
+                "y": 30
+              },
+              {
+                "x": 40,
+                "y": 48
+              },
+              {
+                "x": 50,
+                "y": 63
+              },
+              {
+                "x": 60,
+                "y": 74
+              },
+              {
+                "x": 70,
+                "y": 82
+              },
+              {
+                "x": 80,
+                "y": 87
+              },
+              {
+                "x": 90,
+                "y": 91
+              },
+              {
+                "x": 100,
+                "y": 93
+              },
+              {
+                "x": 120,
+                "y": 94.5
+              },
+              {
+                "x": 150,
+                "y": 95.5
+              }
+            ],
+            "label": "Production",
+            "type": "curve"
+          }
+        ],
+        "asymptotes": [
+          {
+            "y": 96,
+            "label": "y \u2248 96"
+          }
+        ]
+      }
     },
     {
       "id": 46,
@@ -701,8 +2216,91 @@
       "correctAnswer": 2,
       "explanation": "Reading the logistic growth graph, the maximum number of people who hear the rumor is the upper asymptote. 25% of that maximum corresponds to the early growth phase. Tracing the graph to where it reaches approximately one quarter of its maximum value leads to approximately day 3.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "logistic", "percentage"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "logistic",
+        "percentage"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Rumor Spread in School",
+        "xLabel": "Days (d)",
+        "yLabel": "People who heard rumor (R)",
+        "xMin": 0,
+        "xMax": 14,
+        "yMin": 0,
+        "yMax": 220,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 5
+              },
+              {
+                "x": 1,
+                "y": 15
+              },
+              {
+                "x": 2,
+                "y": 30
+              },
+              {
+                "x": 3,
+                "y": 50
+              },
+              {
+                "x": 4,
+                "y": 75
+              },
+              {
+                "x": 5,
+                "y": 105
+              },
+              {
+                "x": 6,
+                "y": 135
+              },
+              {
+                "x": 7,
+                "y": 160
+              },
+              {
+                "x": 8,
+                "y": 175
+              },
+              {
+                "x": 9,
+                "y": 185
+              },
+              {
+                "x": 10,
+                "y": 192
+              },
+              {
+                "x": 11,
+                "y": 196
+              },
+              {
+                "x": 12,
+                "y": 198
+              },
+              {
+                "x": 13,
+                "y": 199
+              },
+              {
+                "x": 14,
+                "y": 199.5
+              }
+            ],
+            "label": "Rumor Spread",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 47,
@@ -716,8 +2314,102 @@
       "correctAnswer": 2,
       "explanation": "Reading the graph at y = 100 page views and tracing horizontally to the curve, then down to the x-axis, the month that corresponds to approximately 100 page views is June.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "find-input", "page-views"],
-      "difficulty": 1
+      "tags": [
+        "graph-reading",
+        "find-input",
+        "page-views"
+      ],
+      "difficulty": 1,
+      "graphData": {
+        "type": "line",
+        "title": "Website Page Views by Month",
+        "xLabel": "Month",
+        "yLabel": "Page Views",
+        "xMin": 0,
+        "xMax": 12,
+        "yMin": 0,
+        "yMax": 300,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 1,
+                "y": 50
+              },
+              {
+                "x": 2,
+                "y": 80
+              },
+              {
+                "x": 3,
+                "y": 120
+              },
+              {
+                "x": 4,
+                "y": 180
+              },
+              {
+                "x": 5,
+                "y": 220
+              },
+              {
+                "x": 6,
+                "y": 100
+              },
+              {
+                "x": 7,
+                "y": 140
+              },
+              {
+                "x": 8,
+                "y": 160
+              },
+              {
+                "x": 9,
+                "y": 200
+              },
+              {
+                "x": 10,
+                "y": 240
+              },
+              {
+                "x": 11,
+                "y": 260
+              },
+              {
+                "x": 12,
+                "y": 280
+              }
+            ],
+            "label": "Page Views",
+            "type": "line"
+          }
+        ],
+        "annotations": [
+          {
+            "x": 1,
+            "y": 50,
+            "text": "Jan",
+            "dx": 0,
+            "dy": -10
+          },
+          {
+            "x": 6,
+            "y": 100,
+            "text": "Jun",
+            "dx": 0,
+            "dy": -10
+          },
+          {
+            "x": 12,
+            "y": 280,
+            "text": "Dec",
+            "dx": 0,
+            "dy": -10
+          }
+        ]
+      }
     },
     {
       "id": 48,
@@ -731,8 +2423,87 @@
       "correctAnswer": 0,
       "explanation": "When a shift ends, employees take breaks and use vending machines before leaving, causing a spike in revenue. The graph shows a revenue spike around 5:00 p.m. reaching approximately $55, indicating the end of a work shift.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "spike", "interpret-event"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "spike",
+        "interpret-event"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "line",
+        "title": "Vending Machine Revenue",
+        "xLabel": "Time (24-hour clock)",
+        "yLabel": "Revenue ($)",
+        "xMin": 700,
+        "xMax": 2000,
+        "yMin": 10,
+        "yMax": 110,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 700,
+                "y": 25
+              },
+              {
+                "x": 800,
+                "y": 40
+              },
+              {
+                "x": 900,
+                "y": 35
+              },
+              {
+                "x": 1000,
+                "y": 30
+              },
+              {
+                "x": 1100,
+                "y": 28
+              },
+              {
+                "x": 1200,
+                "y": 50
+              },
+              {
+                "x": 1300,
+                "y": 35
+              },
+              {
+                "x": 1400,
+                "y": 25
+              },
+              {
+                "x": 1500,
+                "y": 20
+              },
+              {
+                "x": 1600,
+                "y": 30
+              },
+              {
+                "x": 1700,
+                "y": 55
+              },
+              {
+                "x": 1800,
+                "y": 35
+              },
+              {
+                "x": 1900,
+                "y": 20
+              },
+              {
+                "x": 2000,
+                "y": 15
+              }
+            ],
+            "label": "Revenue",
+            "type": "line"
+          }
+        ]
+      }
     },
     {
       "id": 49,
@@ -746,8 +2517,92 @@
       "correctAnswer": 3,
       "explanation": "Reading the graph, the stock first drops below $20 at September 2015 (9 months after December 2014). Looking at the next month (October 2015), the stock price increased. So the program would have first bought in September 2015, and the investment would have gained value.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "threshold", "stock"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "threshold",
+        "stock"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "line",
+        "title": "Stock Price After December 2014",
+        "xLabel": "Months after Dec 2014",
+        "yLabel": "Stock Price ($)",
+        "xMin": 0,
+        "xMax": 24,
+        "yMin": 10,
+        "yMax": 35,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 30
+              },
+              {
+                "x": 2,
+                "y": 28
+              },
+              {
+                "x": 4,
+                "y": 26
+              },
+              {
+                "x": 6,
+                "y": 24
+              },
+              {
+                "x": 7,
+                "y": 22
+              },
+              {
+                "x": 8,
+                "y": 20
+              },
+              {
+                "x": 9,
+                "y": 18
+              },
+              {
+                "x": 10,
+                "y": 22
+              },
+              {
+                "x": 12,
+                "y": 25
+              },
+              {
+                "x": 15,
+                "y": 27
+              },
+              {
+                "x": 18,
+                "y": 29
+              },
+              {
+                "x": 21,
+                "y": 30
+              },
+              {
+                "x": 24,
+                "y": 32
+              }
+            ],
+            "label": "Stock Price",
+            "type": "line"
+          }
+        ],
+        "annotations": [
+          {
+            "x": 9,
+            "y": 18,
+            "text": "Sep 2015",
+            "dx": 0,
+            "dy": -12
+          }
+        ]
+      }
     },
     {
       "id": 50,
@@ -761,12 +2616,99 @@
       "correctAnswer": 2,
       "explanation": "Reading the graph: March page views are approximately 1,400 and August page views are approximately 200. Average rate of change = (200 - 1400)/(8 - 3) = -1200/5 = -240 page views per month. The negative sign indicates page views decreased on average.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "average", "negative"],
-      "difficulty": 2
+      "tags": [
+        "rate-of-change",
+        "average",
+        "negative"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "line",
+        "title": "Website Page Views Over Time",
+        "xLabel": "Month",
+        "yLabel": "Page Views",
+        "xMin": 0,
+        "xMax": 12,
+        "yMin": 0,
+        "yMax": 1600,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 1,
+                "y": 1200
+              },
+              {
+                "x": 2,
+                "y": 1300
+              },
+              {
+                "x": 3,
+                "y": 1400
+              },
+              {
+                "x": 4,
+                "y": 1300
+              },
+              {
+                "x": 5,
+                "y": 1100
+              },
+              {
+                "x": 6,
+                "y": 900
+              },
+              {
+                "x": 7,
+                "y": 600
+              },
+              {
+                "x": 8,
+                "y": 200
+              },
+              {
+                "x": 9,
+                "y": 150
+              },
+              {
+                "x": 10,
+                "y": 120
+              },
+              {
+                "x": 11,
+                "y": 100
+              },
+              {
+                "x": 12,
+                "y": 80
+              }
+            ],
+            "label": "Page Views",
+            "type": "line"
+          }
+        ],
+        "annotations": [
+          {
+            "x": 3,
+            "y": 1400,
+            "text": "Mar",
+            "dx": 0,
+            "dy": -10
+          },
+          {
+            "x": 8,
+            "y": 200,
+            "text": "Aug",
+            "dx": 0,
+            "dy": -10
+          }
+        ]
+      }
     },
     {
       "id": 51,
-      "text": "A chain of stores started out as 100 stores the first year, then increased by 400 stores the following year, and then increased each year for the next six years.\n [Graph: Store Growth]\n Which statement about the average rate of change is correct?",
+      "text": "A chain of stores started out as 100 stores the first year, then increased by 150 stores the following year, and then continued growing each year for the next five years.\n [Graph: Store Growth]\n Which statement about the average rate of change is correct?",
       "options": [
         "The average rate of change from years 1 to 7 is 6 stores per year.",
         "The average rate of change from years 1 to 4 is less than the average rate of change for years 4 to 7.",
@@ -776,8 +2718,59 @@
       "correctAnswer": 1,
       "explanation": "The graph shows accelerating growth (concave up). When growth is accelerating, the average rate of change over later intervals is greater than over earlier intervals. Therefore, the rate from years 4 to 7 is greater than from years 1 to 4, meaning the rate from years 1 to 4 is less than from years 4 to 7.",
       "category": "Rate of Change",
-      "tags": ["rate-of-change", "compare-intervals", "accelerating"],
-      "difficulty": 2
+      "tags": [
+        "rate-of-change",
+        "compare-intervals",
+        "accelerating"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Store Chain Growth",
+        "xLabel": "Year",
+        "yLabel": "Number of Stores",
+        "xMin": 0,
+        "xMax": 8,
+        "yMin": 0,
+        "yMax": 3000,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 1,
+                "y": 100
+              },
+              {
+                "x": 2,
+                "y": 250
+              },
+              {
+                "x": 3,
+                "y": 500
+              },
+              {
+                "x": 4,
+                "y": 850
+              },
+              {
+                "x": 5,
+                "y": 1350
+              },
+              {
+                "x": 6,
+                "y": 2050
+              },
+              {
+                "x": 7,
+                "y": 3000
+              }
+            ],
+            "label": "Stores",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 52,
@@ -791,8 +2784,71 @@
       "correctAnswer": 0,
       "explanation": "Reading the scatterplot, the data point with the highest revenue (y-value) is at approximately (9, 19), meaning a budget of $9,000 returned a revenue of $19,000. This is the maximum revenue observed in the data.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "maximum", "scatterplot"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "maximum",
+        "scatterplot"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "scatter",
+        "title": "Project Revenue vs Marketing Budget",
+        "xLabel": "Budget ($ thousands)",
+        "yLabel": "Revenue ($ thousands)",
+        "xMin": 0,
+        "xMax": 25,
+        "yMin": 0,
+        "yMax": 25,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 3,
+                "y": 8
+              },
+              {
+                "x": 5,
+                "y": 12
+              },
+              {
+                "x": 6,
+                "y": 14
+              },
+              {
+                "x": 7,
+                "y": 16
+              },
+              {
+                "x": 9,
+                "y": 19
+              },
+              {
+                "x": 11,
+                "y": 17
+              },
+              {
+                "x": 13,
+                "y": 15
+              },
+              {
+                "x": 15,
+                "y": 13
+              },
+              {
+                "x": 17,
+                "y": 10
+              },
+              {
+                "x": 20,
+                "y": 6
+              }
+            ],
+            "label": "Projects",
+            "type": "scatter"
+          }
+        ]
+      }
     },
     {
       "id": 53,
@@ -806,8 +2862,79 @@
       "correctAnswer": 1,
       "explanation": "After each expansion (valley), profits recover and increase. The expansion at 3,500 units shows the steepest upward slope in the recovery phase, meaning profits increase the fastest on average after this particular expansion compared to the others.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "rate-of-change", "expansion"],
-      "difficulty": 3
+      "tags": [
+        "graph-reading",
+        "rate-of-change",
+        "expansion"
+      ],
+      "difficulty": 3,
+      "graphData": {
+        "type": "line",
+        "title": "Profit with Production Expansions",
+        "xLabel": "Production (thousands of units)",
+        "yLabel": "Profit ($ thousands)",
+        "xMin": 0,
+        "xMax": 11,
+        "yMin": 0,
+        "yMax": 80,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 20
+              },
+              {
+                "x": 1,
+                "y": 40
+              },
+              {
+                "x": 1.5,
+                "y": 15
+              },
+              {
+                "x": 2.5,
+                "y": 45
+              },
+              {
+                "x": 3,
+                "y": 55
+              },
+              {
+                "x": 3.5,
+                "y": 10
+              },
+              {
+                "x": 4.5,
+                "y": 70
+              },
+              {
+                "x": 5.5,
+                "y": 75
+              },
+              {
+                "x": 6.5,
+                "y": 25
+              },
+              {
+                "x": 8,
+                "y": 60
+              },
+              {
+                "x": 9.5,
+                "y": 20
+              },
+              {
+                "x": 11,
+                "y": 50
+              }
+            ],
+            "label": "Profit",
+            "type": "line"
+          }
+        ]
+      }
     },
     {
       "id": 54,
@@ -821,7 +2948,11 @@
       "correctAnswer": 3,
       "explanation": "A concave down graph curves downward. If sales are currently increasing and the graph is concave down, sales are increasing slower and slower (the rate of increase is declining). If this trend continues, sales will eventually peak and begin decreasing. Once decreasing on a concave down graph, sales would decrease faster and faster.",
       "category": "Concavity & Curvature",
-      "tags": ["concavity", "concave-down", "prediction"],
+      "tags": [
+        "concavity",
+        "concave-down",
+        "prediction"
+      ],
       "difficulty": 3
     },
     {
@@ -836,7 +2967,11 @@
       "correctAnswer": 0,
       "explanation": "The description requires: increasing faster and faster (concave up) from December to March, then increasing slower and slower (concave down) from March to June, with an inflection point around March. Graph A shows this S-shaped pattern of concave up transitioning to concave down while continuously increasing.",
       "category": "Concavity & Curvature",
-      "tags": ["concavity", "inflection", "model-selection"],
+      "tags": [
+        "concavity",
+        "inflection",
+        "model-selection"
+      ],
       "difficulty": 3
     },
     {
@@ -851,8 +2986,67 @@
       "correctAnswer": 3,
       "explanation": "Reading the graph, the maximum revenue is approximately $100 and the minimum revenue is approximately $15. The difference is $100 - $15 = $85. This represents the range of daily revenue from the vending machines.",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "range", "revenue"],
-      "difficulty": 1
+      "tags": [
+        "graph-reading",
+        "range",
+        "revenue"
+      ],
+      "difficulty": 1,
+      "graphData": {
+        "type": "line",
+        "title": "Vending Machine Revenue (Full Day)",
+        "xLabel": "Time",
+        "yLabel": "Revenue ($)",
+        "xMin": 0,
+        "xMax": 24,
+        "yMin": 10,
+        "yMax": 110,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 15
+              },
+              {
+                "x": 3,
+                "y": 20
+              },
+              {
+                "x": 6,
+                "y": 40
+              },
+              {
+                "x": 9,
+                "y": 60
+              },
+              {
+                "x": 12,
+                "y": 100
+              },
+              {
+                "x": 15,
+                "y": 80
+              },
+              {
+                "x": 18,
+                "y": 50
+              },
+              {
+                "x": 21,
+                "y": 30
+              },
+              {
+                "x": 24,
+                "y": 15
+              }
+            ],
+            "label": "Revenue",
+            "type": "line"
+          }
+        ]
+      }
     },
     {
       "id": 57,
@@ -866,8 +3060,71 @@
       "correctAnswer": 3,
       "explanation": "Reading the graph, the housing price index starts at its lowest point in 1970 and rises over the decades, reaching its peak around 2005 before declining. The highest value is around 2005, not 2010 (which shows the post-crash decline).",
       "category": "Graph Reading",
-      "tags": ["graph-reading", "extremes", "housing"],
-      "difficulty": 2
+      "tags": [
+        "graph-reading",
+        "extremes",
+        "housing"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "US Housing Price Index 1970-2010",
+        "xLabel": "Year",
+        "yLabel": "Price Index",
+        "xMin": 1970,
+        "xMax": 2010,
+        "yMin": 20,
+        "yMax": 200,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 1970,
+                "y": 30
+              },
+              {
+                "x": 1975,
+                "y": 40
+              },
+              {
+                "x": 1980,
+                "y": 60
+              },
+              {
+                "x": 1985,
+                "y": 75
+              },
+              {
+                "x": 1990,
+                "y": 90
+              },
+              {
+                "x": 1995,
+                "y": 100
+              },
+              {
+                "x": 2000,
+                "y": 120
+              },
+              {
+                "x": 2005,
+                "y": 180
+              },
+              {
+                "x": 2007,
+                "y": 175
+              },
+              {
+                "x": 2010,
+                "y": 140
+              }
+            ],
+            "label": "Price Index",
+            "type": "curve"
+          }
+        ]
+      }
     },
     {
       "id": 58,
@@ -881,8 +3138,81 @@
       "correctAnswer": 1,
       "explanation": "The graph shows the error rate decreasing rapidly at first, then leveling off and approaching a horizontal asymptote at approximately 2.5%. The error rate stabilizes rather than continuing to decrease to 0%, indicating there is a fundamental limit to the algorithm's accuracy.",
       "category": "Exponential & Logistic",
-      "tags": ["asymptote", "error-rate", "algorithm"],
-      "difficulty": 2
+      "tags": [
+        "asymptote",
+        "error-rate",
+        "algorithm"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Algorithm Error Rate vs Customer Data",
+        "xLabel": "Amount of Customer Data",
+        "yLabel": "Error Rate (%)",
+        "xMin": 0,
+        "xMax": 1000,
+        "yMin": 0,
+        "yMax": 30,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 25
+              },
+              {
+                "x": 100,
+                "y": 18
+              },
+              {
+                "x": 200,
+                "y": 12
+              },
+              {
+                "x": 300,
+                "y": 8
+              },
+              {
+                "x": 400,
+                "y": 6
+              },
+              {
+                "x": 500,
+                "y": 4.5
+              },
+              {
+                "x": 600,
+                "y": 3.5
+              },
+              {
+                "x": 700,
+                "y": 3.0
+              },
+              {
+                "x": 800,
+                "y": 2.7
+              },
+              {
+                "x": 900,
+                "y": 2.6
+              },
+              {
+                "x": 1000,
+                "y": 2.5
+              }
+            ],
+            "label": "Error Rate",
+            "type": "curve"
+          }
+        ],
+        "asymptotes": [
+          {
+            "y": 2.5,
+            "label": "y = 2.5%"
+          }
+        ]
+      }
     },
     {
       "id": 59,
@@ -896,8 +3226,81 @@
       "correctAnswer": 3,
       "explanation": "Reading the graph, as x increases, the average cost curve decreases and approaches a horizontal asymptote at approximately $2 per cover. The cost decreases due to economies of scale but never reaches $0 because there are always some per-unit costs.",
       "category": "Exponential & Logistic",
-      "tags": ["asymptote", "average-cost", "economies-of-scale"],
-      "difficulty": 2
+      "tags": [
+        "asymptote",
+        "average-cost",
+        "economies-of-scale"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "Average Cost per Cover",
+        "xLabel": "Number of Covers (x)",
+        "yLabel": "Average Cost ($)",
+        "xMin": 0,
+        "xMax": 500,
+        "yMin": 0,
+        "yMax": 20,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 18
+              },
+              {
+                "x": 50,
+                "y": 12
+              },
+              {
+                "x": 100,
+                "y": 8
+              },
+              {
+                "x": 150,
+                "y": 6
+              },
+              {
+                "x": 200,
+                "y": 4.5
+              },
+              {
+                "x": 250,
+                "y": 3.5
+              },
+              {
+                "x": 300,
+                "y": 3.0
+              },
+              {
+                "x": 350,
+                "y": 2.6
+              },
+              {
+                "x": 400,
+                "y": 2.3
+              },
+              {
+                "x": 450,
+                "y": 2.15
+              },
+              {
+                "x": 500,
+                "y": 2.05
+              }
+            ],
+            "label": "Average Cost",
+            "type": "curve"
+          }
+        ],
+        "asymptotes": [
+          {
+            "y": 2,
+            "label": "y = $2"
+          }
+        ]
+      }
     },
     {
       "id": 60,
@@ -911,8 +3314,118 @@
       "correctAnswer": 3,
       "explanation": "The graph shows both curves leveling off over time, each approaching its own horizontal asymptote. Group A (active users) stabilizes at a higher retention rate than Group B. The two different asymptotes indicate that early engagement (sharing pictures) leads to a permanently higher retention rate.",
       "category": "Exponential & Logistic",
-      "tags": ["asymptote", "retention", "compare-groups"],
-      "difficulty": 2
+      "tags": [
+        "asymptote",
+        "retention",
+        "compare-groups"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "curve",
+        "title": "User Retention by Group",
+        "xLabel": "Days since signup",
+        "yLabel": "Retention Rate (%)",
+        "xMin": 0,
+        "xMax": 90,
+        "yMin": 0,
+        "yMax": 100,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 100
+              },
+              {
+                "x": 5,
+                "y": 88
+              },
+              {
+                "x": 10,
+                "y": 80
+              },
+              {
+                "x": 15,
+                "y": 75
+              },
+              {
+                "x": 20,
+                "y": 71
+              },
+              {
+                "x": 30,
+                "y": 68
+              },
+              {
+                "x": 40,
+                "y": 66
+              },
+              {
+                "x": 50,
+                "y": 65
+              },
+              {
+                "x": 60,
+                "y": 64.5
+              },
+              {
+                "x": 90,
+                "y": 64
+              }
+            ],
+            "label": "Group A (Active)",
+            "type": "curve"
+          },
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 100
+              },
+              {
+                "x": 5,
+                "y": 75
+              },
+              {
+                "x": 10,
+                "y": 60
+              },
+              {
+                "x": 15,
+                "y": 50
+              },
+              {
+                "x": 20,
+                "y": 44
+              },
+              {
+                "x": 30,
+                "y": 39
+              },
+              {
+                "x": 40,
+                "y": 36
+              },
+              {
+                "x": 50,
+                "y": 34
+              },
+              {
+                "x": 60,
+                "y": 33
+              },
+              {
+                "x": 90,
+                "y": 32
+              }
+            ],
+            "label": "Group B (Inactive)",
+            "type": "curve",
+            "dashed": true
+          }
+        ]
+      }
     },
     {
       "id": 61,
@@ -926,8 +3439,101 @@
       "correctAnswer": 1,
       "explanation": "An r^2 value of 0.82 indicates a strong correlation (generally r^2 > 0.7 is considered strong). The data shows a roughly linear pattern with a constant rate of change, making a linear model appropriate. The data is not S-shaped or exponential in nature.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "r-squared", "linear-fit"],
-      "difficulty": 2
+      "tags": [
+        "regression",
+        "r-squared",
+        "linear-fit"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "scatter",
+        "title": "Sales Correlation",
+        "xLabel": "Item A Sales",
+        "yLabel": "Item B Sales",
+        "xMin": 0,
+        "xMax": 100,
+        "yMin": 0,
+        "yMax": 100,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 10,
+                "y": 15
+              },
+              {
+                "x": 20,
+                "y": 25
+              },
+              {
+                "x": 25,
+                "y": 32
+              },
+              {
+                "x": 30,
+                "y": 35
+              },
+              {
+                "x": 35,
+                "y": 42
+              },
+              {
+                "x": 40,
+                "y": 48
+              },
+              {
+                "x": 45,
+                "y": 50
+              },
+              {
+                "x": 50,
+                "y": 55
+              },
+              {
+                "x": 55,
+                "y": 62
+              },
+              {
+                "x": 60,
+                "y": 65
+              },
+              {
+                "x": 65,
+                "y": 70
+              },
+              {
+                "x": 70,
+                "y": 75
+              },
+              {
+                "x": 75,
+                "y": 78
+              },
+              {
+                "x": 80,
+                "y": 85
+              },
+              {
+                "x": 85,
+                "y": 88
+              },
+              {
+                "x": 90,
+                "y": 92
+              }
+            ],
+            "label": "Sales Data",
+            "type": "scatter"
+          }
+        ],
+        "regression": {
+          "type": "linear",
+          "slope": 1.0,
+          "intercept": 5,
+          "r2": 0.82
+        }
+      }
     },
     {
       "id": 62,
@@ -941,8 +3547,117 @@
       "correctAnswer": 0,
       "explanation": "An r^2 value of 0.18 means only 18% of the variation in the data is explained by the model. This is a very weak fit (well below 0.5). With such a weak correlation, predictions based on this model would be unreliable and should not be made.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "r-squared", "weak-fit"],
-      "difficulty": 1
+      "tags": [
+        "regression",
+        "r-squared",
+        "weak-fit"
+      ],
+      "difficulty": 1,
+      "graphData": {
+        "type": "scatter",
+        "title": "Product Sales Comparison (20 Months)",
+        "xLabel": "Product 1 Sales",
+        "yLabel": "Product 2 Sales",
+        "xMin": 0,
+        "xMax": 100,
+        "yMin": 0,
+        "yMax": 100,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 10,
+                "y": 60
+              },
+              {
+                "x": 15,
+                "y": 20
+              },
+              {
+                "x": 20,
+                "y": 70
+              },
+              {
+                "x": 25,
+                "y": 30
+              },
+              {
+                "x": 30,
+                "y": 80
+              },
+              {
+                "x": 35,
+                "y": 25
+              },
+              {
+                "x": 40,
+                "y": 55
+              },
+              {
+                "x": 45,
+                "y": 40
+              },
+              {
+                "x": 50,
+                "y": 65
+              },
+              {
+                "x": 55,
+                "y": 35
+              },
+              {
+                "x": 60,
+                "y": 75
+              },
+              {
+                "x": 65,
+                "y": 45
+              },
+              {
+                "x": 70,
+                "y": 50
+              },
+              {
+                "x": 75,
+                "y": 60
+              },
+              {
+                "x": 80,
+                "y": 30
+              },
+              {
+                "x": 85,
+                "y": 70
+              },
+              {
+                "x": 90,
+                "y": 55
+              },
+              {
+                "x": 92,
+                "y": 40
+              },
+              {
+                "x": 95,
+                "y": 65
+              },
+              {
+                "x": 98,
+                "y": 50
+              }
+            ],
+            "label": "Sales Data",
+            "type": "scatter"
+          }
+        ],
+        "regression": {
+          "type": "linear",
+          "slope": 0.3,
+          "intercept": 35,
+          "r2": 0.18
+        }
+      }
     },
     {
       "id": 63,
@@ -956,8 +3671,79 @@
       "correctAnswer": 2,
       "explanation": "With r^2 = 0.83, the correlation is strong. Exponential functions are characterized by data that increases by a constant ratio (multiplicative growth) rather than a constant amount. The data pattern matches exponential behavior, confirming the model is a good fit.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "exponential", "constant-ratio"],
-      "difficulty": 2
+      "tags": [
+        "regression",
+        "exponential",
+        "constant-ratio"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "scatter",
+        "title": "Vacancy Days vs Rental Price",
+        "xLabel": "Price vs Market Value Ratio",
+        "yLabel": "Vacancy Days",
+        "xMin": 0.8,
+        "xMax": 1.5,
+        "yMin": 0,
+        "yMax": 150,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0.85,
+                "y": 8
+              },
+              {
+                "x": 0.9,
+                "y": 12
+              },
+              {
+                "x": 0.95,
+                "y": 18
+              },
+              {
+                "x": 1.0,
+                "y": 25
+              },
+              {
+                "x": 1.05,
+                "y": 35
+              },
+              {
+                "x": 1.1,
+                "y": 48
+              },
+              {
+                "x": 1.15,
+                "y": 62
+              },
+              {
+                "x": 1.2,
+                "y": 78
+              },
+              {
+                "x": 1.25,
+                "y": 95
+              },
+              {
+                "x": 1.3,
+                "y": 110
+              },
+              {
+                "x": 1.35,
+                "y": 125
+              },
+              {
+                "x": 1.4,
+                "y": 138
+              }
+            ],
+            "label": "Vacancy Data",
+            "type": "scatter"
+          }
+        ]
+      }
     },
     {
       "id": 64,
@@ -971,8 +3757,73 @@
       "correctAnswer": 3,
       "explanation": "An r^2 value of 0.9947 is extremely close to 1, indicating that approximately 99.5% of the variation in total cost is explained by the number of items. This is a very strong correlation, meaning the linear model fits the data almost perfectly.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "r-squared", "interpret"],
-      "difficulty": 1
+      "tags": [
+        "regression",
+        "r-squared",
+        "interpret"
+      ],
+      "difficulty": 1,
+      "graphData": {
+        "type": "scatter",
+        "title": "Items vs Total Cost",
+        "xLabel": "Number of Items",
+        "yLabel": "Total Cost ($)",
+        "xMin": 0,
+        "xMax": 50,
+        "yMin": 0,
+        "yMax": 120,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 5,
+                "y": 12
+              },
+              {
+                "x": 10,
+                "y": 24
+              },
+              {
+                "x": 15,
+                "y": 36
+              },
+              {
+                "x": 20,
+                "y": 48
+              },
+              {
+                "x": 25,
+                "y": 60
+              },
+              {
+                "x": 30,
+                "y": 72
+              },
+              {
+                "x": 35,
+                "y": 84
+              },
+              {
+                "x": 40,
+                "y": 96
+              },
+              {
+                "x": 45,
+                "y": 108
+              }
+            ],
+            "label": "Cost Data",
+            "type": "scatter"
+          }
+        ],
+        "regression": {
+          "type": "linear",
+          "slope": 2.4,
+          "intercept": 0,
+          "r2": 0.9947
+        }
+      }
     },
     {
       "id": 65,
@@ -980,14 +3831,81 @@
       "options": [
         "Yes, it would be appropriate because the data has a strong correlation, and 12 is within the range for accurate extrapolation.",
         "Yes, it would be appropriate because 12 is an interpolation value.",
-        "No, it would not be appropriate because 12 is not close enough to the known data values, so it would be an extreme extrapolation value.",
+        "No, it would not be appropriate because exponential models are unreliable for extrapolation, even when the prediction point is close to the data range.",
         "No, it would not be appropriate because 12 is an interpolation value."
       ],
       "correctAnswer": 2,
-      "explanation": "The data covers years 0-10. Predicting at x = 12 is extrapolation (outside the known data range). While x = 12 is not extremely far from x = 10, it is far enough outside the 10-year data window that the model may not accurately represent real depreciation. This makes it an extreme extrapolation that should not be relied upon.",
+      "explanation": "The data covers years 0-10. Predicting at x = 12 is extrapolation (outside the known data range). For exponential models, even small extrapolations can produce unreliable predictions because exponential functions grow or decay rapidly. Unlike linear models where small extrapolations are usually safe, exponential models amplify errors outside the data range. Since this is an exponential decay model, predicting beyond the known data is not appropriate.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "extrapolation", "appropriate"],
-      "difficulty": 2
+      "tags": [
+        "regression",
+        "extrapolation",
+        "appropriate"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "scatter",
+        "title": "Car Depreciation (10 Years)",
+        "xLabel": "Year",
+        "yLabel": "Value ($)",
+        "xMin": 0,
+        "xMax": 12,
+        "yMin": 0,
+        "yMax": 30000,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 26878
+              },
+              {
+                "x": 1,
+                "y": 21800
+              },
+              {
+                "x": 2,
+                "y": 17650
+              },
+              {
+                "x": 3,
+                "y": 14300
+              },
+              {
+                "x": 4,
+                "y": 11600
+              },
+              {
+                "x": 5,
+                "y": 9400
+              },
+              {
+                "x": 6,
+                "y": 7600
+              },
+              {
+                "x": 7,
+                "y": 6200
+              },
+              {
+                "x": 8,
+                "y": 5000
+              },
+              {
+                "x": 9,
+                "y": 4050
+              },
+              {
+                "x": 10,
+                "y": 3280
+              }
+            ],
+            "label": "Car Value",
+            "type": "scatter"
+          }
+        ]
+      }
     },
     {
       "id": 66,
@@ -1001,8 +3919,72 @@
       "correctAnswer": 1,
       "explanation": "The r^2 = 0.96 indicates very strong correlation. While t = 24 is outside the 19-year data range (extrapolation), it is only 5 years beyond, which is considered a somewhat safe extrapolation. Additionally, logistic functions naturally level off, so predictions slightly beyond the data are more reliable than with other model types.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "extrapolation", "logistic", "safe"],
-      "difficulty": 2
+      "tags": [
+        "regression",
+        "extrapolation",
+        "logistic",
+        "safe"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "scatter",
+        "title": "University Enrollment Growth (19 Years)",
+        "xLabel": "Years since start (t)",
+        "yLabel": "Enrollment (thousands)",
+        "xMin": 0,
+        "xMax": 25,
+        "yMin": 0,
+        "yMax": 10,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 0.7
+              },
+              {
+                "x": 2,
+                "y": 1.2
+              },
+              {
+                "x": 4,
+                "y": 2.0
+              },
+              {
+                "x": 6,
+                "y": 3.2
+              },
+              {
+                "x": 8,
+                "y": 4.8
+              },
+              {
+                "x": 10,
+                "y": 6.2
+              },
+              {
+                "x": 12,
+                "y": 7.3
+              },
+              {
+                "x": 14,
+                "y": 8.1
+              },
+              {
+                "x": 16,
+                "y": 8.7
+              },
+              {
+                "x": 18,
+                "y": 9.1
+              }
+            ],
+            "label": "Enrollment",
+            "type": "scatter"
+          }
+        ]
+      }
     },
     {
       "id": 67,
@@ -1016,8 +3998,77 @@
       "correctAnswer": 3,
       "explanation": "The plan is appropriate for two reasons: (1) r^2 = 0.92 is close to 1, indicating a strong fit, and (2) x = 45 falls within the range of known data values, making it an interpolation (not extrapolation). Both conditions support making a reliable prediction.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "interpolation", "r-squared"],
-      "difficulty": 2
+      "tags": [
+        "regression",
+        "interpolation",
+        "r-squared"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "scatter",
+        "title": "Cost vs Number of Items",
+        "xLabel": "Number of Items (x)",
+        "yLabel": "Cost ($)",
+        "xMin": 0,
+        "xMax": 100,
+        "yMin": 350,
+        "yMax": 450,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 10,
+                "y": 371
+              },
+              {
+                "x": 20,
+                "y": 376
+              },
+              {
+                "x": 30,
+                "y": 382
+              },
+              {
+                "x": 40,
+                "y": 387
+              },
+              {
+                "x": 45,
+                "y": 389
+              },
+              {
+                "x": 50,
+                "y": 392
+              },
+              {
+                "x": 60,
+                "y": 397
+              },
+              {
+                "x": 70,
+                "y": 402
+              },
+              {
+                "x": 80,
+                "y": 407
+              },
+              {
+                "x": 90,
+                "y": 413
+              }
+            ],
+            "label": "Cost Data",
+            "type": "scatter"
+          }
+        ],
+        "regression": {
+          "type": "linear",
+          "slope": 0.52,
+          "intercept": 366,
+          "r2": 0.92
+        }
+      }
     },
     {
       "id": 68,
@@ -1031,8 +4082,63 @@
       "correctAnswer": 3,
       "explanation": "Checking: f(12) = -24.34(144) + 336.21(12) + 53.88 = -3504.96 + 4034.52 + 53.88 = 583.44. The calculation is correct, r^2 = 0.93 indicates a strong fit, and x = 12 is close to the known data range. All three conditions validate the conclusion.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "polynomial", "validate-prediction"],
-      "difficulty": 3
+      "tags": [
+        "regression",
+        "polynomial",
+        "validate-prediction"
+      ],
+      "difficulty": 3,
+      "graphData": {
+        "type": "scatter",
+        "title": "Revenue vs Selling Price",
+        "xLabel": "Price ($)",
+        "yLabel": "Revenue ($)",
+        "xMin": 0,
+        "xMax": 18,
+        "yMin": 0,
+        "yMax": 700,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 2,
+                "y": 150
+              },
+              {
+                "x": 4,
+                "y": 320
+              },
+              {
+                "x": 6,
+                "y": 450
+              },
+              {
+                "x": 8,
+                "y": 530
+              },
+              {
+                "x": 10,
+                "y": 570
+              },
+              {
+                "x": 12,
+                "y": 583
+              },
+              {
+                "x": 14,
+                "y": 550
+              },
+              {
+                "x": 16,
+                "y": 480
+              }
+            ],
+            "label": "Revenue Data",
+            "type": "scatter"
+          }
+        ]
+      }
     },
     {
       "id": 69,
@@ -1046,8 +4152,71 @@
       "correctAnswer": 3,
       "explanation": "Even though r^2 = 0.76 suggests a moderate fit, x = 180 (180,000 items) is far outside the range of known data values. Extrapolating exponential functions far beyond the data range produces highly unreliable predictions. The extreme extrapolation makes this prediction invalid.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "extrapolation", "invalid"],
-      "difficulty": 2
+      "tags": [
+        "regression",
+        "extrapolation",
+        "invalid"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "scatter",
+        "title": "Revenue vs Units Sold",
+        "xLabel": "Units Sold (thousands)",
+        "yLabel": "Revenue ($)",
+        "xMin": 0,
+        "xMax": 200,
+        "yMin": 0,
+        "yMax": 700,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 10,
+                "y": 234
+              },
+              {
+                "x": 20,
+                "y": 242
+              },
+              {
+                "x": 30,
+                "y": 253
+              },
+              {
+                "x": 40,
+                "y": 262
+              },
+              {
+                "x": 50,
+                "y": 273
+              },
+              {
+                "x": 60,
+                "y": 285
+              },
+              {
+                "x": 70,
+                "y": 297
+              },
+              {
+                "x": 80,
+                "y": 312
+              },
+              {
+                "x": 90,
+                "y": 327
+              },
+              {
+                "x": 100,
+                "y": 343
+              }
+            ],
+            "label": "Revenue Data",
+            "type": "scatter"
+          }
+        ]
+      }
     },
     {
       "id": 70,
@@ -1061,8 +4230,74 @@
       "correctAnswer": 0,
       "explanation": "The r^2 = 0.96 indicates a very strong linear correlation. Since the data covers 8 years and x = 10 is only 2 years beyond the data range, this is a close extrapolation. The strong fit combined with the proximity to known data makes this prediction appropriate.",
       "category": "Regression & Predictions",
-      "tags": ["regression", "extrapolation", "close", "appropriate"],
-      "difficulty": 2
+      "tags": [
+        "regression",
+        "extrapolation",
+        "close",
+        "appropriate"
+      ],
+      "difficulty": 2,
+      "graphData": {
+        "type": "scatter",
+        "title": "Car Depreciation (8 Years)",
+        "xLabel": "Year",
+        "yLabel": "Value ($)",
+        "xMin": 0,
+        "xMax": 12,
+        "yMin": 0,
+        "yMax": 26000,
+        "noFill": true,
+        "series": [
+          {
+            "data": [
+              {
+                "x": 0,
+                "y": 24109
+              },
+              {
+                "x": 1,
+                "y": 21503
+              },
+              {
+                "x": 2,
+                "y": 18896
+              },
+              {
+                "x": 3,
+                "y": 16290
+              },
+              {
+                "x": 4,
+                "y": 13683
+              },
+              {
+                "x": 5,
+                "y": 11077
+              },
+              {
+                "x": 6,
+                "y": 8470
+              },
+              {
+                "x": 7,
+                "y": 5864
+              },
+              {
+                "x": 8,
+                "y": 3257
+              }
+            ],
+            "label": "Car Value",
+            "type": "scatter"
+          }
+        ],
+        "regression": {
+          "type": "linear",
+          "slope": -2606.54,
+          "intercept": 24109.37,
+          "r2": 0.96
+        }
+      }
     }
   ]
 }
