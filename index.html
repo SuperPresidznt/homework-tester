@@ -979,6 +979,8 @@ button:focus-visible {
 .pet-meter-fill.evolution{background:linear-gradient(90deg,#9b59b6,#3498db)}
 .pet-meter-fill.care{background:linear-gradient(90deg,#10b981,#06b6d4)}
 .pet-sick-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:6px 10px;border-radius:8px;font-size:12px;text-align:center;margin:6px 0;animation:buddySick 2s ease-in-out infinite}
+.pet-evo-timer{font-size:11px;color:var(--blue);text-align:center;margin:4px 0;font-weight:500}
+.food-growth{font-size:9px;color:var(--green);margin-left:4px;font-weight:600}
 .pet-modal-content h4{font-size:13px;color:var(--navy);margin:12px 0 8px;border-bottom:1px solid var(--gray-200);padding-bottom:4px}
 .pet-food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
 .pet-food-btn{padding:8px;border:2px solid var(--gray-200);border-radius:8px;background:var(--white);font-size:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
@@ -1521,7 +1523,6 @@ button:focus-visible {
                 <label><input type="checkbox" id="gamifyGarden" checked onchange="Gamification.updateSettings()"> Garden System</label>
                 <label><input type="checkbox" id="gamifyCoinPopups" checked onchange="Gamification.updateSettings()"> Coin Popups</label>
                 <label><input type="checkbox" id="gamifyPixelArt" onchange="Gamification.updateSettings()"> Pixel Art Mode</label>
-                <label><input type="checkbox" id="gamifyDemoSpeed" onchange="Gamification.updateSettings()"> Demo Speed (60x decay - see pet effects live)</label>
                 <div class="volume-row">
                     <label>Volume:</label>
                     <input type="range" id="gamifyVolume" min="0" max="100" value="50" onchange="Gamification.updateSettings()">
@@ -1885,10 +1886,10 @@ const Gamification = {
     // Shop catalog
     SHOP: {
         food: {
-            kibble:  { name: 'Kibble',    price: 10,  icon: '🍖', hunger: 15, happiness: 5 },
-            treat:   { name: 'Treat',     price: 25,  icon: '🍪', hunger: 25, happiness: 15 },
-            feast:   { name: 'Feast',     price: 60,  icon: '🍗', hunger: 50, happiness: 30 },
-            goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 40, happiness: 50 }
+            kibble:  { name: 'Kibble',    price: 10,  icon: '🍖', hunger: 15, happiness: 5,  careBonus: 5 },
+            treat:   { name: 'Treat',     price: 25,  icon: '🍪', hunger: 25, happiness: 15, careBonus: 10 },
+            feast:   { name: 'Feast',     price: 60,  icon: '🍗', hunger: 50, happiness: 30, careBonus: 20 },
+            goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 40, happiness: 50, careBonus: 15 }
         },
         seeds: {
             sunflower: { name: 'Sunflower',     price: 15,  icon: '🌻', gpNeeded: 10, stages: 4, coinReward: 10, xpReward: 25,
@@ -1968,7 +1969,6 @@ const Gamification = {
                 garden: true,
                 coinPopups: true,
                 pixelArt: false,
-                demoSpeed: false,
                 volume: 50
             },
             stats: {
@@ -2726,7 +2726,6 @@ const Gamification = {
         state.settings.garden = document.getElementById('gamifyGarden')?.checked ?? true;
         state.settings.coinPopups = document.getElementById('gamifyCoinPopups')?.checked ?? true;
         state.settings.pixelArt = document.getElementById('gamifyPixelArt')?.checked ?? false;
-        state.settings.demoSpeed = document.getElementById('gamifyDemoSpeed')?.checked ?? false;
         state.settings.volume = parseInt(document.getElementById('gamifyVolume')?.value ?? 50);
 
         const volumeLabel = document.getElementById('gamifyVolumeLabel');
@@ -2748,11 +2747,6 @@ const Gamification = {
         // Clear sprite cache when pixel art toggled
         Sprites._cache = {};
 
-        // Restart decay timer when demo speed toggled
-        if (window._decayTimer) clearInterval(window._decayTimer);
-        const decayInt = state.settings.demoSpeed ? 5 * 1000 : 5 * 60 * 1000;
-        window._decayTimer = setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); }, decayInt);
-        if (state.settings.demoSpeed) { Garden.decayWater(); Garden.decayPetStats(); }
     },
 
     // Load settings into UI
@@ -2782,9 +2776,6 @@ const Gamification = {
 
         const el5d = document.getElementById('gamifyPixelArt');
         if (el5d) el5d.checked = !!state.settings.pixelArt;
-
-        const el5e = document.getElementById('gamifyDemoSpeed');
-        if (el5e) el5e.checked = !!state.settings.demoSpeed;
 
         const el6 = document.getElementById('gamifyVolume');
         if (el6) el6.value = state.settings.volume;
@@ -3855,60 +3846,58 @@ const Garden = {
     },
 
     // Decay pet hunger/happiness over time (all owned pets)
+    // Base rates: hunger 12/hr, happiness 8/hr — you feel it within a session
+    // Bird at 100/100 → hungry in ~4h, sick in ~8h
+    // Dragon (1.5x) → hungry in ~2.5h, sick in ~5h
+    // Phoenix (2x) → hungry in ~2h, sick in ~4h
     decayPetStats() {
         const state = Gamification.getState();
         const now = Date.now();
-        const demo = state.settings.demoSpeed;
-        const timeMultiplier = demo ? 60 : 1; // Demo: 1 min = 1 hour
         const pets = state.pets || [state.studyBuddy];
         const petCount = pets.length;
 
         let anyChanged = false;
         pets.forEach(pet => {
             const last = pet.lastDecayCheck || now;
-            let hoursPassed = (now - last) / (1000 * 60 * 60);
-            hoursPassed *= timeMultiplier;
+            const hoursPassed = (now - last) / (1000 * 60 * 60);
 
-            const minInterval = demo ? 0.001 : 0.5;
-            if (hoursPassed < minInterval) return;
+            if (hoursPassed < 0.015) return; // ~1 min minimum
 
             const diff = Gamification.getSpeciesDifficulty(pet.species);
-            // More pets = each is harder (10% more decay per extra pet)
-            const crowdPenalty = 1 + (petCount - 1) * 0.1;
+            const crowdPenalty = 1 + (petCount - 1) * 0.15;
             const decayRate = diff * crowdPenalty;
 
-            const hungerDecay = Math.floor(hoursPassed * 4 * decayRate);
-            const happyDecay = Math.floor(hoursPassed * 3 * decayRate);
+            const hungerDecay = hoursPassed * 12 * decayRate;
+            const happyDecay = hoursPassed * 8 * decayRate;
 
             pet.hunger = Math.max(0, (pet.hunger ?? 100) - hungerDecay);
             pet.happiness = Math.max(0, (pet.happiness ?? 100) - happyDecay);
 
-            // Passive care minutes
-            const passiveCare = Math.min(Math.floor(hoursPassed), demo ? 60 : 24);
+            // Passive care minutes (1 per real hour)
+            const passiveCare = Math.min(hoursPassed, 24);
             pet.careMinutes = (pet.careMinutes || 0) + passiveCare;
 
-            // Sickness
+            // Sickness at both below 15
             if (pet.hunger < 15 && pet.happiness < 15) pet.sick = true;
             if (pet.sick) {
-                pet.hunger = Math.max(0, pet.hunger - Math.floor(hoursPassed * 2 * decayRate));
-                pet.happiness = Math.max(0, pet.happiness - Math.floor(hoursPassed * 2 * decayRate));
+                pet.hunger = Math.max(0, pet.hunger - hoursPassed * 4 * decayRate);
+                pet.happiness = Math.max(0, pet.happiness - hoursPassed * 4 * decayRate);
             }
 
             pet.lastDecayCheck = now;
             anyChanged = true;
         });
 
-        // Bonuses (only for active pet)
+        // Bonuses (active pet only)
         const buddy = state.studyBuddy;
-        const last = buddy.lastDecayCheck || now;
-        let h = ((now - last) / (1000 * 60 * 60)) * timeMultiplier;
-        if (h < 0.001) h = 0;
+        const bLast = buddy.lastDecayCheck || now;
+        const bH = (now - bLast) / (1000 * 60 * 60);
         const growingCount = (state.garden.plots || []).filter(p => p && p.seedType).length;
-        if (growingCount >= 3) {
-            buddy.happiness = Math.min(100, (buddy.happiness ?? 0) + Math.floor(h * 3));
+        if (growingCount >= 3 && bH > 0) {
+            buddy.happiness = Math.min(100, (buddy.happiness ?? 0) + bH * 5);
         }
-        if ((buddy.happiness ?? 0) > 75) {
-            state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + Math.floor(h * 2.5));
+        if ((buddy.happiness ?? 0) > 75 && bH > 0) {
+            state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + bH * 2.5);
         }
 
         if (anyChanged) {
@@ -3942,6 +3931,20 @@ const PetModal = {
             const carePct = neededCare > 0 ? Math.min(100, Math.floor((currentCare / neededCare) * 100)) : 100;
             progressInfo = `<div class="pet-meter"><span>XP Progress</span><div class="pet-meter-bar"><div class="pet-meter-fill evolution" style="width:${xpPct}%"></div></div><span>${xpPct}%</span></div>`;
             progressInfo += `<div class="pet-meter"><span>Care Time</span><div class="pet-meter-bar"><div class="pet-meter-fill care" style="width:${carePct}%"></div></div><span>${carePct}%</span></div>`;
+
+            // Evolution timer estimate
+            const remainXp = Math.max(0, neededXp - currentXp);
+            const remainCare = Math.max(0, neededCare - currentCare);
+            // ~25 avg XP per question (correctAnswer), 3 care min per question
+            const questionsForXp = Math.ceil(remainXp / 25);
+            const questionsForCare = Math.ceil(remainCare / 3);
+            const questionsNeeded = Math.max(questionsForXp, questionsForCare);
+            // ~2 min per question average
+            const minutesNeeded = questionsNeeded * 2;
+            const evoHours = Math.floor(minutesNeeded / 60);
+            const evoMins = minutesNeeded % 60;
+            const timeStr = evoHours > 0 ? `~${evoHours}h ${evoMins}m` : `~${evoMins}m`;
+            progressInfo += `<div class="pet-evo-timer">Next evolution: ~${questionsNeeded} questions (${timeStr} of study)</div>`;
         } else {
             progressInfo = '<div class="pet-meter"><span>Max Evolution!</span></div>';
         }
@@ -3953,7 +3956,7 @@ const PetModal = {
         let foodHtml = '<div class="pet-food-grid">';
         for (const [id, item] of Object.entries(Gamification.SHOP.food)) {
             const count = inv[id] || 0;
-            foodHtml += `<button class="pet-food-btn" onclick="PetModal.feed('${id}')" ${count <= 0 ? 'disabled' : ''}>${item.icon} ${item.name} <span class="pet-food-count">x${count}</span></button>`;
+            foodHtml += `<button class="pet-food-btn" onclick="PetModal.feed('${id}')" ${count <= 0 ? 'disabled' : ''} title="+${item.hunger} hunger, +${item.happiness} happy, +${item.careBonus || 0} growth">${item.icon} ${item.name} <span class="pet-food-count">x${count}</span>${item.careBonus ? '<span class="food-growth">+' + item.careBonus + ' growth</span>' : ''}</button>`;
         }
         foodHtml += '</div>';
 
@@ -4060,15 +4063,37 @@ const PetModal = {
         if (!item) return;
 
         inv[foodId]--;
-        state.studyBuddy.hunger = Math.min(100, (state.studyBuddy.hunger ?? 0) + item.hunger);
-        state.studyBuddy.happiness = Math.min(100, (state.studyBuddy.happiness ?? 0) + item.happiness);
-        state.studyBuddy.totalMealsEaten = (state.studyBuddy.totalMealsEaten || 0) + 1;
-        state.studyBuddy.lastFed = Date.now();
-        state.studyBuddy.lastInteraction = Date.now();
+        const buddy = state.studyBuddy;
+        buddy.hunger = Math.min(100, (buddy.hunger ?? 0) + item.hunger);
+        buddy.happiness = Math.min(100, (buddy.happiness ?? 0) + item.happiness);
+        buddy.totalMealsEaten = (buddy.totalMealsEaten || 0) + 1;
+        buddy.lastFed = Date.now();
+        buddy.lastInteraction = Date.now();
+
+        // Feeding gives care minutes toward evolution
+        if (item.careBonus) {
+            buddy.careMinutes = (buddy.careMinutes || 0) + item.careBonus;
+            // Check evolution
+            for (let i = Gamification.BUDDY_STAGES.length - 1; i >= 0; i--) {
+                const req = Gamification.BUDDY_STAGES[i];
+                if (buddy.totalXpFed >= req.xpNeeded && (buddy.careMinutes || 0) >= req.careNeeded) {
+                    if (buddy.stage < req.stage) {
+                        buddy.stage = req.stage;
+                        Gamification.showAchievementToast({
+                            icon: Gamification.getSpeciesEmoji(buddy.species, req.stage),
+                            name: buddy.name + ' evolved!',
+                            desc: 'Now a ' + Gamification.getSpeciesStageName(buddy.species, req.stage),
+                            xp: 0
+                        });
+                    }
+                    break;
+                }
+            }
+        }
 
         // Feeding can heal sickness
-        if (state.studyBuddy.sick && state.studyBuddy.hunger > 30 && state.studyBuddy.happiness > 30) {
-            state.studyBuddy.sick = false;
+        if (buddy.sick && buddy.hunger > 30 && buddy.happiness > 30) {
+            buddy.sick = false;
         }
 
         Gamification.updateBuddyMood();
@@ -8233,13 +8258,10 @@ async function init() {
     // Initialize gamification system
     Gamification.init();
 
-    // Initialize garden decay timers
+    // Initialize garden decay timers — checks every 60s for live feel
     Garden.decayWater();
     Garden.decayPetStats();
-    // Normal: 5 min intervals. Demo mode: every 5 seconds
-    const demoOn = Gamification.getState().settings.demoSpeed;
-    const decayInterval = demoOn ? 5 * 1000 : 5 * 60 * 1000;
-    window._decayTimer = setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); }, decayInterval);
+    setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); }, 60 * 1000);
 
     // Hide garden/shop buttons if garden disabled
     const gState = Gamification.getState();
