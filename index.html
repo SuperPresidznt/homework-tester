@@ -926,38 +926,88 @@ button:focus-visible {
 
 /* === GARDEN === */
 .garden-header{display:flex;align-items:center;gap:8px;padding:12px 0;margin-bottom:12px;border-bottom:2px solid var(--gray-200);flex-wrap:wrap}
-.garden-water-bar{display:flex;align-items:center;gap:6px;font-size:13px}
-.water-bar-track{width:100px;height:10px;background:var(--gray-200);border-radius:5px;overflow:hidden}
-.water-bar-fill{height:100%;background:linear-gradient(90deg,#3498db,#2ecc71);border-radius:5px;transition:width .3s}
-.garden-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;max-width:480px;margin-left:auto;margin-right:auto}
-.garden-plot{aspect-ratio:1;background:var(--white);border:2px solid var(--gray-200);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;min-height:100px}
-.garden-plot:hover{transform:scale(1.03);box-shadow:0 4px 12px rgba(0,0,0,.1)}
-.garden-plot.locked{background:var(--gray-100);cursor:pointer;opacity:.5}
-.garden-plot.locked:hover{opacity:.7}
-.plot-lock{font-size:24px}
-.plot-empty{font-size:32px;color:var(--gray-400);font-weight:bold}
-.garden-plot.empty{border-style:dashed}
-.plot-plant{font-size:40px;transition:all .3s}
-.plot-plant.glow-bounce{animation:glowBounce 1s infinite alternate;filter:drop-shadow(0 0 8px rgba(255,215,0,.6))}
-@keyframes glowBounce{0%{transform:scale(1)}100%{transform:scale(1.1) translateY(-4px)}}
-.plot-progress-bar{width:70%;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden;margin-top:4px}
-.plot-progress-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--green-light));border-radius:3px}
-.plot-ready{font-size:11px;font-weight:bold;color:var(--green);margin-top:4px;animation:pulse 1s infinite alternate}
-@keyframes pulse{0%{opacity:.7}100%{opacity:1}}
-.plot-label{font-size:10px;color:var(--gray-600);margin-top:2px}
-.plot-fertilized{position:absolute;top:4px;right:4px;font-size:14px}
-.garden-decos{grid-column:1/-1;display:flex;gap:8px;justify-content:center;padding:8px;background:var(--gray-50);border-radius:8px}
-.garden-deco{font-size:28px;cursor:default}
 
-/* Garden Pet */
-.garden-pet{text-align:center;padding:16px;cursor:pointer;transition:transform .2s}
-.garden-pet:hover{transform:scale(1.05)}
+/* Garden Scene */
+.garden-scene{position:relative;border-radius:16px;overflow:hidden;min-height:420px;background:linear-gradient(to bottom,#87CEEB 0%,#a8d8ea 28%,#7CCD7C 28%,#6ab84a 40%,#5a9e3a 100%);padding:0;display:flex;flex-direction:column}
+.garden-sky{position:absolute;top:0;left:0;right:0;height:28%;pointer-events:none;z-index:1}
+.garden-sky-sun{position:absolute;top:12px;right:16px;font-size:28px;filter:drop-shadow(0 0 8px rgba(255,200,0,.5));transition:opacity .3s}
+.garden-sky-stars{display:none;position:absolute;top:8px;left:16px;font-size:16px;letter-spacing:12px}
+.garden-fence{position:relative;z-index:2;display:flex;justify-content:center;padding:4px 12px 0;font-size:11px;letter-spacing:1px;color:#8B6914;opacity:.5;user-select:none}
+.garden-ground{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:8px 16px 12px}
+.garden-plots{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:480px;margin:0 auto;width:100%}
+
+/* Dirt plot beds */
+.garden-plot{aspect-ratio:1;background:linear-gradient(145deg,#8B6C42,#6B4E2E);border:2px solid #5a3e1b;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;position:relative;min-height:100px;box-shadow:inset 0 2px 6px rgba(0,0,0,.3),0 3px 6px rgba(0,0,0,.2)}
+.garden-plot:hover{transform:scale(1.04);box-shadow:inset 0 2px 6px rgba(0,0,0,.3),0 5px 14px rgba(0,0,0,.25)}
+.garden-plot.locked{background:linear-gradient(145deg,#6b6b6b,#4a4a4a);border-color:#3a3a3a;cursor:pointer;opacity:.6}
+.garden-plot.locked:hover{opacity:.75}
+.plot-lock{font-size:24px}
+.plot-empty-icon{font-size:28px;opacity:.6;transition:opacity .2s}
+.garden-plot.empty:hover .plot-empty-icon{opacity:1}
+.garden-plot.empty{border-style:dashed;border-color:#7a5c30}
+.plot-plant{font-size:40px;transition:all .3s;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+.plot-plant.glow-bounce{animation:glowBounce 1s infinite alternate;filter:drop-shadow(0 0 10px rgba(255,215,0,.7)) drop-shadow(0 0 20px rgba(255,215,0,.3))}
+@keyframes glowBounce{0%{transform:scale(1)}100%{transform:scale(1.12) translateY(-5px)}}
+.plot-progress-bar{width:75%;height:5px;background:rgba(0,0,0,.3);border-radius:3px;overflow:hidden;margin-top:6px}
+.plot-progress-fill{height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);border-radius:3px;transition:width .3s}
+.plot-ready{font-size:11px;font-weight:bold;color:#fef08a;margin-top:4px;animation:pulse 1s infinite alternate;text-shadow:0 1px 2px rgba(0,0,0,.5)}
+@keyframes pulse{0%{opacity:.7}100%{opacity:1}}
+.plot-label{font-size:10px;color:rgba(255,255,255,.75);margin-top:2px;text-shadow:0 1px 1px rgba(0,0,0,.4)}
+.plot-fertilized{position:absolute;top:4px;right:4px;font-size:14px;filter:drop-shadow(0 0 4px rgba(100,200,255,.5))}
+
+/* Decorations in scene */
+.garden-decos-row{display:flex;gap:10px;justify-content:center;padding:6px 0;z-index:2}
+.garden-deco{font-size:26px;cursor:default;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+
+/* Garden Pet in scene */
+.garden-pet{position:absolute;bottom:12px;left:16px;z-index:3;cursor:pointer;transition:transform .2s;text-align:center}
+.garden-pet:hover{transform:scale(1.08)}
 .garden-pet-sprite{position:relative;display:inline-block}
-.garden-pet-emoji{font-size:48px;animation:petIdle 2s ease-in-out infinite}
-@keyframes petIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.garden-pet-emoji{font-size:44px;animation:petIdle 2s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
+@keyframes petIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .pet-accessory{position:absolute;top:-10px;right:-10px;font-size:20px}
-.garden-pet-name{font-weight:bold;font-size:14px;color:var(--navy);margin-top:4px}
-.garden-pet-mood{font-size:12px;color:var(--gray-600)}
+.garden-pet-name{font-weight:bold;font-size:11px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
+.garden-pet-mood-bubble{position:absolute;top:-24px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.92);border-radius:10px;padding:2px 7px;font-size:11px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.15);pointer-events:none}
+.garden-pet-mood-bubble::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:8px;height:4px;background:rgba(255,255,255,.92);clip-path:polygon(0 0,100% 0,50% 100%)}
+
+/* Watering can button in scene */
+.garden-water-btn{position:absolute;bottom:12px;right:16px;z-index:3;background:rgba(255,255,255,.85);border:2px solid rgba(52,152,219,.4);border-radius:12px;padding:6px 12px;cursor:pointer;font-size:14px;transition:all .2s;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.garden-water-btn:hover{background:rgba(255,255,255,.95);transform:scale(1.05);border-color:rgba(52,152,219,.7)}
+.garden-water-btn .water-count{font-size:12px;font-weight:bold;color:#2563eb}
+
+/* Weather effects on scene */
+.garden-scene.water-low{filter:saturate(.6) brightness(.92)}
+.garden-scene.water-critical{filter:saturate(.35) brightness(.82)}
+
+/* Seed Picker & Plot Info Modals */
+.garden-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:5000;animation:fadeIn .2s}
+.garden-modal{background:var(--white);border-radius:16px;padding:24px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3);position:relative;max-height:80vh;overflow-y:auto}
+.garden-modal h3{margin:0 0 16px;font-size:18px;color:var(--navy);text-align:center}
+.garden-modal-close{position:absolute;top:10px;right:12px;background:none;border:none;font-size:22px;color:var(--gray-400);cursor:pointer;line-height:1;padding:4px}
+.garden-modal-close:hover{color:var(--gray-700)}
+.seed-option{display:flex;align-items:center;gap:12px;padding:12px;border:2px solid var(--gray-200);border-radius:12px;cursor:pointer;transition:all .15s;margin-bottom:8px}
+.seed-option:hover{border-color:var(--green);background:rgba(74,222,128,.08);transform:translateX(4px)}
+.seed-option:active{transform:translateX(2px) scale(.98)}
+.seed-option-icon{font-size:32px;flex-shrink:0}
+.seed-option-info{flex:1}
+.seed-option-name{font-weight:bold;font-size:14px;color:var(--navy)}
+.seed-option-meta{font-size:12px;color:var(--gray-600);margin-top:2px}
+.seed-option-count{font-size:12px;font-weight:bold;color:var(--green);background:rgba(74,222,128,.15);padding:2px 8px;border-radius:8px;flex-shrink:0}
+.plot-info-header{text-align:center;margin-bottom:16px}
+.plot-info-header .plot-info-emoji{font-size:48px}
+.plot-info-header .plot-info-name{font-size:16px;font-weight:bold;color:var(--navy);margin-top:4px}
+.plot-info-stats{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.plot-info-stat{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--gray-700)}
+.plot-info-stat span:last-child{font-weight:600}
+.plot-info-progress{width:100%;height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;margin:4px 0 12px}
+.plot-info-progress-fill{height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);border-radius:4px;transition:width .3s}
+.plot-info-actions{display:flex;flex-direction:column;gap:8px}
+.plot-info-action{display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .15s;background:none;width:100%;text-align:left;font-size:13px;color:var(--navy)}
+.plot-info-action:hover:not(:disabled){border-color:var(--blue);background:rgba(37,99,235,.06)}
+.plot-info-action:disabled{opacity:.4;cursor:not-allowed}
+.plot-info-action-icon{font-size:22px;flex-shrink:0}
+.plot-info-action-label{font-weight:600}
+.plot-info-action-desc{font-size:11px;color:var(--gray-500)}
 
 /* === PET MODAL === */
 .pet-modal-content{background:var(--white);border-radius:16px;padding:24px;max-width:400px;width:90%;margin:40px auto;position:relative;max-height:85vh;overflow-y:auto}
@@ -1047,6 +1097,115 @@ button:focus-visible {
 .mastery-badge.gold{background:linear-gradient(135deg,#ffd700,#ffb700);color:#333}
 .mastery-badge.platinum{background:linear-gradient(135deg,#e5e4e2,#a0d2db);color:#333}
 
+/* === BATTLE SYSTEM === */
+.battle-header{display:flex;align-items:center;gap:8px;padding:12px 0;margin-bottom:12px;border-bottom:2px solid var(--gray-200);flex-wrap:wrap}
+.battle-header h2{flex:1;text-align:center;margin:0;font-size:18px;color:var(--navy)}
+.battle-header .battle-stars{color:var(--yellow);font-size:14px;letter-spacing:2px}
+.battle-arena{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 0}
+.battle-combatant{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 20px;background:var(--white);border:2px solid var(--gray-200);border-radius:12px;min-width:220px;position:relative;transition:transform .15s}
+.battle-combatant.enemy-side{border-color:var(--red)}
+.battle-combatant.pet-side{border-color:var(--blue)}
+.battle-combatant .combatant-sprite{font-size:48px;line-height:1}
+.battle-combatant .combatant-name{font-size:14px;font-weight:bold;color:var(--gray-800)}
+.battle-combatant .combatant-level{font-size:11px;color:var(--gray-600)}
+.battle-hp{width:100%;display:flex;align-items:center;gap:6px;font-size:11px}
+.battle-hp-bar{flex:1;height:12px;background:var(--gray-200);border-radius:6px;overflow:hidden}
+.battle-hp-fill{height:100%;border-radius:6px;transition:width .4s ease}
+.battle-hp-fill.hp-high{background:linear-gradient(90deg,#27ae60,#2ecc71)}
+.battle-hp-fill.hp-mid{background:linear-gradient(90deg,#f39c12,#f1c40f)}
+.battle-hp-fill.hp-low{background:linear-gradient(90deg,#c0392b,#e74c3c)}
+.battle-vs{font-size:28px;font-weight:bold;color:var(--gray-400);margin:4px 0}
+.battle-stats-row{display:flex;gap:16px;font-size:11px;color:var(--gray-600)}
+.battle-stats-row span{display:flex;align-items:center;gap:3px}
+.battle-question{margin-top:12px;padding:16px;background:var(--white);border:1px solid var(--gray-200);border-radius:8px}
+.battle-question .bq-text{font-size:14px;color:var(--gray-800);margin-bottom:12px;line-height:1.5}
+.battle-question .bq-options{display:grid;gap:8px}
+.battle-question .bq-opt{padding:12px 14px;border:2px solid var(--gray-200);border-radius:var(--radius);background:var(--white);text-align:left;font-size:13px;cursor:pointer;transition:all .15s}
+.battle-question .bq-opt:hover:not(.disabled){background:#f0f7ff;border-color:var(--blue)}
+.battle-question .bq-opt.correct{border-color:var(--green);background:#eafaf1}
+.battle-question .bq-opt.wrong{border-color:var(--red);background:#fdf2f2}
+.battle-question .bq-opt.disabled{cursor:not-allowed;opacity:.7}
+.battle-items-bar{display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.battle-item-btn{padding:8px 14px;border:1px solid var(--gray-200);border-radius:8px;background:var(--white);font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all .15s}
+.battle-item-btn:hover:not(:disabled){border-color:var(--blue);background:#f0f7ff}
+.battle-item-btn:disabled{opacity:.4;cursor:not-allowed}
+.battle-item-btn .item-count{background:var(--blue);color:#fff;border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold}
+.battle-log{margin-top:8px;padding:8px 12px;background:var(--gray-50);border-radius:6px;font-size:12px;color:var(--gray-600);text-align:center;min-height:24px}
+
+/* Chapter Select */
+.chapter-select{display:grid;grid-template-columns:1fr;gap:12px;max-width:500px;margin:0 auto}
+.chapter-card{display:flex;align-items:center;gap:14px;padding:16px;border:2px solid var(--gray-200);border-radius:12px;background:var(--white);cursor:pointer;transition:all .2s}
+.chapter-card:hover:not(.locked){border-color:var(--blue);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.chapter-card.locked{opacity:.5;cursor:not-allowed;filter:grayscale(.6)}
+.chapter-card.current{border-color:var(--green);background:#eafaf1}
+.chapter-card .ch-icon{font-size:36px;line-height:1}
+.chapter-card .ch-info{flex:1}
+.chapter-card .ch-name{font-size:15px;font-weight:bold;color:var(--navy)}
+.chapter-card .ch-progress{font-size:11px;color:var(--gray-600);margin-top:2px}
+.chapter-card .ch-stars{color:var(--yellow);font-size:13px;letter-spacing:1px}
+.chapter-card .ch-lock{font-size:20px;color:var(--gray-400)}
+.chapter-card .ch-req{font-size:11px;color:var(--gray-500)}
+
+/* Battle result overlay */
+.battle-result-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:5000;animation:fadeIn .3s}
+.battle-result-modal{background:var(--white);border-radius:16px;padding:32px;text-align:center;max-width:360px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.battle-result-modal h2{font-size:24px;margin-bottom:8px}
+.battle-result-modal .result-icon{font-size:56px;margin-bottom:12px}
+.battle-result-modal .result-rewards{margin:16px 0;font-size:14px;color:var(--gray-700)}
+.battle-result-modal .result-rewards div{margin:4px 0}
+.battle-result-modal button{margin:6px;padding:10px 24px;border:none;border-radius:8px;font-size:14px;font-weight:bold;cursor:pointer}
+.battle-result-modal .btn-primary{background:var(--blue);color:#fff}
+.battle-result-modal .btn-secondary{background:var(--gray-200);color:var(--gray-700)}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Battle animations */
+@keyframes battleShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+@keyframes battleFlash{0%{opacity:1}25%{opacity:.3}50%{opacity:1}75%{opacity:.3}100%{opacity:1}}
+.battle-shake{animation:battleShake .4s ease}
+.battle-flash{animation:battleFlash .5s ease}
+.battle-dmg-popup{position:absolute;top:-10px;right:0;font-size:18px;font-weight:bold;color:var(--red);animation:dmgFloat .8s ease forwards;pointer-events:none}
+.battle-dmg-popup.heal{color:var(--green)}
+@keyframes dmgFloat{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-30px)}}
+
+/* Battle dark mode */
+[data-theme="dark"] .battle-header{border-color:#374151}
+[data-theme="dark"] .battle-combatant{background:#16213e;border-color:#374151}
+[data-theme="dark"] .battle-combatant.enemy-side{border-color:#7f1d1d}
+[data-theme="dark"] .battle-combatant.pet-side{border-color:#1e3a5f}
+[data-theme="dark"] .battle-combatant .combatant-name{color:#e5e7eb}
+[data-theme="dark"] .battle-hp-bar{background:#374151}
+[data-theme="dark"] .battle-question{background:#16213e;border-color:#374151}
+[data-theme="dark"] .battle-question .bq-text{color:#e5e7eb}
+[data-theme="dark"] .battle-question .bq-opt{background:#1f2937;border-color:#374151;color:#e5e7eb}
+[data-theme="dark"] .battle-question .bq-opt:hover:not(.disabled){background:#1e3a5f;border-color:var(--blue)}
+[data-theme="dark"] .battle-question .bq-opt.correct{background:#064e3b;border-color:var(--green)}
+[data-theme="dark"] .battle-question .bq-opt.wrong{background:#7f1d1d;border-color:var(--red)}
+[data-theme="dark"] .battle-item-btn{background:#1f2937;border-color:#374151;color:#d1d5db}
+[data-theme="dark"] .battle-log{background:#1f2937;color:#9ca3af}
+[data-theme="dark"] .chapter-card{background:#16213e;border-color:#374151;color:#e5e7eb}
+[data-theme="dark"] .chapter-card:hover:not(.locked){border-color:var(--blue);background:#1e3a5f}
+[data-theme="dark"] .chapter-card.current{border-color:var(--green);background:#064e3b}
+[data-theme="dark"] .chapter-card .ch-name{color:#93c5fd}
+[data-theme="dark"] .battle-result-modal{background:#16213e;color:#e5e7eb}
+@media (prefers-color-scheme: dark) {
+    body:not([data-theme="light"]) .battle-header{border-color:#374151}
+    body:not([data-theme="light"]) .battle-combatant{background:#16213e;border-color:#374151}
+    body:not([data-theme="light"]) .battle-combatant.enemy-side{border-color:#7f1d1d}
+    body:not([data-theme="light"]) .battle-combatant.pet-side{border-color:#1e3a5f}
+    body:not([data-theme="light"]) .battle-hp-bar{background:#374151}
+    body:not([data-theme="light"]) .battle-question{background:#16213e;border-color:#374151}
+    body:not([data-theme="light"]) .battle-question .bq-opt{background:#1f2937;border-color:#374151;color:#e5e7eb}
+    body:not([data-theme="light"]) .battle-question .bq-opt:hover:not(.disabled){background:#1e3a5f;border-color:var(--blue)}
+    body:not([data-theme="light"]) .battle-question .bq-opt.correct{background:#064e3b;border-color:var(--green)}
+    body:not([data-theme="light"]) .battle-question .bq-opt.wrong{background:#7f1d1d;border-color:var(--red)}
+    body:not([data-theme="light"]) .battle-item-btn{background:#1f2937;border-color:#374151;color:#d1d5db}
+    body:not([data-theme="light"]) .battle-log{background:#1f2937;color:#9ca3af}
+    body:not([data-theme="light"]) .chapter-card{background:#16213e;border-color:#374151}
+    body:not([data-theme="light"]) .chapter-card:hover:not(.locked){border-color:var(--blue);background:#1e3a5f}
+    body:not([data-theme="light"]) .chapter-card .ch-name{color:#93c5fd}
+    body:not([data-theme="light"]) .battle-result-modal{background:#16213e;color:#e5e7eb}
+}
+
 /* Confetti Canvas */
 #confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
 
@@ -1082,9 +1241,25 @@ button:focus-visible {
 [data-theme="dark"] .shop-item-name,[data-theme="dark"] .pet-modal-name{color:#93c5fd}
 [data-theme="dark"] .shop-tab{background:#1f2937;border-color:#374151;color:#d1d5db}
 [data-theme="dark"] .shop-tab.active{background:#2563eb;border-color:#2563eb}
-[data-theme="dark"] .garden-plot{background:#1f2937;border-color:#374151}
-[data-theme="dark"] .garden-plot.empty{border-color:#4b5563}
+[data-theme="dark"] .garden-scene{background:linear-gradient(to bottom,#0d1b3e 0%,#162350 28%,#1a3a1a 28%,#122e12 40%,#0a1f0a 100%)}
+[data-theme="dark"] .garden-sky-stars{display:block}
+[data-theme="dark"] .garden-sky-sun{display:none}
+[data-theme="dark"] .garden-plot{background:linear-gradient(145deg,#4a3728,#3a2718);border-color:#2a1a0a}
+[data-theme="dark"] .garden-plot.locked{background:linear-gradient(145deg,#2a2a2a,#1a1a1a);border-color:#111}
+[data-theme="dark"] .garden-plot.empty{border-color:#5a4530}
 [data-theme="dark"] .garden-header{border-color:#374151}
+[data-theme="dark"] .garden-modal{background:#16213e}
+[data-theme="dark"] .garden-modal h3,.garden-modal .plot-info-name{color:#93c5fd}
+[data-theme="dark"] .seed-option{border-color:#374151}
+[data-theme="dark"] .seed-option:hover{border-color:#4ade80;background:rgba(74,222,128,.1)}
+[data-theme="dark"] .seed-option-name{color:#e2e8f0}
+[data-theme="dark"] .seed-option-meta{color:#9ca3af}
+[data-theme="dark"] .plot-info-stat{color:#d1d5db}
+[data-theme="dark"] .plot-info-action{border-color:#374151;color:#e2e8f0}
+[data-theme="dark"] .plot-info-action:hover:not(:disabled){border-color:#60a5fa;background:rgba(96,165,250,.1)}
+[data-theme="dark"] .garden-water-btn{background:rgba(30,40,60,.85);border-color:rgba(96,165,250,.4);color:#e2e8f0}
+[data-theme="dark"] .garden-pet-mood-bubble{background:rgba(30,40,60,.92);color:#e2e8f0}
+[data-theme="dark"] .garden-pet-mood-bubble::after{background:rgba(30,40,60,.92)}
 [data-theme="dark"] .shop-header{border-color:#374151}
 [data-theme="dark"] .pet-food-btn{background:#1f2937;border-color:#374151;color:#d1d5db}
 [data-theme="dark"] .pet-accessory-btn{background:#1f2937;border-color:#374151}
@@ -1100,9 +1275,16 @@ button:focus-visible {
     body:not([data-theme="light"]) .shop-item-name,body:not([data-theme="light"]) .pet-modal-name{color:#93c5fd}
     body:not([data-theme="light"]) .shop-tab{background:#1f2937;border-color:#374151;color:#d1d5db}
     body:not([data-theme="light"]) .shop-tab.active{background:#2563eb;border-color:#2563eb}
-    body:not([data-theme="light"]) .garden-plot{background:#1f2937;border-color:#374151}
-    body:not([data-theme="light"]) .garden-plot.empty{border-color:#4b5563}
+    body:not([data-theme="light"]) .garden-scene{background:linear-gradient(to bottom,#0d1b3e 0%,#162350 28%,#1a3a1a 28%,#122e12 40%,#0a1f0a 100%)}
+    body:not([data-theme="light"]) .garden-sky-stars{display:block}
+    body:not([data-theme="light"]) .garden-sky-sun{display:none}
+    body:not([data-theme="light"]) .garden-plot{background:linear-gradient(145deg,#4a3728,#3a2718);border-color:#2a1a0a}
+    body:not([data-theme="light"]) .garden-plot.locked{background:linear-gradient(145deg,#2a2a2a,#1a1a1a);border-color:#111}
+    body:not([data-theme="light"]) .garden-plot.empty{border-color:#5a4530}
     body:not([data-theme="light"]) .garden-header,body:not([data-theme="light"]) .shop-header{border-color:#374151}
+    body:not([data-theme="light"]) .garden-modal{background:#16213e}
+    body:not([data-theme="light"]) .garden-water-btn{background:rgba(30,40,60,.85);border-color:rgba(96,165,250,.4);color:#e2e8f0}
+    body:not([data-theme="light"]) .garden-pet-mood-bubble{background:rgba(30,40,60,.92);color:#e2e8f0}
     body:not([data-theme="light"]) .pet-food-btn{background:#1f2937;border-color:#374151;color:#d1d5db}
     body:not([data-theme="light"]) .pet-accessory-btn{background:#1f2937;border-color:#374151}
     body:not([data-theme="light"]) .pet-meter-bar{background:#374151}
@@ -1229,11 +1411,17 @@ button:focus-visible {
     .shop-tabs{gap:4px}
     .shop-tab{padding:6px 10px;font-size:12px}
     /* Garden responsive */
-    .garden-grid{gap:8px;max-width:100%}
-    .garden-plot{min-height:80px}
-    .plot-plant{font-size:32px}
+    .garden-scene{min-height:360px}
+    .garden-plots{gap:6px}
+    .garden-plot{min-height:75px}
+    .plot-plant{font-size:30px}
+    .plot-empty-icon{font-size:22px}
     .garden-header{gap:6px;font-size:12px}
-    .water-bar-track{width:70px}
+    .garden-pet-emoji{font-size:36px}
+    .garden-pet{bottom:8px;left:8px}
+    .garden-water-btn{bottom:8px;right:8px;padding:5px 8px;font-size:12px}
+    .garden-ground{padding:6px 8px 10px}
+    .garden-modal{padding:16px;max-width:320px}
     /* Pet modal responsive */
     .pet-modal-content{padding:16px;margin:20px auto}
     .pet-modal-emoji{font-size:48px}
@@ -1288,6 +1476,7 @@ button:focus-visible {
         <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Progress.show()">View Progress</button>
         <button class="btn-nav" style="background:var(--green);border-color:var(--green)" id="btnGarden" onclick="Garden.show()">&#127793; Garden</button>
         <button class="btn-nav" style="background:var(--orange);border-color:var(--orange)" id="btnShop" onclick="Shop.show()">&#128176; Shop</button>
+        <button class="btn-nav" style="background:var(--red);border-color:var(--red)" id="btnBattle" onclick="Battle.show()">&#9876;&#65039; Battle</button>
     </div>
 
     <div id="bankList"></div>
@@ -1308,16 +1497,35 @@ button:focus-visible {
 <div class="screen" id="screen-garden">
     <div class="garden-header">
         <button class="btn-nav btn-home" onclick="showScreen('home');Home.render()" style="margin-right:8px">Home</button>
-        <div class="garden-water-bar" title="Water Level">
-            <span>&#128167;</span>
-            <div class="water-bar-track"><div class="water-bar-fill" id="gardenWaterFill" style="width:100%"></div></div>
-            <span id="gardenWaterPct">100%</span>
-        </div>
         <span class="coin-display" id="gardenCoins" style="margin-left:auto">&#x1FA99; 0</span>
         <button class="btn-nav" style="background:var(--orange);border-color:var(--orange);margin-left:8px" onclick="Shop.show()">Shop</button>
     </div>
-    <div class="garden-grid" id="gardenGrid"></div>
-    <div class="garden-pet" id="gardenPet" onclick="PetModal.show()"></div>
+    <div class="garden-scene" id="gardenScene">
+        <div class="garden-sky">
+            <span class="garden-sky-sun" id="gardenSun">&#9728;&#65039;</span>
+            <span class="garden-sky-stars">&#10024; &#11088; &#10024;</span>
+        </div>
+        <div class="garden-fence">&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;</div>
+        <div class="garden-ground">
+            <div class="garden-plots" id="gardenGrid"></div>
+            <div class="garden-decos-row" id="gardenDecos"></div>
+        </div>
+        <div class="garden-pet" id="gardenPet" onclick="PetModal.show()"></div>
+        <div class="garden-water-btn" id="gardenWaterBtn" onclick="Garden.useWater()" title="Use Watering Can">
+            <span>&#x1FAA3;</span>
+            <span class="water-count" id="gardenWaterCount">0</span>
+        </div>
+    </div>
+</div>
+
+<!-- ========== BATTLE SCREEN ========== -->
+<div class="screen" id="screen-battle">
+    <div class="battle-header">
+        <button class="btn-nav btn-home" onclick="Battle.goHome()">Home</button>
+        <h2 id="battleTitle">Battle</h2>
+        <span class="battle-stars" id="battleStars"></span>
+    </div>
+    <div id="battleContent"></div>
 </div>
 
 <!-- ========== TEST / PRACTICE SCREEN ========== -->
@@ -1799,7 +2007,12 @@ const Gamification = {
         { id: 'happy_tummy', name: 'Happy Tummy', desc: 'Feed your pet 50 meals', icon: '🍖', xp: 150 },
         { id: 'window_shopper', name: 'Window Shopper', desc: 'Make your first purchase', icon: '🛒', xp: 50 },
         { id: 'big_spender', name: 'Big Spender', desc: 'Earn 1000 total coins', icon: '💰', xp: 200 },
-        { id: 'rainbow_bloom', name: 'Rainbow Bloom', desc: 'Grow a Rainbow Rose', icon: '🌈', xp: 500 }
+        { id: 'rainbow_bloom', name: 'Rainbow Bloom', desc: 'Grow a Rainbow Rose', icon: '🌈', xp: 500 },
+        // Battle achievements
+        { id: 'first_victory', name: 'First Blood', desc: 'Win your first battle', icon: '⚔️', xp: 75 },
+        { id: 'chapter_clear', name: 'Chapter Master', desc: 'Complete a full chapter', icon: '🏰', xp: 200 },
+        { id: 'boss_slayer', name: 'Boss Slayer', desc: 'Defeat all 5 bosses', icon: '💀', xp: 500 },
+        { id: 'flawless', name: 'Flawless Victory', desc: 'Win a battle taking no damage', icon: '✨', xp: 150 }
     ],
 
     // Power-ups
@@ -1815,7 +2028,7 @@ const Gamification = {
     LEVEL_REQS: {
         food:        { kibble: 1, treat: 3, feast: 7, goldfish: 12 },
         seeds:       { sunflower: 1, cactus: 3, bonsai: 7, crystal: 12, rainbow: 18 },
-        gardenItems: { water: 1, fertilizer: 5, magicDust: 10, evoStone: 5 },
+        gardenItems: { water: 1, fertilizer: 5, magicDust: 10, evoStone: 5, healthPotion: 1, shieldCharm: 5, powerBerry: 3 },
         decorations: { fountain: 5, gnome: 1, lantern: 3, bench: 1 },
         cosmetics:   { hat: 3, crown: 10, scarf: 1, sunglasses: 3, cape: 7 }
     },
@@ -1907,7 +2120,10 @@ const Gamification = {
             water:      { name: 'Watering Can', price: 5,   icon: '💧', desc: '+25 water level' },
             fertilizer: { name: 'Fertilizer',   price: 20,  icon: '🧪', desc: '2x growth for 1 plant (10 questions)' },
             magicDust:  { name: 'Magic Dust',   price: 50,  icon: '✨', desc: 'Advance 1 plant by 1 stage' },
-            evoStone:   { name: 'Evolution Stone', price: 150, icon: '🪨', desc: '+60 care minutes for pet evolution' }
+            evoStone:   { name: 'Evolution Stone', price: 150, icon: '🪨', desc: '+60 care minutes for pet evolution' },
+            healthPotion: { name: 'Health Potion', price: 30, icon: '🧃', desc: 'Heal pet 40 HP mid-battle' },
+            shieldCharm:  { name: 'Shield Charm',  price: 50, icon: '🛡️', desc: 'Block next enemy attack 100%' },
+            powerBerry:   { name: 'Power Berry',   price: 40, icon: '🫐', desc: '+50% ATK for 3 questions' }
         },
         decorations: {
             fountain: { name: 'Fountain',     price: 80,  icon: '⛲', desc: '+5 water per question (passive)', effect: 'autoWater' },
@@ -1956,8 +2172,17 @@ const Gamification = {
                 petFood: { kibble: 3, treat: 1, feast: 0, goldfish: 0 },
                 seeds: { sunflower: 2, cactus: 0, bonsai: 0, crystal: 0, rainbow: 0 },
                 gardenItems: { water: 5, fertilizer: 0, magicDust: 0, evoStone: 0 },
+                battleItems: { healthPotion: 0, shieldCharm: 0, powerBerry: 0 },
                 decorations: [],
                 petAccessories: []
+            },
+            battle: {
+                currentChapter: 1,
+                currentEnemy: 0,
+                chaptersCompleted: [],
+                totalWins: 0,
+                totalLosses: 0,
+                bestChapter: 0
             },
             currentTitle: 'Curious Beginner',
             settings: {
@@ -2018,7 +2243,8 @@ const Gamification = {
                     studyBuddy: m(defaults.studyBuddy, saved.studyBuddy),
                     powerUpInventory: m(defaults.powerUpInventory, saved.powerUpInventory),
                     garden: m(defaults.garden, saved.garden),
-                    inventory: mDeep(defaults.inventory, saved.inventory)
+                    inventory: mDeep(defaults.inventory, saved.inventory),
+                    battle: m(defaults.battle, saved.battle)
                 };
                 // Multi-pet sync: migrate and sync active pet
                 const st = this._state;
@@ -2738,11 +2964,13 @@ const Gamification = {
         this.updateBuddyWidget();
         this.updateComboDisplay();
 
-        // Toggle garden/shop buttons
+        // Toggle garden/shop/battle buttons
         const btnGarden = document.getElementById('btnGarden');
         const btnShop = document.getElementById('btnShop');
+        const btnBattle = document.getElementById('btnBattle');
         if (btnGarden) btnGarden.style.display = state.settings.garden ? '' : 'none';
         if (btnShop) btnShop.style.display = state.settings.garden ? '' : 'none';
+        if (btnBattle) btnBattle.style.display = state.settings.garden ? '' : 'none';
 
         // Clear sprite cache when pixel art toggled
         Sprites._cache = {};
@@ -3314,6 +3542,45 @@ const SoundFX = {
                 gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.2);
                 oscillator.start(); oscillator.stop(this.audioContext.currentTime + 0.2);
                 break;
+
+            case 'battleHit':
+                // Sharp saw wave attack
+                oscillator.frequency.value = 200;
+                oscillator.type = 'sawtooth';
+                oscillator.frequency.exponentialRampToValueAtTime(600, this.audioContext.currentTime + 0.05);
+                oscillator.frequency.exponentialRampToValueAtTime(150, this.audioContext.currentTime + 0.15);
+                gainNode.gain.setValueAtTime(volume * 0.25, this.audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.15);
+                oscillator.start(); oscillator.stop(this.audioContext.currentTime + 0.15);
+                break;
+
+            case 'battleWin':
+                // Ascending 4-note victory fanfare
+                [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                    const osc = this.audioContext.createOscillator();
+                    const gain = this.audioContext.createGain();
+                    osc.connect(gain); gain.connect(this.audioContext.destination);
+                    osc.frequency.value = freq; osc.type = 'triangle';
+                    gain.gain.setValueAtTime(volume * 0.3, this.audioContext.currentTime + i * 0.12);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + i * 0.12 + 0.4);
+                    osc.start(this.audioContext.currentTime + i * 0.12);
+                    osc.stop(this.audioContext.currentTime + i * 0.12 + 0.4);
+                });
+                break;
+
+            case 'battleLose':
+                // Descending 2-note sad horn
+                [392, 293.66].forEach((freq, i) => {
+                    const osc = this.audioContext.createOscillator();
+                    const gain = this.audioContext.createGain();
+                    osc.connect(gain); gain.connect(this.audioContext.destination);
+                    osc.frequency.value = freq; osc.type = 'sawtooth';
+                    gain.gain.setValueAtTime(volume * 0.2, this.audioContext.currentTime + i * 0.25);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + i * 0.25 + 0.4);
+                    osc.start(this.audioContext.currentTime + i * 0.25);
+                    osc.stop(this.audioContext.currentTime + i * 0.25 + 0.4);
+                });
+                break;
         }
     }
 };
@@ -3431,7 +3698,9 @@ const Shop = {
         } else if (tab === 'seeds') {
             state.inventory.seeds[id] = (state.inventory.seeds[id] || 0) + 1;
         } else if (tab === 'gardenItems') {
-            if (id === 'evoStone') {
+            if (id === 'healthPotion' || id === 'shieldCharm' || id === 'powerBerry') {
+                state.inventory.battleItems[id] = (state.inventory.battleItems[id] || 0) + 1;
+            } else if (id === 'evoStone') {
                 // Evolution stone: apply care minutes directly
                 state.studyBuddy.careMinutes = (state.studyBuddy.careMinutes || 0) + 60;
                 // Re-check evolution
@@ -3558,6 +3827,487 @@ const Shop = {
 };
 
 // =====================================================================
+// BATTLE SYSTEM (PVE Story Campaign)
+// =====================================================================
+const Battle = {
+    active: false,
+    petHP: 0,
+    petMaxHP: 0,
+    enemyHP: 0,
+    enemyMaxHP: 0,
+    currentQuestion: null,
+    answered: false,
+    shieldActive: false,
+    powerBerryLeft: 0,
+    comboCount: 0,
+    damageTaken: 0,
+
+    CHAPTERS: [
+        { name: 'Enchanted Forest', icon: '\u{1F332}', unlockLevel: 1,
+          enemies: [
+            { name: 'Rat', emoji: '\u{1F400}' }, { name: 'Spider', emoji: '\u{1F577}\uFE0F' },
+            { name: 'Snake', emoji: '\u{1F40D}' }, { name: 'Mushroom', emoji: '\u{1F344}' },
+            { name: 'Wolf', emoji: '\u{1F43A}' },
+            { name: 'Forest Guardian', emoji: '\u{1F333}', boss: true }
+          ]},
+        { name: 'Crystal Cave', icon: '\u{1F987}', unlockLevel: 5,
+          enemies: [
+            { name: 'Bat', emoji: '\u{1F987}' }, { name: 'Slime', emoji: '\u{1F7E2}' },
+            { name: 'Golem', emoji: '\u{1FAA8}' }, { name: 'Scorpion', emoji: '\u{1F982}' },
+            { name: 'Shadow', emoji: '\u{1F47B}' },
+            { name: 'Cave Troll', emoji: '\u{1F9CC}', boss: true }
+          ]},
+        { name: 'Storm Mountain', icon: '\u26F0\uFE0F', unlockLevel: 10,
+          enemies: [
+            { name: 'Hawk', emoji: '\u{1F985}' }, { name: 'Yeti', emoji: '\u2744\uFE0F' },
+            { name: 'Lightning Bug', emoji: '\u26A1' }, { name: 'Rock Worm', emoji: '\u{1FAB1}' },
+            { name: 'Ice Wolf', emoji: '\u{1F43A}' },
+            { name: 'Storm Giant', emoji: '\u{1F329}\uFE0F', boss: true }
+          ]},
+        { name: 'Dark Castle', icon: '\u{1F3F0}', unlockLevel: 15,
+          enemies: [
+            { name: 'Ghost', emoji: '\u{1F47B}' }, { name: 'Knight', emoji: '\u2694\uFE0F' },
+            { name: 'Mage', emoji: '\u{1F9D9}' }, { name: 'Archer', emoji: '\u{1F3F9}' },
+            { name: 'Gargoyle', emoji: '\u{1F5FF}' },
+            { name: 'Dark King', emoji: '\u{1F451}', boss: true }
+          ]},
+        { name: 'Volcanic Core', icon: '\u{1F30B}', unlockLevel: 20,
+          enemies: [
+            { name: 'Fire Imp', emoji: '\u{1F525}' }, { name: 'Lava Snake', emoji: '\u{1F40D}' },
+            { name: 'Demon', emoji: '\u{1F479}' }, { name: 'Hellhound', emoji: '\u{1F415}' },
+            { name: 'Wyvern', emoji: '\u{1F432}' },
+            { name: 'Ancient Dragon', emoji: '\u{1F409}', boss: true }
+          ]}
+    ],
+
+    getEnemyStats(chapterIdx, enemyIdx) {
+        const ch = chapterIdx + 1;
+        const enemy = this.CHAPTERS[chapterIdx].enemies[enemyIdx];
+        const isBoss = enemy.boss || false;
+        let hp = 40 + (ch * 25) + (enemyIdx * 8);
+        let atk = 8 + (ch * 6) + (enemyIdx * 2);
+        let def = 2 + (ch * 3);
+        if (isBoss) { hp = Math.round(hp * 2); atk = Math.round(atk * 1.3); def = Math.round(def * 1.5); }
+        return { hp, atk, def, name: enemy.name, emoji: enemy.emoji, boss: isBoss };
+    },
+
+    getPetStats() {
+        const state = Gamification.getState();
+        const pet = state.studyBuddy;
+        const stage = pet.stage || 1;
+        const hunger = Math.min(100, Math.max(0, pet.hunger || 0));
+        const happiness = Math.min(100, Math.max(0, pet.happiness || 0));
+        const diff = Gamification.getSpeciesDifficulty(pet.species);
+        const hp = Math.round(50 + (stage * 30) + (hunger / 5) + (happiness / 5));
+        const atk = Math.round(10 + (stage * 8) + (diff * 5));
+        const def = Math.round(3 + (stage * 3) + (happiness / 10));
+        const emoji = Gamification.getSpeciesEmoji(pet.species, stage);
+        const name = pet.name || 'Pet';
+        return { hp, atk, def, emoji, name, stage };
+    },
+
+    show() {
+        this.renderChapterSelect();
+        showScreen('battle');
+    },
+
+    goHome() {
+        this.active = false;
+        showScreen('home');
+        Home.render();
+    },
+
+    renderChapterSelect() {
+        const state = Gamification.getState();
+        const level = state.level || 1;
+        const battleState = state.battle || {};
+        const completed = battleState.chaptersCompleted || [];
+        document.getElementById('battleTitle').textContent = 'Battle - Story Campaign';
+        document.getElementById('battleStars').textContent = '';
+
+        let html = '<div class="chapter-select">';
+        this.CHAPTERS.forEach((ch, idx) => {
+            const chNum = idx + 1;
+            const unlocked = level >= ch.unlockLevel;
+            const isCompleted = completed.includes(chNum);
+            const isCurrent = chNum === (battleState.currentChapter || 1) && !isCompleted;
+            const enemyProgress = (isCurrent && battleState.currentEnemy > 0) ? battleState.currentEnemy : 0;
+            const stars = isCompleted ? '\u2605\u2605\u2605' : (enemyProgress > 0 ? '\u2605'.repeat(Math.min(enemyProgress, 3)) + '\u2606'.repeat(3 - Math.min(enemyProgress, 3)) : '\u2606\u2606\u2606');
+
+            html += `<div class="chapter-card${unlocked ? '' : ' locked'}${isCurrent ? ' current' : ''}" ${unlocked ? `onclick="Battle.selectChapter(${idx})"` : ''}>
+                <span class="ch-icon">${ch.icon}</span>
+                <div class="ch-info">
+                    <div class="ch-name">Ch.${chNum}: ${ch.name}</div>
+                    <div class="ch-progress">${isCompleted ? 'Completed!' : unlocked ? (enemyProgress > 0 ? `Enemy ${enemyProgress + 1}/6` : 'Ready to begin') : `Requires Lv ${ch.unlockLevel}`}</div>
+                    <div class="ch-stars">${stars}</div>
+                </div>
+                ${unlocked ? '' : '<span class="ch-lock">\u{1F512}</span>'}
+            </div>`;
+        });
+        html += '</div>';
+        document.getElementById('battleContent').innerHTML = html;
+    },
+
+    selectChapter(chapterIdx) {
+        const state = Gamification.getState();
+        const battleState = state.battle;
+        const chNum = chapterIdx + 1;
+        battleState.currentChapter = chNum;
+        // If chapter already completed, restart from enemy 0
+        if (battleState.chaptersCompleted.includes(chNum)) {
+            battleState.currentEnemy = 0;
+        }
+        Gamification.saveState(state);
+        this.startBattle(chapterIdx, battleState.currentEnemy || 0);
+    },
+
+    startBattle(chapterIdx, enemyIdx) {
+        this.active = true;
+        this.answered = false;
+        this.shieldActive = false;
+        this.powerBerryLeft = 0;
+        this.comboCount = 0;
+        this.damageTaken = 0;
+
+        const petStats = this.getPetStats();
+        const enemyStats = this.getEnemyStats(chapterIdx, enemyIdx);
+
+        this.petHP = petStats.hp;
+        this.petMaxHP = petStats.hp;
+        this.enemyHP = enemyStats.hp;
+        this.enemyMaxHP = enemyStats.hp;
+        this._chapterIdx = chapterIdx;
+        this._enemyIdx = enemyIdx;
+        this._petStats = petStats;
+        this._enemyStats = enemyStats;
+
+        const ch = this.CHAPTERS[chapterIdx];
+        document.getElementById('battleTitle').textContent = `Ch.${chapterIdx + 1} ${ch.name}`;
+        document.getElementById('battleStars').textContent = '';
+
+        this.loadQuestion();
+        this.render();
+    },
+
+    render() {
+        const pet = this._petStats;
+        const enemy = this._enemyStats;
+        const petHpPct = Math.max(0, (this.petHP / this.petMaxHP) * 100);
+        const enemyHpPct = Math.max(0, (this.enemyHP / this.enemyMaxHP) * 100);
+
+        const hpClass = (pct) => pct > 50 ? 'hp-high' : pct > 25 ? 'hp-mid' : 'hp-low';
+
+        const state = Gamification.getState();
+        const inv = state.inventory.battleItems || {};
+
+        let qHTML = '';
+        if (this.currentQuestion) {
+            const q = this.currentQuestion;
+            qHTML = `<div class="battle-question">
+                <div class="bq-text">${q.text}</div>
+                <div class="bq-options">
+                    ${q.options.map((opt, i) => `<button class="bq-opt${this.answered ? (i === q.correctAnswer ? ' correct' : (i === this._selectedIdx ? ' wrong' : '')) + ' disabled' : ''}" ${this.answered ? 'disabled' : `onclick="Battle.checkAnswer(${i})"`}>${opt}</button>`).join('')}
+                </div>
+            </div>`;
+        }
+
+        const html = `
+            <div class="battle-arena">
+                <div class="battle-combatant enemy-side" id="battleEnemy">
+                    <span class="combatant-sprite" style="${enemy.boss ? 'font-size:64px' : ''}">${enemy.emoji}</span>
+                    <span class="combatant-name">${enemy.name}${enemy.boss ? ' (BOSS)' : ''}</span>
+                    <div class="battle-hp">
+                        <span>HP</span>
+                        <div class="battle-hp-bar"><div class="battle-hp-fill ${hpClass(enemyHpPct)}" style="width:${enemyHpPct}%"></div></div>
+                        <span>${Math.max(0, this.enemyHP)}/${this.enemyMaxHP}</span>
+                    </div>
+                    <div class="battle-stats-row"><span>ATK ${enemy.atk}</span><span>DEF ${enemy.def}</span></div>
+                </div>
+                <div class="battle-vs">\u2694\uFE0F</div>
+                <div class="battle-combatant pet-side" id="battlePet">
+                    <span class="combatant-sprite">${pet.emoji}</span>
+                    <span class="combatant-name">${pet.name}</span>
+                    <span class="combatant-level">Stage ${pet.stage} | ATK ${pet.atk + (this.powerBerryLeft > 0 ? Math.round(pet.atk * 0.5) : 0)} | DEF ${pet.def}</span>
+                    <div class="battle-hp">
+                        <span>HP</span>
+                        <div class="battle-hp-bar"><div class="battle-hp-fill ${hpClass(petHpPct)}" style="width:${petHpPct}%"></div></div>
+                        <span>${Math.max(0, this.petHP)}/${this.petMaxHP}</span>
+                    </div>
+                    ${this.shieldActive ? '<div style="font-size:11px;color:var(--blue);">\u{1F6E1}\uFE0F Shield Active</div>' : ''}
+                    ${this.powerBerryLeft > 0 ? `<div style="font-size:11px;color:var(--green);">\u{1FAD0} Power Berry (${this.powerBerryLeft} left)</div>` : ''}
+                </div>
+            </div>
+            ${qHTML}
+            <div class="battle-items-bar">
+                <button class="battle-item-btn" ${(inv.healthPotion || 0) < 1 || this.answered ? 'disabled' : ''} onclick="Battle.useItem('healthPotion')">
+                    \u{1F9C3} Heal <span class="item-count">${inv.healthPotion || 0}</span>
+                </button>
+                <button class="battle-item-btn" ${(inv.shieldCharm || 0) < 1 || this.shieldActive || this.answered ? 'disabled' : ''} onclick="Battle.useItem('shieldCharm')">
+                    \u{1F6E1}\uFE0F Shield <span class="item-count">${inv.shieldCharm || 0}</span>
+                </button>
+                <button class="battle-item-btn" ${(inv.powerBerry || 0) < 1 || this.powerBerryLeft > 0 || this.answered ? 'disabled' : ''} onclick="Battle.useItem('powerBerry')">
+                    \u{1FAD0} Power <span class="item-count">${inv.powerBerry || 0}</span>
+                </button>
+            </div>
+            <div class="battle-log" id="battleLog">${this.comboCount > 1 ? '\u{1F525} Combo x' + this.comboCount + '!' : 'Answer the question to attack!'}</div>`;
+
+        document.getElementById('battleContent').innerHTML = html;
+        // Render math in question text
+        if (window.renderMathInElement) {
+            try { renderMathInElement(document.getElementById('battleContent'), { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }, { left: '\\(', right: '\\)', display: false }, { left: '\\[', right: '\\]', display: true }] }); } catch {}
+        }
+    },
+
+    loadQuestion() {
+        // Pull random question from current bank
+        const bank = BankManager.banks[0];
+        if (!bank || !bank.questions || bank.questions.length === 0) return;
+        const q = bank.questions[Math.floor(Math.random() * bank.questions.length)];
+        this.currentQuestion = q;
+        this.answered = false;
+        this._selectedIdx = -1;
+    },
+
+    checkAnswer(idx) {
+        if (this.answered || !this.currentQuestion) return;
+        this.answered = true;
+        this._selectedIdx = idx;
+        const q = this.currentQuestion;
+        const isCorrect = idx === q.correctAnswer;
+
+        // Still award XP/coins/care through normal gamification
+        Gamification.awardXp(isCorrect ? 10 : 2);
+        if (isCorrect) Gamification.awardCoins(5);
+        DailyGoal.recordQuestion();
+        if (isCorrect) Garden.grow(1);
+
+        // Re-render to show correct/wrong highlighting
+        this.render();
+
+        if (isCorrect) {
+            this.comboCount++;
+            SoundFX.play('correct');
+            setTimeout(() => this.petAttack(), 600);
+        } else {
+            this.comboCount = 0;
+            SoundFX.play('incorrect');
+            setTimeout(() => this.enemyAttack(), 600);
+        }
+    },
+
+    petAttack() {
+        const pet = this._petStats;
+        const enemy = this._enemyStats;
+        let dmg = Math.max(1, pet.atk - enemy.def);
+        // Combo crit
+        if (this.comboCount >= 3) dmg = Math.round(dmg * 1.5);
+        // Power berry boost
+        if (this.powerBerryLeft > 0) {
+            dmg = Math.round(dmg * 1.5);
+            this.powerBerryLeft--;
+        }
+
+        this.enemyHP -= dmg;
+        SoundFX.play('battleHit');
+
+        // Animate enemy shake
+        const el = document.getElementById('battleEnemy');
+        if (el) { el.classList.add('battle-shake'); setTimeout(() => el.classList.remove('battle-shake'), 400); }
+        // Damage popup
+        this._showDmgPopup('battleEnemy', `-${dmg}`, false);
+
+        if (this.enemyHP <= 0) {
+            this.enemyHP = 0;
+            this.render();
+            setTimeout(() => this.enemyDefeated(), 500);
+        } else {
+            this.render();
+            // Load next question after brief pause
+            setTimeout(() => {
+                this.loadQuestion();
+                this.render();
+            }, 400);
+        }
+    },
+
+    enemyAttack() {
+        if (this.shieldActive) {
+            this.shieldActive = false;
+            this._showDmgPopup('battlePet', 'BLOCKED!', true);
+            SoundFX.play('powerUp');
+            setTimeout(() => {
+                this.loadQuestion();
+                this.render();
+            }, 600);
+            return;
+        }
+
+        const pet = this._petStats;
+        const enemy = this._enemyStats;
+        const dmg = Math.max(1, enemy.atk - pet.def);
+        this.petHP -= dmg;
+        this.damageTaken += dmg;
+        SoundFX.play('battleHit');
+
+        // Animate pet flash
+        const el = document.getElementById('battlePet');
+        if (el) { el.classList.add('battle-flash'); setTimeout(() => el.classList.remove('battle-flash'), 500); }
+        this._showDmgPopup('battlePet', `-${dmg}`, false);
+
+        if (this.petHP <= 0) {
+            this.petHP = 0;
+            this.render();
+            setTimeout(() => this.petKO(), 500);
+        } else {
+            this.render();
+            setTimeout(() => {
+                this.loadQuestion();
+                this.render();
+            }, 400);
+        }
+    },
+
+    _showDmgPopup(containerId, text, isHeal) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        const popup = document.createElement('div');
+        popup.className = 'battle-dmg-popup' + (isHeal ? ' heal' : '');
+        popup.textContent = text;
+        container.appendChild(popup);
+        setTimeout(() => popup.remove(), 800);
+    },
+
+    useItem(itemId) {
+        if (this.answered) return;
+        const state = Gamification.getState();
+        const inv = state.inventory.battleItems;
+        if (!inv[itemId] || inv[itemId] < 1) return;
+
+        inv[itemId]--;
+        Gamification.saveState(state);
+
+        if (itemId === 'healthPotion') {
+            this.petHP = Math.min(this.petMaxHP, this.petHP + 40);
+            this._showDmgPopup('battlePet', '+40 HP', true);
+            SoundFX.play('petFeed');
+        } else if (itemId === 'shieldCharm') {
+            this.shieldActive = true;
+            SoundFX.play('powerUp');
+        } else if (itemId === 'powerBerry') {
+            this.powerBerryLeft = 3;
+            SoundFX.play('powerUp');
+        }
+        this.render();
+    },
+
+    enemyDefeated() {
+        const state = Gamification.getState();
+        const bs = state.battle;
+        const ch = this._chapterIdx;
+        const ei = this._enemyIdx;
+        const enemy = this._enemyStats;
+        const chapterData = this.CHAPTERS[ch];
+
+        // Calculate rewards
+        const baseCoins = 10 + ((ch + 1) * 5);
+        const coins = enemy.boss ? baseCoins * 3 : baseCoins;
+        const xp = enemy.boss ? 100 : 30;
+
+        Gamification.awardCoins(coins);
+        Gamification.awardXp(xp);
+        bs.totalWins = (bs.totalWins || 0) + 1;
+
+        SoundFX.play('battleWin');
+
+        // Check achievements
+        if (bs.totalWins === 1) Gamification.unlockAchievement('first_victory');
+        if (this.damageTaken === 0) Gamification.unlockAchievement('flawless');
+
+        const nextEnemy = ei + 1;
+        if (nextEnemy >= chapterData.enemies.length) {
+            // Chapter complete!
+            if (!bs.chaptersCompleted.includes(ch + 1)) {
+                bs.chaptersCompleted.push(ch + 1);
+            }
+            bs.bestChapter = Math.max(bs.bestChapter || 0, ch + 1);
+            bs.currentEnemy = 0;
+            if (ch + 1 < this.CHAPTERS.length) {
+                bs.currentChapter = ch + 2;
+            }
+            Gamification.unlockAchievement('chapter_clear');
+            // Check boss slayer (all 5 completed)
+            if (bs.chaptersCompleted.length >= 5) {
+                Gamification.unlockAchievement('boss_slayer');
+            }
+            Gamification.saveState(state);
+            this.showResult(true, coins, xp, true);
+        } else {
+            bs.currentEnemy = nextEnemy;
+            Gamification.saveState(state);
+            this.showResult(true, coins, xp, false);
+        }
+    },
+
+    petKO() {
+        const state = Gamification.getState();
+        state.battle.totalLosses = (state.battle.totalLosses || 0) + 1;
+        Gamification.saveState(state);
+        SoundFX.play('battleLose');
+        this.showResult(false, 0, 0, false);
+    },
+
+    showResult(won, coins, xp, chapterDone) {
+        const overlay = document.createElement('div');
+        overlay.className = 'battle-result-overlay';
+        overlay.id = 'battleResultOverlay';
+
+        const enemy = this._enemyStats;
+        let body = '';
+        if (won) {
+            body = `<div class="result-icon">\u{1F389}</div>
+                <h2>${chapterDone ? 'Chapter Complete!' : 'Victory!'}</h2>
+                <p>${enemy.name} defeated!</p>
+                <div class="result-rewards">
+                    <div>\u{1FA99} +${coins} Coins</div>
+                    <div>\u2B50 +${xp} XP</div>
+                    ${this.damageTaken === 0 ? '<div>\u2728 Flawless!</div>' : ''}
+                </div>
+                <button class="btn-primary" onclick="Battle.dismissResult(true, ${chapterDone})">${chapterDone ? 'Back to Chapters' : 'Next Enemy'}</button>
+                <button class="btn-secondary" onclick="Battle.dismissResult(false, false)">Home</button>`;
+        } else {
+            body = `<div class="result-icon">\u{1F4A5}</div>
+                <h2>Defeated!</h2>
+                <p>${enemy.name} was too strong...</p>
+                <div class="result-rewards" style="color:var(--gray-500)">Your pet recovers with full HP on retry.</div>
+                <button class="btn-primary" onclick="Battle.dismissResult(true, false)">Try Again</button>
+                <button class="btn-secondary" onclick="Battle.dismissResult(false, false)">Home</button>`;
+        }
+
+        overlay.innerHTML = `<div class="battle-result-modal">${body}</div>`;
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) Battle.dismissResult(false, false); });
+        document.body.appendChild(overlay);
+    },
+
+    dismissResult(continuePlay, chapterDone) {
+        const el = document.getElementById('battleResultOverlay');
+        if (el) el.remove();
+
+        if (!continuePlay) {
+            this.goHome();
+            return;
+        }
+
+        if (chapterDone) {
+            this.renderChapterSelect();
+        } else {
+            const state = Gamification.getState();
+            const bs = state.battle;
+            this.startBattle(this._chapterIdx, bs.currentEnemy || 0);
+        }
+    }
+};
+
+// =====================================================================
 // GARDEN SYSTEM
 // =====================================================================
 const Garden = {
@@ -3570,13 +4320,23 @@ const Garden = {
         const state = Gamification.getState();
         if (!state.settings.garden) return;
 
-        // Update header
+        // Update header coins
         document.getElementById('gardenCoins').innerHTML = '&#x1FA99; ' + (state.coins || 0).toLocaleString();
+
+        // Water-based scene effects
         const water = state.garden.waterLevel || 0;
-        document.getElementById('gardenWaterFill').style.width = water + '%';
-        document.getElementById('gardenWaterPct').textContent = Math.round(water) + '%';
+        const scene = document.getElementById('gardenScene');
+        if (scene) {
+            scene.classList.toggle('water-low', water > 0 && water < 25);
+            scene.classList.toggle('water-critical', water <= 0);
+        }
+
+        // Update watering can count
+        const waterCount = document.getElementById('gardenWaterCount');
+        if (waterCount) waterCount.textContent = state.inventory.gardenItems.water || 0;
 
         this.renderGrid(state);
+        this.renderDecos(state);
         this.renderPet(state);
     },
 
@@ -3588,37 +4348,39 @@ const Garden = {
 
         for (let i = 0; i < 9; i++) {
             if (i >= unlocked) {
-                html += `<div class="garden-plot locked" onclick="Shop.show();Shop.switchTab('plots')"><span class="plot-lock">🔒</span></div>`;
+                html += `<div class="garden-plot locked" onclick="Shop.show();Shop.switchTab('plots')"><span class="plot-lock">\u{1F512}</span></div>`;
                 continue;
             }
             const plot = plots[i];
             if (!plot || !plot.seedType) {
-                html += `<div class="garden-plot empty" onclick="Garden.showSeedPicker(${i})"><span class="plot-empty">+</span></div>`;
+                html += `<div class="garden-plot empty" onclick="Garden.showSeedPickerModal(${i})"><span class="plot-empty-icon">\u{1F573}\u{FE0F}</span></div>`;
             } else {
                 const seed = Gamification.SHOP.seeds[plot.seedType];
                 if (!seed) { html += `<div class="garden-plot empty"></div>`; continue; }
                 const stageIdx = Math.min(plot.currentStage || 0, seed.emojis.length - 1);
                 const isReady = plot.currentStage >= seed.stages - 1;
-                html += `<div class="garden-plot planted${isReady ? ' harvestable' : ''}" onclick="${isReady ? `Garden.harvest(${i})` : `Garden.showPlotInfo(${i})`}">
+                html += `<div class="garden-plot planted${isReady ? ' harvestable' : ''}" onclick="${isReady ? `Garden.harvest(${i})` : `Garden.showPlotInfoModal(${i})`}">
                     <span class="plot-plant${isReady ? ' glow-bounce' : ''}">${Sprites.plantSprite(plot.seedType, stageIdx, seed.emojis[stageIdx], 40)}</span>
-                    ${!isReady ? `<div class="plot-progress-bar"><div class="plot-progress-fill" style="width:${Math.floor(((plot.growthPoints || 0) / seed.gpNeeded) * 100)}%"></div></div>` : '<div class="plot-ready">Harvest!</div>'}
+                    ${!isReady ? `<div class="plot-progress-bar"><div class="plot-progress-fill" style="width:${Math.floor(((plot.growthPoints || 0) / seed.gpNeeded) * 100)}%"></div></div>` : '<div class="plot-ready">\u2728 Harvest!</div>'}
                     <div class="plot-label">${seed.name}</div>
-                    ${plot.fertilized ? '<span class="plot-fertilized" title="Fertilized">🧪</span>' : ''}
+                    ${plot.fertilized ? '<span class="plot-fertilized" title="Fertilized">\u{1F9EA}</span>' : ''}
                 </div>`;
             }
         }
 
-        // Add decorations row
-        const decos = state.garden.decorations || [];
-        if (decos.length > 0) {
-            html += '<div class="garden-decos">';
-            decos.forEach(d => {
-                const item = Gamification.SHOP.decorations[d];
-                if (item) html += `<span class="garden-deco" title="${item.name}">${item.icon}</span>`;
-            });
-            html += '</div>';
-        }
+        el.innerHTML = html;
+    },
 
+    renderDecos(state) {
+        const el = document.getElementById('gardenDecos');
+        if (!el) return;
+        const decos = state.garden.decorations || [];
+        if (decos.length === 0) { el.innerHTML = ''; return; }
+        let html = '';
+        decos.forEach(d => {
+            const item = Gamification.SHOP.decorations[d];
+            if (item) html += `<span class="garden-deco" title="${item.name}">${item.icon}</span>`;
+        });
         el.innerHTML = html;
     },
 
@@ -3626,18 +4388,18 @@ const Garden = {
         const el = document.getElementById('gardenPet');
         if (!el) return;
         const buddy = state.studyBuddy;
-        const stage = Gamification.BUDDY_STAGES.find(s => s.stage === buddy.stage) || Gamification.BUDDY_STAGES[0];
         const accessories = buddy.accessories || [];
+        const moodText = this.getMoodLabel(buddy);
         el.innerHTML = `
+            <div class="garden-pet-mood-bubble">${moodText}</div>
             <div class="garden-pet-sprite">
-                <span class="garden-pet-emoji">${Sprites.petSprite(buddy.stage, Gamification.getSpeciesEmoji(buddy.species, buddy.stage), 48)}</span>
+                <span class="garden-pet-emoji">${Sprites.petSprite(buddy.stage, Gamification.getSpeciesEmoji(buddy.species, buddy.stage), 44)}</span>
                 ${accessories.map(a => {
                     const item = Gamification.SHOP.cosmetics[a];
                     return item ? `<span class="pet-accessory">${item.icon}</span>` : '';
                 }).join('')}
             </div>
             <div class="garden-pet-name">${buddy.name}</div>
-            <div class="garden-pet-mood">${this.getMoodLabel(buddy)}</div>
         `;
     },
 
@@ -3651,7 +4413,12 @@ const Garden = {
         return 'Sad 😔';
     },
 
-    showSeedPicker(plotIdx) {
+    dismissModal() {
+        const overlay = document.querySelector('.garden-modal-overlay');
+        if (overlay) overlay.remove();
+    },
+
+    showSeedPickerModal(plotIdx) {
         const state = Gamification.getState();
         const inv = state.inventory.seeds;
         const available = Object.entries(inv).filter(([id, count]) => count > 0 && Gamification.isItemUnlocked('seeds', id));
@@ -3661,21 +4428,35 @@ const Garden = {
             return;
         }
 
-        let msg = 'Choose a seed to plant:\n\n';
-        available.forEach(([id, count], i) => {
+        let seedsHtml = '';
+        available.forEach(([id, count]) => {
             const seed = Gamification.SHOP.seeds[id];
-            msg += `${i + 1}. ${seed.icon} ${seed.name} (x${count}) - ${seed.gpNeeded} GP to grow, ${seed.coinReward} coin reward\n`;
+            seedsHtml += `<div class="seed-option" onclick="Garden.plantSeed(${plotIdx},'${id}')">
+                <span class="seed-option-icon">${seed.icon}</span>
+                <div class="seed-option-info">
+                    <div class="seed-option-name">${seed.name}</div>
+                    <div class="seed-option-meta">${seed.gpNeeded} GP \u2022 ${seed.coinReward} coins \u2022 ${seed.xpReward} XP</div>
+                </div>
+                <span class="seed-option-count">x${count}</span>
+            </div>`;
         });
 
-        const choice = prompt(msg + '\nEnter number:');
-        if (!choice) return;
-        const idx = parseInt(choice) - 1;
-        if (idx < 0 || idx >= available.length) return;
+        const overlay = document.createElement('div');
+        overlay.className = 'garden-modal-overlay';
+        overlay.onclick = e => { if (e.target === overlay) Garden.dismissModal(); };
+        overlay.innerHTML = `<div class="garden-modal">
+            <button class="garden-modal-close" onclick="Garden.dismissModal()">\u2715</button>
+            <h3>\u{1F331} Pick a Seed</h3>
+            ${seedsHtml}
+        </div>`;
+        document.body.appendChild(overlay);
+    },
 
-        const [seedId] = available[idx];
+    plantSeed(plotIdx, seedId) {
+        this.dismissModal();
+        const state = Gamification.getState();
         state.inventory.seeds[seedId]--;
 
-        // Ensure plots array is large enough
         while (state.garden.plots.length <= plotIdx) state.garden.plots.push(null);
         state.garden.plots[plotIdx] = {
             seedType: seedId,
@@ -3689,14 +4470,13 @@ const Garden = {
         Gamification.saveState(state);
         SoundFX.play('plant');
 
-        // Check garden paradise achievement (all 9 plots filled)
         const filledPlots = state.garden.plots.filter(p => p && p.seedType).length;
         if (filledPlots >= 9) Gamification.unlockAchievement('garden_paradise');
 
         this.render();
     },
 
-    showPlotInfo(plotIdx) {
+    showPlotInfoModal(plotIdx) {
         const state = Gamification.getState();
         const plot = state.garden.plots[plotIdx];
         if (!plot) return;
@@ -3706,31 +4486,64 @@ const Garden = {
         const gp = plot.growthPoints || 0;
         const needed = seed.gpNeeded;
         const stage = (plot.currentStage || 0) + 1;
-
-        let msg = `${seed.icon} ${seed.name}\nStage: ${stage}/${seed.stages}\nGrowth: ${gp}/${needed} GP\n`;
-        if (plot.fertilized) msg += `Fertilized! (${plot.fertilizedRemaining} questions left)\n`;
-        msg += `\nReward: ${seed.coinReward} coins + ${seed.xpReward} XP`;
-
-        // Offer garden items
+        const pct = Math.floor((gp / needed) * 100);
         const inv = state.inventory.gardenItems;
-        let options = '\n\nActions:\n';
-        if (inv.fertilizer > 0) options += '1. Apply Fertilizer (2x growth)\n';
-        if (inv.magicDust > 0) options += '2. Use Magic Dust (+1 stage)\n';
-        options += '0. Cancel';
+        const hasFert = inv.fertilizer > 0 && !plot.fertilized;
+        const hasDust = inv.magicDust > 0 && plot.currentStage < seed.stages - 1;
 
-        const choice = prompt(msg + options);
-        if (choice === '1' && inv.fertilizer > 0 && !plot.fertilized) {
-            state.inventory.gardenItems.fertilizer--;
-            plot.fertilized = true;
-            plot.fertilizedRemaining = 10;
-            Gamification.saveState(state);
-            this.render();
-        } else if (choice === '2' && inv.magicDust > 0 && plot.currentStage < seed.stages - 1) {
-            state.inventory.gardenItems.magicDust--;
-            plot.currentStage++;
-            Gamification.saveState(state);
-            this.render();
-        }
+        const overlay = document.createElement('div');
+        overlay.className = 'garden-modal-overlay';
+        overlay.onclick = e => { if (e.target === overlay) Garden.dismissModal(); };
+        overlay.innerHTML = `<div class="garden-modal">
+            <button class="garden-modal-close" onclick="Garden.dismissModal()">\u2715</button>
+            <div class="plot-info-header">
+                <div class="plot-info-emoji">${Sprites.plantSprite(plot.seedType, Math.min(plot.currentStage || 0, seed.emojis.length - 1), seed.emojis[Math.min(plot.currentStage || 0, seed.emojis.length - 1)], 48)}</div>
+                <div class="plot-info-name">${seed.name}</div>
+            </div>
+            <div class="plot-info-stats">
+                <div class="plot-info-stat"><span>Stage</span><span>${stage} / ${seed.stages}</span></div>
+                <div class="plot-info-stat"><span>Growth</span><span>${gp} / ${needed} GP</span></div>
+                ${plot.fertilized ? `<div class="plot-info-stat"><span>\u{1F9EA} Fertilized</span><span>${plot.fertilizedRemaining} Q left</span></div>` : ''}
+                <div class="plot-info-stat"><span>Reward</span><span>${seed.coinReward} coins + ${seed.xpReward} XP</span></div>
+            </div>
+            <div class="plot-info-progress"><div class="plot-info-progress-fill" style="width:${pct}%"></div></div>
+            <div class="plot-info-actions">
+                <button class="plot-info-action" onclick="Garden.applyFertilizer(${plotIdx})" ${hasFert ? '' : 'disabled'}>
+                    <span class="plot-info-action-icon">\u{1F9EA}</span>
+                    <div><div class="plot-info-action-label">Fertilizer${hasFert ? ` (x${inv.fertilizer})` : ''}</div><div class="plot-info-action-desc">2x growth for next 10 questions</div></div>
+                </button>
+                <button class="plot-info-action" onclick="Garden.applyMagicDust(${plotIdx})" ${hasDust ? '' : 'disabled'}>
+                    <span class="plot-info-action-icon">\u2728</span>
+                    <div><div class="plot-info-action-label">Magic Dust${hasDust ? ` (x${inv.magicDust})` : ''}</div><div class="plot-info-action-desc">Instantly advance +1 stage</div></div>
+                </button>
+            </div>
+        </div>`;
+        document.body.appendChild(overlay);
+    },
+
+    applyFertilizer(plotIdx) {
+        this.dismissModal();
+        const state = Gamification.getState();
+        const plot = state.garden.plots[plotIdx];
+        if (!plot || plot.fertilized || state.inventory.gardenItems.fertilizer <= 0) return;
+        state.inventory.gardenItems.fertilizer--;
+        plot.fertilized = true;
+        plot.fertilizedRemaining = 10;
+        Gamification.saveState(state);
+        this.render();
+    },
+
+    applyMagicDust(plotIdx) {
+        this.dismissModal();
+        const state = Gamification.getState();
+        const plot = state.garden.plots[plotIdx];
+        if (!plot) return;
+        const seed = Gamification.SHOP.seeds[plot.seedType];
+        if (!seed || state.inventory.gardenItems.magicDust <= 0 || plot.currentStage >= seed.stages - 1) return;
+        state.inventory.gardenItems.magicDust--;
+        plot.currentStage++;
+        Gamification.saveState(state);
+        this.render();
     },
 
     harvest(plotIdx) {
@@ -8263,12 +9076,14 @@ async function init() {
     Garden.decayPetStats();
     setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); }, 60 * 1000);
 
-    // Hide garden/shop buttons if garden disabled
+    // Hide garden/shop/battle buttons if garden disabled
     const gState = Gamification.getState();
     const btnGarden = document.getElementById('btnGarden');
     const btnShop = document.getElementById('btnShop');
+    const btnBattle = document.getElementById('btnBattle');
     if (btnGarden) btnGarden.style.display = gState.settings.garden ? '' : 'none';
     if (btnShop) btnShop.style.display = gState.settings.garden ? '' : 'none';
+    if (btnBattle) btnBattle.style.display = gState.settings.garden ? '' : 'none';
 
     // Try loading the embedded fallback
     try {
