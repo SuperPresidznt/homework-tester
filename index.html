@@ -899,6 +899,22 @@ button:focus-visible {
 .shop-item{background:var(--white);border:2px solid var(--gray-200);border-radius:12px;padding:16px;text-align:center;transition:all .2s}
 .shop-item:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .shop-item.cant-afford{opacity:.6}
+.shop-item.locked-item{opacity:.5;position:relative}
+.shop-item.locked-item .shop-item-icon{filter:grayscale(1)}
+.shop-item-lock{font-size:11px;color:#ef4444;font-weight:600;margin:4px 0}
+.shop-item.sold-out{opacity:.4}
+.pet-roster{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.pet-roster-item{display:flex;flex-direction:column;align-items:center;padding:8px 12px;border:2px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .2s;min-width:80px}
+.pet-roster-item.active{border-color:var(--blue);background:#eff6ff}
+.pet-roster-item:hover{transform:scale(1.05)}
+.pet-roster-emoji{font-size:28px}
+.pet-roster-name{font-size:11px;font-weight:bold;color:var(--navy)}
+.pet-roster-info{font-size:10px;color:var(--gray-600)}
+.pet-roster-active{font-size:9px;background:var(--blue);color:#fff;padding:1px 6px;border-radius:4px;margin-top:2px}
+.pet-selector{display:flex;gap:6px;justify-content:center;margin-bottom:8px}
+.pet-sel-btn{padding:6px 10px;border:2px solid var(--gray-200);border-radius:8px;background:var(--white);font-size:20px;cursor:pointer;transition:all .2s}
+.pet-sel-btn.active{border-color:var(--blue);background:#eff6ff}
+.pet-sel-btn:hover{transform:scale(1.1)}
 .shop-item.sold-out{opacity:.5}
 .shop-item-icon{font-size:36px;margin-bottom:8px}
 .shop-item-name{font-weight:bold;font-size:14px;color:var(--navy);margin-bottom:4px}
@@ -1073,6 +1089,10 @@ button:focus-visible {
 [data-theme="dark"] .pet-meter-bar{background:#374151}
 [data-theme="dark"] .pet-sick-banner{background:#451a03;border-color:#92400e;color:#fbbf24}
 [data-theme="dark"] .study-buddy.sick{background:#1c1917;border-color:#92400e}
+[data-theme="dark"] .pet-sel-btn{background:#1f2937;border-color:#374151}
+[data-theme="dark"] .pet-sel-btn.active{background:#1e3a5f;border-color:#2563eb}
+[data-theme="dark"] .pet-roster-item{background:#1f2937;border-color:#374151;color:#d1d5db}
+[data-theme="dark"] .pet-roster-item.active{background:#1e3a5f;border-color:#2563eb}
 @media (prefers-color-scheme: dark) {
     body:not([data-theme="light"]) .shop-item,body:not([data-theme="light"]) .pet-modal-content{background:#16213e;border-color:#374151}
     body:not([data-theme="light"]) .shop-item-name,body:not([data-theme="light"]) .pet-modal-name{color:#93c5fd}
@@ -1501,6 +1521,7 @@ button:focus-visible {
                 <label><input type="checkbox" id="gamifyGarden" checked onchange="Gamification.updateSettings()"> Garden System</label>
                 <label><input type="checkbox" id="gamifyCoinPopups" checked onchange="Gamification.updateSettings()"> Coin Popups</label>
                 <label><input type="checkbox" id="gamifyPixelArt" onchange="Gamification.updateSettings()"> Pixel Art Mode</label>
+                <label><input type="checkbox" id="gamifyDemoSpeed" onchange="Gamification.updateSettings()"> Demo Speed (60x decay - see pet effects live)</label>
                 <div class="volume-row">
                     <label>Volume:</label>
                     <input type="range" id="gamifyVolume" min="0" max="100" value="50" onchange="Gamification.updateSettings()">
@@ -1789,14 +1810,64 @@ const Gamification = {
         showHint: { name: 'Hint', desc: 'Show explanation hint', cost: 80, icon: '💡' }
     },
 
-    // Study buddy stages — needs BOTH xp AND care minutes to evolve
+    // Level unlock requirements for shop items
+    LEVEL_REQS: {
+        food:        { kibble: 1, treat: 3, feast: 7, goldfish: 12 },
+        seeds:       { sunflower: 1, cactus: 3, bonsai: 7, crystal: 12, rainbow: 18 },
+        gardenItems: { water: 1, fertilizer: 5, magicDust: 10, evoStone: 5 },
+        decorations: { fountain: 5, gnome: 1, lantern: 3, bench: 1 },
+        cosmetics:   { hat: 3, crown: 10, scarf: 1, sunglasses: 3, cape: 7 }
+    },
+
+    // Garden plot auto-unlocks at these levels (additive, on top of starting 3)
+    PLOT_UNLOCK_LEVELS: [5, 10, 15, 20],
+
+    // Check if item is unlocked at current level
+    isItemUnlocked(tab, itemId) {
+        const state = this.getState();
+        const reqs = this.LEVEL_REQS[tab];
+        if (!reqs || !reqs[itemId]) return true;
+        return state.level >= reqs[itemId];
+    },
+
+    // Evolution thresholds (same for all species)
     BUDDY_STAGES: [
-        { stage: 1, emoji: '🥚', name: 'Egg', xpNeeded: 0, careNeeded: 0 },
-        { stage: 2, emoji: '🐣', name: 'Hatchling', xpNeeded: 500, careNeeded: 30 },
-        { stage: 3, emoji: '🐥', name: 'Chick', xpNeeded: 2000, careNeeded: 120 },
-        { stage: 4, emoji: '🐤', name: 'Bird', xpNeeded: 5000, careNeeded: 360 },
-        { stage: 5, emoji: '🦅', name: 'Eagle', xpNeeded: 15000, careNeeded: 720 }
+        { stage: 1, xpNeeded: 0, careNeeded: 0 },
+        { stage: 2, xpNeeded: 500, careNeeded: 30 },
+        { stage: 3, xpNeeded: 2000, careNeeded: 120 },
+        { stage: 4, xpNeeded: 5000, careNeeded: 360 },
+        { stage: 5, xpNeeded: 15000, careNeeded: 720 }
     ],
+
+    // Pet species — each has unique evolution line + difficulty
+    PET_SPECIES: {
+        bird:    { name: 'Bird',    difficulty: 1.0, unlockLevel: 1,  price: 0,
+                   emojis: ['🥚','🐣','🐥','🐤','🦅'], stages: ['Egg','Hatchling','Chick','Bird','Eagle'] },
+        cat:     { name: 'Cat',     difficulty: 1.2, unlockLevel: 3,  price: 200,
+                   emojis: ['🥚','🐱','😺','😸','🦁'], stages: ['Egg','Kitten','Cat','Happy Cat','Lion'] },
+        dragon:  { name: 'Dragon',  difficulty: 1.5, unlockLevel: 5,  price: 400,
+                   emojis: ['🥚','🦎','🐊','🐉','🐲'], stages: ['Dragon Egg','Hatchling','Drake','Dragon','Elder Dragon'] },
+        fox:     { name: 'Fox',     difficulty: 1.3, unlockLevel: 7,  price: 500,
+                   emojis: ['🥚','🐾','🦊','🦊','🌟'], stages: ['Egg','Pup','Fox Cub','Fox','Spirit Fox'] },
+        slime:   { name: 'Slime',   difficulty: 0.7, unlockLevel: 1,  price: 100,
+                   emojis: ['🫧','🟢','💚','🟩','👑'], stages: ['Bubble','Tiny Slime','Slime','Big Slime','King Slime'] },
+        phoenix: { name: 'Phoenix', difficulty: 2.0, unlockLevel: 15, price: 1000,
+                   emojis: ['🥚','🐤','🔥','🦅','✨'], stages: ['Ember Egg','Spark','Firebird','Phoenix','Eternal Phoenix'] }
+    },
+
+    // Helpers to get species emoji/name for a pet
+    getSpeciesEmoji(species, stage) {
+        const sp = this.PET_SPECIES[species || 'bird'];
+        return sp ? (sp.emojis[stage - 1] || '🥚') : '🥚';
+    },
+    getSpeciesStageName(species, stage) {
+        const sp = this.PET_SPECIES[species || 'bird'];
+        return sp ? (sp.stages[stage - 1] || 'Unknown') : 'Unknown';
+    },
+    getSpeciesDifficulty(species) {
+        const sp = this.PET_SPECIES[species || 'bird'];
+        return sp ? sp.difficulty : 1.0;
+    },
 
     // Get default state
     // Coin values for different actions
@@ -1834,7 +1905,8 @@ const Gamification = {
         gardenItems: {
             water:      { name: 'Watering Can', price: 5,   icon: '💧', desc: '+25 water level' },
             fertilizer: { name: 'Fertilizer',   price: 20,  icon: '🧪', desc: '2x growth for 1 plant (10 questions)' },
-            magicDust:  { name: 'Magic Dust',   price: 50,  icon: '✨', desc: 'Advance 1 plant by 1 stage' }
+            magicDust:  { name: 'Magic Dust',   price: 50,  icon: '✨', desc: 'Advance 1 plant by 1 stage' },
+            evoStone:   { name: 'Evolution Stone', price: 150, icon: '🪨', desc: '+60 care minutes for pet evolution' }
         },
         decorations: {
             fountain: { name: 'Fountain',     price: 80,  icon: '⛲', desc: '+5 water per question (passive)', effect: 'autoWater' },
@@ -1863,12 +1935,14 @@ const Gamification = {
             powerUpInventory: { fiftyFifty: 1, skipQuestion: 1, extraTime: 2, doubleXp: 0, showHint: 1 },
             categoryMastery: {},
             studyBuddy: {
-                name: 'Buddy', stage: 1, totalXpFed: 0, mood: 'sleepy', lastFed: null,
+                name: 'Buddy', species: 'bird', stage: 1, totalXpFed: 0, mood: 'sleepy', lastFed: null,
                 hunger: 100, happiness: 100, lastDecayCheck: null,
                 careMinutes: 0, lastCareCheck: null, studyMinutes: 0,
                 sick: false, lastInteraction: null,
                 accessories: [], totalMealsEaten: 0
             },
+            pets: [],
+            activePetIdx: 0,
             garden: {
                 plots: [],
                 decorations: [],
@@ -1880,7 +1954,7 @@ const Gamification = {
             inventory: {
                 petFood: { kibble: 3, treat: 1, feast: 0, goldfish: 0 },
                 seeds: { sunflower: 2, cactus: 0, bonsai: 0, crystal: 0, rainbow: 0 },
-                gardenItems: { water: 5, fertilizer: 0, magicDust: 0 },
+                gardenItems: { water: 5, fertilizer: 0, magicDust: 0, evoStone: 0 },
                 decorations: [],
                 petAccessories: []
             },
@@ -1894,6 +1968,7 @@ const Gamification = {
                 garden: true,
                 coinPopups: true,
                 pixelArt: false,
+                demoSpeed: false,
                 volume: 50
             },
             stats: {
@@ -1945,6 +2020,17 @@ const Gamification = {
                     garden: m(defaults.garden, saved.garden),
                     inventory: mDeep(defaults.inventory, saved.inventory)
                 };
+                // Multi-pet sync: migrate and sync active pet
+                const st = this._state;
+                if (!st.studyBuddy.species) st.studyBuddy.species = 'bird';
+                if (!st.pets || st.pets.length === 0) {
+                    st.pets = [st.studyBuddy];
+                    st.activePetIdx = 0;
+                } else {
+                    // Load active pet into studyBuddy
+                    const idx = st.activePetIdx || 0;
+                    if (st.pets[idx]) st.studyBuddy = st.pets[idx];
+                }
             } catch (e) {
                 console.error('Corrupt gamification data, resetting to defaults:', e);
                 this._state = defaults;
@@ -1955,6 +2041,10 @@ const Gamification = {
 
     // Save state — updates in-memory cache immediately, debounces localStorage write
     saveState(state) {
+        // Sync active pet back to pets array
+        if (state.pets && state.pets.length > 0) {
+            state.pets[state.activePetIdx || 0] = state.studyBuddy;
+        }
         this._state = state;
         if (this._saveTimeout) clearTimeout(this._saveTimeout);
         this._saveTimeout = setTimeout(() => Store.set('gamification', state), 100);
@@ -2025,10 +2115,27 @@ const Gamification = {
             state.xp -= this.getLevelThreshold(state.level);
             state.level++;
             state.currentTitle = this.getTitleForLevel(state.level);
+            const lvlRewards = [];
             if (state.level % 5 === 0) {
                 state.powerUpInventory.fiftyFifty = (state.powerUpInventory.fiftyFifty || 0) + 1;
                 state.powerUpInventory.doubleXp = (state.powerUpInventory.doubleXp || 0) + 1;
-                levelRewards.push('Lv' + state.level + ': +1 50/50, +1 2x XP');
+                lvlRewards.push('+1 50/50, +1 2x XP');
+            }
+            // Auto-unlock garden plots at milestone levels
+            if (this.PLOT_UNLOCK_LEVELS.includes(state.level)) {
+                const maxPlots = 9;
+                if ((state.garden.unlockedPlots || 3) < maxPlots) {
+                    state.garden.unlockedPlots = Math.min(maxPlots, (state.garden.unlockedPlots || 3) + 1);
+                    lvlRewards.push('+1 Garden Plot');
+                }
+            }
+            // Evolution stones at levels 10, 15, 20
+            if (state.level === 10 || state.level === 15 || state.level === 20) {
+                state.inventory.gardenItems.evoStone = (state.inventory.gardenItems.evoStone || 0) + 1;
+                lvlRewards.push('+1 Evolution Stone');
+            }
+            if (lvlRewards.length > 0) {
+                levelRewards.push('Lv' + state.level + ': ' + lvlRewards.join(', '));
             }
         }
 
@@ -2210,11 +2317,23 @@ const Gamification = {
             state.xp -= this.getLevelThreshold(state.level);
             state.level++;
             state.currentTitle = this.getTitleForLevel(state.level);
+            const lvlR = [];
             if (state.level % 5 === 0) {
                 state.powerUpInventory.fiftyFifty = (state.powerUpInventory.fiftyFifty || 0) + 1;
                 state.powerUpInventory.doubleXp = (state.powerUpInventory.doubleXp || 0) + 1;
-                levelRewards.push('Lv' + state.level + ': +1 50/50, +1 2x XP');
+                lvlR.push('+1 50/50, +1 2x XP');
             }
+            if (this.PLOT_UNLOCK_LEVELS.includes(state.level)) {
+                if ((state.garden.unlockedPlots || 3) < 9) {
+                    state.garden.unlockedPlots = Math.min(9, (state.garden.unlockedPlots || 3) + 1);
+                    lvlR.push('+1 Garden Plot');
+                }
+            }
+            if (state.level === 10 || state.level === 15 || state.level === 20) {
+                state.inventory.gardenItems.evoStone = (state.inventory.gardenItems.evoStone || 0) + 1;
+                lvlR.push('+1 Evolution Stone');
+            }
+            if (lvlR.length > 0) levelRewards.push('Lv' + state.level + ': ' + lvlR.join(', '));
         }
         this.saveState(state);
 
@@ -2341,9 +2460,9 @@ const Gamification = {
                 if (buddy.stage < req.stage) {
                     buddy.stage = req.stage;
                     this.showAchievementToast({
-                        icon: req.emoji,
+                        icon: this.getSpeciesEmoji(buddy.species, req.stage),
                         name: buddy.name + ' evolved!',
-                        desc: 'Now a ' + req.name,
+                        desc: 'Now a ' + this.getSpeciesStageName(buddy.species, req.stage),
                         xp: 0
                     });
                 }
@@ -2399,7 +2518,7 @@ const Gamification = {
             const item = this.SHOP?.cosmetics?.[a];
             return item ? item.icon : '';
         }).join('');
-        document.getElementById('buddySprite').innerHTML = Sprites.petSprite(buddy.stage, stage.emoji, 36);
+        document.getElementById('buddySprite').innerHTML = Sprites.petSprite(buddy.stage, this.getSpeciesEmoji(buddy.species, buddy.stage), 36);
         document.getElementById('buddyName').textContent = buddy.name + (accessories ? ' ' + accessories : '');
         const moodStr = buddy.mood || 'content';
         const moodDisplay = buddy.sick ? 'Sick \ud83e\udd12' : moodStr.charAt(0).toUpperCase() + moodStr.slice(1);
@@ -2483,7 +2602,7 @@ const Gamification = {
                     <div class="xp-title">${state.currentTitle}</div>
                 </div>
                 <span class="coin-display" title="Coins">&#x1FA99; ${coins.toLocaleString()}</span>
-                <span class="buddy-mini" onclick="event.stopPropagation();Gamification.showBuddyInfo()">${Sprites.petSprite(state.studyBuddy.stage, stage.emoji, 24)}</span>
+                <span class="buddy-mini" onclick="event.stopPropagation();Gamification.showBuddyInfo()">${Sprites.petSprite(state.studyBuddy.stage, this.getSpeciesEmoji(state.studyBuddy.species, state.studyBuddy.stage), 24)}</span>
             </div>
         `;
     },
@@ -2607,6 +2726,7 @@ const Gamification = {
         state.settings.garden = document.getElementById('gamifyGarden')?.checked ?? true;
         state.settings.coinPopups = document.getElementById('gamifyCoinPopups')?.checked ?? true;
         state.settings.pixelArt = document.getElementById('gamifyPixelArt')?.checked ?? false;
+        state.settings.demoSpeed = document.getElementById('gamifyDemoSpeed')?.checked ?? false;
         state.settings.volume = parseInt(document.getElementById('gamifyVolume')?.value ?? 50);
 
         const volumeLabel = document.getElementById('gamifyVolumeLabel');
@@ -2627,6 +2747,12 @@ const Gamification = {
 
         // Clear sprite cache when pixel art toggled
         Sprites._cache = {};
+
+        // Restart decay timer when demo speed toggled
+        if (window._decayTimer) clearInterval(window._decayTimer);
+        const decayInt = state.settings.demoSpeed ? 5 * 1000 : 5 * 60 * 1000;
+        window._decayTimer = setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); }, decayInt);
+        if (state.settings.demoSpeed) { Garden.decayWater(); Garden.decayPetStats(); }
     },
 
     // Load settings into UI
@@ -2656,6 +2782,9 @@ const Gamification = {
 
         const el5d = document.getElementById('gamifyPixelArt');
         if (el5d) el5d.checked = !!state.settings.pixelArt;
+
+        const el5e = document.getElementById('gamifyDemoSpeed');
+        if (el5e) el5e.checked = !!state.settings.demoSpeed;
 
         const el6 = document.getElementById('gamifyVolume');
         if (el6) el6.value = state.settings.volume;
@@ -3203,9 +3332,9 @@ const SoundFX = {
 // =====================================================================
 const Shop = {
     currentTab: 'food',
-    TABS: ['food','seeds','gardenItems','decorations','cosmetics'],
-    TAB_LABELS: { food:'Food', seeds:'Seeds', gardenItems:'Garden', decorations:'Decor', cosmetics:'Cosmetics' },
-    TAB_ICONS: { food:'🍖', seeds:'🌱', gardenItems:'💧', decorations:'⛲', cosmetics:'🎩' },
+    TABS: ['food','seeds','gardenItems','decorations','cosmetics','adoptPet'],
+    TAB_LABELS: { food:'Food', seeds:'Seeds', gardenItems:'Garden', decorations:'Decor', cosmetics:'Cosmetics', adoptPet:'Pets' },
+    TAB_ICONS: { food:'🍖', seeds:'🌱', gardenItems:'💧', decorations:'⛲', cosmetics:'🎩', adoptPet:'🐾' },
 
     show() {
         this.render();
@@ -3257,6 +3386,11 @@ const Shop = {
             return;
         }
 
+        if (this.currentTab === 'adoptPet') {
+            this.renderAdoptTab(el, state, coins);
+            return;
+        }
+
         const catalog = Gamification.SHOP[this.currentTab];
         if (!catalog) { el.innerHTML = ''; return; }
 
@@ -3265,13 +3399,16 @@ const Shop = {
             const price = item.price;
             const owned = this.getOwned(this.currentTab, id, state);
             const canAfford = coins >= price;
+            const unlocked = Gamification.isItemUnlocked(this.currentTab, id);
+            const reqLevel = (Gamification.LEVEL_REQS[this.currentTab] || {})[id] || 1;
             html += `
-                <div class="shop-item${!canAfford ? ' cant-afford' : ''}">
+                <div class="shop-item${!unlocked ? ' locked-item' : ''}${!canAfford && unlocked ? ' cant-afford' : ''}">
                     <div class="shop-item-icon">${this.currentTab === 'seeds' ? Sprites.plantSprite(id, (item.stages || 4) - 1, item.icon, 36) : item.icon}</div>
                     <div class="shop-item-name">${item.name}</div>
                     ${item.desc ? `<div class="shop-item-desc">${item.desc}</div>` : ''}
-                    ${owned !== null ? `<div class="shop-item-owned">Owned: ${owned}</div>` : ''}
-                    <button class="shop-buy-btn" onclick="Shop.buy('${this.currentTab}','${id}')" ${!canAfford ? 'disabled' : ''}>&#x1FA99; ${price}</button>
+                    ${!unlocked ? `<div class="shop-item-lock">Unlocks at Lv. ${reqLevel}</div>` : ''}
+                    ${owned !== null && unlocked ? `<div class="shop-item-owned">Owned: ${owned}</div>` : ''}
+                    ${unlocked ? `<button class="shop-buy-btn" onclick="Shop.buy('${this.currentTab}','${id}')" ${!canAfford ? 'disabled' : ''}>&#x1FA99; ${price}</button>` : ''}
                 </div>`;
         }
         html += '</div>';
@@ -3303,7 +3440,24 @@ const Shop = {
         } else if (tab === 'seeds') {
             state.inventory.seeds[id] = (state.inventory.seeds[id] || 0) + 1;
         } else if (tab === 'gardenItems') {
-            state.inventory.gardenItems[id] = (state.inventory.gardenItems[id] || 0) + 1;
+            if (id === 'evoStone') {
+                // Evolution stone: apply care minutes directly
+                state.studyBuddy.careMinutes = (state.studyBuddy.careMinutes || 0) + 60;
+                // Re-check evolution
+                for (let i = Gamification.BUDDY_STAGES.length - 1; i >= 0; i--) {
+                    const req = Gamification.BUDDY_STAGES[i];
+                    if (state.studyBuddy.totalXpFed >= req.xpNeeded && (state.studyBuddy.careMinutes || 0) >= req.careNeeded) {
+                        if (state.studyBuddy.stage < req.stage) {
+                            state.studyBuddy.stage = req.stage;
+                            Gamification.showAchievementToast({ icon: Gamification.getSpeciesEmoji(state.studyBuddy.species, req.stage), name: state.studyBuddy.name + ' evolved!', desc: 'Now a ' + Gamification.getSpeciesStageName(state.studyBuddy.species, req.stage), xp: 0 });
+                        }
+                        break;
+                    }
+                }
+                Gamification.updateBuddyWidget();
+            } else {
+                state.inventory.gardenItems[id] = (state.inventory.gardenItems[id] || 0) + 1;
+            }
         } else if (tab === 'decorations') {
             state.inventory.decorations.push(id);
         } else if (tab === 'cosmetics') {
@@ -3325,6 +3479,89 @@ const Shop = {
         state.garden.unlockedPlots++;
         Gamification.saveState(state);
         SoundFX.play('purchase');
+        this.render();
+    },
+
+    renderAdoptTab(el, state, coins) {
+        const pets = state.pets || [];
+        const ownedSpecies = pets.map(p => p.species);
+        const maxPets = 4;
+        let html = `<div class="shop-section"><h3>Your Pets (${pets.length}/${maxPets})</h3>`;
+
+        // Show owned pets
+        if (pets.length > 0) {
+            html += '<div class="pet-roster">';
+            pets.forEach((pet, idx) => {
+                const sp = Gamification.PET_SPECIES[pet.species] || Gamification.PET_SPECIES.bird;
+                const isActive = idx === (state.activePetIdx || 0);
+                html += `<div class="pet-roster-item${isActive ? ' active' : ''}" onclick="Shop.switchPet(${idx})">
+                    <span class="pet-roster-emoji">${Gamification.getSpeciesEmoji(pet.species, pet.stage)}</span>
+                    <span class="pet-roster-name">${pet.name}</span>
+                    <span class="pet-roster-info">${sp.name} Lv${pet.stage}</span>
+                    ${isActive ? '<span class="pet-roster-active">Active</span>' : ''}
+                </div>`;
+            });
+            html += '</div>';
+        }
+
+        // Show adoptable species
+        html += '<h3>Adopt New Pet</h3><div class="shop-grid">';
+        for (const [id, sp] of Object.entries(Gamification.PET_SPECIES)) {
+            const owned = ownedSpecies.includes(id);
+            const levelOk = state.level >= sp.unlockLevel;
+            const canAfford = coins >= sp.price;
+            const full = pets.length >= maxPets;
+            const disabled = owned || !levelOk || !canAfford || full;
+            html += `<div class="shop-item${!levelOk ? ' locked-item' : ''}${owned ? ' sold-out' : ''}${!canAfford && levelOk && !owned ? ' cant-afford' : ''}">
+                <div class="shop-item-icon">${sp.emojis[sp.emojis.length - 1]}</div>
+                <div class="shop-item-name">${sp.name}</div>
+                <div class="shop-item-desc">Difficulty: ${'★'.repeat(Math.ceil(sp.difficulty * 2))}${'☆'.repeat(4 - Math.ceil(sp.difficulty * 2))}</div>
+                <div class="shop-item-desc">${sp.stages.join(' → ')}</div>
+                ${!levelOk ? `<div class="shop-item-lock">Unlocks at Lv. ${sp.unlockLevel}</div>` : ''}
+                ${owned ? '<div class="shop-item-owned">Owned</div>' : ''}
+                ${full && !owned ? '<div class="shop-item-lock">Pet roster full (${maxPets})</div>' : ''}
+                ${!disabled ? `<button class="shop-buy-btn" onclick="Shop.adoptPet('${id}')">${sp.price > 0 ? '&#x1FA99; ' + sp.price : 'Free!'}</button>` : ''}
+            </div>`;
+        }
+        html += '</div></div>';
+        el.innerHTML = html;
+    },
+
+    adoptPet(speciesId) {
+        const sp = Gamification.PET_SPECIES[speciesId];
+        if (!sp) return;
+        const state = Gamification.getState();
+        const pets = state.pets || [];
+        if (pets.length >= 4) return;
+        if (pets.some(p => p.species === speciesId)) return;
+        if (state.level < sp.unlockLevel) return;
+        if (sp.price > 0 && !Gamification.spendCoins(sp.price)) return;
+
+        const name = prompt('Name your new ' + sp.name + ':') || sp.name;
+        const newPet = {
+            name: name.slice(0, 20), species: speciesId, stage: 1, totalXpFed: 0,
+            mood: 'sleepy', lastFed: null, hunger: 100, happiness: 100,
+            lastDecayCheck: Date.now(), careMinutes: 0, lastCareCheck: null,
+            studyMinutes: 0, sick: false, lastInteraction: Date.now(),
+            accessories: [], totalMealsEaten: 0
+        };
+        state.pets.push(newPet);
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.render();
+    },
+
+    switchPet(idx) {
+        const state = Gamification.getState();
+        if (idx < 0 || idx >= (state.pets || []).length) return;
+        // Save current active pet back
+        state.pets[state.activePetIdx || 0] = state.studyBuddy;
+        // Switch
+        state.activePetIdx = idx;
+        state.studyBuddy = state.pets[idx];
+        Gamification.saveState(state);
+        Gamification.updateBuddyWidget();
+        Gamification.renderXpBar();
         this.render();
     }
 };
@@ -3402,7 +3639,7 @@ const Garden = {
         const accessories = buddy.accessories || [];
         el.innerHTML = `
             <div class="garden-pet-sprite">
-                <span class="garden-pet-emoji">${Sprites.petSprite(buddy.stage, stage.emoji, 48)}</span>
+                <span class="garden-pet-emoji">${Sprites.petSprite(buddy.stage, Gamification.getSpeciesEmoji(buddy.species, buddy.stage), 48)}</span>
                 ${accessories.map(a => {
                     const item = Gamification.SHOP.cosmetics[a];
                     return item ? `<span class="pet-accessory">${item.icon}</span>` : '';
@@ -3426,10 +3663,10 @@ const Garden = {
     showSeedPicker(plotIdx) {
         const state = Gamification.getState();
         const inv = state.inventory.seeds;
-        const available = Object.entries(inv).filter(([, count]) => count > 0);
+        const available = Object.entries(inv).filter(([id, count]) => count > 0 && Gamification.isItemUnlocked('seeds', id));
 
         if (available.length === 0) {
-            alert('No seeds! Buy some from the Shop.');
+            alert('No seeds available! Buy some from the Shop or level up to unlock more.');
             return;
         }
 
@@ -3617,48 +3854,64 @@ const Garden = {
         }
     },
 
-    // Decay pet hunger/happiness over time
+    // Decay pet hunger/happiness over time (all owned pets)
     decayPetStats() {
         const state = Gamification.getState();
-        const buddy = state.studyBuddy;
         const now = Date.now();
+        const demo = state.settings.demoSpeed;
+        const timeMultiplier = demo ? 60 : 1; // Demo: 1 min = 1 hour
+        const pets = state.pets || [state.studyBuddy];
+        const petCount = pets.length;
+
+        let anyChanged = false;
+        pets.forEach(pet => {
+            const last = pet.lastDecayCheck || now;
+            let hoursPassed = (now - last) / (1000 * 60 * 60);
+            hoursPassed *= timeMultiplier;
+
+            const minInterval = demo ? 0.001 : 0.5;
+            if (hoursPassed < minInterval) return;
+
+            const diff = Gamification.getSpeciesDifficulty(pet.species);
+            // More pets = each is harder (10% more decay per extra pet)
+            const crowdPenalty = 1 + (petCount - 1) * 0.1;
+            const decayRate = diff * crowdPenalty;
+
+            const hungerDecay = Math.floor(hoursPassed * 4 * decayRate);
+            const happyDecay = Math.floor(hoursPassed * 3 * decayRate);
+
+            pet.hunger = Math.max(0, (pet.hunger ?? 100) - hungerDecay);
+            pet.happiness = Math.max(0, (pet.happiness ?? 100) - happyDecay);
+
+            // Passive care minutes
+            const passiveCare = Math.min(Math.floor(hoursPassed), demo ? 60 : 24);
+            pet.careMinutes = (pet.careMinutes || 0) + passiveCare;
+
+            // Sickness
+            if (pet.hunger < 15 && pet.happiness < 15) pet.sick = true;
+            if (pet.sick) {
+                pet.hunger = Math.max(0, pet.hunger - Math.floor(hoursPassed * 2 * decayRate));
+                pet.happiness = Math.max(0, pet.happiness - Math.floor(hoursPassed * 2 * decayRate));
+            }
+
+            pet.lastDecayCheck = now;
+            anyChanged = true;
+        });
+
+        // Bonuses (only for active pet)
+        const buddy = state.studyBuddy;
         const last = buddy.lastDecayCheck || now;
-        const hoursPassed = (now - last) / (1000 * 60 * 60);
+        let h = ((now - last) / (1000 * 60 * 60)) * timeMultiplier;
+        if (h < 0.001) h = 0;
+        const growingCount = (state.garden.plots || []).filter(p => p && p.seedType).length;
+        if (growingCount >= 3) {
+            buddy.happiness = Math.min(100, (buddy.happiness ?? 0) + Math.floor(h * 3));
+        }
+        if ((buddy.happiness ?? 0) > 75) {
+            state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + Math.floor(h * 2.5));
+        }
 
-        if (hoursPassed >= 0.5) {
-            // Faster decay — hunger 4/hr, happiness 3/hr
-            const hungerDecay = Math.floor(hoursPassed * 4);
-            const happyDecay = Math.floor(hoursPassed * 3);
-
-            buddy.hunger = Math.max(0, (buddy.hunger ?? 100) - hungerDecay);
-            buddy.happiness = Math.max(0, (buddy.happiness ?? 100) - happyDecay);
-
-            // Passive real-time care minutes (1 per real hour, capped)
-            const passiveCare = Math.min(Math.floor(hoursPassed), 24);
-            buddy.careMinutes = (buddy.careMinutes || 0) + passiveCare;
-
-            // Sickness — both stats below 15
-            if (buddy.hunger < 15 && buddy.happiness < 15) {
-                buddy.sick = true;
-            }
-            // Sick = even faster decay
-            if (buddy.sick) {
-                buddy.hunger = Math.max(0, buddy.hunger - Math.floor(hoursPassed * 2));
-                buddy.happiness = Math.max(0, buddy.happiness - Math.floor(hoursPassed * 2));
-            }
-
-            // Bonus: 3+ growing plants = +3 happiness/hr
-            const growingCount = (state.garden.plots || []).filter(p => p && p.seedType).length;
-            if (growingCount >= 3) {
-                buddy.happiness = Math.min(100, buddy.happiness + Math.floor(hoursPassed * 3));
-            }
-
-            // Bonus: happy pet = water decays slower
-            if ((buddy.happiness ?? 0) > 75) {
-                state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + Math.floor(hoursPassed * 2.5));
-            }
-
-            buddy.lastDecayCheck = now;
+        if (anyChanged) {
             Gamification.saveState(state);
             Gamification.updateBuddyWidget();
         }
@@ -3716,15 +3969,32 @@ const PetModal = {
         if (owned.length === 0) accessoryHtml += '<span style="color:var(--gray-500);font-size:12px">Buy accessories in the Shop!</span>';
         accessoryHtml += '</div>';
 
+        // Pet selector (if multiple pets)
+        const pets = state.pets || [];
+        let petSelectorHtml = '';
+        if (pets.length > 1) {
+            petSelectorHtml = '<div class="pet-selector">';
+            pets.forEach((p, i) => {
+                const isActive = i === (state.activePetIdx || 0);
+                const sp = Gamification.PET_SPECIES[p.species] || Gamification.PET_SPECIES.bird;
+                const statusIcon = p.sick ? '\ud83e\udd12' : ((p.hunger ?? 100) < 30 ? '\u26a0\ufe0f' : '');
+                petSelectorHtml += `<button class="pet-sel-btn${isActive ? ' active' : ''}" onclick="PetModal.switchAndShow(${i})" title="${p.name}">${Gamification.getSpeciesEmoji(p.species, p.stage)} ${statusIcon}</button>`;
+            });
+            petSelectorHtml += '</div>';
+        }
+
+        const spInfo = Gamification.PET_SPECIES[buddy.species] || Gamification.PET_SPECIES.bird;
+
         const html = `
             <div class="pet-modal-content">
                 <button class="pet-modal-close" onclick="PetModal.close()">&times;</button>
+                ${petSelectorHtml}
                 <div class="pet-modal-sprite">
-                    <span class="pet-modal-emoji">${Sprites.petSprite(buddy.stage, stage.emoji, 64)}</span>
+                    <span class="pet-modal-emoji">${Sprites.petSprite(buddy.stage, Gamification.getSpeciesEmoji(buddy.species, buddy.stage), 64)}</span>
                     ${accessories.map(a => { const it = Gamification.SHOP.cosmetics[a]; return it ? `<span class="pet-modal-acc">${it.icon}</span>` : ''; }).join('')}
                 </div>
                 <div class="pet-modal-name" onclick="PetModal.rename()">${buddy.name} ✏️</div>
-                <div class="pet-modal-stage">${stage.name}${buddy.sick ? ' \ud83e\udd12' : ''}</div>
+                <div class="pet-modal-stage">${Gamification.getSpeciesStageName(buddy.species, buddy.stage)}${buddy.sick ? ' \ud83e\udd12' : ''} <span style="font-size:11px;color:var(--gray-500)">(${spInfo.name})</span></div>
                 ${sickBanner}
                 <div class="pet-meters">
                     <div class="pet-meter"><span>Hunger</span><div class="pet-meter-bar"><div class="pet-meter-fill hunger" style="width:${hunger}%"></div></div><span>${Math.round(hunger)}%</span></div>
@@ -3758,6 +4028,17 @@ const PetModal = {
     close() {
         const overlay = document.getElementById('petModalOverlay');
         if (overlay) overlay.classList.remove('active');
+    },
+
+    switchAndShow(idx) {
+        const state = Gamification.getState();
+        if (idx < 0 || idx >= (state.pets || []).length) return;
+        state.pets[state.activePetIdx || 0] = state.studyBuddy;
+        state.activePetIdx = idx;
+        state.studyBuddy = state.pets[idx];
+        Gamification.saveState(state);
+        Gamification.updateBuddyWidget();
+        this.show();
     },
 
     rename() {
@@ -7955,7 +8236,10 @@ async function init() {
     // Initialize garden decay timers
     Garden.decayWater();
     Garden.decayPetStats();
-    setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); }, 5 * 60 * 1000); // Check every 5 min
+    // Normal: 5 min intervals. Demo mode: every 5 seconds
+    const demoOn = Gamification.getState().settings.demoSpeed;
+    const decayInterval = demoOn ? 5 * 1000 : 5 * 60 * 1000;
+    window._decayTimer = setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); }, decayInterval);
 
     // Hide garden/shop buttons if garden disabled
     const gState = Gamification.getState();
