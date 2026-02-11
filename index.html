@@ -961,6 +961,8 @@ button:focus-visible {
 .pet-meter-fill.hunger{background:linear-gradient(90deg,#e74c3c,#e67e22)}
 .pet-meter-fill.happiness{background:linear-gradient(90deg,#f39c12,#ffd60a)}
 .pet-meter-fill.evolution{background:linear-gradient(90deg,#9b59b6,#3498db)}
+.pet-meter-fill.care{background:linear-gradient(90deg,#10b981,#06b6d4)}
+.pet-sick-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:6px 10px;border-radius:8px;font-size:12px;text-align:center;margin:6px 0;animation:buddySick 2s ease-in-out infinite}
 .pet-modal-content h4{font-size:13px;color:var(--navy);margin:12px 0 8px;border-bottom:1px solid var(--gray-200);padding-bottom:4px}
 .pet-food-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
 .pet-food-btn{padding:8px;border:2px solid var(--gray-200);border-radius:8px;background:var(--white);font-size:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
@@ -1003,6 +1005,10 @@ button:focus-visible {
 .buddy-sprite{font-size:36px;margin-bottom:4px}
 .buddy-name{font-size:12px;font-weight:bold;color:var(--navy)}
 .buddy-mood{font-size:10px;color:var(--gray-600)}
+.study-buddy.urgent{animation:buddyPulse 1.5s ease-in-out infinite;border-color:#ef4444}
+.study-buddy.sick{animation:buddySick 1s ease-in-out infinite;border-color:#f59e0b;background:#fffbeb}
+@keyframes buddyPulse{0%,100%{transform:scale(1);box-shadow:0 4px 12px rgba(0,0,0,.1)}50%{transform:scale(1.08);box-shadow:0 4px 16px rgba(239,68,68,.3)}}
+@keyframes buddySick{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
 .buddy-progress{width:60px;height:4px;background:var(--gray-200);border-radius:2px;margin:6px auto 0;overflow:hidden}
 .buddy-progress-fill{height:100%;background:var(--green);border-radius:2px}
 
@@ -1065,6 +1071,8 @@ button:focus-visible {
 [data-theme="dark"] .pet-food-btn{background:#1f2937;border-color:#374151;color:#d1d5db}
 [data-theme="dark"] .pet-accessory-btn{background:#1f2937;border-color:#374151}
 [data-theme="dark"] .pet-meter-bar{background:#374151}
+[data-theme="dark"] .pet-sick-banner{background:#451a03;border-color:#92400e;color:#fbbf24}
+[data-theme="dark"] .study-buddy.sick{background:#1c1917;border-color:#92400e}
 @media (prefers-color-scheme: dark) {
     body:not([data-theme="light"]) .shop-item,body:not([data-theme="light"]) .pet-modal-content{background:#16213e;border-color:#374151}
     body:not([data-theme="light"]) .shop-item-name,body:not([data-theme="light"]) .pet-modal-name{color:#93c5fd}
@@ -1076,6 +1084,8 @@ button:focus-visible {
     body:not([data-theme="light"]) .pet-food-btn{background:#1f2937;border-color:#374151;color:#d1d5db}
     body:not([data-theme="light"]) .pet-accessory-btn{background:#1f2937;border-color:#374151}
     body:not([data-theme="light"]) .pet-meter-bar{background:#374151}
+    body:not([data-theme="light"]) .pet-sick-banner{background:#451a03;border-color:#92400e;color:#fbbf24}
+    body:not([data-theme="light"]) .study-buddy.sick{background:#1c1917;border-color:#92400e}
 }
 
 /* === CENGAGE LIGHT THEME === */
@@ -1779,13 +1789,13 @@ const Gamification = {
         showHint: { name: 'Hint', desc: 'Show explanation hint', cost: 80, icon: '💡' }
     },
 
-    // Study buddy stages
+    // Study buddy stages — needs BOTH xp AND care minutes to evolve
     BUDDY_STAGES: [
-        { stage: 1, emoji: '🥚', name: 'Egg', xpNeeded: 0 },
-        { stage: 2, emoji: '🐣', name: 'Hatchling', xpNeeded: 500 },
-        { stage: 3, emoji: '🐥', name: 'Chick', xpNeeded: 2000 },
-        { stage: 4, emoji: '🐤', name: 'Bird', xpNeeded: 5000 },
-        { stage: 5, emoji: '🦅', name: 'Eagle', xpNeeded: 15000 }
+        { stage: 1, emoji: '🥚', name: 'Egg', xpNeeded: 0, careNeeded: 0 },
+        { stage: 2, emoji: '🐣', name: 'Hatchling', xpNeeded: 500, careNeeded: 30 },
+        { stage: 3, emoji: '🐥', name: 'Chick', xpNeeded: 2000, careNeeded: 120 },
+        { stage: 4, emoji: '🐤', name: 'Bird', xpNeeded: 5000, careNeeded: 360 },
+        { stage: 5, emoji: '🦅', name: 'Eagle', xpNeeded: 15000, careNeeded: 720 }
     ],
 
     // Get default state
@@ -1855,6 +1865,8 @@ const Gamification = {
             studyBuddy: {
                 name: 'Buddy', stage: 1, totalXpFed: 0, mood: 'sleepy', lastFed: null,
                 hunger: 100, happiness: 100, lastDecayCheck: null,
+                careMinutes: 0, lastCareCheck: null, studyMinutes: 0,
+                sick: false, lastInteraction: null,
                 accessories: [], totalMealsEaten: 0
             },
             garden: {
@@ -2304,22 +2316,34 @@ const Gamification = {
         if (!this.isEnabled()) return;
 
         const state = this.getState();
-        state.studyBuddy.totalXpFed += xp;
-        state.studyBuddy.lastFed = Date.now();
+        const buddy = state.studyBuddy;
+        buddy.totalXpFed += xp;
+        buddy.lastFed = Date.now();
+        buddy.lastInteraction = Date.now();
 
         // Studying gives a small happiness boost
-        state.studyBuddy.happiness = Math.min(100, (state.studyBuddy.happiness ?? 100) + 1);
+        buddy.happiness = Math.min(100, (buddy.happiness ?? 100) + 1);
 
-        // Check for evolution
+        // Accumulate study minutes (~1 min per question)
+        buddy.studyMinutes = (buddy.studyMinutes || 0) + 1;
+        // Study time counts 3x toward care (active study > passive time)
+        buddy.careMinutes = (buddy.careMinutes || 0) + 3;
+
+        // Studying heals sickness
+        if (buddy.sick && buddy.hunger > 30 && buddy.happiness > 30) {
+            buddy.sick = false;
+        }
+
+        // Check for evolution — needs BOTH enough XP AND enough care time
         for (let i = this.BUDDY_STAGES.length - 1; i >= 0; i--) {
-            if (state.studyBuddy.totalXpFed >= this.BUDDY_STAGES[i].xpNeeded) {
-                if (state.studyBuddy.stage < this.BUDDY_STAGES[i].stage) {
-                    state.studyBuddy.stage = this.BUDDY_STAGES[i].stage;
-                    // Show evolution notification
+            const req = this.BUDDY_STAGES[i];
+            if (buddy.totalXpFed >= req.xpNeeded && (buddy.careMinutes || 0) >= req.careNeeded) {
+                if (buddy.stage < req.stage) {
+                    buddy.stage = req.stage;
                     this.showAchievementToast({
-                        icon: this.BUDDY_STAGES[i].emoji,
-                        name: state.studyBuddy.name + ' evolved!',
-                        desc: 'Now a ' + this.BUDDY_STAGES[i].name,
+                        icon: req.emoji,
+                        name: buddy.name + ' evolved!',
+                        desc: 'Now a ' + req.name,
                         xp: 0
                     });
                 }
@@ -2334,14 +2358,16 @@ const Gamification = {
     // Update buddy mood
     updateBuddyMood() {
         const state = this.getState();
-        const h = state.studyBuddy.hunger ?? 100;
-        const hp = state.studyBuddy.happiness ?? 100;
+        const buddy = state.studyBuddy;
+        const h = buddy.hunger ?? 100;
+        const hp = buddy.happiness ?? 100;
 
-        if (h > 75 && hp > 75) state.studyBuddy.mood = 'happy';
-        else if (h > 50 && hp > 50) state.studyBuddy.mood = 'content';
-        else if (h < 25 || hp < 25) state.studyBuddy.mood = 'miserable';
-        else if (h < 50) state.studyBuddy.mood = 'hungry';
-        else state.studyBuddy.mood = 'sad';
+        if (buddy.sick) buddy.mood = 'sick';
+        else if (h > 75 && hp > 75) buddy.mood = 'happy';
+        else if (h > 50 && hp > 50) buddy.mood = 'content';
+        else if (h < 25 || hp < 25) buddy.mood = 'miserable';
+        else if (h < 50) buddy.mood = 'hungry';
+        else buddy.mood = 'sad';
 
         this.saveState(state);
         this.updateBuddyWidget();
@@ -2363,6 +2389,12 @@ const Gamification = {
         if (!el) return;
 
         el.classList.add('active');
+        el.classList.remove('urgent', 'sick');
+        const hunger = buddy.hunger ?? 100;
+        const happiness = buddy.happiness ?? 100;
+        if (buddy.sick) el.classList.add('sick');
+        else if (hunger < 30 || happiness < 30) el.classList.add('urgent');
+
         const accessories = (buddy.accessories || []).map(a => {
             const item = this.SHOP?.cosmetics?.[a];
             return item ? item.icon : '';
@@ -2370,7 +2402,8 @@ const Gamification = {
         document.getElementById('buddySprite').innerHTML = Sprites.petSprite(buddy.stage, stage.emoji, 36);
         document.getElementById('buddyName').textContent = buddy.name + (accessories ? ' ' + accessories : '');
         const moodStr = buddy.mood || 'content';
-        document.getElementById('buddyMood').textContent = moodStr.charAt(0).toUpperCase() + moodStr.slice(1);
+        const moodDisplay = buddy.sick ? 'Sick \ud83e\udd12' : moodStr.charAt(0).toUpperCase() + moodStr.slice(1);
+        document.getElementById('buddyMood').textContent = moodDisplay;
 
         // Progress to next stage
         if (nextStage) {
@@ -3587,30 +3620,47 @@ const Garden = {
     // Decay pet hunger/happiness over time
     decayPetStats() {
         const state = Gamification.getState();
+        const buddy = state.studyBuddy;
         const now = Date.now();
-        const last = state.studyBuddy.lastDecayCheck || now;
+        const last = buddy.lastDecayCheck || now;
         const hoursPassed = (now - last) / (1000 * 60 * 60);
 
-        if (hoursPassed >= 1) {
-            const hungerDecay = Math.floor(hoursPassed * 2);
-            const happyDecay = Math.floor(hoursPassed * 1);
+        if (hoursPassed >= 0.5) {
+            // Faster decay — hunger 4/hr, happiness 3/hr
+            const hungerDecay = Math.floor(hoursPassed * 4);
+            const happyDecay = Math.floor(hoursPassed * 3);
 
-            state.studyBuddy.hunger = Math.max(0, (state.studyBuddy.hunger ?? 100) - hungerDecay);
-            state.studyBuddy.happiness = Math.max(0, (state.studyBuddy.happiness ?? 100) - happyDecay);
+            buddy.hunger = Math.max(0, (buddy.hunger ?? 100) - hungerDecay);
+            buddy.happiness = Math.max(0, (buddy.happiness ?? 100) - happyDecay);
 
-            // Bonus: 3+ growing plants = +5 happiness/hr
-            const growingCount = (state.garden.plots || []).filter(p => p && p.seedType).length;
-            if (growingCount >= 3) {
-                state.studyBuddy.happiness = Math.min(100, state.studyBuddy.happiness + Math.floor(hoursPassed * 5));
+            // Passive real-time care minutes (1 per real hour, capped)
+            const passiveCare = Math.min(Math.floor(hoursPassed), 24);
+            buddy.careMinutes = (buddy.careMinutes || 0) + passiveCare;
+
+            // Sickness — both stats below 15
+            if (buddy.hunger < 15 && buddy.happiness < 15) {
+                buddy.sick = true;
+            }
+            // Sick = even faster decay
+            if (buddy.sick) {
+                buddy.hunger = Math.max(0, buddy.hunger - Math.floor(hoursPassed * 2));
+                buddy.happiness = Math.max(0, buddy.happiness - Math.floor(hoursPassed * 2));
             }
 
-            // Bonus: happy pet = water decays 50% slower (already factored into decay rate)
-            if ((state.studyBuddy.happiness ?? 0) > 75) {
+            // Bonus: 3+ growing plants = +3 happiness/hr
+            const growingCount = (state.garden.plots || []).filter(p => p && p.seedType).length;
+            if (growingCount >= 3) {
+                buddy.happiness = Math.min(100, buddy.happiness + Math.floor(hoursPassed * 3));
+            }
+
+            // Bonus: happy pet = water decays slower
+            if ((buddy.happiness ?? 0) > 75) {
                 state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + Math.floor(hoursPassed * 2.5));
             }
 
-            state.studyBuddy.lastDecayCheck = now;
+            buddy.lastDecayCheck = now;
             Gamification.saveState(state);
+            Gamification.updateBuddyWidget();
         }
     }
 };
@@ -3633,11 +3683,17 @@ const PetModal = {
         if (nextStage) {
             const currentXp = buddy.totalXpFed - stage.xpNeeded;
             const neededXp = nextStage.xpNeeded - stage.xpNeeded;
-            const pct = Math.min(100, Math.floor((currentXp / neededXp) * 100));
-            progressInfo = `<div class="pet-meter"><span>Evolution</span><div class="pet-meter-bar"><div class="pet-meter-fill evolution" style="width:${pct}%"></div></div><span>${pct}%</span></div>`;
+            const xpPct = Math.min(100, Math.floor((currentXp / neededXp) * 100));
+            const currentCare = (buddy.careMinutes || 0) - (stage.careNeeded || 0);
+            const neededCare = (nextStage.careNeeded || 0) - (stage.careNeeded || 0);
+            const carePct = neededCare > 0 ? Math.min(100, Math.floor((currentCare / neededCare) * 100)) : 100;
+            progressInfo = `<div class="pet-meter"><span>XP Progress</span><div class="pet-meter-bar"><div class="pet-meter-fill evolution" style="width:${xpPct}%"></div></div><span>${xpPct}%</span></div>`;
+            progressInfo += `<div class="pet-meter"><span>Care Time</span><div class="pet-meter-bar"><div class="pet-meter-fill care" style="width:${carePct}%"></div></div><span>${carePct}%</span></div>`;
         } else {
             progressInfo = '<div class="pet-meter"><span>Max Evolution!</span></div>';
         }
+
+        const sickBanner = buddy.sick ? '<div class="pet-sick-banner">Your pet is sick! Feed and study to heal.</div>' : '';
 
         // Food inventory
         const inv = state.inventory.petFood;
@@ -3668,7 +3724,8 @@ const PetModal = {
                     ${accessories.map(a => { const it = Gamification.SHOP.cosmetics[a]; return it ? `<span class="pet-modal-acc">${it.icon}</span>` : ''; }).join('')}
                 </div>
                 <div class="pet-modal-name" onclick="PetModal.rename()">${buddy.name} ✏️</div>
-                <div class="pet-modal-stage">${stage.name}</div>
+                <div class="pet-modal-stage">${stage.name}${buddy.sick ? ' \ud83e\udd12' : ''}</div>
+                ${sickBanner}
                 <div class="pet-meters">
                     <div class="pet-meter"><span>Hunger</span><div class="pet-meter-bar"><div class="pet-meter-fill hunger" style="width:${hunger}%"></div></div><span>${Math.round(hunger)}%</span></div>
                     <div class="pet-meter"><span>Happiness</span><div class="pet-meter-bar"><div class="pet-meter-fill happiness" style="width:${happiness}%"></div></div><span>${Math.round(happiness)}%</span></div>
@@ -3681,6 +3738,8 @@ const PetModal = {
                 <div class="pet-modal-stats">
                     <span>Meals eaten: ${buddy.totalMealsEaten || 0}</span>
                     <span>Total XP fed: ${buddy.totalXpFed.toLocaleString()}</span>
+                    <span>Study time: ${Math.floor((buddy.studyMinutes || 0) / 60)}h ${(buddy.studyMinutes || 0) % 60}m</span>
+                    <span>Care time: ${Math.floor((buddy.careMinutes || 0) / 60)}h ${(buddy.careMinutes || 0) % 60}m</span>
                 </div>
             </div>`;
 
@@ -3724,7 +3783,14 @@ const PetModal = {
         state.studyBuddy.happiness = Math.min(100, (state.studyBuddy.happiness ?? 0) + item.happiness);
         state.studyBuddy.totalMealsEaten = (state.studyBuddy.totalMealsEaten || 0) + 1;
         state.studyBuddy.lastFed = Date.now();
+        state.studyBuddy.lastInteraction = Date.now();
 
+        // Feeding can heal sickness
+        if (state.studyBuddy.sick && state.studyBuddy.hunger > 30 && state.studyBuddy.happiness > 30) {
+            state.studyBuddy.sick = false;
+        }
+
+        Gamification.updateBuddyMood();
         Gamification.saveState(state);
         SoundFX.play('petFeed');
         Gamification.updateBuddyWidget();
