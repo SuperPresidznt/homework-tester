@@ -974,6 +974,15 @@ button:focus-visible {
 .garden-water-btn{position:absolute;bottom:12px;right:16px;z-index:3;background:rgba(255,255,255,.85);border:2px solid rgba(52,152,219,.4);border-radius:12px;padding:6px 12px;cursor:pointer;font-size:14px;transition:all .2s;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
 .garden-water-btn:hover{background:rgba(255,255,255,.95);transform:scale(1.05);border-color:rgba(52,152,219,.7)}
 .garden-water-btn .water-count{font-size:12px;font-weight:bold;color:#2563eb}
+.garden-water-meter{position:absolute;bottom:110px;right:16px;z-index:3;background:rgba(255,255,255,.92);border:2px solid rgba(52,152,219,.35);border-radius:14px;padding:10px 14px;font-size:12px;box-shadow:0 2px 10px rgba(0,0,0,.12);width:160px}
+.garden-water-meter .water-meter-label{font-weight:600;color:#2563eb;margin-bottom:4px;text-transform:uppercase;font-size:11px;letter-spacing:.05em}
+.garden-water-meter .water-meter-bar{position:relative;height:10px;background:rgba(37,99,235,.12);border-radius:999px;overflow:hidden}
+.garden-water-meter .water-meter-fill{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,#2563eb,#60a5fa);border-radius:999px;transition:width .3s ease}
+.garden-water-meter .water-meter-text{margin-top:6px;font-weight:bold;color:#2563eb}
+.garden-water-meter .water-meter-text.low{color:#f97316}
+.garden-water-meter .water-meter-text.critical{color:#dc2626}
+.garden-water-meter.pulse .water-meter-fill{animation:meterPulse .7s ease}
+@keyframes meterPulse{0%{box-shadow:0 0 0 0 rgba(96,165,250,.6)}100%{box-shadow:0 0 0 12px rgba(96,165,250,0)}}
 
 /* Weather effects on scene */
 .garden-scene.water-low{filter:saturate(.6) brightness(.92)}
@@ -1067,9 +1076,13 @@ button:focus-visible {
 @keyframes levelUpBounce{0%{opacity:0;transform:scale(.5)}60%{transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
 
 /* Study Buddy Widget */
-.study-buddy{position:fixed;bottom:100px;left:20px;background:#fff;border:2px solid var(--gray-200);border-radius:16px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:100;display:none;text-align:center;cursor:pointer;transition:transform .2s}
+.study-buddy{position:fixed;background:#fff;border:2px solid var(--gray-200);border-radius:16px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.1);z-index:100;display:none;text-align:center;cursor:grab;transition:transform .2s,box-shadow .2s;touch-action:none;user-select:none;transform-origin:center}
+.study-buddy.hidden{display:none!important}
 .study-buddy.active{display:block}
-.study-buddy:hover{transform:scale(1.05)}
+@media (hover:hover) {
+    .study-buddy:hover:not(.dragging){transform:scale(1.05)}
+}
+.study-buddy.dragging{cursor:grabbing;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .buddy-sprite{font-size:36px;margin-bottom:4px}
 .buddy-name{font-size:12px;font-weight:bold;color:var(--navy)}
 .buddy-mood{font-size:10px;color:var(--gray-600)}
@@ -1258,6 +1271,9 @@ button:focus-visible {
 [data-theme="dark"] .plot-info-action{border-color:#374151;color:#e2e8f0}
 [data-theme="dark"] .plot-info-action:hover:not(:disabled){border-color:#60a5fa;background:rgba(96,165,250,.1)}
 [data-theme="dark"] .garden-water-btn{background:rgba(30,40,60,.85);border-color:rgba(96,165,250,.4);color:#e2e8f0}
+[data-theme="dark"] .garden-water-meter{background:rgba(15,23,42,.92);border-color:rgba(96,165,250,.3)}
+[data-theme="dark"] .garden-water-meter .water-meter-bar{background:rgba(59,130,246,.2)}
+[data-theme="dark"] .garden-water-meter .water-meter-fill{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
 [data-theme="dark"] .garden-pet-mood-bubble{background:rgba(30,40,60,.92);color:#e2e8f0}
 [data-theme="dark"] .garden-pet-mood-bubble::after{background:rgba(30,40,60,.92)}
 [data-theme="dark"] .shop-header{border-color:#374151}
@@ -1420,6 +1436,7 @@ button:focus-visible {
     .garden-pet-emoji{font-size:36px}
     .garden-pet{bottom:8px;left:8px}
     .garden-water-btn{bottom:8px;right:8px;padding:5px 8px;font-size:12px}
+    .garden-water-meter{right:8px;bottom:72px;width:140px}
     .garden-ground{padding:6px 8px 10px}
     .garden-modal{padding:16px;max-width:320px}
     /* Pet modal responsive */
@@ -2194,7 +2211,8 @@ const Gamification = {
                 garden: true,
                 coinPopups: true,
                 pixelArt: false,
-                volume: 50
+                volume: 50,
+                buddyPosition: null
             },
             stats: {
                 totalXpEarned: 0,
@@ -2215,6 +2233,7 @@ const Gamification = {
     // each read stale copies from localStorage
     _state: null,
     _saveTimeout: null,
+    _rewardToastTimer: null,
 
     // Get current state (reads localStorage only on first call, then returns cached)
     getState() {
@@ -2721,8 +2740,11 @@ const Gamification = {
     // Update buddy widget
     updateBuddyWidget() {
         const state = this.getState();
+        const el = document.getElementById('studyBuddy');
+        if (!el) return;
+
         if (!state.settings.pet) {
-            document.getElementById('studyBuddy')?.classList.remove('active');
+            el.classList.remove('active');
             return;
         }
 
@@ -2730,15 +2752,15 @@ const Gamification = {
         const stage = this.BUDDY_STAGES.find(s => s.stage === buddy.stage) || this.BUDDY_STAGES[0];
         const nextStage = this.BUDDY_STAGES.find(s => s.stage === buddy.stage + 1);
 
-        const el = document.getElementById('studyBuddy');
-        if (!el) return;
-
         el.classList.add('active');
         el.classList.remove('urgent', 'sick');
         const hunger = buddy.hunger ?? 100;
         const happiness = buddy.happiness ?? 100;
         if (buddy.sick) el.classList.add('sick');
         else if (hunger < 30 || happiness < 30) el.classList.add('urgent');
+
+        this._applyBuddyPosition(el, state.settings.buddyPosition);
+        this._ensureBuddyDraggable(el);
 
         const accessories = (buddy.accessories || []).map(a => {
             const item = this.SHOP?.cosmetics?.[a];
@@ -2759,6 +2781,112 @@ const Gamification = {
         } else {
             document.getElementById('buddyProgress').style.width = '100%';
         }
+    },
+
+    _applyBuddyPosition(el, pos) {
+        if (!el) return;
+        if (pos && typeof pos.left === 'number' && typeof pos.top === 'number') {
+            el.style.left = pos.left + 'px';
+            el.style.top = pos.top + 'px';
+            el.style.bottom = 'auto';
+        } else {
+            el.style.left = '20px';
+            el.style.bottom = '100px';
+            el.style.top = 'auto';
+        }
+    },
+
+    _ensureBuddyDraggable(el) {
+        if (!el || el.dataset.dragInit === '1') return;
+        el.dataset.dragInit = '1';
+        el.setAttribute('role', 'button');
+        el.setAttribute('tabindex', '0');
+        const self = this;
+        let pointerId = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let startX = 0;
+        let startY = 0;
+        let moved = false;
+        let pointerDownAt = 0;
+
+        const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+
+        const endDrag = (e) => {
+            if (pointerId === null || e.pointerId !== pointerId) return;
+            el.releasePointerCapture(pointerId);
+            pointerId = null;
+            document.removeEventListener('pointermove', onPointerMove);
+            document.removeEventListener('pointerup', endDrag);
+            document.removeEventListener('pointercancel', endDrag);
+            el.classList.remove('dragging');
+            const wasDrag = moved;
+            moved = false;
+            const pressDuration = Date.now() - pointerDownAt;
+            pointerDownAt = 0;
+            if (!wasDrag && pressDuration < 350) {
+                self.showBuddyInfo();
+            }
+        };
+
+        const onPointerMove = (e) => {
+            if (pointerId === null || e.pointerId !== pointerId) return;
+            e.preventDefault();
+            const left = clamp(e.clientX - offsetX, 5, window.innerWidth - el.offsetWidth - 5);
+            const top = clamp(e.clientY - offsetY, 50, window.innerHeight - el.offsetHeight - 5);
+            el.style.left = left + 'px';
+            el.style.top = top + 'px';
+            el.style.bottom = 'auto';
+            if (!moved && (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5)) {
+                moved = true;
+                el.classList.add('dragging');
+            }
+            const state = self.getState();
+            state.settings.buddyPosition = { left, top };
+            self.saveState(state);
+        };
+
+        el.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0 || pointerId !== null) return;
+            pointerId = e.pointerId;
+            const rect = el.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+            startX = e.clientX;
+            startY = e.clientY;
+            pointerDownAt = Date.now();
+            moved = false;
+            el.setPointerCapture(pointerId);
+            document.addEventListener('pointermove', onPointerMove, { passive: false });
+            document.addEventListener('pointerup', endDrag);
+            document.addEventListener('pointercancel', endDrag);
+        });
+
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                self.showBuddyInfo();
+            }
+        });
+    },
+
+    showAnswerReward(reward) {
+        if (!reward) return;
+        const toast = document.getElementById('rewardToast');
+        if (!toast) return;
+        const iconEl = document.getElementById('rewardToastIcon');
+        const titleEl = document.getElementById('rewardToastTitle');
+        const breakdownEl = document.getElementById('rewardToastBreakdown');
+        iconEl.textContent = reward.icon || (reward.isCorrect ? '⚔️' : '🛡️');
+        titleEl.textContent = reward.title || (reward.isCorrect ? 'Great strike!' : 'Keep going!');
+        const parts = [];
+        if (reward.xp) parts.push(`<span>⭐ ${reward.xp} XP</span>`);
+        if (reward.coins) parts.push(`<span>🪙 ${reward.coins} coins</span>`);
+        if (reward.combo) parts.push(`<span>🔥 x${reward.combo.toFixed(1)} combo</span>`);
+        breakdownEl.innerHTML = parts.join('');
+        toast.classList.add('show');
+        clearTimeout(this._rewardToastTimer);
+        this._rewardToastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
     },
 
     // Show buddy info — opens garden screen with pet modal
@@ -4311,6 +4439,7 @@ const Battle = {
 // GARDEN SYSTEM
 // =====================================================================
 const Garden = {
+    _meterPulseTimer: null,
     show() {
         this.render();
         showScreen('garden');
@@ -4330,6 +4459,8 @@ const Garden = {
             scene.classList.toggle('water-low', water > 0 && water < 25);
             scene.classList.toggle('water-critical', water <= 0);
         }
+
+        this.updateWaterMeter(state);
 
         // Update watering can count
         const waterCount = document.getElementById('gardenWaterCount');
@@ -4629,6 +4760,7 @@ const Garden = {
         state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 25);
         Gamification.saveState(state);
         this.render();
+        this.flashWaterMeter();
     },
 
     // Decay water over time (called on init and periodically)
@@ -4717,6 +4849,39 @@ const Garden = {
             Gamification.saveState(state);
             Gamification.updateBuddyWidget();
         }
+    }
+    ,
+
+    updateWaterMeter(state) {
+        const meter = document.getElementById('gardenWaterMeter');
+        if (!meter) return;
+        const fill = meter.querySelector('.water-meter-fill');
+        const text = meter.querySelector('.water-meter-text');
+        const level = Math.max(0, Math.min(100, Math.round(state.garden.waterLevel || 0)));
+        if (fill) fill.style.width = level + '%';
+        let status = 'Hydrated';
+        let statusClass = '';
+        if (level <= 10) {
+            status = 'Critical';
+            statusClass = 'critical';
+        } else if (level <= 30) {
+            status = 'Low';
+            statusClass = 'low';
+        }
+        meter.classList.toggle('pulse', statusClass !== '');
+        if (text) {
+            text.textContent = level + '% ' + status;
+            text.classList.remove('low', 'critical');
+            if (statusClass) text.classList.add(statusClass);
+        }
+    },
+
+    flashWaterMeter() {
+        const meter = document.getElementById('gardenWaterMeter');
+        if (!meter) return;
+        meter.classList.add('pulse');
+        if (this._meterPulseTimer) clearTimeout(this._meterPulseTimer);
+        this._meterPulseTimer = setTimeout(() => meter.classList.remove('pulse'), 600);
     }
 };
 
@@ -9171,7 +9336,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 </div>
 
 <!-- Study Buddy Widget -->
-<div class="study-buddy" id="studyBuddy" onclick="Gamification.showBuddyInfo()">
+<div class="study-buddy" id="studyBuddy">
     <div class="buddy-sprite" id="buddySprite">🥚</div>
     <div class="buddy-name" id="buddyName">Mathie</div>
     <div class="buddy-mood" id="buddyMood">Sleepy</div>
