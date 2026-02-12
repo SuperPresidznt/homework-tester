@@ -945,6 +945,9 @@ button:focus-visible {
 .plot-empty-icon{font-size:28px;opacity:.6;transition:opacity .2s}
 .garden-plot.empty:hover .plot-empty-icon{opacity:1}
 .garden-plot.empty{border-style:dashed;border-color:#7a5c30}
+.plot-water-btn{margin-top:6px;padding:3px 10px;font-size:11px;border-radius:999px;border:1px solid rgba(59,130,246,.4);background:rgba(59,130,246,.15);color:#0b5394;font-weight:600;cursor:pointer;transition:all .2s}
+.plot-water-btn:hover{background:rgba(59,130,246,.25);border-color:rgba(59,130,246,.6)}
+.plot-water-btn:disabled{opacity:.5;cursor:not-allowed}
 .plot-plant{font-size:40px;transition:all .3s;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
 .plot-plant.glow-bounce{animation:glowBounce 1s infinite alternate;filter:drop-shadow(0 0 10px rgba(255,215,0,.7)) drop-shadow(0 0 20px rgba(255,215,0,.3))}
 @keyframes glowBounce{0%{transform:scale(1)}100%{transform:scale(1.12) translateY(-5px)}}
@@ -2116,10 +2119,10 @@ const Gamification = {
     // Shop catalog
     SHOP: {
         food: {
-            kibble:  { name: 'Kibble',    price: 10,  icon: '🍖', hunger: 15, happiness: 5,  careBonus: 5 },
-            treat:   { name: 'Treat',     price: 25,  icon: '🍪', hunger: 25, happiness: 15, careBonus: 10 },
-            feast:   { name: 'Feast',     price: 60,  icon: '🍗', hunger: 50, happiness: 30, careBonus: 20 },
-            goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 40, happiness: 50, careBonus: 15 }
+            kibble:  { name: 'Kibble',    price: 10,  icon: '🍖', hunger: 10, happiness: 4,  careBonus: 4 },
+            treat:   { name: 'Treat',     price: 25,  icon: '🍪', hunger: 20, happiness: 10, careBonus: 8 },
+            feast:   { name: 'Feast',     price: 60,  icon: '🍗', hunger: 40, happiness: 22, careBonus: 15 },
+            goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 35, happiness: 35, careBonus: 12 }
         },
         seeds: {
             sunflower: { name: 'Sunflower',     price: 15,  icon: '🌻', gpNeeded: 10, stages: 4, coinReward: 10, xpReward: 25,
@@ -2186,6 +2189,7 @@ const Gamification = {
                 unlockedPlots: 3,
                 waterLevel: 100,
                 lastWaterDecay: null,
+                lastGrowthTick: null,
                 totalHarvests: 0
             },
             inventory: {
@@ -4450,6 +4454,7 @@ const Battle = {
 // =====================================================================
 const Garden = {
     _meterPulseTimer: null,
+    _waterPromptEl: null,
     show() {
         this.render();
         showScreen('garden');
@@ -4475,6 +4480,11 @@ const Garden = {
         // Update watering can count
         const waterCount = document.getElementById('gardenWaterCount');
         if (waterCount) waterCount.textContent = state.inventory.gardenItems.water || 0;
+        if ((state.inventory.gardenItems.water || 0) <= 0) {
+            this._promptWaterPurchase();
+        } else {
+            this._dismissWaterPrompt();
+        }
 
         this.renderGrid(state);
         this.renderDecos(state);
@@ -4485,6 +4495,7 @@ const Garden = {
         const el = document.getElementById('gardenGrid');
         const plots = state.garden.plots || [];
         const unlocked = state.garden.unlockedPlots || 3;
+        const outOfWater = (state.inventory.gardenItems.water || 0) <= 0;
         let html = '';
 
         for (let i = 0; i < 9; i++) {
@@ -4504,6 +4515,7 @@ const Garden = {
                     <span class="plot-plant${isReady ? ' glow-bounce' : ''}">${Sprites.plantSprite(plot.seedType, stageIdx, seed.emojis[stageIdx], 40)}</span>
                     ${!isReady ? `<div class="plot-progress-bar"><div class="plot-progress-fill" style="width:${Math.floor(((plot.growthPoints || 0) / seed.gpNeeded) * 100)}%"></div></div>` : '<div class="plot-ready">\u2728 Harvest!</div>'}
                     <div class="plot-label">${seed.name}</div>
+                    ${!isReady ? `<button class="plot-water-btn" ${outOfWater ? 'disabled' : ''} onclick="event.stopPropagation();Garden.waterPlot(${i})">\u{1F4A7} Water</button>` : ''}
                     ${plot.fertilized ? '<span class="plot-fertilized" title="Fertilized">\u{1F9EA}</span>' : ''}
                 </div>`;
             }
@@ -4735,6 +4747,7 @@ const Garden = {
         state.garden.waterLevel = Math.max(0, (state.garden.waterLevel || 100) - 1);
 
         const plots = state.garden.plots || [];
+        const now = Date.now();
         for (let i = 0; i < plots.length; i++) {
             const plot = plots[i];
             if (!plot || !plot.seedType) continue;
@@ -4759,15 +4772,45 @@ const Garden = {
             }
         }
 
+        state.garden.lastGrowthTick = now;
         Gamification.saveState(state);
     },
 
     // Use watering can from inventory
     useWater() {
         const state = Gamification.getState();
-        if ((state.inventory.gardenItems.water || 0) <= 0) return;
+        if ((state.inventory.gardenItems.water || 0) <= 0) {
+            this._promptWaterPurchase();
+            return;
+        }
         state.inventory.gardenItems.water--;
         state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 25);
+        Gamification.saveState(state);
+        this.render();
+        this.flashWaterMeter();
+    },
+
+    waterPlot(plotIdx) {
+        const state = Gamification.getState();
+        const plot = state.garden.plots?.[plotIdx];
+        if (!plot || !plot.seedType) return;
+        if ((state.inventory.gardenItems.water || 0) <= 0) {
+            this._promptWaterPurchase();
+            return;
+        }
+        state.inventory.gardenItems.water--;
+        state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 15);
+        const seed = Gamification.SHOP.seeds[plot.seedType];
+        if (seed) {
+            const bonus = Math.ceil(seed.gpNeeded * 0.1);
+            plot.growthPoints = (plot.growthPoints || 0) + bonus;
+            const gpPerStage = seed.gpNeeded / (seed.stages - 1);
+            const newStage = Math.min(seed.stages - 1, Math.floor(plot.growthPoints / gpPerStage));
+            if (newStage > (plot.currentStage || 0)) {
+                plot.currentStage = newStage;
+            }
+        }
+        state.garden.lastGrowthTick = Date.now();
         Gamification.saveState(state);
         this.render();
         this.flashWaterMeter();
@@ -4800,11 +4843,57 @@ const Garden = {
         }
     },
 
-    // Decay pet hunger/happiness over time (all owned pets)
-    // Base rates: hunger 12/hr, happiness 8/hr — you feel it within a session
-    // Bird at 100/100 → hungry in ~4h, sick in ~8h
-    // Dragon (1.5x) → hungry in ~2.5h, sick in ~5h
-    // Phoenix (2x) → hungry in ~2h, sick in ~4h
+    idleGrow() {
+        const state = Gamification.getState();
+        if (!state.settings.garden) return;
+        const now = Date.now();
+        const last = state.garden.lastGrowthTick || now;
+        const hoursPassed = (now - last) / (1000 * 60 * 60);
+        if (hoursPassed < 1 / 60) return; // run roughly once per minute of elapsed time
+
+        state.garden.lastGrowthTick = now;
+
+        if ((state.garden.waterLevel || 0) <= 0) {
+            Gamification.saveState(state);
+            return;
+        }
+
+        const isTesting = typeof App !== 'undefined' && App && App.mode === 'test';
+        const growthRatePerHour = isTesting ? 2.5 : 1.4; // GP-equivalent per hour
+        const gpBonus = hoursPassed * growthRatePerHour;
+        if (gpBonus <= 0) {
+            Gamification.saveState(state);
+            return;
+        }
+
+        let changed = false;
+        const plots = state.garden.plots || [];
+        plots.forEach(plot => {
+            if (!plot || !plot.seedType) return;
+            const seed = Gamification.SHOP.seeds[plot.seedType];
+            if (!seed) return;
+            if ((plot.currentStage || 0) >= seed.stages - 1) return;
+
+            let gp = gpBonus;
+            if (plot.fertilized && plot.fertilizedRemaining > 0) {
+                gp *= 2;
+                const fertDrain = Math.max(1, Math.round(gpBonus));
+                plot.fertilizedRemaining = Math.max(0, (plot.fertilizedRemaining || 0) - fertDrain);
+                if (plot.fertilizedRemaining === 0) plot.fertilized = false;
+            }
+
+            plot.growthPoints = (plot.growthPoints || 0) + gp;
+            const gpPerStage = seed.gpNeeded / (seed.stages - 1);
+            const newStage = Math.min(seed.stages - 1, Math.floor(plot.growthPoints / gpPerStage));
+            if (newStage > (plot.currentStage || 0)) {
+                plot.currentStage = newStage;
+            }
+            changed = true;
+        });
+        Gamification.saveState(state);
+        if (changed) this.render();
+    },
+
     decayPetStats() {
         const state = Gamification.getState();
         const now = Date.now();
@@ -4826,7 +4915,8 @@ const Garden = {
 
             const diff = Gamification.getSpeciesDifficulty(pet.species);
             const crowdPenalty = 1 + (petCount - 1) * 0.15;
-            const decayRate = diff * crowdPenalty;
+            const stageMultiplier = 1 + Math.max(0, (pet.stage || 1) - 1) * 0.25;
+            const decayRate = diff * crowdPenalty * stageMultiplier;
 
             const hungerDecay = scaledHours * 12 * decayRate;
             const happyDecay = scaledHours * 8 * decayRate;
@@ -4899,6 +4989,38 @@ const Garden = {
         meter.classList.add('pulse');
         if (this._meterPulseTimer) clearTimeout(this._meterPulseTimer);
         this._meterPulseTimer = setTimeout(() => meter.classList.remove('pulse'), 600);
+    },
+
+    _promptWaterPurchase() {
+        if (this._waterPromptEl) return;
+        const prompt = document.createElement('div');
+        prompt.className = 'garden-water-prompt';
+        prompt.innerHTML = `
+            <p>Out of water! Restock watering cans to keep plants growing.</p>
+            <div class="garden-water-prompt-actions">
+                <button class="prompt-primary">Go to Shop</button>
+                <button class="prompt-secondary">Not now</button>
+            </div>`;
+        const [primary, secondary] = prompt.querySelectorAll('button');
+        if (primary) primary.onclick = () => this._gotoWaterShop();
+        if (secondary) secondary.onclick = () => this._dismissWaterPrompt();
+        document.body.appendChild(prompt);
+        this._waterPromptEl = prompt;
+    },
+
+    _dismissWaterPrompt() {
+        if (this._waterPromptEl) {
+            this._waterPromptEl.remove();
+            this._waterPromptEl = null;
+        }
+    },
+
+    _gotoWaterShop() {
+        this._dismissWaterPrompt();
+        if (typeof Shop !== 'undefined' && Shop) {
+            Shop.show();
+            Shop.switchTab('gardenItems');
+        }
     }
 };
 
@@ -9256,7 +9378,8 @@ async function init() {
     // Initialize garden decay timers — checks every 60s for live feel
     Garden.decayWater();
     Garden.decayPetStats();
-    setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); }, 15 * 1000);
+    Garden.idleGrow();
+    setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); Garden.idleGrow(); }, 15 * 1000);
 
     // Hide garden/shop/battle buttons if garden disabled
     const gState = Gamification.getState();
