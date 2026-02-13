@@ -54,70 +54,15 @@ button:active:not(:disabled){transform:scale(0.97)}
 @keyframes screenIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* === HOME SCREEN === */
-.home-grid{display:flex;flex-direction:column;gap:24px}
-.home-main,.home-side{width:100%}
 .home-hero{text-align:center;padding:30px 0 20px}
 .home-hero h1{color:var(--navy);font-size:28px;margin-bottom:8px}
 .home-hero p{color:var(--gray-600);font-size:15px}
-.animated-bg body,.animated-bg .screen{transition:background 1s ease}
-body.animated-bg{background:radial-gradient(circle at 20% 20%,rgba(255,255,255,.25),transparent 35%),radial-gradient(circle at 80% 10%,rgba(255,255,255,.18),transparent 40%),linear-gradient(135deg,#0f172a,#1e3a5f,#111827)}
-body.animated-bg .home-hero{position:relative;padding:48px 0 28px;color:#f8fafc}
-body.animated-bg .home-hero::after{content:"";position:absolute;inset:10px 0;border-radius:24px;background:rgba(15,23,42,.45);filter:blur(18px);z-index:-1}
-body.animated-bg .home-hero h1{color:#facc15;text-shadow:0 0 16px rgba(250,204,21,.5)}
-body.animated-bg .home-hero p{color:#e2e8f0}
-.home-hero .bg-orb{position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:.5;animation:floatOrb 12s ease-in-out infinite}
-.home-hero .bg-orb:nth-child(1){left:10%;top:5%;width:120px;height:120px;background:radial-gradient(circle,#ff8fb1,transparent 70%)}
-.home-hero .bg-orb:nth-child(2){right:15%;bottom:-10%;width:160px;height:160px;background:radial-gradient(circle,#60a5fa,transparent 70%);animation-delay:-4s}
-@keyframes floatOrb{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-
-.trinket-shelf{display:flex;gap:14px;margin:18px 0;padding:12px 16px;border:1px dashed rgba(15,23,42,.15);border-radius:14px;background:rgba(255,255,255,.85);align-items:center}
-.trinket-shelf h4{margin:0;font-size:13px;color:var(--gray-700);text-transform:uppercase;letter-spacing:.08em}
-.trinket-items{display:flex;gap:10px;flex-wrap:wrap}
-.trinket-chip{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:12px;background:rgba(15,23,42,.05);border:1px solid rgba(15,23,42,.1);font-size:12px;color:var(--navy)}
-.trinket-chip span{font-size:16px}
-.backpack-panel{position:relative;margin-top:16px;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(15,23,42,.9),rgba(59,130,246,.35));color:#e2e8f0;box-shadow:0 10px 30px rgba(15,23,42,.2)}
-.backpack-panel h4{margin:0 0 8px;font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:#fcd34d}
-.backpack-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
-.backpack-slot{border:1px dashed rgba(248,250,252,.4);border-radius:10px;padding:10px;min-height:64px;display:flex;flex-direction:column;gap:4px;justify-content:center;align-items:center;font-size:12px;color:#f8fafc;background:rgba(15,23,42,.35)}
-.backpack-slot .slot-icon{font-size:20px}
-.backpack-slot.empty{opacity:.5;font-style:italic}
-
-body.trinkets-enabled .home-side{position:relative}
-body.trinkets-enabled #xpBarContainer{background:rgba(255,255,255,.9);border:1px solid rgba(15,23,42,.08);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(15,23,42,.12)}
-body.trinkets-enabled .trinket-shelf{display:flex}
-.home-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:16px 0}
-.home-actions .btn-nav{min-width:150px}
-.home-stats-wrapper{margin-top:24px}
-.home-stats-wrapper h3{font-size:16px;color:var(--navy);margin-bottom:8px}
-.difficulty-panel{margin:12px 0 16px;padding:12px;border:1px dashed var(--gray-300);border-radius:10px;background:rgba(26,58,92,0.03)}
-.difficulty-panel .setting-row{margin-bottom:12px}
-.difficulty-panel select{width:100%;padding:8px;border-radius:6px;border:1px solid var(--gray-300)}
-.difficulty-panel input[type="range"]{width:100%}
-
-body.compact-home .home-grid{flex-direction:row;align-items:flex-start}
-body.compact-home .home-main{flex:1 1 65%;min-width:0}
-body.compact-home .home-side{flex:1 1 32%;min-width:280px;position:sticky;top:90px;align-self:flex-start;display:flex;flex-direction:column;gap:16px}
-body.compact-home .home-side > *{margin:0}
-body.compact-home .home-hero{padding:10px 0 0;text-align:left}
-body.compact-home .home-hero h1{font-size:24px;margin-bottom:4px}
-body.compact-home .home-hero p{font-size:14px;color:var(--gray-500)}
-body.compact-home .stats-row{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-body.compact-home .stat-card{padding:12px 10px;border-radius:10px}
-body.compact-home #bankList{margin-top:8px}
-body.compact-home .home-actions{justify-content:flex-start;margin:12px 0 16px}
-body.compact-home .home-stats-wrapper h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray-500)}
-body.compact-home .bank-card{border-radius:14px;padding:18px;box-shadow:0 20px 45px rgba(15,23,42,0.08);border:1px solid rgba(15,23,42,0.06)}
-body.compact-home .bank-card h2{font-size:20px;margin-bottom:6px}
-body.compact-home .bank-card .mode-buttons{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-body.compact-home #streakBanner,body.compact-home #dailyGoalCard,body.compact-home #xpBarContainer{width:100%}
-body.compact-home #xpBarContainer{background:var(--white);border:1px solid rgba(15,23,42,0.08);border-radius:12px;padding:16px}
 
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:20px 0}
 .stat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:16px;text-align:center;transition:transform .2s ease,box-shadow .2s ease}
 .stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
 .stat-card .stat-val{font-size:28px;font-weight:bold;color:var(--navy)}
 .stat-card .stat-lbl{font-size:12px;color:var(--gray-600);margin-top:4px}
-.stat-card .stat-sub{font-size:11px;color:var(--gray-500);margin-top:4px}
 
 /* === STREAK & DAILY GOAL === */
 .streak-banner{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0;padding:16px;background:linear-gradient(135deg,#ff6b35,#f7931e);border-radius:12px;color:#fff;font-weight:bold}
@@ -287,6 +232,22 @@ body.compact-home #xpBarContainer{background:var(--white);border:1px solid rgba(
 /* === EXPLANATION PANEL === */
 .explanation-panel{display:none;margin-top:15px;padding:16px;border-radius:var(--radius);background:#f0faf4;border:1px solid #c3e6cb;font-size:14px;line-height:1.6;color:#155724;word-break:normal;overflow-wrap:break-word;white-space:normal}
 .explanation-panel.show{display:block}
+.explanation-panel.incorrect{background:#fdf2f2;border-color:#f5c6cb;color:#721c24}
+.explanation-panel h4{margin-bottom:6px}
+.explanation-panel p{margin:0;word-break:normal;white-space:normal}
+
+/* === NOTE PANEL === */
+.note-panel{margin-top:12px;display:none}
+.note-panel.open{display:block}
+.note-textarea{width:100%;min-height:80px;padding:10px;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:13px;resize:vertical;font-family:inherit}
+.note-saved{font-size:11px;color:var(--green);margin-top:4px;opacity:0;transition:opacity .3s}
+.note-saved.show{opacity:1}
+.btn-note{padding:4px 14px;border:1px solid var(--gray-500);border-radius:3px;background:#f0f0f0;font-size:12px;color:var(--gray-700)}
+.btn-note:hover{background:#e0e0e0}
+.btn-note.has-note{background:#e8f4fd;border-color:var(--blue);color:var(--blue)}
+.q-num.has-note::before{content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:6px;height:6px;background:var(--blue);border-radius:50%}
+.q-num{position:relative}
+.review-q .rq-note{margin-top:10px;padding:10px;background:#e8f4fd;border-left:3px solid var(--blue);font-size:13px;line-height:1.5;color:var(--gray-700)}
 .review-q .rq-note-label{font-weight:bold;color:var(--blue);margin-bottom:4px;font-size:12px}
 
 /* === CHECK ANSWER BUTTON (Practice mode) === */
@@ -304,20 +265,17 @@ body.compact-home #xpBarContainer{background:var(--white);border:1px solid rgba(
 .confidence-btn.conf-probably.selected{background:var(--blue);border-color:var(--blue)}
 .confidence-btn.conf-definitely.selected{background:var(--green);border-color:var(--green)}
 
-/* === TOOLBAR (Calculator, Audio, Timer, Notes) === */
+/* === TOOLBAR (Calculator, Audio, Timer) === */
 .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .tool-btn{background:var(--gray-100);border:1px solid var(--gray-300);border-radius:var(--radius);padding:6px 12px;font-size:12px;color:var(--gray-700);display:flex;align-items:center;gap:4px}
 .tool-btn:hover{background:var(--gray-200)}
 .tool-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
 .tool-btn svg{width:14px;height:14px}
-.tool-btn.has-note{position:relative}
-.tool-btn.has-note::after{content:'';position:absolute;top:4px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--orange)}
 
 /* === CALCULATOR === */
-.calc-panel{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:400;width:280px;max-width:90vw;touch-action:none}
+.calc-panel{display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;border-radius:8px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:400;width:280px}
 .calc-panel.open{display:block}
-.calc-panel.dragging{opacity:.95;box-shadow:0 18px 44px rgba(0,0,0,.35)}
-.calc-header{background:var(--navy);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-radius:8px 8px 0 0;cursor:move;user-select:none}
+.calc-header{background:var(--navy);color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;border-radius:8px 8px 0 0}
 .calc-header h4{font-size:14px;margin:0}
 .calc-close{background:none;border:none;color:#fff;font-size:18px;cursor:pointer}
 .calc-display{background:#222;color:#0f0;font-family:monospace;font-size:24px;padding:12px;text-align:right;min-height:50px;word-break:break-all}
@@ -346,10 +304,8 @@ body.compact-home #xpBarContainer{background:var(--white);border:1px solid rgba(
 
 /* === FOOTER NAV === */
 .footer-nav{background:var(--gray-50);border-top:1px solid var(--gray-300);padding:10px 20px;position:sticky;bottom:0;z-index:50}
-.nav-controls{display:flex;align-items:center;max-width:960px;margin:0 auto;gap:12px;flex-wrap:wrap}
-.nav-buttons{display:flex;gap:8px;align-items:center;flex-shrink:0}
-.nav-buttons-left{flex-wrap:wrap}
-.nav-buttons-right{margin-left:auto}
+.nav-controls{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto;gap:10px;flex-wrap:wrap}
+.nav-buttons{display:flex;gap:8px;flex-shrink:0}
 .btn-nav{padding:8px 20px;border:1px solid var(--navy);border-radius:3px;background:var(--navy);color:#fff;font-size:13px;font-weight:bold}
 .btn-nav:hover{background:#2c5a8a}
 .btn-nav:disabled{background:var(--gray-500);border-color:var(--gray-500);cursor:not-allowed}
@@ -358,7 +314,7 @@ body.compact-home #xpBarContainer{background:var(--white);border:1px solid rgba(
 .btn-home{background:var(--gray-700);border-color:var(--gray-700)}
 
 /* === QUESTION PALETTE === */
-.palette-wrap{flex:1;text-align:center;min-width:0;overflow:hidden;display:flex;flex-direction:column;align-items:center}
+.palette-wrap{text-align:center;min-width:0;overflow:hidden}
 .question-palette{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:600px;margin:0 auto}
 .q-num{width:32px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid var(--gray-500);border-radius:3px;cursor:pointer;font-size:12px;font-weight:bold;background:#fff;color:#666;transition:all .15s;flex-shrink:0}
 .q-num:hover{border-color:var(--blue);color:var(--blue)}
@@ -367,8 +323,6 @@ body.compact-home #xpBarContainer{background:var(--white);border:1px solid rgba(
 .q-num.visited{color:#996600}
 .q-num.flagged{position:relative}
 .q-num.flagged::after{content:'';position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--orange);border-radius:50%}
-.q-num.has-note{position:relative}
-.q-num.has-note::before{content:'✎';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);font-size:9px;color:var(--blue);}
 /* Practice palette colors */
 .q-num.p-correct{background:var(--green);color:#fff;border-color:var(--green)}
 .q-num.p-incorrect{background:var(--red);color:#fff;border-color:var(--red)}
@@ -462,19 +416,6 @@ body.compact-home #xpBarContainer{background:var(--white);border:1px solid rgba(
 .review-q .rq-meta{display:flex;gap:8px;margin-top:8px;font-size:11px}
 .review-q .rq-tag{background:var(--gray-100);padding:2px 6px;border-radius:3px;color:#333}
 
-/* === ELDEN MODE PANELS === */
-.elden-panel{display:none;margin:18px 0;padding:16px 18px;border:1px solid rgba(139,92,246,0.4);border-radius:12px;background:linear-gradient(135deg,rgba(76,29,149,0.08),rgba(15,23,42,0.08));box-shadow:0 8px 26px rgba(15,23,42,0.12);animation:eldenFade .35s ease;position:relative;overflow:hidden}
-.elden-panel::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 10%,rgba(236,72,153,0.25),transparent 55%);opacity:.6;pointer-events:none}
-.elden-panel h4{margin:0 0 6px;color:#8b5cf6;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
-.elden-region{font-size:18px;font-weight:600;color:#f9fafb;margin-bottom:4px}
-.elden-desc{font-size:13px;color:#d1d5db;margin-bottom:10px;line-height:1.5}
-.elden-npc{display:flex;gap:12px;align-items:flex-start;border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;margin-top:10px}
-.elden-npc-avatar{width:44px;height:44px;border-radius:50%;background:rgba(15,23,42,0.5);display:flex;align-items:center;justify-content:center;font-size:20px}
-.elden-npc-line{flex:1;font-size:13px;color:#e0e7ff;line-height:1.5}
-.elden-egg{margin-top:10px;font-size:12px;color:#fbbf24;font-style:italic;display:flex;align-items:center;gap:6px}
-.elden-egg::before{content:"✧";color:#fbbf24}
-@keyframes eldenFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
 /* === SETTINGS === */
 .settings-panel{max-width:600px;margin:0 auto}
 .settings-panel h2{color:var(--navy);margin-bottom:20px}
@@ -493,20 +434,20 @@ body.compact-home #xpBarContainer{background:var(--white);border:1px solid rgba(
 .chat-fab:hover{transform:scale(1.1)}
 .chat-fab.has-context::after{content:'';position:absolute;top:2px;right:2px;width:10px;height:10px;background:var(--green);border-radius:50%;border:2px solid var(--navy)}
 
-/* === NOTE PANEL === */
-.note-panel{display:none;position:fixed;right:32px;bottom:120px;width:min(340px,calc(100vw - 32px));max-height:60vh;background:#fff;border:1px solid var(--gray-300);border-radius:12px;box-shadow:0 14px 48px rgba(0,0,0,.25);z-index:380;padding:0;flex-direction:column;touch-action:none}
-.note-panel.open{display:flex}
-.note-panel.dragging{opacity:.96;box-shadow:0 18px 48px rgba(0,0,0,.35)}
-.note-panel-header{display:flex;justify-content:space-between;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--gray-200);cursor:move;user-select:none}
-.note-panel-title{font-size:14px;font-weight:600;color:var(--navy)}
-.note-panel-sub{font-size:12px;color:var(--gray-600)}
-.note-close{background:none;border:none;color:var(--gray-500);font-size:20px;line-height:1;cursor:pointer;padding:0;margin:0}
-.note-textarea{width:100%;flex:1;min-height:140px;padding:14px;border:none;border-bottom:1px solid var(--gray-200);font-size:13px;font-family:inherit;resize:none;outline:none}
-.note-panel-footer{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;gap:12px}
-.note-clear{border:none;background:var(--gray-200);color:var(--gray-700);padding:6px 10px;border-radius:var(--radius);font-size:12px;cursor:pointer}
-.note-clear:hover{background:var(--gray-300)}
-.note-saved{font-size:11px;color:var(--green);opacity:0;transition:opacity .3s}
-.note-saved.show{opacity:1}
+.chat-panel{display:none;position:fixed;bottom:80px;right:20px;width:360px;max-width:calc(100vw - 40px);height:460px;max-height:calc(100vh - 120px);background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.25);z-index:300;flex-direction:column;overflow:hidden}
+.chat-panel.open{display:flex}
+.chat-header{background:var(--navy);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.chat-header h3{font-size:14px}
+.chat-close{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:0 4px}
+.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.chat-msg{max-width:85%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;word-wrap:break-word}
+.chat-msg.user{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px}
+.chat-msg.assistant{align-self:flex-start;background:var(--gray-50);color:var(--gray-800);border:1px solid var(--gray-200);border-bottom-left-radius:4px}
+.chat-msg.system{align-self:center;background:#fffde7;color:#856404;font-size:12px;text-align:center;border-radius:8px}
+.chat-input-area{display:flex;gap:8px;padding:12px;border-top:1px solid var(--gray-200);flex-shrink:0}
+.chat-input-area input{flex:1;padding:8px 12px;border:1px solid var(--gray-300);border-radius:20px;font-size:13px;outline:none}
+.chat-input-area input:focus{border-color:var(--blue)}
+.chat-input-area button{background:var(--navy);color:#fff;border:none;border-radius:50%;width:36px;height:36px;font-size:16px;flex-shrink:0}
 .chat-tts-btn{position:absolute;top:4px;right:4px;background:none;border:none;cursor:pointer;font-size:14px;opacity:.4;padding:2px 4px;border-radius:4px;line-height:1}
 .chat-tts-btn:hover{opacity:.8;background:rgba(0,0,0,.05)}
 .chat-tts-btn.speaking{opacity:1;color:var(--blue)}
@@ -559,13 +500,11 @@ body:not([data-theme="light"]) .qcount-opt.selected{background:#1e3a5f;border-co
     .mode-buttons{grid-template-columns:1fr 1fr}
     .nav-controls{flex-direction:column;gap:6px}
     .nav-buttons{width:100%;justify-content:space-between;flex-wrap:wrap}
-    .nav-buttons-right{justify-content:flex-end}
     .toolbar{width:100%;justify-content:center;margin-bottom:4px!important;margin-right:0!important}
     .tool-btn{flex:1;justify-content:center;padding:8px 10px;font-size:11px;min-height:40px}
     .tool-btn svg{width:14px;height:14px}
     .question-palette{max-width:100%;gap:4px}
     .calc-panel{width:calc(100vw - 24px);max-width:320px}
-    .note-panel{left:12px;right:12px;bottom:80px;width:auto;max-height:70vh}
     .q-num{width:38px;height:38px;font-size:12px}
     .palette-mini .q-num{width:38px;height:38px}
     .btn-nav{padding:10px 14px;min-height:40px;font-size:12px}
@@ -577,7 +516,6 @@ body:not([data-theme="light"]) .qcount-opt.selected{background:#1e3a5f;border-co
     .stats-row{grid-template-columns:repeat(2,1fr)}
     .home-hero h1{font-size:22px}
     .home-hero{padding:15px 0 10px}
-    .home-grid{gap:16px}
 }
 @media(max-width:400px){
     .mode-buttons{grid-template-columns:1fr}
@@ -757,10 +695,7 @@ button:focus-visible {
     body:not([data-theme="light"]) .btn-clear { background: #374151; border-color: #4b5563; color: #d1d5db; }
     body:not([data-theme="light"]) .btn-note { background: #374151; border-color: #4b5563; color: #d1d5db; }
     body:not([data-theme="light"]) .btn-note.has-note { background: #1e3a5f; border-color: var(--blue); color: #60a5fa; }
-    body:not([data-theme="light"]) .note-panel { background: #111827; border-color: #1f2937; }
-    body:not([data-theme="light"]) .note-textarea { background: #1f2937; color: #e5e7eb; }
-    body:not([data-theme="light"]) .note-panel-header { border-color: #1f2937; }
-    body:not([data-theme="light"]) .note-panel-footer { border-color: #1f2937; }
+    body:not([data-theme="light"]) .note-textarea { background: #1f2937; border-color: #374151; color: #e5e7eb; }
     body:not([data-theme="light"]) .review-q .rq-note { background: #1e3a5f; border-color: var(--blue); color: #d1d5db; }
     body:not([data-theme="light"]) .modal th { background: #1e3a5f; }
     body:not([data-theme="light"]) .daily-goal-card { background: #16213e; border-color: #374151; }
@@ -801,10 +736,8 @@ button:focus-visible {
 [data-theme="dark"] .btn-clear { background: #374151; border-color: #4b5563; color: #d1d5db; }
 [data-theme="dark"] .btn-note { background: #374151; border-color: #4b5563; color: #d1d5db; }
 [data-theme="dark"] .btn-note.has-note { background: #1e3a5f; border-color: var(--blue); color: #60a5fa; }
-[data-theme="dark"] .note-panel { background: #111827; border-color: #1f2937; }
-[data-theme="dark"] .note-textarea { background: #1f2937; color: #e5e7eb; border-color:#1f2937; }
-[data-theme="dark"] .note-panel-header { border-color: #1f2937; }
-[data-theme="dark"] .note-panel-footer { border-color: #1f2937; }
+[data-theme="dark"] .note-textarea { background: #1f2937; border-color: #374151; color: #e5e7eb; }
+[data-theme="dark"] .note-panel { background: transparent; }
 [data-theme="dark"] .review-q .rq-note { background: #1e3a5f; border-color: var(--blue); color: #d1d5db; }
 [data-theme="dark"] .modal th { background: #1e3a5f; }
 [data-theme="dark"] .daily-goal-card { background: #16213e; border-color: #374151; }
@@ -851,10 +784,7 @@ button:focus-visible {
 
 .study-bars{display:flex;align-items:flex-end;gap:4px;height:80px;margin-top:12px}
 .study-day{flex:1;display:flex;flex-direction:column;align-items:center}
-.study-day .bar{width:100%;height:80px;background:var(--gray-100);border-radius:4px 4px 0 0;overflow:hidden;display:flex;flex-direction:column-reverse}
-.study-day .bar-seg{width:100%;transition:height .3s}
-.study-day .bar-seg.active{background:var(--blue)}
-.study-day .bar-seg.idle{background:linear-gradient(180deg,rgba(255,177,66,.8),rgba(255,138,0,.85))}
+.study-day .bar{width:100%;background:var(--blue);border-radius:4px 4px 0 0;transition:height .3s}
 .study-day .day-label{font-size:10px;color:var(--gray-600);margin-top:4px}
 
 @media (prefers-color-scheme: dark) {
@@ -869,8 +799,8 @@ button:focus-visible {
 [data-theme="dark"] .progress-section h3 { color: #93c5fd; }
 
 /* Inline chart container */
-.inline-chart-wrap{margin:12px 0;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:#fff;width:100%;max-width:100%;box-sizing:border-box}
-.inline-chart-wrap canvas{display:block;width:100%;max-width:100%;height:clamp(180px,35vw,320px);max-height:320px;box-sizing:border-box}
+.inline-chart-wrap{margin:12px 0;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:#fff;max-width:100%}
+.inline-chart-wrap canvas{display:block;width:100%;height:clamp(180px,35vw,320px);max-height:320px}
 [data-theme="dark"] .inline-chart-wrap{background:#16213e;border-color:#374151}
 @media(prefers-color-scheme:dark){body:not([data-theme="light"]) .inline-chart-wrap{background:#16213e;border-color:#374151}}
 
@@ -938,21 +868,13 @@ button:focus-visible {
 .xp-title{color:var(--yellow);font-size:11px;font-weight:bold;margin-top:2px}
 .xp-bar-container .buddy-mini{font-size:24px;margin-left:8px;cursor:pointer;transition:transform .2s}
 .xp-bar-container .buddy-mini:hover{transform:scale(1.2)}
-.xp-meta{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
-.xp-meta .meta-pill{font-size:11px;padding:4px 10px;border-radius:999px;background:rgba(26,58,92,0.08);color:var(--navy);text-transform:uppercase;font-weight:bold;letter-spacing:.4px}
-.xp-meta .meta-pill.momentum{background:rgba(255,107,53,0.15);color:#c0392b}
-.xp-meta .meta-pill.batch{background:rgba(39,174,96,0.15);color:#1d7a46}
-.xp-meta .meta-pill.pet{background:rgba(155,89,182,0.15);color:#70347c}
 
 /* Combo Display */
-.combo-display{position:fixed;top:90px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ff6b35,#f7931e);color:#fff;padding:10px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(255,107,53,.4);z-index:100;display:none;align-items:center;gap:8px;font-weight:bold;max-width:220px;cursor:grab;touch-action:none;user-select:none}
+.combo-display{position:fixed;top:100px;right:20px;background:linear-gradient(135deg,#ff6b35,#f7931e);color:#fff;padding:10px 16px;border-radius:12px;box-shadow:0 4px 16px rgba(255,107,53,.4);z-index:100;display:none;align-items:center;gap:8px;font-weight:bold;max-width:200px}
 .combo-display.active{display:flex}
-.combo-display.dragging{cursor:grabbing;opacity:.95}
 .combo-fire{font-size:24px;animation:firePulse .5s infinite alternate}
 .combo-count{font-size:20px}
 .combo-mult{font-size:14px;opacity:.9;background:rgba(0,0,0,.2);padding:2px 8px;border-radius:4px}
-.combo-display.heating .combo-mult{background:rgba(0,0,0,.3);color:#fffbeb}
-.combo-display.blazing .combo-mult{background:rgba(0,0,0,.35);color:#fef3c7;box-shadow:0 0 8px rgba(255,255,255,.4)}
 @keyframes firePulse{0%{transform:scale(1)}100%{transform:scale(1.15)}}
 
 /* XP Popup */
@@ -1050,24 +972,11 @@ button:focus-visible {
 .garden-pet-name{font-weight:bold;font-size:11px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .garden-pet-mood-bubble{position:absolute;top:-24px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.92);border-radius:10px;padding:2px 7px;font-size:11px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.15);pointer-events:none}
 .garden-pet-mood-bubble::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:8px;height:4px;background:rgba(255,255,255,.92);clip-path:polygon(0 0,100% 0,50% 100%)}
-.garden-bowls{position:absolute;bottom:20px;left:18px;display:flex;flex-direction:column;gap:8px;background:rgba(255,255,255,.85);border:2px solid rgba(15,23,42,.15);border-radius:14px;padding:10px 14px;box-shadow:0 6px 18px rgba(15,23,42,.15);min-width:150px}
-.pet-bowl{display:flex;flex-direction:column;gap:4px}
-.pet-bowl h4{font-size:12px;margin:0;color:var(--navy)}
-.pet-bowl-level{height:8px;background:rgba(15,23,42,.08);border-radius:999px;overflow:hidden;position:relative}
-.pet-bowl-fill{height:100%;background:linear-gradient(90deg,#f97316,#fbbf24);transition:width .3s}
-.pet-bowl.water .pet-bowl-fill{background:linear-gradient(90deg,#2563eb,#60a5fa)}
-.pet-bowl-actions{display:flex;gap:6px}
-.pet-bowl-actions button{flex:1;padding:4px 6px;font-size:11px;border-radius:8px;border:1px solid rgba(15,23,42,.2);background:#fff;cursor:pointer}
-.pet-bowl-actions button:disabled{opacity:.4;cursor:not-allowed}
-.pet-bowl-meta{font-size:10px;color:var(--gray-600)}
 
 /* Watering can button in scene */
-.garden-water-btn,.garden-timeskip-btn{position:absolute;bottom:12px;z-index:3;background:rgba(255,255,255,.85);border:2px solid rgba(52,152,219,.4);border-radius:12px;padding:6px 12px;cursor:pointer;font-size:14px;transition:all .2s;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
-.garden-water-btn{right:16px}
-.garden-timeskip-btn{right:128px;background:rgba(255,255,255,.78)}
-.garden-water-btn:hover,.garden-timeskip-btn:hover{background:rgba(255,255,255,.95);transform:scale(1.05);border-color:rgba(52,152,219,.7)}
-.garden-water-btn .water-count,.garden-timeskip-btn .skip-count{font-size:12px;font-weight:bold;color:#2563eb}
-.garden-timeskip-btn.disabled{opacity:.45;cursor:not-allowed;transform:none}
+.garden-water-btn{position:absolute;bottom:12px;right:16px;z-index:3;background:rgba(255,255,255,.85);border:2px solid rgba(52,152,219,.4);border-radius:12px;padding:6px 12px;cursor:pointer;font-size:14px;transition:all .2s;display:flex;align-items:center;gap:4px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.garden-water-btn:hover{background:rgba(255,255,255,.95);transform:scale(1.05);border-color:rgba(52,152,219,.7)}
+.garden-water-btn .water-count{font-size:12px;font-weight:bold;color:#2563eb}
 .garden-water-meter{position:absolute;bottom:110px;right:16px;z-index:3;background:rgba(255,255,255,.92);border:2px solid rgba(52,152,219,.35);border-radius:14px;padding:10px 14px;font-size:12px;box-shadow:0 2px 10px rgba(0,0,0,.12);width:160px}
 .garden-water-meter .water-meter-label{font-weight:600;color:#2563eb;margin-bottom:4px;text-transform:uppercase;font-size:11px;letter-spacing:.05em}
 .garden-water-meter .water-meter-bar{position:relative;height:10px;background:rgba(37,99,235,.12);border-radius:999px;overflow:hidden}
@@ -1364,7 +1273,7 @@ button:focus-visible {
 [data-theme="dark"] .plot-info-stat{color:#d1d5db}
 [data-theme="dark"] .plot-info-action{border-color:#374151;color:#e2e8f0}
 [data-theme="dark"] .plot-info-action:hover:not(:disabled){border-color:#60a5fa;background:rgba(96,165,250,.1)}
-[data-theme="dark"] .garden-water-btn,[data-theme="dark"] .garden-timeskip-btn{background:rgba(30,40,60,.85);border-color:rgba(96,165,250,.4);color:#e2e8f0}
+[data-theme="dark"] .garden-water-btn{background:rgba(30,40,60,.85);border-color:rgba(96,165,250,.4);color:#e2e8f0}
 [data-theme="dark"] .garden-water-meter{background:rgba(15,23,42,.92);border-color:rgba(96,165,250,.3)}
 [data-theme="dark"] .garden-water-meter .water-meter-bar{background:rgba(59,130,246,.2)}
 [data-theme="dark"] .garden-water-meter .water-meter-fill{background:linear-gradient(90deg,#3b82f6,#60a5fa)}
@@ -1393,7 +1302,7 @@ button:focus-visible {
     body:not([data-theme="light"]) .garden-plot.empty{border-color:#5a4530}
     body:not([data-theme="light"]) .garden-header,body:not([data-theme="light"]) .shop-header{border-color:#374151}
     body:not([data-theme="light"]) .garden-modal{background:#16213e}
-    body:not([data-theme="light"]) .garden-water-btn,body:not([data-theme="light"]) .garden-timeskip-btn{background:rgba(30,40,60,.85);border-color:rgba(96,165,250,.4);color:#e2e8f0}
+    body:not([data-theme="light"]) .garden-water-btn{background:rgba(30,40,60,.85);border-color:rgba(96,165,250,.4);color:#e2e8f0}
     body:not([data-theme="light"]) .garden-pet-mood-bubble{background:rgba(30,40,60,.92);color:#e2e8f0}
     body:not([data-theme="light"]) .pet-food-btn{background:#1f2937;border-color:#374151;color:#d1d5db}
     body:not([data-theme="light"]) .pet-accessory-btn{background:#1f2937;border-color:#374151}
@@ -1508,7 +1417,7 @@ button:focus-visible {
     .xp-bar-container{flex-wrap:wrap;padding:10px 14px;gap:8px}
     .xp-bar{order:3;flex-basis:100%}
     .xp-info{order:2;min-width:auto}
-    .combo-display{top:70px;left:50%;transform:translateX(-50%);padding:8px 12px;font-size:14px;max-width:260px}
+    .combo-display{top:70px;right:10px;padding:8px 12px;font-size:14px}
     .combo-fire{font-size:20px}
     .achievement-toast{bottom:80px;right:10px;left:10px;max-width:none}
     .study-buddy{bottom:80px;left:10px}
@@ -1530,7 +1439,6 @@ button:focus-visible {
     .garden-pet-emoji{font-size:36px}
     .garden-pet{bottom:8px;left:8px}
     .garden-water-btn{bottom:8px;right:8px;padding:5px 8px;font-size:12px}
-    .garden-timeskip-btn{bottom:8px;right:96px;padding:5px 8px;font-size:12px}
     .garden-water-meter{right:8px;bottom:72px;width:140px}
     .garden-ground{padding:6px 8px 10px}
     .garden-modal{padding:16px;max-width:320px}
@@ -1558,22 +1466,6 @@ button:focus-visible {
     </div>
 </div>
 
-<!-- FLOATING NOTE PANEL -->
-<div class="note-panel" id="notePanel" role="dialog" aria-modal="true" aria-labelledby="notePanelTitle">
-    <div class="note-panel-header">
-        <div>
-            <div class="note-panel-title" id="notePanelTitle">Question Notes</div>
-            <div class="note-panel-sub" id="notePanelSub">Question 1</div>
-        </div>
-        <button class="note-close" onclick="Notes.toggle(false)" aria-label="Close notes">&times;</button>
-    </div>
-    <textarea class="note-textarea" id="noteTextarea" placeholder="Add your notes here..." oninput="Notes.onInput()" onblur="Notes.save()"></textarea>
-    <div class="note-panel-footer">
-        <button class="note-clear" onclick="Notes.clearCurrent()">Clear note</button>
-        <div class="note-saved" id="noteSaved">Note saved</div>
-    </div>
-</div>
-
 <!-- SUBHEADER (test/practice modes) -->
 <div class="subheader" id="subheader" style="display:none">
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
@@ -1588,35 +1480,26 @@ button:focus-visible {
 
 <!-- ========== HOME SCREEN ========== -->
 <div class="screen active" id="screen-home">
-    <div class="home-grid">
-        <div class="home-main">
-            <div class="home-hero">
-                <svg width="80" height="88" viewBox="0 0 80 88" fill="none" style="display:block;margin:0 auto 8px"><defs><linearGradient id="herosg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient><linearGradient id="herosw" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient><filter id="heroglow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><line x1="12" y1="6" x2="68" y2="82" stroke="url(#herosw)" stroke-width="3" stroke-linecap="round"/><line x1="68" y1="6" x2="12" y2="82" stroke="url(#herosw)" stroke-width="3" stroke-linecap="round"/><rect x="4" y="2" width="16" height="3" rx="1.5" fill="#fbbf24" transform="rotate(40 12 6)"/><rect x="60" y="2" width="16" height="3" rx="1.5" fill="#fbbf24" transform="rotate(-40 68 6)"/><circle cx="12" cy="6" r="3" fill="#fbbf24" opacity=".6"/><circle cx="68" cy="6" r="3" fill="#fbbf24" opacity=".6"/><path d="M40 12L64 22V44C64 58 53 68 40 76 27 68 16 58 16 44V22Z" fill="url(#herosg)" filter="url(#heroglow)"/><path d="M30 31L50 55M50 31L30 55" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>
-                <h1>Xooper's Battleground</h1>
-                <p>Choose a question bank and study mode</p>
-            </div>
-
-            <div class="home-actions">
-                <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Progress.show()">View Progress</button>
-                <button class="btn-nav" style="background:var(--green);border-color:var(--green)" id="btnGarden" onclick="Garden.show()">&#127793; Garden</button>
-                <button class="btn-nav" style="background:var(--orange);border-color:var(--orange)" id="btnShop" onclick="Shop.show()">&#128176; Shop</button>
-                <button class="btn-nav" style="background:var(--red);border-color:var(--red)" id="btnBattle" onclick="Battle.show()">&#9876;&#65039; Battle</button>
-            </div>
-
-            <div class="home-stats-wrapper">
-                <h3>Today</h3>
-                <div class="stats-row" id="homeStats"></div>
-            </div>
-
-            <div id="bankList"></div>
-        </div>
-
-        <div class="home-side">
-            <div id="streakBanner"></div>
-            <div id="dailyGoalCard"></div>
-            <div id="xpBarContainer"></div>
-        </div>
+    <div class="home-hero">
+        <svg width="80" height="88" viewBox="0 0 80 88" fill="none" style="display:block;margin:0 auto 8px"><defs><linearGradient id="herosg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient><linearGradient id="herosw" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#f59e0b"/></linearGradient><filter id="heroglow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><line x1="12" y1="6" x2="68" y2="82" stroke="url(#herosw)" stroke-width="3" stroke-linecap="round"/><line x1="68" y1="6" x2="12" y2="82" stroke="url(#herosw)" stroke-width="3" stroke-linecap="round"/><rect x="4" y="2" width="16" height="3" rx="1.5" fill="#fbbf24" transform="rotate(40 12 6)"/><rect x="60" y="2" width="16" height="3" rx="1.5" fill="#fbbf24" transform="rotate(-40 68 6)"/><circle cx="12" cy="6" r="3" fill="#fbbf24" opacity=".6"/><circle cx="68" cy="6" r="3" fill="#fbbf24" opacity=".6"/><path d="M40 12L64 22V44C64 58 53 68 40 76 27 68 16 58 16 44V22Z" fill="url(#herosg)" filter="url(#heroglow)"/><path d="M30 31L50 55M50 31L30 55" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>
+        <h1>Xooper's Battleground</h1>
+        <p>Choose a question bank and study mode</p>
     </div>
+
+    <div id="streakBanner"></div>
+    <div id="dailyGoalCard"></div>
+    <div id="xpBarContainer"></div>
+
+    <div class="stats-row" id="homeStats"></div>
+
+    <div style="text-align:center;margin:16px 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Progress.show()">View Progress</button>
+        <button class="btn-nav" style="background:var(--green);border-color:var(--green)" id="btnGarden" onclick="Garden.show()">&#127793; Garden</button>
+        <button class="btn-nav" style="background:var(--orange);border-color:var(--orange)" id="btnShop" onclick="Shop.show()">&#128176; Shop</button>
+        <button class="btn-nav" style="background:var(--red);border-color:var(--red)" id="btnBattle" onclick="Battle.show()">&#9876;&#65039; Battle</button>
+    </div>
+
+    <div id="bankList"></div>
 </div>
 
 <!-- ========== SHOP SCREEN ========== -->
@@ -1648,11 +1531,6 @@ button:focus-visible {
             <div class="garden-decos-row" id="gardenDecos"></div>
         </div>
         <div class="garden-pet" id="gardenPet" onclick="PetModal.show()"></div>
-        <div class="garden-bowls" id="gardenBowls" style="display:none"></div>
-        <div class="garden-timeskip-btn" id="gardenSkipBtn" onclick="Garden.useTimeSkip()" title="Spend a Time Capsule to fast-forward care">
-            <span>⏩</span>
-            <span class="skip-count" id="gardenSkipCount">0</span>
-        </div>
         <div class="garden-water-btn" id="gardenWaterBtn" onclick="Garden.useWater()" title="Use Watering Can">
             <span>&#x1FAA3;</span>
             <span class="water-count" id="gardenWaterCount">0</span>
@@ -1677,6 +1555,7 @@ button:focus-visible {
             <span class="question-number" id="questionNumber">Question 1 of 70</span>
             <div class="question-actions">
                 <button class="btn-bookmark" id="btnBookmark" onclick="App.toggleBookmark()" aria-label="Bookmark this question">Bookmark</button>
+                <button class="btn-note" id="btnNote" onclick="Notes.toggle()" aria-label="Add note to this question">Notes</button>
                 <button class="btn-clear" onclick="App.clearAnswer()">Clear</button>
             </div>
         </div>
@@ -1691,6 +1570,10 @@ button:focus-visible {
             <button class="confidence-btn conf-definitely" onclick="App.setConfidence(3)">Definitely</button>
         </div>
         <div class="explanation-panel" id="explanationPanel"></div>
+        <div class="note-panel" id="notePanel">
+            <textarea class="note-textarea" id="noteTextarea" placeholder="Add your notes here..." oninput="Notes.onInput()" onblur="Notes.save()"></textarea>
+            <div class="note-saved" id="noteSaved">Note saved</div>
+        </div>
     </div>
 </div>
 
@@ -1789,17 +1672,6 @@ button:focus-visible {
             </div>
         </div>
         <div class="setting-group">
-            <h3>Experimental Modes</h3>
-            <div class="setting-row">
-                <label>Elden Mode (story + NPC guides)</label>
-                <select id="settingEldenMode" onchange="Settings.setEldenMode(this.value === 'on')">
-                    <option value="off">Off (default)</option>
-                    <option value="on">On</option>
-                </select>
-                <div class="hint">Toggle Elden Ring-inspired features (lore hubs, NPC mentors, heroic quests). Disabled by default.</div>
-            </div>
-        </div>
-        <div class="setting-group">
             <h3>AI Chat - Anthropic (Claude)</h3>
             <div class="setting-row">
                 <label>Anthropic API Key</label>
@@ -1879,34 +1751,6 @@ button:focus-visible {
                 <label><input type="checkbox" id="gamifyGarden" checked onchange="Gamification.updateSettings()"> Garden System</label>
                 <label><input type="checkbox" id="gamifyCoinPopups" checked onchange="Gamification.updateSettings()"> Coin Popups</label>
                 <label><input type="checkbox" id="gamifyPixelArt" onchange="Gamification.updateSettings()"> Pixel Art Mode</label>
-                <div class="setting-row" style="margin:12px 0 4px"><strong>Experimental Toggles</strong></div>
-                <label><input type="checkbox" id="gamifyPetBowls" onchange="Gamification.updateSettings()"> Enable Pet Food/Water Bowls</label>
-                <label><input type="checkbox" id="gamifyTimeSkip" onchange="Gamification.updateSettings()"> Enable Time Capsules / Time Skips</label>
-                <label><input type="checkbox" id="gamifyCompactHome" onchange="Gamification.updateSettings()"> Compact Home Layout</label>
-                <label><input type="checkbox" id="gamifyDifficultyControls" onchange="Gamification.updateSettings()"> Difficulty Controls (Easy/Normal/Hard + Slider)</label>
-                <div class="setting">
-                    <label><input type="checkbox" id="gamifyAdaptiveXp" onchange="Gamification.updateSettings()"> Adaptive XP (novel/harder = more, repeats = less)</label>
-                </div>
-                <label><input type="checkbox" id="gamifyMomentum" onchange="Gamification.updateSettings()"> Momentum Rewards (session streak boosts)</label>
-                <label><input type="checkbox" id="gamifyDisasters" onchange="Gamification.updateSettings()"> Hard Mode Disasters (bugs/robbers if away too long)</label>
-                <label><input type="checkbox" id="gamifyAnimatedBg" onchange="Gamification.updateSettings()"> Animated Backgrounds</label>
-                <label><input type="checkbox" id="gamifyTrinkets" onchange="Gamification.updateSettings()"> Desk Trinkets & Backpack</label>
-                <div id="difficultyControlsPanel" class="difficulty-panel" style="display:none">
-                    <div class="setting-row">
-                        <label>Difficulty Mode</label>
-                        <select id="difficultyMode" onchange="Gamification.updateSettings()">
-                            <option value="easy">Easy</option>
-                            <option value="normal" selected>Normal</option>
-                            <option value="hard">Hard</option>
-                        </select>
-                        <div class="hint">Easy: slower decay & generous bowls. Hard: faster decay, lower efficiency.</div>
-                    </div>
-                    <div class="setting-row">
-                        <label>Intensity Slider <span id="difficultySliderLabel">50</span></label>
-                        <input type="range" id="difficultySlider" min="0" max="100" value="50" onchange="Gamification.updateSettings()">
-                        <div class="hint">Fine-tune hunger/happiness decay (left = gentler, right = punishments).</div>
-                    </div>
-                </div>
                 <div class="volume-row">
                     <label>Volume:</label>
                     <input type="range" id="gamifyVolume" min="0" max="100" value="50" onchange="Gamification.updateSettings()">
@@ -2019,15 +1863,11 @@ button:focus-visible {
 <!-- FOOTER NAV (exam/practice/review-after-test) -->
 <div class="footer-nav" id="footerNav" style="display:none">
     <div class="nav-controls">
-        <div class="nav-buttons nav-buttons-left">
+        <div class="nav-buttons">
             <div class="toolbar" style="margin-right:8px">
                 <button class="tool-btn" id="btnCalc" onclick="Calc.toggle()" title="Calculator" aria-label="Open Calculator">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14h-2v-2h2v2zm0-4h-2V9h2v4zm4 4h-2v-6h2v6zm0-8h-2V7h2v2zm-8 8H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2z"/></svg>
                     Calc
-                </button>
-                <button class="tool-btn" id="btnNote" onclick="Notes.toggle()" title="Question notes" aria-label="Open question notes">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h9l7-7V5a2 2 0 00-2-2zm-4 15v-4h4l-4 4zm-7-8h7v2H8v-2zm0-4h8v2H8V6zm0 8h4v2H8v-2z"/></svg>
-                    <span class="tool-label">Notes</span>
                 </button>
                 <button class="tool-btn" id="btnAudio" onclick="Audio.speak()" title="Read question aloud" aria-label="Read question aloud">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
@@ -2040,6 +1880,8 @@ button:focus-visible {
             </div>
             <button class="btn-nav btn-home" onclick="App.exitToHome()">Exit</button>
             <button class="btn-nav" id="btnPrev" onclick="App.prev()" disabled>&laquo; Prev</button>
+            <button class="btn-nav" id="btnNext" onclick="App.next()">Next &raquo;</button>
+            <button class="btn-nav btn-submit" id="btnSubmit" onclick="App.showSubmitModal()">Submit</button>
         </div>
         <div class="palette-wrap">
             <div class="palette-mini" id="paletteMini"></div>
@@ -2051,10 +1893,6 @@ button:focus-visible {
                 <div class="legend-item"><div class="legend-dot lg-unanswered"></div>Not Visited</div>
                 <div class="legend-item"><div class="legend-dot lg-flagged"></div>Flagged</div>
             </div>
-        </div>
-        <div class="nav-buttons nav-buttons-right">
-            <button class="btn-nav" id="btnNext" onclick="App.next()">Next &raquo;</button>
-            <button class="btn-nav btn-submit" id="btnSubmit" onclick="App.showSubmitModal()">Submit</button>
         </div>
     </div>
 </div>
@@ -2140,39 +1978,16 @@ function escapeHtml(str) {
 const Gamification = {
     // XP Values for different actions
     XP_VALUES: {
-        correctAnswer: 20,
-        firstTryCorrect: 30,
-        drillGotIt: 25,
-        drillStruggled: 10,
-        testComplete: 80,
-        perfectTest: 350,
-        comboBonus: 5,
-        dailyGoalReached: 75,
-        weeklyGoalReached: 225,
-        loginBonus: 15
-    },
-    QUESTION_XP_ACTIONS: new Set(['correctAnswer', 'firstTryCorrect', 'drillGotIt', 'drillStruggled']),
-    BATCH_WINDOW_MS: 8 * 60 * 1000,
-
-    useTimeSkip() {
-        const state = Gamification.getState();
-        if (!state.settings.timeSkipEnabled) return;
-        const inv = state.inventory.gardenItems;
-        if ((inv.timeCapsule || 0) <= 0) return;
-        inv.timeCapsule--;
-        const boostHours = 6;
-        state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 40);
-        const buddy = state.studyBuddy;
-        buddy.hunger = Math.min(100, (buddy.hunger ?? 0) + 25);
-        buddy.happiness = Math.min(100, (buddy.happiness ?? 0) + 30);
-        buddy.lastInteraction = Date.now();
-        buddy.sick = buddy.hunger > 20 && buddy.happiness > 20 ? false : buddy.sick;
-        state.garden.lastGrowthTick = (state.garden.lastGrowthTick || Date.now()) - (boostHours * 60 * 60 * 1000);
-        state.garden.lastWaterDecay = (state.garden.lastWaterDecay || Date.now()) - (boostHours * 60 * 60 * 1000);
-        Gamification.saveState(state);
-        this.render();
-        SoundFX.play('powerUp');
-        Toast.show('Time skip activated! Garden and buddy refreshed.');
+        correctAnswer: 25,
+        firstTryCorrect: 50,
+        drillGotIt: 40,
+        drillStruggled: 15,
+        testComplete: 100,
+        perfectTest: 500,
+        comboBonus: 10,
+        dailyGoalReached: 100,
+        weeklyGoalReached: 300,
+        loginBonus: 25
     },
 
     // Level titles
@@ -2183,11 +1998,7 @@ const Gamification = {
         15: 'Pattern Finder',
         20: 'Skilled Scholar',
         25: 'Expert Explorer',
-        30: 'Grand Master',
-        35: 'Mythic Mentor',
-        40: 'Legendary Scholar',
-        45: 'Chronicle Sage',
-        50: 'Ascended Oracle'
+        30: 'Grand Master'
     },
 
     // Achievements list
@@ -2208,9 +2019,6 @@ const Gamification = {
         { id: 'level_5', name: 'Rising Star', desc: 'Reach level 5', icon: '⭐', xp: 100 },
         { id: 'level_10', name: 'Dedicated Student', desc: 'Reach level 10', icon: '🌟', xp: 200 },
         { id: 'level_20', name: 'True Expert', desc: 'Reach level 20', icon: '✨', xp: 500 },
-        { id: 'level_30', name: 'Scholar Supreme', desc: 'Reach level 30', icon: '📘', xp: 600 },
-        { id: 'level_40', name: 'Mythic Mind', desc: 'Reach level 40', icon: '🧠', xp: 900 },
-        { id: 'level_50', name: 'Ascendant', desc: 'Reach level 50', icon: '🌌', xp: 1500 },
         // Garden & Pet achievements
         { id: 'green_thumb', name: 'Green Thumb', desc: 'Harvest your first plant', icon: '🌱', xp: 75 },
         { id: 'master_gardener', name: 'Master Gardener', desc: 'Harvest 10 plants', icon: '🧑‍🌾', xp: 200 },
@@ -2234,14 +2042,6 @@ const Gamification = {
         extraTime: { name: '+2 Min', desc: 'Add 2 minutes to timer', cost: 50, icon: '⏱️' },
         doubleXp: { name: '2x XP', desc: 'Double XP for next 5 questions', cost: 150, icon: '✨' },
         showHint: { name: 'Hint', desc: 'Show explanation hint', cost: 80, icon: '💡' }
-    },
-
-    LEVEL_REWARD_PACKS: {
-        10: { coins: 200, powerUps: { doubleXp: 1 } },
-        20: { coins: 350, items: { gardenItems: { magicDust: 1 } }, powerUps: { doubleXp: 1 } },
-        30: { coins: 500, items: { gardenItems: { magicDust: 1, evoStone: 1 } } },
-        40: { coins: 700, powerUps: { doubleXp: 2 }, items: { gardenItems: { evoStone: 1 } } },
-        50: { coins: 1000, powerUps: { doubleXp: 2 }, items: { gardenItems: { evoStone: 2, magicDust: 2 } } }
     },
 
     // Level unlock requirements for shop items
@@ -2325,23 +2125,22 @@ const Gamification = {
             goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 35, happiness: 35, careBonus: 12 }
         },
         seeds: {
-            sunflower: { name: 'Sunflower',     price: 12,  icon: '🌻', gpNeeded: 9,  stages: 4, coinReward: 18,  xpReward: 35,
+            sunflower: { name: 'Sunflower',     price: 15,  icon: '🌻', gpNeeded: 10, stages: 4, coinReward: 10, xpReward: 25,
                          emojis: ['🫘','🌱','🌿','🌻'] },
-            cactus:    { name: 'Cactus',        price: 18,  icon: '🌵', gpNeeded: 14, stages: 4, coinReward: 28,  xpReward: 55,
+            cactus:    { name: 'Cactus',        price: 20,  icon: '🌵', gpNeeded: 15, stages: 4, coinReward: 15, xpReward: 40,
                          emojis: ['🫘','🌱','🪴','🌵'] },
-            bonsai:    { name: 'Bonsai',        price: 32,  icon: '🌳', gpNeeded: 22, stages: 5, coinReward: 55,  xpReward: 110,
+            bonsai:    { name: 'Bonsai',        price: 40,  icon: '🌳', gpNeeded: 25, stages: 5, coinReward: 30, xpReward: 75,
                          emojis: ['🫘','🌱','🪴','🌿','🌳'] },
-            crystal:   { name: 'Crystal Bloom', price: 60,  icon: '💎', gpNeeded: 34, stages: 5, coinReward: 90,  xpReward: 180,
+            crystal:   { name: 'Crystal Bloom', price: 75,  icon: '💎', gpNeeded: 40, stages: 5, coinReward: 50, xpReward: 120,
                          emojis: ['🫘','🌱','🪴','💠','💎'] },
-            rainbow:   { name: 'Rainbow Rose',  price: 100, icon: '🌈', gpNeeded: 50, stages: 6, coinReward: 150, xpReward: 320,
+            rainbow:   { name: 'Rainbow Rose',  price: 120, icon: '🌈', gpNeeded: 60, stages: 6, coinReward: 100, xpReward: 250,
                          emojis: ['🫘','🌱','🌿','🪻','🌹','🌈'] }
         },
         gardenItems: {
-            water:        { name: 'Watering Can',   price: 3,   icon: '💧', desc: '+30 water level' },
-            fertilizer:   { name: 'Fertilizer',     price: 15,  icon: '🧪', desc: '2x growth for 1 plant (10 questions)' },
-            magicDust:    { name: 'Magic Dust',     price: 50,  icon: '✨', desc: 'Advance 1 plant by 1 stage' },
-            timeCapsule:  { name: 'Time Capsule',  price: 60,  icon: '⏳', desc: 'Skip 6h: restores water + pet mood' },
-            evoStone:     { name: 'Evolution Stone', price: 150, icon: '🪨', desc: '+60 care minutes for pet evolution' },
+            water:      { name: 'Watering Can', price: 5,   icon: '💧', desc: '+25 water level' },
+            fertilizer: { name: 'Fertilizer',   price: 20,  icon: '🧪', desc: '2x growth for 1 plant (10 questions)' },
+            magicDust:  { name: 'Magic Dust',   price: 50,  icon: '✨', desc: 'Advance 1 plant by 1 stage' },
+            evoStone:   { name: 'Evolution Stone', price: 150, icon: '🪨', desc: '+60 care minutes for pet evolution' },
             healthPotion: { name: 'Health Potion', price: 30, icon: '🧃', desc: 'Heal pet 40 HP mid-battle' },
             shieldCharm:  { name: 'Shield Charm',  price: 50, icon: '🛡️', desc: 'Block next enemy attack 100%' },
             powerBerry:   { name: 'Power Berry',   price: 40, icon: '🫐', desc: '+50% ATK for 3 questions' }
@@ -2363,9 +2162,7 @@ const Gamification = {
     },
 
     // Multiplier to make pet decay more visible during short sessions (1 = real time)
-    PET_DECAY_TIMESCALE: 1.5,
-    CALORIES_PER_HUNGER_POINT: 5,
-    ML_PER_HAPPINESS_POINT: 3,
+    PET_DECAY_TIMESCALE: 3,
 
     getDefaultState() {
         return {
@@ -2398,7 +2195,7 @@ const Gamification = {
             inventory: {
                 petFood: { kibble: 3, treat: 1, feast: 0, goldfish: 0 },
                 seeds: { sunflower: 2, cactus: 0, bonsai: 0, crystal: 0, rainbow: 0 },
-                gardenItems: { water: 5, fertilizer: 0, magicDust: 0, timeCapsule: 1, evoStone: 0 },
+                gardenItems: { water: 5, fertilizer: 0, magicDust: 0, evoStone: 0 },
                 battleItems: { healthPotion: 0, shieldCharm: 0, powerBerry: 0 },
                 decorations: [],
                 petAccessories: []
@@ -2421,29 +2218,8 @@ const Gamification = {
                 garden: true,
                 coinPopups: true,
                 pixelArt: false,
-                petBowlsEnabled: false,
-                timeSkipEnabled: false,
-                compactHomeEnabled: false,
-                difficultyControlsEnabled: false,
-                confidenceSpacingEnabled: false,
-                adaptiveXpEnabled: true,
-                momentumRewardsEnabled: true,
-                disastersEnabled: false,
-                animatedBgEnabled: false,
-                trinketsEnabled: false,
-                difficultyMode: 'normal',
-                difficultySlider: 50,
                 volume: 50,
-                buddyPosition: null,
-                comboPosition: null,
-                calcPosition: null,
-                notePosition: null
-            },
-            petCare: {
-                foodBowl: 0,
-                waterBowl: 0,
-                maxFood: 400,
-                maxWater: 500
+                buddyPosition: null
             },
             stats: {
                 totalXpEarned: 0,
@@ -2453,232 +2229,11 @@ const Gamification = {
                 longestStreak: 0,
                 powerUpsUsed: 0,
                 lastActiveDate: null,
-                lastActiveTimestamp: null,
-                momentum: { streak: 0, lastQuestionTs: 0 },
-                batchSession: null,
-                lastRewardMeta: null
+                lastActiveTimestamp: null
             },
             doubleXpRemaining: 0,
-            questionStartTime: null,
-            questionAccumulatedMs: 0,
-            questionTimerPaused: false,
-            questionTimerEnabled: false
+            questionStartTime: null
         };
-    },
-
-    getDifficultyConfig(state) {
-        const settings = state?.settings || {};
-        const mode = settings.difficultyMode || 'normal';
-        const slider = Math.max(0, Math.min(100, settings.difficultySlider ?? 50));
-        const sliderScale = 0.75 + (slider / 100) * 0.75; // 0.75 - 1.5
-        const modes = {
-            easy: { hunger: 0.75, happiness: 0.8, bowlEfficiency: 1.2 },
-            normal: { hunger: 1.0, happiness: 1.0, bowlEfficiency: 1.0 },
-            hard: { hunger: 1.25, happiness: 1.2, bowlEfficiency: 0.85 }
-        };
-        const base = modes[mode] || modes.normal;
-        return {
-            hungerDecay: base.hunger * sliderScale,
-            happinessDecay: base.happiness * sliderScale,
-            bowlEfficiency: base.bowlEfficiency,
-            caloriesPerPoint: this.CALORIES_PER_HUNGER_POINT / (base.bowlEfficiency || 1),
-            waterPerPoint: this.ML_PER_HAPPINESS_POINT / (base.bowlEfficiency || 1)
-        };
-    },
-
-    _getRewardScalar(state) {
-        const settings = state?.settings || {};
-        if (!settings.difficultyControlsEnabled) return 1;
-        const mode = settings.difficultyMode || 'normal';
-        const slider = Math.max(0, Math.min(100, settings.difficultySlider ?? 50));
-        const sliderScale = 0.75 + (slider / 100) * 0.75; // 0.75 - 1.5
-        let base = 1;
-        if (mode === 'easy') base = 0.9;
-        else if (mode === 'hard') base = 1.12;
-        let scalar = base;
-        if (sliderScale > 1) scalar *= 1 + (sliderScale - 1) * 0.35;
-        else scalar *= 1 - (1 - sliderScale) * 0.25;
-        return Math.max(0.6, Math.min(1.5, scalar));
-    },
-
-    getPetBuffs(state) {
-        const pet = state?.studyBuddy || {};
-        const species = pet.species || 'bird';
-        const hunger = pet.hunger ?? 100;
-        const happiness = pet.happiness ?? 100;
-        const avg = (hunger + happiness) / 2;
-        let xp = 1, coins = 1, garden = 1;
-
-        const speciesBuff = {
-            cat: { coins: 1.05 },
-            dog: { xp: 1.05 },
-            bunny: { garden: 1.08 },
-            dragon: { coins: 1.1, xp: 1.05 },
-            turtle: { xp: 1.03, garden: 1.03 }
-        }[species] || {};
-
-        xp *= speciesBuff.xp || 1;
-        coins *= speciesBuff.coins || 1;
-        garden *= speciesBuff.garden || 1;
-
-        if (avg >= 80) {
-            xp *= 1.05; coins *= 1.05; garden *= 1.05;
-        } else if (avg < 40) {
-            xp *= 0.9; coins *= 0.9; garden *= 0.9;
-        }
-
-        return { xp, coins, garden };
-    },
-
-    _getBatchBonus(state, action) {
-        const stats = state.stats || (state.stats = {});
-        if (!stats.batchSession) {
-            stats.batchSession = { count: 0, startedAt: Date.now(), lastQuestionTs: 0, multiplier: 1 };
-        }
-        const session = stats.batchSession;
-        if (!this.QUESTION_XP_ACTIONS.has(action)) {
-            return { multiplier: session.multiplier || 1, count: session.count || 0 };
-        }
-        const now = Date.now();
-        if (!session.lastQuestionTs || (now - session.lastQuestionTs) > this.BATCH_WINDOW_MS) {
-            session.count = 0;
-            session.startedAt = now;
-            session.multiplier = 1;
-        }
-        session.lastQuestionTs = now;
-        session.count = (session.count || 0) + 1;
-        const tier = Math.min(5, Math.floor(Math.max(0, session.count - 1) / 4));
-        const bonus = 1 + tier * 0.05;
-        session.multiplier = bonus;
-        session.tier = tier;
-        return { multiplier: bonus, count: session.count, tier };
-    },
-
-    _getBatchStatus(state) {
-        const stats = state.stats || {};
-        const session = stats.batchSession;
-        if (!session) return { count: 0, multiplier: 1 };
-        if (session.lastQuestionTs && (Date.now() - session.lastQuestionTs) > this.BATCH_WINDOW_MS) {
-            session.count = 0;
-            session.multiplier = 1;
-            session.tier = 0;
-            return { count: 0, multiplier: 1 };
-        }
-        return {
-            count: session.count || 0,
-            multiplier: session.multiplier || 1,
-            tier: session.tier || 0
-        };
-    },
-
-    _getMomentumBonus(state, options) {
-        const stats = state.stats || (state.stats = {});
-        if (!state.settings?.momentumRewardsEnabled) return { xp: 1, coins: 1 };
-        const now = Date.now();
-        if (!stats.momentum) stats.momentum = { streak: 0, lastQuestionTs: 0 };
-        if (options?.withCombo) {
-            if (stats.momentum.lastQuestionTs && (now - stats.momentum.lastQuestionTs) < 10 * 60 * 1000) {
-                stats.momentum.streak = (stats.momentum.streak || 0) + 1;
-            } else {
-                stats.momentum.streak = 1;
-            }
-            stats.momentum.lastQuestionTs = now;
-        }
-        const bonus = 1 + Math.min((stats.momentum.streak || 0) * 0.02, 0.25);
-        return { xp: bonus, coins: bonus };
-    },
-
-    _maybeTriggerDisaster(state) {
-        const settings = state.settings || {};
-        if (!settings.disastersEnabled || settings.difficultyMode !== 'hard') return;
-        const now = Date.now();
-        const lastActive = state.stats?.lastActiveTimestamp || now;
-        const hoursAway = (now - lastActive) / (1000 * 60 * 60);
-        if (hoursAway < 3) return;
-        if (state.stats?.lastDisasterCheck && (now - state.stats.lastDisasterCheck) < 60 * 60 * 1000) return;
-        state.stats.lastDisasterCheck = now;
-        const chance = Math.min(0.6, 0.15 + (hoursAway / 12) * 0.2);
-        if (Math.random() > chance) return;
-        const coinLoss = Math.min(state.coins || 0, Math.round((state.coins || 0) * 0.08));
-        state.coins = Math.max(0, (state.coins || 0) - coinLoss);
-        state.garden.waterLevel = Math.max(0, (state.garden.waterLevel || 0) - 15);
-        state.garden.lastWaterDecay = now;
-        state.garden.lastGrowthTick = now;
-        state.stats.lastDisaster = { coinLoss, at: now };
-    },
-
-    renderBowls(state) {
-        const bowls = document.getElementById('gardenBowls');
-        if (!bowls) return;
-        const enabled = state.settings.petBowlsEnabled;
-        bowls.style.display = enabled ? '' : 'none';
-        if (!enabled) return;
-
-        const care = state.petCare || { foodBowl: 0, waterBowl: 0, maxFood: 400, maxWater: 500 };
-        const foodPct = Math.round(Math.min(100, (care.foodBowl / Math.max(1, care.maxFood)) * 100));
-        const waterPct = Math.round(Math.min(100, (care.waterBowl / Math.max(1, care.maxWater)) * 100));
-        const foodInv = state.inventory.petFood || {};
-        const totalFood = Object.values(foodInv).reduce((sum, c) => sum + c, 0);
-        const waterInv = state.inventory.gardenItems.water || 0;
-
-        bowls.innerHTML = `
-            <div class="pet-bowl food">
-                <h4>Food Bowl (${Math.round(care.foodBowl)} / ${care.maxFood} kcal)</h4>
-                <div class="pet-bowl-level"><div class="pet-bowl-fill" style="width:${foodPct}%"></div></div>
-                <div class="pet-bowl-actions">
-                    <button onclick="Garden.fillFoodBowl(100)" ${totalFood <= 0 ? 'disabled' : ''}>+100</button>
-                    <button onclick="Garden.fillFoodBowl(200)" ${totalFood <= 0 ? 'disabled' : ''}>+200</button>
-                </div>
-                <div class="pet-bowl-meta">Inventory portions: ${totalFood}</div>
-            </div>
-            <div class="pet-bowl water">
-                <h4>Water Bowl (${Math.round(care.waterBowl)} / ${care.maxWater} ml)</h4>
-                <div class="pet-bowl-level"><div class="pet-bowl-fill" style="width:${waterPct}%"></div></div>
-                <div class="pet-bowl-actions">
-                    <button onclick="Garden.fillWaterBowl(100)" ${waterInv <= 0 ? 'disabled' : ''}>+100</button>
-                    <button onclick="Garden.fillWaterBowl(200)" ${waterInv <= 0 ? 'disabled' : ''}>+200</button>
-                </div>
-                <div class="pet-bowl-meta">Watering cans: ${waterInv}</div>
-            </div>`;
-    },
-
-    fillFoodBowl(amount) {
-        const state = Gamification.getState();
-        if (!state.settings.petBowlsEnabled) return;
-        const inv = state.inventory.petFood || {};
-        const care = state.petCare;
-        const needed = Math.max(0, Math.min(amount, (care.maxFood || 400) - (care.foodBowl || 0)));
-        if (needed <= 0) return;
-        let remaining = needed;
-        const foodOrder = Object.keys(inv);
-        for (const id of foodOrder) {
-            if (remaining <= 0) break;
-            while (inv[id] > 0 && remaining > 0) {
-                const food = Gamification.SHOP.food[id];
-                const nutrition = food?.hunger || 10;
-                inv[id]--;
-                remaining -= nutrition;
-            }
-        }
-        const added = needed - Math.max(0, remaining);
-        care.foodBowl = Math.min(care.maxFood || 400, (care.foodBowl || 0) + added);
-        Gamification.saveState(state);
-        this.renderBowls(state);
-    },
-
-    fillWaterBowl(amount) {
-        const state = Gamification.getState();
-        if (!state.settings.petBowlsEnabled) return;
-        const inv = state.inventory.gardenItems;
-        const care = state.petCare;
-        const needed = Math.max(0, Math.min(amount, (care.maxWater || 500) - (care.waterBowl || 0)));
-        if (needed <= 0 || (inv.water || 0) <= 0) return;
-        const cansNeeded = Math.ceil(needed / 30);
-        const cansUsed = Math.min(cansNeeded, inv.water);
-        inv.water -= cansUsed;
-        care.waterBowl = Math.min(care.maxWater || 500, (care.waterBowl || 0) + cansUsed * 30);
-        Gamification.saveState(state);
-        this.renderBowls(state);
     },
 
     // In-memory state cache — prevents read-modify-write race conditions
@@ -2716,8 +2271,7 @@ const Gamification = {
                     powerUpInventory: m(defaults.powerUpInventory, saved.powerUpInventory),
                     garden: m(defaults.garden, saved.garden),
                     inventory: mDeep(defaults.inventory, saved.inventory),
-                    battle: m(defaults.battle, saved.battle),
-                    petCare: { ...defaults.petCare, ...(saved.petCare || {}) }
+                    battle: m(defaults.battle, saved.battle)
                 };
                 // Multi-pet sync: migrate and sync active pet
                 const st = this._state;
@@ -2767,11 +2321,9 @@ const Gamification = {
         return this.getState().settings.enabled;
     },
 
-    // Get level threshold (progressively harder curve)
+    // Get level threshold (exponential curve)
     getLevelThreshold(level) {
-        if (level <= 1) return 200;
-        const quadraticRamp = 40 * level * level + 80 * level + 200;
-        return Math.floor(quadraticRamp);
+        return Math.floor(100 * Math.pow(1.5, level - 1));
     },
 
     // Get total XP needed for level
@@ -2792,91 +2344,12 @@ const Gamification = {
         return title;
     },
 
-    applyLevelRewardPack(level, rewardLog, state) {
-        if (!this.LEVEL_REWARD_PACKS) return;
-        const pack = this.LEVEL_REWARD_PACKS[level];
-        if (!pack) return;
-
-        const notes = [];
-
-        if (pack.coins) {
-            state.coins = (state.coins || 0) + pack.coins;
-            state.totalCoinsEarned = (state.totalCoinsEarned || 0) + pack.coins;
-            notes.push(`+${pack.coins} Coins`);
-        }
-
-        if (pack.powerUps) {
-            const powerNotes = [];
-            for (const [powerId, amount] of Object.entries(pack.powerUps)) {
-                if (!state.powerUpInventory[powerId]) state.powerUpInventory[powerId] = 0;
-                state.powerUpInventory[powerId] += amount;
-                const label = this.POWERUPS[powerId]?.name || powerId;
-                powerNotes.push(`${label} x${amount}`);
-            }
-            if (powerNotes.length) notes.push(powerNotes.join(', '));
-        }
-
-        if (pack.items) {
-            for (const [invKey, payload] of Object.entries(pack.items)) {
-                if (!state.inventory[invKey]) {
-                    state.inventory[invKey] = Array.isArray(payload) ? [] : {};
-                }
-                if (Array.isArray(payload)) {
-                    payload.forEach(item => {
-                        if (Array.isArray(state.inventory[invKey])) {
-                            state.inventory[invKey].push(item);
-                        }
-                    });
-                    if (payload.length) notes.push(`${invKey} +${payload.length}`);
-                } else {
-                    const entryNotes = [];
-                    const bucket = state.inventory[invKey];
-                    for (const [itemId, amount] of Object.entries(payload)) {
-                        bucket[itemId] = (bucket[itemId] || 0) + amount;
-                        entryNotes.push(`${itemId} x${amount}`);
-                    }
-                    if (entryNotes.length) notes.push(entryNotes.join(', '));
-                }
-            }
-        }
-
-        if (notes.length) {
-            rewardLog.push(notes.join(' | '));
-        }
-    },
-
     // Award XP
     awardXp(action, options = {}) {
         if (!this.isEnabled()) return 0;
 
         const state = this.getState();
-        this._maybeTriggerDisaster(state);
         let xpAmount = this.XP_VALUES[action] || 0;
-
-        // Adaptive scaling hooks
-        const adaptiveEnabled = !!(state.settings?.adaptiveXpEnabled);
-        if (adaptiveEnabled && options.questionMeta) {
-            const { difficulty = 1, noveltyScore = 1, streakPenalty = 1, confidenceFactor = 1 } = options.questionMeta;
-            const baseScalar = 0.6 + (difficulty * 0.3);
-            const noveltyScalar = 0.4 + (noveltyScore * 0.6);
-            const streakScalar = streakPenalty;
-            const confidenceScalar = confidenceFactor;
-            const adaptiveScalar = Math.max(0.3, Math.min(2.5, baseScalar * noveltyScalar * streakScalar * confidenceScalar));
-            xpAmount = Math.round(xpAmount * adaptiveScalar);
-        }
-
-        // Difficulty reward scalar & pet buffs
-        const rewardScalar = this._getRewardScalar(state);
-        const petBuffs = this.getPetBuffs(state);
-        xpAmount = Math.round(xpAmount * rewardScalar * (petBuffs.xp || 1));
-
-        // Momentum bonus (session pacing)
-        const momentum = this._getMomentumBonus(state, options);
-        xpAmount = Math.round(xpAmount * (momentum.xp || 1));
-
-        // Batch size bonus
-        const batch = this._getBatchBonus(state, action);
-        xpAmount = Math.round(xpAmount * (batch.multiplier || 1));
 
         // Apply multipliers
         if (options.multiplier) xpAmount = Math.floor(xpAmount * options.multiplier);
@@ -2920,7 +2393,6 @@ const Gamification = {
                 state.inventory.gardenItems.evoStone = (state.inventory.gardenItems.evoStone || 0) + 1;
                 lvlRewards.push('+1 Evolution Stone');
             }
-            this.applyLevelRewardPack(state.level, lvlRewards, state);
             if (lvlRewards.length > 0) {
                 levelRewards.push('Lv' + state.level + ': ' + lvlRewards.join(', '));
             }
@@ -2945,23 +2417,7 @@ const Gamification = {
         // Award coins alongside XP
         const coinAction = this.COIN_VALUES[action];
         if (coinAction !== undefined && coinAction > 0) {
-            const coinScaled = Math.round(coinAction * rewardScalar * (petBuffs.coins || 1) * (momentum.coins || 1));
-            this.awardCoins(coinScaled, action);
-        }
-
-        if (state.stats) {
-            state.stats.lastRewardMeta = {
-                action,
-                timestamp: Date.now(),
-                xpFinal: xpAmount,
-                momentumStreak: state.stats.momentum?.streak || 0,
-                momentumBonus: momentum.xp || 1,
-                batchCount: batch.count || 0,
-                batchMultiplier: batch.multiplier || 1,
-                rewardScalar,
-                petBuffs,
-                comboMultiplier: state.combo?.multiplier || 1
-            };
+            this.awardCoins(coinAction, action);
         }
 
         // Update home XP bar if visible
@@ -3042,13 +2498,15 @@ const Gamification = {
         }
     },
 
-    // Save widget position
-    saveWidgetPosition(key, pos) {
-        if (!key || !pos || typeof pos.left !== 'number' || typeof pos.top !== 'number') return;
+    // Reset combo
+    resetCombo() {
+        if (!this.isEnabled()) return;
+
         const state = this.getState();
-        state.settings = state.settings || {};
-        state.settings[key] = { left: pos.left, top: pos.top };
+        state.combo.current = 0;
+        state.combo.multiplier = 1.0;
         this.saveState(state);
+        this.updateComboDisplay();
     },
 
     // Update combo display
@@ -3057,9 +2515,6 @@ const Gamification = {
         const el = document.getElementById('comboDisplay');
         if (!el) return;
 
-        this._applyComboPosition(el, state.settings.comboPosition);
-        this._ensureComboDraggable(el);
-
         if (state.combo.current >= 2) {
             el.classList.add('active');
             document.getElementById('comboCount').textContent = 'x' + state.combo.current;
@@ -3067,75 +2522,6 @@ const Gamification = {
         } else {
             el.classList.remove('active');
         }
-    },
-
-    _applyComboPosition(el, pos) {
-        if (!el) return;
-        if (pos && typeof pos.left === 'number' && typeof pos.top === 'number') {
-            el.style.left = pos.left + 'px';
-            el.style.top = pos.top + 'px';
-            el.style.transform = 'none';
-        } else {
-            el.style.left = '50%';
-            el.style.top = '90px';
-            el.style.transform = 'translateX(-50%)';
-        }
-    },
-
-    _ensureComboDraggable(el) {
-        if (!el || el.dataset.comboDragInit === '1') return;
-        el.dataset.comboDragInit = '1';
-        const self = this;
-        let pointerId = null;
-        let offsetX = 0;
-        let offsetY = 0;
-        let startX = 0;
-        let startY = 0;
-        let moved = false;
-
-        const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
-
-        const endDrag = (e) => {
-            if (pointerId === null || e.pointerId !== pointerId) return;
-            el.releasePointerCapture(pointerId);
-            pointerId = null;
-            document.removeEventListener('pointermove', onPointerMove);
-            document.removeEventListener('pointerup', endDrag);
-            document.removeEventListener('pointercancel', endDrag);
-            el.classList.remove('dragging');
-            moved = false;
-        };
-
-        const onPointerMove = (e) => {
-            if (pointerId === null || e.pointerId !== pointerId) return;
-            e.preventDefault();
-            const left = clamp(e.clientX - offsetX, 5, window.innerWidth - el.offsetWidth - 5);
-            const top = clamp(e.clientY - offsetY, 40, window.innerHeight - el.offsetHeight - 5);
-            el.style.left = left + 'px';
-            el.style.top = top + 'px';
-            el.style.transform = 'none';
-            if (!moved && (Math.abs(e.clientX - startX) > 4 || Math.abs(e.clientY - startY) > 4)) {
-                moved = true;
-                el.classList.add('dragging');
-            }
-            const state = self.getState();
-            self.saveWidgetPosition('comboPosition', { left, top });
-        };
-
-        el.addEventListener('pointerdown', (e) => {
-            if (e.button !== 0 || pointerId !== null) return;
-            pointerId = e.pointerId;
-            const rect = el.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-            startX = e.clientX;
-            startY = e.clientY;
-            moved = false;
-            el.setPointerCapture(pointerId);
-            document.addEventListener('pointermove', onPointerMove, { passive: false });
-            document.addEventListener('pointerup', endDrag);
-            document.addEventListener('pointercancel', endDrag);
-        });
     },
 
     // Show XP popup
@@ -3206,7 +2592,6 @@ const Gamification = {
                 state.inventory.gardenItems.evoStone = (state.inventory.gardenItems.evoStone || 0) + 1;
                 lvlR.push('+1 Evolution Stone');
             }
-            this.applyLevelRewardPack(state.level, lvlR, state);
             if (lvlR.length > 0) levelRewards.push('Lv' + state.level + ': ' + lvlR.join(', '));
         }
         this.saveState(state);
@@ -3512,22 +2897,6 @@ const Gamification = {
         if (reward.xp) parts.push(`<span>⭐ ${reward.xp} XP</span>`);
         if (reward.coins) parts.push(`<span>🪙 ${reward.coins} coins</span>`);
         if (reward.combo) parts.push(`<span>🔥 x${reward.combo.toFixed(1)} combo</span>`);
-        const state = this.getState();
-        const meta = state.stats?.lastRewardMeta;
-        if (meta) {
-            const momentumPct = Math.round(((meta.momentumBonus || 1) - 1) * 100);
-            if (momentumPct > 0) {
-                parts.push(`<span title="Momentum streak ${meta.momentumStreak || 0}">⚡ +${momentumPct}%</span>`);
-            }
-            const batchPct = Math.round(((meta.batchMultiplier || 1) - 1) * 100);
-            if (batchPct > 0) {
-                parts.push(`<span title="Batch x${meta.batchCount || 0}">📦 +${batchPct}%</span>`);
-            }
-            const petPct = Math.round(((meta.petBuffs?.xp || 1) - 1) * 100);
-            if (petPct !== 0) {
-                parts.push(`<span title="Buddy mood boost">🐾 ${petPct > 0 ? '+' : ''}${petPct}%</span>`);
-            }
-        }
         breakdownEl.innerHTML = parts.join('');
         toast.classList.add('show');
         clearTimeout(this._rewardToastTimer);
@@ -3590,25 +2959,6 @@ const Gamification = {
         const stage = this.BUDDY_STAGES.find(s => s.stage === state.studyBuddy.stage) || this.BUDDY_STAGES[0];
 
         const coins = state.coins || 0;
-        const stats = state.stats || {};
-        const metaPills = [];
-        const momentumStreak = state.settings.momentumRewardsEnabled ? (stats.momentum?.streak || 0) : 0;
-        const momentumBonusPct = momentumStreak > 0 ? Math.round(Math.min(momentumStreak * 2, 25)) : 0;
-        if (momentumBonusPct > 0) {
-            metaPills.push(`<span class="meta-pill momentum" title="Momentum streak ${momentumStreak}">Momentum +${momentumBonusPct}%</span>`);
-        }
-        const batchStatus = this._getBatchStatus(state);
-        const batchBonusPct = Math.round(((batchStatus.multiplier || 1) - 1) * 100);
-        if (batchStatus.count >= 2 && batchBonusPct > 0) {
-            metaPills.push(`<span class="meta-pill batch" title="${batchStatus.count} question batch">Batch x${batchStatus.count} (+${batchBonusPct}%)</span>`);
-        }
-        const petBuffs = this.getPetBuffs(state);
-        const petMood = Math.round(((state.studyBuddy?.hunger ?? 100) + (state.studyBuddy?.happiness ?? 100)) / 2);
-        const petBonusPct = Math.round(((petBuffs.xp || 1) - 1) * 100);
-        const petLabel = petBonusPct !== 0 ? ` (${petBonusPct > 0 ? '+' : ''}${petBonusPct}% XP)` : '';
-        metaPills.push(`<span class="meta-pill pet" title="Buddy mood ${petMood}%">Pet ${petMood}%${petLabel}</span>`);
-        const metaHtml = metaPills.length ? `<div class="xp-meta">${metaPills.join('')}</div>` : '';
-
         el.innerHTML = `
             <div class="xp-bar-container">
                 <div class="xp-level">Lv. ${state.level}</div>
@@ -3622,7 +2972,6 @@ const Gamification = {
                 <span class="coin-display" title="Coins">&#x1FA99; ${coins.toLocaleString()}</span>
                 <span class="buddy-mini" onclick="event.stopPropagation();Gamification.showBuddyInfo()">${Sprites.petSprite(state.studyBuddy.stage, this.getSpeciesEmoji(state.studyBuddy.species, state.studyBuddy.stage), 24)}</span>
             </div>
-            ${metaHtml}
         `;
     },
 
@@ -3745,45 +3094,12 @@ const Gamification = {
         state.settings.garden = document.getElementById('gamifyGarden')?.checked ?? true;
         state.settings.coinPopups = document.getElementById('gamifyCoinPopups')?.checked ?? true;
         state.settings.pixelArt = document.getElementById('gamifyPixelArt')?.checked ?? false;
-        state.settings.petBowlsEnabled = document.getElementById('gamifyPetBowls')?.checked ?? false;
-        state.settings.timeSkipEnabled = document.getElementById('gamifyTimeSkip')?.checked ?? false;
-        state.settings.compactHomeEnabled = document.getElementById('gamifyCompactHome')?.checked ?? false;
-        state.settings.difficultyControlsEnabled = document.getElementById('gamifyDifficultyControls')?.checked ?? false;
-        state.settings.adaptiveXpEnabled = document.getElementById('gamifyAdaptiveXp')?.checked ?? false;
-        state.settings.momentumRewardsEnabled = document.getElementById('gamifyMomentum')?.checked ?? true;
-        state.settings.disastersEnabled = document.getElementById('gamifyDisasters')?.checked ?? false;
-        state.settings.animatedBgEnabled = document.getElementById('gamifyAnimatedBg')?.checked ?? false;
-        state.settings.trinketsEnabled = document.getElementById('gamifyTrinkets')?.checked ?? false;
-        state.settings.confidenceSpacingEnabled = document.getElementById('gamifyConfidenceSpacing')?.checked ?? false;
         state.settings.volume = parseInt(document.getElementById('gamifyVolume')?.value ?? 50);
-
-        const diffPanel = document.getElementById('difficultyControlsPanel');
-        if (diffPanel) diffPanel.style.display = state.settings.difficultyControlsEnabled ? '' : 'none';
-        if (state.settings.difficultyControlsEnabled) {
-            const modeSelect = document.getElementById('difficultyMode');
-            const sliderInput = document.getElementById('difficultySlider');
-            if (modeSelect) state.settings.difficultyMode = modeSelect.value || 'normal';
-            if (sliderInput) {
-                const sliderVal = parseInt(sliderInput.value ?? '50', 10);
-                state.settings.difficultySlider = Number.isFinite(sliderVal) ? sliderVal : 50;
-                const sliderLabel = document.getElementById('difficultySliderLabel');
-                if (sliderLabel) sliderLabel.textContent = state.settings.difficultySlider;
-            }
-        } else {
-            state.settings.difficultyMode = 'normal';
-            state.settings.difficultySlider = 50;
-            const sliderLabel = document.getElementById('difficultySliderLabel');
-            if (sliderLabel) sliderLabel.textContent = '50';
-        }
 
         const volumeLabel = document.getElementById('gamifyVolumeLabel');
         if (volumeLabel) volumeLabel.textContent = state.settings.volume + '%';
 
         this.saveState(state);
-
-        document.body.classList.toggle('compact-home', !!state.settings.compactHomeEnabled);
-        document.body.classList.toggle('animated-bg', !!state.settings.animatedBgEnabled);
-        document.body.classList.toggle('trinkets-enabled', !!state.settings.trinketsEnabled);
 
         // Update UI
         this.renderXpBar();
@@ -3828,46 +3144,14 @@ const Gamification = {
         const el5c = document.getElementById('gamifyCoinPopups');
         if (el5c) el5c.checked = state.settings.coinPopups !== false;
 
-        const el8 = document.getElementById('gamifyPixelArt');
-        if (el8) el8.checked = state.settings.pixelArt;
-        const el9 = document.getElementById('gamifyPetBowls');
-        if (el9) el9.checked = state.settings.petBowlsEnabled;
-        const el10 = document.getElementById('gamifyTimeSkip');
-        if (el10) el10.checked = state.settings.timeSkipEnabled;
-        const el11 = document.getElementById('gamifyCompactHome');
-        if (el11) el11.checked = state.settings.compactHomeEnabled;
-        const el12 = document.getElementById('gamifyDifficultyControls');
-        if (el12) el12.checked = state.settings.difficultyControlsEnabled;
-        const el13 = document.getElementById('gamifyAdaptiveXp');
-        if (el13) el13.checked = state.settings.adaptiveXpEnabled;
-        const el14 = document.getElementById('gamifyMomentum');
-        if (el14) el14.checked = state.settings.momentumRewardsEnabled;
-        const el15 = document.getElementById('gamifyDisasters');
-        if (el15) el15.checked = state.settings.disastersEnabled;
-        const el16 = document.getElementById('gamifyAnimatedBg');
-        if (el16) el16.checked = state.settings.animatedBgEnabled;
-        const el17 = document.getElementById('gamifyTrinkets');
-        if (el17) el17.checked = state.settings.trinketsEnabled;
-        const el18 = document.getElementById('gamifyConfidenceSpacing');
-        if (el18) el18.checked = state.settings.confidenceSpacingEnabled;
+        const el5d = document.getElementById('gamifyPixelArt');
+        if (el5d) el5d.checked = !!state.settings.pixelArt;
 
         const el6 = document.getElementById('gamifyVolume');
         if (el6) el6.value = state.settings.volume;
 
         const volumeLabel = document.getElementById('gamifyVolumeLabel');
         if (volumeLabel) volumeLabel.textContent = state.settings.volume + '%';
-
-        const diffPanel = document.getElementById('difficultyControlsPanel');
-        if (diffPanel) diffPanel.style.display = state.settings.difficultyControlsEnabled ? '' : 'none';
-        const diffMode = document.getElementById('difficultyMode');
-        if (diffMode) diffMode.value = state.settings.difficultyMode || 'normal';
-        const diffSlider = document.getElementById('difficultySlider');
-        const sliderVal = state.settings.difficultySlider ?? 50;
-        if (diffSlider) diffSlider.value = sliderVal;
-        const sliderLabel = document.getElementById('difficultySliderLabel');
-        if (sliderLabel) sliderLabel.textContent = sliderVal;
-
-        document.body.classList.toggle('compact-home', !!state.settings.compactHomeEnabled);
     },
 
     // Reset progress
@@ -3886,31 +3170,6 @@ const Gamification = {
     // Start tracking question time
     startQuestionTimer() {
         const state = this.getState();
-        state.questionTimerEnabled = true;
-        state.questionTimerPaused = false;
-        state.questionAccumulatedMs = 0;
-        state.questionStartTime = Date.now();
-        this.saveState(state);
-    },
-
-    pauseQuestionTimer(options = {}) {
-        const state = this.getState();
-        if (!state.questionTimerEnabled) return;
-        if (state.questionStartTime) {
-            state.questionAccumulatedMs = (state.questionAccumulatedMs || 0) + (Date.now() - state.questionStartTime);
-            state.questionStartTime = null;
-        }
-        state.questionTimerPaused = true;
-        if (!options.auto) {
-            state.questionTimerEnabled = false;
-        }
-        this.saveState(state);
-    },
-
-    resumeQuestionTimer() {
-        const state = this.getState();
-        if (!state.questionTimerEnabled || !state.questionTimerPaused) return;
-        state.questionTimerPaused = false;
         state.questionStartTime = Date.now();
         this.saveState(state);
     },
@@ -3918,11 +3177,8 @@ const Gamification = {
     // Get time spent on question
     getQuestionTime() {
         const state = this.getState();
-        const acc = state.questionAccumulatedMs || 0;
-        if (state.questionStartTime) {
-            return acc + (Date.now() - state.questionStartTime);
-        }
-        return acc;
+        if (!state.questionStartTime) return null;
+        return Date.now() - state.questionStartTime;
     },
 
     // Record test completion
@@ -4603,9 +3859,6 @@ const Shop = {
                 Gamification.updateBuddyWidget();
             } else {
                 state.inventory.gardenItems[id] = (state.inventory.gardenItems[id] || 0) + 1;
-                if (id === 'water' && typeof Garden !== 'undefined' && Garden && typeof Garden._dismissWaterPrompt === 'function') {
-                    Garden._dismissWaterPrompt();
-                }
             }
         } else if (tab === 'decorations') {
             state.inventory.decorations.push(id);
@@ -5227,15 +4480,6 @@ const Garden = {
         // Update watering can count
         const waterCount = document.getElementById('gardenWaterCount');
         if (waterCount) waterCount.textContent = state.inventory.gardenItems.water || 0;
-        const skipCount = document.getElementById('gardenSkipCount');
-        const skipBtn = document.getElementById('gardenSkipBtn');
-        const skips = state.inventory.gardenItems.timeCapsule || 0;
-        if (skipCount) skipCount.textContent = skips;
-        if (skipBtn) {
-            const showSkip = state.settings.timeSkipEnabled;
-            skipBtn.style.display = showSkip ? '' : 'none';
-            skipBtn.classList.toggle('disabled', skips <= 0);
-        }
         if ((state.inventory.gardenItems.water || 0) <= 0) {
             this._promptWaterPurchase();
         } else {
@@ -5245,7 +4489,6 @@ const Garden = {
         this.renderGrid(state);
         this.renderDecos(state);
         this.renderPet(state);
-        this.renderBowls(state);
     },
 
     renderGrid(state) {
@@ -5522,7 +4765,7 @@ const Garden = {
             plot.growthPoints = (plot.growthPoints || 0) + gp;
 
             // Check for stage advancement
-            const gpPerStage = seed.gpNeeded / Math.max(1, (seed.stages - 1));
+            const gpPerStage = seed.gpNeeded / (seed.stages - 1);
             const newStage = Math.min(seed.stages - 1, Math.floor(plot.growthPoints / gpPerStage));
             if (newStage > (plot.currentStage || 0)) {
                 plot.currentStage = newStage;
@@ -5541,11 +4784,10 @@ const Garden = {
             return;
         }
         state.inventory.gardenItems.water--;
-        state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 30);
+        state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 25);
         Gamification.saveState(state);
         this.render();
         this.flashWaterMeter();
-        this._dismissWaterPrompt();
     },
 
     waterPlot(plotIdx) {
@@ -5560,7 +4802,7 @@ const Garden = {
         state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 15);
         const seed = Gamification.SHOP.seeds[plot.seedType];
         if (seed) {
-            const bonus = Math.max(2, Math.ceil(seed.gpNeeded * 0.12));
+            const bonus = Math.ceil(seed.gpNeeded * 0.1);
             plot.growthPoints = (plot.growthPoints || 0) + bonus;
             const gpPerStage = seed.gpNeeded / (seed.stages - 1);
             const newStage = Math.min(seed.stages - 1, Math.floor(plot.growthPoints / gpPerStage));
@@ -5572,7 +4814,6 @@ const Garden = {
         Gamification.saveState(state);
         this.render();
         this.flashWaterMeter();
-        this._dismissWaterPrompt();
     },
 
     // Decay water over time (called on init and periodically)
@@ -5583,7 +4824,7 @@ const Garden = {
         const hoursPassed = (now - last) / (1000 * 60 * 60);
 
         if (hoursPassed >= 1) {
-            const decay = Math.floor(hoursPassed * 3.5);
+            const decay = Math.floor(hoursPassed * 5);
             state.garden.waterLevel = Math.max(0, (state.garden.waterLevel || 100) - decay);
             state.garden.lastWaterDecay = now;
 
@@ -5618,7 +4859,7 @@ const Garden = {
         }
 
         const isTesting = typeof App !== 'undefined' && App && App.mode === 'test';
-        const growthRatePerHour = isTesting ? 2.8 : 1.8; // GP-equivalent per hour
+        const growthRatePerHour = isTesting ? 2.5 : 1.4; // GP-equivalent per hour
         const gpBonus = hoursPassed * growthRatePerHour;
         if (gpBonus <= 0) {
             Gamification.saveState(state);
@@ -5657,10 +4898,8 @@ const Garden = {
         const state = Gamification.getState();
         const now = Date.now();
         const timeScale = Math.max(1, Gamification.PET_DECAY_TIMESCALE || 1);
-        const diffConfig = this.getDifficultyConfig(state);
         const pets = state.pets || [state.studyBuddy];
         const petCount = pets.length;
-        const care = state.petCare || { foodBowl: 0, waterBowl: 0, maxFood: 400, maxWater: 500 };
 
         let anyChanged = false;
         const lastActiveTs = state.stats?.lastActiveTimestamp || now;
@@ -5679,29 +4918,14 @@ const Garden = {
             const stageMultiplier = 1 + Math.max(0, (pet.stage || 1) - 1) * 0.25;
             const decayRate = diff * crowdPenalty * stageMultiplier;
 
-            const hungerDecay = scaledHours * 12 * decayRate * diffConfig.hungerDecay;
-            const happyDecay = scaledHours * 8 * decayRate * diffConfig.happinessDecay;
+            const hungerDecay = scaledHours * 12 * decayRate;
+            const happyDecay = scaledHours * 8 * decayRate;
 
             pet.hunger = Math.max(0, (pet.hunger ?? 100) - hungerDecay);
             pet.happiness = Math.max(0, (pet.happiness ?? 100) - happyDecay);
 
-            if (state.settings.petBowlsEnabled && care.foodBowl > 0 && (pet.hunger ?? 0) < 100) {
-                const needed = 100 - (pet.hunger ?? 0);
-                const caloriesNeeded = needed * diffConfig.caloriesPerPoint;
-                const consumed = Math.min(caloriesNeeded, care.foodBowl);
-                care.foodBowl -= consumed;
-                pet.hunger = Math.min(100, (pet.hunger ?? 0) + consumed / diffConfig.caloriesPerPoint);
-            }
-            if (state.settings.petBowlsEnabled && care.waterBowl > 0 && (pet.happiness ?? 0) < 100) {
-                const neededHappy = 100 - (pet.happiness ?? 0);
-                const waterNeeded = neededHappy * diffConfig.waterPerPoint;
-                const consumedWater = Math.min(waterNeeded, care.waterBowl);
-                care.waterBowl -= consumedWater;
-                pet.happiness = Math.min(100, (pet.happiness ?? 0) + consumedWater / diffConfig.waterPerPoint);
-            }
-
             // Passive care minutes (1 per real hour)
-            const passiveCare = Math.min(scaledHours * 1.25, 30);
+            const passiveCare = Math.min(scaledHours, 24);
             pet.careMinutes = (pet.careMinutes || 0) + passiveCare;
 
             // Sickness at both below 15
@@ -5725,7 +4949,7 @@ const Garden = {
             buddy.happiness = Math.min(100, (buddy.happiness ?? 0) + bH * 5);
         }
         if ((buddy.happiness ?? 0) > 75 && bH > 0) {
-            state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + bH * 3.5);
+            state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + bH * 2.5);
         }
 
         if (anyChanged) {
@@ -6360,172 +5584,32 @@ const SessionState = {
 // =====================================================================
 const Session = {
     startTime: 0,
-    stateChangedAt: 0,
-    activeMs: 0,
-    idleMs: 0,
-    currentState: 'idle',
-    lastActivityTs: 0,
-    idleThresholdMs: 60000,
-    isRunning: false,
-    monitorReady: false,
-
     start() {
-        if (this.isRunning) this.end();
-        this._ensureMonitor();
-        const now = Date.now();
-        this.startTime = now;
-        this.stateChangedAt = now;
-        this.activeMs = 0;
-        this.idleMs = 0;
-        this.currentState = 'active';
-        this.lastActivityTs = now;
-        this.isRunning = true;
+        this.startTime = Date.now();
     },
-
     end() {
-        if (!this.isRunning) return;
-        const now = Date.now();
-        this._accumulateState(now);
-        this.isRunning = false;
-
-        const activeMins = Math.round(this.activeMs / 60000);
-        const idleMins = Math.round(this.idleMs / 60000);
-
-        if (activeMins > 0 || idleMins > 0) {
-            const stats = Store.get('globalStats', DailyGoal.getDefaultStats());
-            stats.totalStudyMins = (stats.totalStudyMins || 0) + activeMins;
-            stats.totalIdleMins = (stats.totalIdleMins || 0) + idleMins;
+        if (!this.startTime) return;
+        const mins = Math.round((Date.now() - this.startTime) / 60000);
+        if (mins > 0) {
+            // Update globalStats.totalStudyMins
+            const stats = Store.get('globalStats', { totalStudyMins: 0 });
+            stats.totalStudyMins = (stats.totalStudyMins || 0) + mins;
             Store.set('globalStats', stats);
 
-            const today = this._getDayKey();
+            // Update studyByDay for today
+            const d = new Date();
+            const today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
             const studyByDay = Store.get('studyByDay', {});
-            const existing = this.normalizeDayEntry(studyByDay[today]);
-            studyByDay[today] = {
-                active: existing.active + activeMins,
-                idle: existing.idle + idleMins
-            };
+            studyByDay[today] = (studyByDay[today] || 0) + mins;
             Store.set('studyByDay', studyByDay);
         }
-
         this.startTime = 0;
-        this.stateChangedAt = 0;
-        this.activeMs = 0;
-        this.idleMs = 0;
-        this.currentState = 'idle';
-        this.lastActivityTs = 0;
     },
-
-    markActive() {
-        if (!this.isRunning) return;
-        this.lastActivityTs = Date.now();
-        if (this.currentState === 'idle') {
-            this._transition('active');
-        }
-    },
-
-    markIdle() {
-        if (!this.isRunning) return;
-        if (this.currentState !== 'idle') {
-            this._transition('idle');
-        }
-    },
-
     getTodayMins() {
-        return this.getTodayBreakdown().active;
-    },
-
-    getTodayBreakdown() {
+        const d = new Date();
+        const today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         const studyByDay = Store.get('studyByDay', {});
-        return this.normalizeDayEntry(studyByDay[this._getDayKey()]);
-    },
-
-    normalizeDayEntry(entry) {
-        if (entry === undefined || entry === null) return { active: 0, idle: 0 };
-        if (typeof entry === 'number') return { active: entry, idle: 0 };
-        return {
-            active: Math.max(0, entry.active || 0),
-            idle: Math.max(0, entry.idle || 0)
-        };
-    },
-
-    _transition(nextState) {
-        const now = Date.now();
-        this._accumulateState(now);
-        this.currentState = nextState;
-        this.stateChangedAt = now;
-        if (nextState === 'idle') {
-            Gamification.pauseQuestionTimer({ auto: true });
-        } else if (nextState === 'active') {
-            Gamification.resumeQuestionTimer();
-        }
-    },
-
-    _accumulateState(now) {
-        if (!this.currentState || !this.stateChangedAt) {
-            this.stateChangedAt = now;
-            return;
-        }
-        const delta = Math.max(0, now - this.stateChangedAt);
-        if (this.currentState === 'active') {
-            this.activeMs += delta;
-        } else if (this.currentState === 'idle') {
-            this.idleMs += delta;
-        }
-    },
-
-    _getDayKey(date = new Date()) {
-        return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
-    },
-
-    _ensureMonitor() {
-        if (this.monitorReady) return;
-        ActivityMonitor.init();
-        this.monitorReady = true;
-    }
-};
-
-const ActivityMonitor = {
-    initialized: false,
-    lastMouseMove: 0,
-    mouseThrottleMs: 1500,
-    idleCheckTimer: null,
-
-    init() {
-        if (this.initialized) return;
-        const activityHandler = () => Session.markActive();
-        ['pointerdown', 'pointerup', 'keydown', 'touchstart', 'wheel'].forEach(evt => {
-            document.addEventListener(evt, activityHandler, { passive: true });
-        });
-        document.addEventListener('mousemove', this._onMouseMove.bind(this), { passive: true });
-        window.addEventListener('focus', activityHandler);
-        window.addEventListener('blur', () => Session.markIdle());
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                Session.markIdle();
-            } else {
-                Session.markActive();
-            }
-        });
-
-        this.idleCheckTimer = setInterval(() => {
-            if (!Session.isRunning) return;
-            if (document.hidden) {
-                Session.markIdle();
-                return;
-            }
-            if (Date.now() - Session.lastActivityTs >= Session.idleThresholdMs) {
-                Session.markIdle();
-            }
-        }, 10000);
-
-        this.initialized = true;
-    },
-
-    _onMouseMove() {
-        const now = Date.now();
-        if (now - this.lastMouseMove < this.mouseThrottleMs) return;
-        this.lastMouseMove = now;
-        Session.markActive();
+        return studyByDay[today] || 0;
     }
 };
 
@@ -6534,67 +5618,17 @@ const ActivityMonitor = {
 // =====================================================================
 const DailyGoal = {
     getTodayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
-    getDefaultStats() { return { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0, totalIdleMins: 0, streak: 0, lastStudyDate: null, dailyGoal: 10, questionsToday: 0, todayDate: null }; },
+    getDefaultStats() { return { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0, streak: 0, lastStudyDate: null, dailyGoal: 10, questionsToday: 0, todayDate: null }; },
     getStats() { const defaults = this.getDefaultStats(); const stats = Store.get('globalStats', defaults); return { ...defaults, ...stats }; },
     saveStats(stats) { Store.set('globalStats', stats); },
     checkDateReset(stats) { const today = this.getTodayStr(); if (stats.todayDate !== today) { stats.questionsToday = 0; stats.todayDate = today; } return stats; },
     updateStreak(stats) { const today = this.getTodayStr(); const lastDate = stats.lastStudyDate; if (!lastDate) { stats.streak = 1; } else if (lastDate !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); const yesterdayStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0'); stats.streak = (lastDate === yesterdayStr) ? stats.streak + 1 : 1; } stats.lastStudyDate = today; return stats; },
     recordQuestion() { return this.recordQuestions(1); },
-    recordQuestions(count) {
-        let stats = this.getStats();
-        stats = this.checkDateReset(stats);
-        const wasGoalMet = stats.questionsToday >= stats.dailyGoal;
-        stats.questionsToday += count;
-        const isGoalMet = stats.questionsToday >= stats.dailyGoal;
-        if (!wasGoalMet && isGoalMet) {
-            stats = this.updateStreak(stats);
-            Gamification.awardXp('dailyGoalReached');
-            Gamification.triggerConfetti();
-            Gamification.checkStreakAchievements(stats.streak);
-            if (stats.streak > 0 && stats.streak % 7 === 0) {
-                Gamification.awardXp('weeklyGoalReached');
-            }
-        }
-        this.saveStats(stats);
-        this.refreshUI();
-        return !wasGoalMet && isGoalMet;
-    },
-    setGoal(goal) {
-        let stats = this.getStats();
-        stats.dailyGoal = goal;
-        this.saveStats(stats);
-        this.refreshUI();
-    },
+    recordQuestions(count) { let stats = this.getStats(); stats = this.checkDateReset(stats); const wasGoalMet = stats.questionsToday >= stats.dailyGoal; stats.questionsToday += count; const isGoalMet = stats.questionsToday >= stats.dailyGoal; if (!wasGoalMet && isGoalMet) { stats = this.updateStreak(stats); Gamification.awardXp('dailyGoalReached'); Gamification.triggerConfetti(); Gamification.checkStreakAchievements(stats.streak); if (stats.streak > 0 && stats.streak % 7 === 0) { Gamification.awardXp('weeklyGoalReached'); } } this.saveStats(stats); return !wasGoalMet && isGoalMet; },
+    setGoal(goal) { let stats = this.getStats(); stats.dailyGoal = goal; this.saveStats(stats); },
     checkStreakOnLoad() { let stats = this.getStats(); stats = this.checkDateReset(stats); const today = this.getTodayStr(); const lastDate = stats.lastStudyDate; if (lastDate && lastDate !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); const yesterdayStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0'); if (lastDate !== yesterdayStr) { stats.streak = 0; this.saveStats(stats); } } return stats; },
-    renderStreakBanner(statsOverride) {
-        const el = document.getElementById('streakBanner');
-        if (!el) return;
-        const stats = statsOverride ? { ...statsOverride } : this.checkStreakOnLoad();
-        const streak = stats.streak || 0;
-        const hasStreak = streak > 0;
-        el.innerHTML = '<div class="streak-banner ' + (hasStreak ? '' : 'no-streak') + '"><span class="streak-flame">\uD83D\uDD25</span><div class="streak-info"><div class="streak-count">' + streak + ' day' + (streak !== 1 ? 's' : '') + '</div><div class="streak-label">' + (hasStreak ? 'Study Streak' : 'Start your streak today!') + '</div></div></div>';
-    },
-    renderDailyGoalCard(statsOverride) {
-        const el = document.getElementById('dailyGoalCard');
-        if (!el) return;
-        const stats = statsOverride ? { ...statsOverride } : this.getStats();
-        const today = this.getTodayStr();
-        let questionsToday = stats.questionsToday || 0;
-        if (stats.todayDate !== today) { questionsToday = 0; }
-        const goal = stats.dailyGoal || 10;
-        const pct = Math.round((Math.min(questionsToday, goal) / goal) * 100);
-        const isComplete = questionsToday >= goal;
-        el.innerHTML = '<div class="daily-goal-card"><h3>\uD83C\uDFAF Daily Goal</h3><div class="goal-progress"><div class="goal-bar"><div class="goal-bar-fill ' + (isComplete ? 'complete' : '') + '" style="width:' + pct + '%"></div></div><div class="goal-text ' + (isComplete ? 'complete' : '') + '">' + questionsToday + '/' + goal + ' questions</div></div>' + (isComplete ? '<div class="goal-celebration">Goal reached! Great job today!</div>' : '') + '</div>';
-    },
-    refreshUI() {
-        const stats = this.getStats();
-        this.renderDailyGoalCard(stats);
-        this.renderStreakBanner(stats);
-        const select = document.getElementById('settingDailyGoal');
-        if (select && String(stats.dailyGoal || 10) !== select.value) {
-            select.value = String(stats.dailyGoal || 10);
-        }
-    }
+    renderStreakBanner() { const stats = this.checkStreakOnLoad(); const el = document.getElementById('streakBanner'); if (!el) return; const streak = stats.streak || 0; const hasStreak = streak > 0; el.innerHTML = '<div class="streak-banner ' + (hasStreak ? '' : 'no-streak') + '"><span class="streak-flame">\uD83D\uDD25</span><div class="streak-info"><div class="streak-count">' + streak + ' day' + (streak !== 1 ? 's' : '') + '</div><div class="streak-label">' + (hasStreak ? 'Study Streak' : 'Start your streak today!') + '</div></div></div>'; },
+    renderDailyGoalCard() { const stats = this.getStats(); const el = document.getElementById('dailyGoalCard'); if (!el) return; const today = this.getTodayStr(); let questionsToday = stats.questionsToday || 0; if (stats.todayDate !== today) { questionsToday = 0; } const goal = stats.dailyGoal || 10; const pct = Math.round((Math.min(questionsToday, goal) / goal) * 100); const isComplete = questionsToday >= goal; el.innerHTML = '<div class="daily-goal-card"><h3>\uD83C\uDFAF Daily Goal</h3><div class="goal-progress"><div class="goal-bar"><div class="goal-bar-fill ' + (isComplete ? 'complete' : '') + '" style="width:' + pct + '%"></div></div><div class="goal-text ' + (isComplete ? 'complete' : '') + '">' + questionsToday + '/' + goal + ' questions</div></div>' + (isComplete ? '<div class="goal-celebration">Goal reached! Great job today!</div>' : '') + '</div>'; }
 };
 
 // =====================================================================
@@ -6674,15 +5708,12 @@ const Home = {
         const totalQ = Object.keys(drillData).length;
         const mastered = Object.values(drillData).filter(d => d.ef >= 2.5 && d.reps >= 3).length;
         const masteryPct = totalQ > 0 ? Math.round((mastered / totalQ) * 100) : 0;
-        const todayBreakdown = Session.getTodayBreakdown();
-        const todayActive = todayBreakdown.active;
-        const todayIdle = todayBreakdown.idle;
-        const totalActive = stats.totalStudyMins || 0;
-        const totalIdle = stats.totalIdleMins || 0;
+        const todayMins = Session.getTodayMins();
+        const totalMins = stats.totalStudyMins || 0;
 
         document.getElementById('homeStats').innerHTML = `
-            <div class="stat-card"><div class="stat-val">${todayActive}m</div><div class="stat-lbl">Today (Active)</div><div class="stat-sub">Idle ${todayIdle}m</div></div>
-            <div class="stat-card"><div class="stat-val">${totalActive}m</div><div class="stat-lbl">Lifetime Active</div><div class="stat-sub">Idle ${totalIdle}m</div></div>
+            <div class="stat-card"><div class="stat-val">${todayMins}m</div><div class="stat-lbl">Today</div></div>
+            <div class="stat-card"><div class="stat-val">${totalMins}m</div><div class="stat-lbl">Total Study</div></div>
             <div class="stat-card"><div class="stat-val">${stats.testsCompleted}</div><div class="stat-lbl">Tests Taken</div></div>
             <div class="stat-card"><div class="stat-val">${Math.round(stats.avgScore || 0)}%</div><div class="stat-lbl">Avg Score</div></div>
             <div class="stat-card"><div class="stat-val">${masteryPct}%</div><div class="stat-lbl">Mastery</div></div>
@@ -6777,7 +5808,6 @@ const App = {
     startTime: 0,
     answerHistory: {},    // { qIndex: [firstAnswer, ...changesArray] }
     confidence: {},       // { qIndex: 1|2|3 } (1=Maybe, 2=Probably, 3=Definitely)
-    _recentQuestionLimit: 80,
 
     // Pending start state for question count picker
     _pendingBankId: null,
@@ -6849,10 +5879,16 @@ const App = {
         // Clear any saved session so we don't restore stale state on reload
         SessionState.clear();
 
-        const indices = this._buildQuestionSelection(this.bank, count);
+        // Shuffle indices and pick requested number of questions
+        let indices = this.bank.questions.map((_, i) => i);
+        // Fisher-Yates shuffle
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        indices = indices.slice(0, Math.min(count, indices.length));
         this._questionIndices = indices;
         this.questions = indices.map(i => this.bank.questions[i]);
-        this._recordRecentQuestions(this.bank.bankId, this.questions.map(q => q.id));
 
         // Shuffle answer options for each question (keeps correctAnswer mapping)
         this._optionMaps = {};
@@ -6912,126 +5948,6 @@ const App = {
         // Chat context
         Chat.clearHistory();
         document.getElementById('chatFab').classList.add('has-context');
-    },
-
-    _buildQuestionSelection(bank, requestedCount) {
-        if (!bank || !bank.questions || bank.questions.length === 0) return [];
-        const total = bank.questions.length;
-        const target = Math.min(requestedCount || total, total);
-        const weakCategories = this._getWeakCategories();
-        const recents = this._getRecentQuestions(bank.bankId);
-        const recentIndex = new Map();
-        recents.forEach((id, idx) => recentIndex.set(id, idx));
-        const gamifyState = Gamification.getState ? Gamification.getState() : null;
-        const confSpacingEnabled = !!(gamifyState && gamifyState.settings && gamifyState.settings.confidenceSpacingEnabled);
-        const trackerData = confSpacingEnabled && QuestionTracker.getAll ? QuestionTracker.getAll() : null;
-        const now = Date.now();
-
-        const items = bank.questions.map((q, idx) => {
-            const category = q.category || 'General';
-            const isWeak = weakCategories.has(category);
-            let weight = 1;
-            if (isWeak) weight += 2;
-            const recentPos = recentIndex.get(q.id);
-            if (recentPos === undefined) {
-                weight += 1.5;
-            } else {
-                const penalty = Math.max(0.2, 1 - (recentPos / Math.max(recents.length, 1)));
-                weight *= penalty;
-            }
-
-            if (confSpacingEnabled && trackerData && q.id) {
-                const entry = trackerData[q.id];
-                if (entry && entry.history && entry.history.length > 0) {
-                    const streak = entry.highConfidenceStreak || 0;
-                    const last = entry.history[entry.history.length - 1];
-                    const lastDate = last?.date || now;
-                    const hoursSince = (now - lastDate) / (1000 * 60 * 60);
-                    if (streak >= 4 && hoursSince < 96 && last.confidenceLevel === 3 && last.correct) {
-                        weight *= 0.15;
-                    } else if (streak >= 3 && hoursSince < 72 && last.confidenceLevel === 3 && last.correct) {
-                        weight *= 0.25;
-                    } else if (streak >= 2 && hoursSince < 48 && last.confidenceLevel === 3 && last.correct) {
-                        weight *= 0.4;
-                    } else if (streak >= 2 && hoursSince < 72 && last.confidenceLevel === 3 && last.correct) {
-                        weight *= 0.6;
-                    }
-                }
-            }
-
-            weight = Math.max(weight, 0.05);
-            return { idx, id: q.id, category, weak: isWeak, weight: Math.max(weight, 0.1) };
-        });
-
-        if (!items.length) return [];
-
-        const weakPool = items.filter(item => item.weak);
-        const desiredWeak = Math.min(weakPool.length, Math.max(1, Math.round(target * 0.3)));
-
-        const selectedItems = [];
-        if (desiredWeak > 0) {
-            selectedItems.push(...this._weightedSample(weakPool, desiredWeak));
-        }
-
-        const selectedIdx = new Set(selectedItems.map(item => item.idx));
-        const remainingNeeded = target - selectedItems.length;
-        if (remainingNeeded > 0) {
-            const remainingPool = items.filter(item => !selectedIdx.has(item.idx));
-            selectedItems.push(...this._weightedSample(remainingPool, remainingNeeded));
-        }
-
-        if (selectedItems.length < target) {
-            const unused = items.filter(item => !selectedIdx.has(item.idx) && !selectedItems.some(sel => sel.idx === item.idx));
-            while (selectedItems.length < target && unused.length > 0) {
-                const rand = Math.floor(Math.random() * unused.length);
-                const [picked] = unused.splice(rand, 1);
-                selectedItems.push(picked);
-            }
-        }
-
-        return selectedItems.slice(0, target).map(item => item.idx);
-    },
-
-    _weightedSample(pool, count) {
-        if (!pool || pool.length === 0 || count <= 0) return [];
-        const working = pool.map(item => ({ ...item }));
-        const picks = [];
-        while (picks.length < count && working.length > 0) {
-            const totalWeight = working.reduce((sum, item) => sum + Math.max(item.weight || 0, 0.0001), 0);
-            let r = Math.random() * totalWeight;
-            let pickIndex = 0;
-            for (; pickIndex < working.length; pickIndex++) {
-                r -= Math.max(working[pickIndex].weight || 0, 0.0001);
-                if (r <= 0) break;
-            }
-            if (pickIndex >= working.length) pickIndex = working.length - 1;
-            const [picked] = working.splice(pickIndex, 1);
-            picks.push(picked);
-        }
-        return picks;
-    },
-
-    _getWeakCategories() {
-        const cats = QuestionTracker.getCategoryAccuracy();
-        const weak = new Set();
-        Object.entries(cats).forEach(([cat, data]) => {
-            if (data.total >= 3 && (data.correct / data.total) < 0.6) {
-                weak.add(cat);
-            }
-        });
-        return weak;
-    },
-
-    _getRecentQuestions(bankId) {
-        if (!bankId) return [];
-        return Store.get('recentQs_' + bankId, []);
-    },
-
-    _recordRecentQuestions(bankId, questionIds) {
-        if (!bankId || !Array.isArray(questionIds)) return;
-        const prev = this._getRecentQuestions(bankId);
-        const merged = questionIds.concat(prev.filter(id => !questionIds.includes(id)));
-        Store.set('recentQs_' + bankId, merged.slice(0, this._recentQuestionLimit));
     },
 
     paletteExpanded: false,
@@ -7107,11 +6023,9 @@ const App = {
     renderQuestion() {
         const q = this.questions[this.currentQ];
         document.getElementById('questionNumber').textContent = `Question ${this.currentQ + 1} of ${this.questions.length}`;
-        const qtEl = document.getElementById('questionText');
-        qtEl.innerHTML = escapeHtml(q.text).replace(/\n/g, '<br>');
-        // Render inline chart/table if provided
-        if (q.graphData) InlineChart.renderInElement(qtEl, q.graphData);
-        if (q.tableData) InlineTable.renderInElement(qtEl, q.tableData);
+        document.getElementById('questionText').innerHTML = escapeHtml(q.text).replace(/\n/g, '<br>');
+        // Render inline chart if question has graphData
+        if (q.graphData) InlineChart.renderInElement(document.getElementById('questionText'), q.graphData);
         // Render power-up bar
         this.renderPowerups();
 
@@ -7190,7 +6104,6 @@ const App = {
         document.getElementById('btnPrev').disabled = this.currentQ === 0;
 
         // Load note for current question
-        Notes.updateQuestionMeta();
         Notes.load();
         Notes.close(); // Close note panel when navigating
 
@@ -7246,14 +6159,7 @@ const App = {
             Gamification.incrementCombo();
             const trackerData = QuestionTracker._getData();
             const isFirstTry = !trackerData[q.id] || trackerData[q.id].attempts === 0;
-            const questionMeta = QuestionTracker.getAdaptiveMeta(q.id, q.difficulty);
-            const adaptiveMeta = {
-                difficulty: questionMeta.difficulty,
-                noveltyScore: questionMeta.noveltyScore,
-                streakPenalty: questionMeta.streakPenalty,
-                confidenceFactor: questionMeta.confidenceFactor
-            };
-            Gamification.awardXp(isFirstTry ? 'firstTryCorrect' : 'correctAnswer', { withCombo: true, questionMeta: adaptiveMeta });
+            Gamification.awardXp(isFirstTry ? 'firstTryCorrect' : 'correctAnswer', { withCombo: true });
             SoundFX.play('correct');
         } else {
             Gamification.resetCombo();
@@ -7265,16 +6171,7 @@ const App = {
         if (isCorrect) Garden.grow(1);
 
         DailyGoal.recordQuestion();
-        const confidenceLevel = this.confidence[this.currentQ] || null;
-        const questionMeta = QuestionTracker.getAdaptiveMeta(q.id, q.difficulty);
-        QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeSpent, { confidenceLevel });
-        const adaptiveMeta = {
-            difficulty: questionMeta.difficulty,
-            noveltyScore: questionMeta.noveltyScore,
-            streakPenalty: questionMeta.streakPenalty,
-            confidenceFactor: questionMeta.confidenceFactor
-        };
-        Gamification.awardXp(isCorrect ? (questionMeta.isFirstTry ? 'firstTryCorrect' : 'correctAnswer') : 'drillStruggled', { withCombo: true, questionMeta: adaptiveMeta });
+        QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeSpent);
         this.renderQuestion();
         SessionState.save();
     },
@@ -7906,15 +6803,7 @@ const Drill = {
         DailyGoal.recordQuestion();
 
         // Track per-question performance (AFTER firstTry check above)
-        const qMeta = QuestionTracker.getAdaptiveMeta(q.id, q.difficulty);
         QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeSpent);
-        const adaptiveMeta = {
-            difficulty: qMeta.difficulty,
-            noveltyScore: qMeta.noveltyScore,
-            streakPenalty: qMeta.streakPenalty,
-            confidenceFactor: qMeta.confidenceFactor
-        };
-        Gamification.awardXp(isCorrect ? (qMeta.isFirstTry ? 'firstTryCorrect' : 'drillGotIt') : 'drillStruggled', { withCombo: true, questionMeta: adaptiveMeta });
 
         SessionState.save();
         this.nextCard();
@@ -8335,8 +7224,6 @@ const AIPractice = {
     },
 
     async generateQuestion(category, difficulty) {
-        // Gentle pacing: small delay to simulate deliberation
-        await new Promise(res => setTimeout(res, 250));
         const provider = Store.get('provider', 'anthropic');
         const apiKey = provider === 'openai' ? Store.get('openaiKey', '') : Store.get('anthropicKey', '');
 
@@ -8532,21 +7419,12 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         DailyGoal.recordQuestion();
 
         // Track per-question performance
-        const qId = this.currentQuestion.id || ('ai_' + this.sessionStats.total);
-        const qMeta = QuestionTracker.getAdaptiveMeta(qId, this.currentQuestion.difficulty);
         QuestionTracker.recordSingle(
-            qId,
-            this.currentCategory || 'General', isCorrect, timeSpent,
-            { confidenceLevel: null }
+            this.currentQuestion.id || ('ai_' + this.sessionStats.total),
+            this.currentCategory || 'General', isCorrect, timeSpent
         );
-        const adaptiveMeta = {
-            difficulty: qMeta.difficulty,
-            noveltyScore: qMeta.noveltyScore,
-            streakPenalty: qMeta.streakPenalty,
-            confidenceFactor: qMeta.confidenceFactor
-        };
-        Gamification.awardXp(isCorrect ? (qMeta.isFirstTry ? 'firstTryCorrect' : 'correctAnswer') : 'drillStruggled', { withCombo: true, questionMeta: adaptiveMeta });
 
+        // Update global stats
         const globalStats = Store.get('globalStats', {});
         globalStats.aiPracticeTotal = (globalStats.aiPracticeTotal || 0) + 1;
         globalStats.aiPracticeCorrect = (globalStats.aiPracticeCorrect || 0) + (isCorrect ? 1 : 0);
@@ -8638,13 +7516,6 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
 
         const q = this.currentQuestion;
         const el = document.getElementById('aiCard');
-
-        // Reset chat context per question to avoid stale threads
-        if (Chat && Chat.clearHistory) {
-            Chat.clearHistory();
-            const fab = document.getElementById('chatFab');
-            if (fab) fab.classList.remove('has-context');
-        }
 
         // Difficulty indicator
         let diffHtml = '<div class="ai-difficulty"><span>Difficulty:</span><div class="diff-indicator">';
@@ -9093,7 +7964,7 @@ const Progress = {
     },
 
     renderStudyTime() {
-        const stats = Store.get('globalStats', { totalStudyMins: 0, totalIdleMins: 0 });
+        const stats = Store.get('globalStats', { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0 });
         const studyByDay = Store.get('studyByDay', {});
 
         const days = [];
@@ -9103,19 +7974,17 @@ const Progress = {
             d.setDate(d.getDate() - i);
             const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
             const dayName = dayNames[d.getDay()];
-            const entry = Session.normalizeDayEntry(studyByDay[key]);
-            days.push({ key, dayName, active: entry.active, idle: entry.idle });
+            days.push({ key: key, dayName: dayName, mins: studyByDay[key] || 0 });
         }
 
-        const maxMins = Math.max(...days.map(d => d.active + d.idle), 1);
+        const maxMins = Math.max(...days.map(d => d.mins), 1);
+
         const bars = days.map(d => {
-            const totalHeight = Math.round(((d.active + d.idle) / maxMins) * 70);
-            const idleHeight = totalHeight > 0 ? Math.round((d.idle / Math.max(d.active + d.idle, 1)) * totalHeight) : 0;
-            const activeHeight = totalHeight - idleHeight;
-            return `<div class="study-day" title="Active ${d.active}m | Idle ${d.idle}m"><div class="bar"><div class="bar-seg idle" style="height:${idleHeight}px"></div><div class="bar-seg active" style="height:${activeHeight}px"></div></div><span class="day-label">${d.dayName}</span></div>`;
+            const height = Math.round((d.mins / maxMins) * 70);
+            return '<div class="study-day"><div class="bar" style="height:' + height + 'px" title="' + d.mins + ' min"></div><span class="day-label">' + d.dayName + '</span></div>';
         }).join('');
 
-        return `<div class="progress-section"><h3>Study Time (Last 7 Days)</h3><p style="font-size:12px;color:var(--gray-600);margin:0">Blue = Active · Orange = Idle</p><div class="study-bars">${bars}</div><p style="text-align:center;font-size:12px;color:var(--gray-600);margin-top:8px">Active Total: ${stats.totalStudyMins || 0} m • Idle Logged: ${stats.totalIdleMins || 0} m</p></div>`;
+        return '<div class="progress-section"><h3>Study Time (Last 7 Days)</h3><div class="study-bars">' + bars + '</div><p style="text-align:center;font-size:12px;color:var(--gray-600);margin-top:8px">Total: ' + (stats.totalStudyMins || 0) + ' minutes</p></div>';
     }
 };
 
@@ -9131,10 +8000,6 @@ const Settings = {
         // Load daily goal setting
         const stats = DailyGoal.getStats();
         document.getElementById('settingDailyGoal').value = stats.dailyGoal || 10;
-        const eldenEnabled = Store.get('eldenModeEnabled', false);
-        const eldenSelect = document.getElementById('settingEldenMode');
-        if (eldenSelect) eldenSelect.value = eldenEnabled ? 'on' : 'off';
-        this._applyEldenModeClass(eldenEnabled);
     },
     save() {
         Store.set('anthropicKey', document.getElementById('settingAnthropicKey').value.trim());
@@ -9144,16 +8009,6 @@ const Settings = {
         Store.set('provider', document.getElementById('settingProvider').value);
         // Theme is already saved on change via Theme.apply()
         alert('Settings saved!');
-    },
-    setEldenMode(enabled) {
-        Store.set('eldenModeEnabled', !!enabled);
-        this._applyEldenModeClass(!!enabled);
-    },
-    isEldenModeEnabled() {
-        return !!Store.get('eldenModeEnabled', false);
-    },
-    _applyEldenModeClass(enabled) {
-        document.body.classList.toggle('elden-enabled', !!enabled);
     },
     exportAll() {
         // Flush gamification cache to localStorage before exporting
@@ -9347,8 +8202,7 @@ const Notes = {
         const btn = document.getElementById('btnNote');
         if (btn) {
             btn.classList.toggle('has-note', !!hasNote);
-            const label = btn.querySelector('.tool-label');
-            if (label) label.textContent = hasNote ? 'Notes *' : 'Notes';
+            btn.textContent = hasNote ? 'Notes *' : 'Notes';
         }
 
         // Update palette indicators
@@ -9419,7 +8273,6 @@ const Chat = {
 
     toggle() {
         this.isOpen = !this.isOpen;
-        if (!this.isOpen) this.stopSpeech();
         document.getElementById('chatPanel').classList.toggle('open', this.isOpen);
         document.getElementById('chatFab').style.display = this.isOpen ? 'none' : '';
         if (this.isOpen && this.history.length === 0) {
@@ -9430,7 +8283,6 @@ const Chat = {
     close() {
         this.isOpen = false;
         document.getElementById('chatPanel').classList.remove('open');
-        this.stopSpeech();
     },
 
     clearHistory() {
@@ -9599,14 +8451,6 @@ const Chat = {
         utterance.onend = () => { if (btn) btn.classList.remove('speaking'); };
         utterance.onerror = () => { if (btn) btn.classList.remove('speaking'); };
         speechSynthesis.speak(utterance);
-    },
-
-    stopSpeech() {
-        if (!('speechSynthesis' in window)) return;
-        if (speechSynthesis.speaking || speechSynthesis.pending) {
-            speechSynthesis.cancel();
-            document.querySelectorAll('.chat-tts-btn.speaking').forEach(b => b.classList.remove('speaking'));
-        }
     }
 };
 
@@ -9616,45 +8460,26 @@ const Chat = {
 const Calc = {
     isOpen: false,
     expr: '',
-    panel: null,
-    display: null,
-    dragHandle: null,
 
-    init() {
-        if (this.panel) return;
-        this.panel = document.getElementById('calcPanel');
-        this.display = document.getElementById('calcDisplay');
-        if (!this.panel) return;
-        this.dragHandle = this.panel.querySelector('.calc-header');
-        this._restorePosition();
-        this._ensureDraggable();
-    },
-
-    toggle(forceState) {
-        if (!this.panel) this.init();
-        const nextState = typeof forceState === 'boolean' ? forceState : !this.isOpen;
-        this.isOpen = nextState;
-        if (this.panel) this.panel.classList.toggle('open', this.isOpen);
-        const btn = document.getElementById('btnCalc');
-        if (btn) btn.classList.toggle('active', this.isOpen);
+    toggle() {
+        this.isOpen = !this.isOpen;
+        document.getElementById('calcPanel').classList.toggle('open', this.isOpen);
+        document.getElementById('btnCalc').classList.toggle('active', this.isOpen);
     },
 
     clear() {
         this.expr = '';
-        if (!this.display) this.display = document.getElementById('calcDisplay');
-        if (this.display) this.display.textContent = '0';
+        document.getElementById('calcDisplay').textContent = '0';
     },
 
     input(val) {
         this.expr += val;
-        if (!this.display) this.display = document.getElementById('calcDisplay');
-        if (this.display) this.display.textContent = this.expr || '0';
+        document.getElementById('calcDisplay').textContent = this.expr || '0';
     },
 
     backspace() {
         this.expr = this.expr.slice(0, -1);
-        if (!this.display) this.display = document.getElementById('calcDisplay');
-        if (this.display) this.display.textContent = this.expr || '0';
+        document.getElementById('calcDisplay').textContent = this.expr || '0';
     },
 
     equals() {
@@ -9663,79 +8488,17 @@ const Calc = {
             const sanitized = this.expr.replace(/[^0-9+\-*/().]/g, '');
             const result = Function('"use strict"; return (' + sanitized + ')')();
             if (!isFinite(result)) {
-                if (!this.display) this.display = document.getElementById('calcDisplay');
-                if (this.display) this.display.textContent = 'Error';
+                document.getElementById('calcDisplay').textContent = 'Error';
                 this.expr = '';
                 return;
             }
             const rounded = Math.round(result * 1000000) / 1000000;
-            if (!this.display) this.display = document.getElementById('calcDisplay');
-            if (this.display) this.display.textContent = rounded;
+            document.getElementById('calcDisplay').textContent = rounded;
             this.expr = String(rounded);
         } catch {
-            if (!this.display) this.display = document.getElementById('calcDisplay');
-            if (this.display) this.display.textContent = 'Error';
+            document.getElementById('calcDisplay').textContent = 'Error';
             this.expr = '';
         }
-    },
-
-    _restorePosition() {
-        const state = Gamification.getState?.();
-        const pos = state?.settings?.calcPosition;
-        if (!this.panel) return;
-        if (pos && typeof pos.left === 'number' && typeof pos.top === 'number') {
-            this.panel.style.left = pos.left + 'px';
-            this.panel.style.top = pos.top + 'px';
-            this.panel.style.bottom = 'auto';
-            this.panel.style.right = 'auto';
-        }
-    },
-
-    _ensureDraggable() {
-        if (!this.panel || !this.dragHandle || this.dragHandle.dataset.dragInit === '1') return;
-        this.dragHandle.dataset.dragInit = '1';
-
-        const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
-        let pointerId = null;
-        let offsetX = 0;
-        let offsetY = 0;
-
-        const onPointerMove = (e) => {
-            if (pointerId === null || e.pointerId !== pointerId) return;
-            e.preventDefault();
-            const maxLeft = Math.max(8, window.innerWidth - this.panel.offsetWidth - 8);
-            const maxTop = Math.max(8, window.innerHeight - this.panel.offsetHeight - 8);
-            const left = clamp(e.clientX - offsetX, 8, maxLeft);
-            const top = clamp(e.clientY - offsetY, 8, maxTop);
-            this.panel.style.left = left + 'px';
-            this.panel.style.top = top + 'px';
-            this.panel.style.right = 'auto';
-            this.panel.style.bottom = 'auto';
-            Gamification.saveWidgetPosition('calcPosition', { left, top });
-        };
-
-        const endDrag = (e) => {
-            if (pointerId === null || e.pointerId !== pointerId) return;
-            this.dragHandle.releasePointerCapture(pointerId);
-            pointerId = null;
-            document.removeEventListener('pointermove', onPointerMove);
-            document.removeEventListener('pointerup', endDrag);
-            document.removeEventListener('pointercancel', endDrag);
-            this.panel.classList.remove('dragging');
-        };
-
-        this.dragHandle.addEventListener('pointerdown', (e) => {
-            if (e.button !== 0) return;
-            pointerId = e.pointerId;
-            const rect = this.panel.getBoundingClientRect();
-            offsetX = e.clientX - rect.left;
-            offsetY = e.clientY - rect.top;
-            this.dragHandle.setPointerCapture(pointerId);
-            this.panel.classList.add('dragging');
-            document.addEventListener('pointermove', onPointerMove);
-            document.addEventListener('pointerup', endDrag);
-            document.addEventListener('pointercancel', endDrag);
-        });
     }
 };
 
@@ -9814,8 +8577,6 @@ const InlineChart = {
         ctx.lineWidth = 0.5;
         const xTicks = this._niceTicks(xMin, xMax, 8);
         const yTicks = this._niceTicks(yMin, yMax, 6);
-        const xTickFormatter = this._normalizeTickFormatter(gd.xTickFormat);
-        const yTickFormatter = this._normalizeTickFormatter(gd.yTickFormat);
 
         xTicks.forEach(v => {
             ctx.beginPath(); ctx.moveTo(sx(v), m.top); ctx.lineTo(sx(v), m.top + ph); ctx.stroke();
@@ -9834,12 +8595,12 @@ const InlineChart = {
         ctx.font = '11px Arial';
         ctx.textAlign = 'center';
         xTicks.forEach(v => {
-            const label = xTickFormatter ? xTickFormatter(v) : this._fmtNum(v);
+            const label = gd.xTickFormat ? gd.xTickFormat(v) : this._fmtNum(v);
             ctx.fillText(label, sx(v), m.top + ph + 16);
         });
         ctx.textAlign = 'right';
         yTicks.forEach(v => {
-            const label = yTickFormatter ? yTickFormatter(v) : this._fmtNum(v);
+            const label = gd.yTickFormat ? gd.yTickFormat(v) : this._fmtNum(v);
             ctx.fillText(label, m.left - 6, sy(v) + 4);
         });
 
@@ -10050,47 +8811,10 @@ const InlineChart = {
     },
 
     _fmtNum(v) {
-        if (!Number.isFinite(v)) return '0';
-        const abs = Math.abs(v);
-        if (abs >= 1e9) {
-            return (v / 1e9).toFixed(abs >= 1e10 ? 1 : 2).replace(/\.0+$/, '') + 'B';
-        }
-        if (abs >= 1e6) {
-            return (v / 1e6).toFixed(abs >= 1e7 ? 1 : 2).replace(/\.0+$/, '') + 'M';
-        }
-        if (Number.isInteger(v) && abs >= 1000) {
-            return Math.round(v).toString();
-        }
+        if (Math.abs(v) >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+        if (Math.abs(v) >= 1e3) return (v / 1e3).toFixed(v % 1000 === 0 ? 0 : 1) + 'K';
         if (Number.isInteger(v)) return v.toString();
-        const precision = abs >= 100 ? 1 : 2;
-        return v.toFixed(precision).replace(/\.0+$/, '').replace(/(\.\d*[1-9])0+$/, '$1');
-    },
-
-    _normalizeTickFormatter(format) {
-        if (!format) return null;
-        if (typeof format === 'function') return format;
-        if (typeof format === 'string') {
-            const key = format.trim().toLowerCase();
-            if (['militaryclock', 'military', '24h', '24hour', 'hundreds', 'hundredsclock', 'time-24h'].includes(key)) {
-                return (v) => this._formatHundredsClock(v);
-            }
-        }
-        return null;
-    },
-
-    _formatHundredsClock(value) {
-        if (!Number.isFinite(value)) return '00:00';
-        const isNegative = value < 0;
-        const absVal = Math.abs(Math.round(value));
-        let hours = Math.floor(absVal / 100);
-        let minutes = absVal % 100;
-        if (minutes >= 60) {
-            hours += Math.floor(minutes / 60);
-            minutes = minutes % 60;
-        }
-        hours = hours % 24;
-        const prefix = isNegative ? '-' : '';
-        return `${prefix}${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+        return v.toFixed(1);
     }
 };
 
@@ -10496,8 +9220,7 @@ const QuestionTracker = {
                 data[r.qId] = {
                     attempts: 0, correct: 0, incorrect: 0, skipped: 0,
                     totalTime: 0, category: r.category || 'General',
-                    history: [],
-                    highConfidenceStreak: 0
+                    history: []
                 };
             }
             const entry = data[r.qId];
@@ -10507,16 +9230,25 @@ const QuestionTracker = {
             else { entry.incorrect++; }
             entry.totalTime += r.timeSpent || 0;
             if (r.category) entry.category = r.category;
-            const highConfCorrect = r.confidenceLevel === 3 && r.correct;
-            if (r.confidenceLevel === 3) {
-                entry.highConfidenceStreak = highConfCorrect ? (entry.highConfidenceStreak || 0) + 1 : 0;
-            } else if (entry.highConfidenceStreak === undefined) {
-                entry.highConfidenceStreak = 0;
-            }
+            // Keep last 20 attempts
+            entry.history.push({
+                date: now, correct: r.correct, answered: r.answered,
+                chosen: r.chosen, time: r.timeSpent || 0
+            });
+            if (entry.history.length > 20) entry.history = entry.history.slice(-20);
         }
         this._save(data);
     },
 
+    // Record a single question attempt (for drill and AI practice)
+    recordSingle(qId, category, isCorrect, timeSpent) {
+        this.recordResults([{
+            qId, category, correct: isCorrect, answered: true,
+            chosen: null, correctAnswer: null, timeSpent: timeSpent || 0
+        }]);
+    },
+
+    // Get most missed questions (sorted by miss rate, min 2 attempts)
     getMostMissed(limit) {
         limit = limit || 10;
         const data = this._getData();
@@ -10586,40 +9318,6 @@ const QuestionTracker = {
             if (q) return { question: q, bankTitle: bank.title };
         }
         return null;
-    },
-
-    // Adaptive XP metadata helper
-    getAdaptiveMeta(qId, difficulty = 1) {
-        const data = this._getData();
-        const entry = data[qId];
-        const attempts = entry ? entry.attempts : 0;
-        const correct = entry ? entry.correct : 0;
-        const history = entry?.history || [];
-        const last = history.length ? history[history.length - 1] : null;
-        const hoursSince = last ? (Date.now() - last.date) / (1000 * 60 * 60) : Infinity;
-
-        // Novelty: new questions are rewarded more; mild decay with attempts
-        const noveltyScore = attempts === 0 ? 1.4 : Math.max(0.6, 1.2 - attempts * 0.1);
-
-        // Streak penalty for repeated recent high-confidence correct answers
-        let streakPenalty = 1.0;
-        if (entry && entry.highConfidenceStreak >= 3 && last && last.confidenceLevel === 3 && last.correct && hoursSince < 72) {
-            streakPenalty = 0.55;
-        } else if (entry && entry.highConfidenceStreak >= 2 && last && last.confidenceLevel === 3 && last.correct && hoursSince < 48) {
-            streakPenalty = 0.7;
-        }
-
-        // Confidence factor slightly rewards higher certainty
-        const confidenceFactor = last && last.confidenceLevel ? (1 + (last.confidenceLevel - 1) * 0.08) : 1.0;
-
-        return {
-            difficulty: Math.max(0.5, difficulty || 1),
-            noveltyScore,
-            streakPenalty,
-            confidenceFactor,
-            isFirstTry: attempts === 0,
-            accuracy: attempts > 0 ? correct / attempts : 0
-        };
     }
 };
 
