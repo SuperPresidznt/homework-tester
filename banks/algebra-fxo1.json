@@ -666,7 +666,7 @@
     },
     {
       "id": 13,
-      "text": "The following table compares the number of employees hired and the number of employees dismissed over an 11-year period for a certain business.\n [Table: Employees Hired vs Dismissed 2007-2017]\n What can be concluded from this table?",
+      "text": "The following table compares the number of employees hired and the number of employees dismissed over an 11-year period for a certain business.\n\nYear:   2007 2008 2009 2010 2011 2012 2013 2014 2015 2016 2017\nHired:     50   20   30   21   60   70   40   15   20   10   10\nDismissed: 10   10    5   17   30   15   20    5    6    2    7\n\nWhat can be concluded from this table?",
       "options": [
         "Fewer employees were hired than dismissed each year.",
         "More employees were hired in 2007 and 2008 than in 2010 and 2011.",
@@ -681,7 +681,28 @@
         "compare",
         "employees"
       ],
-      "difficulty": 1
+      "difficulty": 1,
+      "tableData": {
+        "caption": "Employees Hired vs Dismissed (2007-2017)",
+        "columns": [
+          { "key": "year", "label": "Year" },
+          { "key": "hired", "label": "Hired" },
+          { "key": "dismissed", "label": "Dismissed" }
+        ],
+        "rows": [
+          { "year": 2007, "hired": 50, "dismissed": 10 },
+          { "year": 2008, "hired": 20, "dismissed": 10 },
+          { "year": 2009, "hired": 30, "dismissed": 5 },
+          { "year": 2010, "hired": 21, "dismissed": 17 },
+          { "year": 2011, "hired": 60, "dismissed": 30 },
+          { "year": 2012, "hired": 70, "dismissed": 15 },
+          { "year": 2013, "hired": 40, "dismissed": 20 },
+          { "year": 2014, "hired": 15, "dismissed": 5 },
+          { "year": 2015, "hired": 20, "dismissed": 6 },
+          { "year": 2016, "hired": 10, "dismissed": 2 },
+          { "year": 2017, "hired": 10, "dismissed": 7 }
+        ]
+      }
     },
     {
       "id": 14,
@@ -723,7 +744,7 @@
     },
     {
       "id": 16,
-      "text": "An airplane was cruising at an altitude of 39,000 feet and descended as shown in the table below.\n Time (min): 0,10,20,30,40,50,60 | Altitude (ft): 39000,33000,27000,21000,15000,9000,3000\n What can be concluded from this table?",
+      "text": "An airplane was cruising at an altitude of 39,000 feet and descended as shown in the table below.\n\nTime (min):      0   10   20   30   40   50   60\nAltitude (ft): 39000 33000 27000 21000 15000  9000  3000\n\nWhat can be concluded from this table?",
       "options": [
         "The airplane had a descent rate of 600 ft./min.",
         "At minute 70, the airplane landed.",
@@ -738,11 +759,27 @@
         "constant",
         "descent"
       ],
-      "difficulty": 1
+      "difficulty": 1,
+      "tableData": {
+        "caption": "Airplane Descent Data",
+        "columns": [
+          { "key": "time", "label": "Time (min)" },
+          { "key": "altitude", "label": "Altitude (ft)" }
+        ],
+        "rows": [
+          { "time": 0, "altitude": 39000 },
+          { "time": 10, "altitude": 33000 },
+          { "time": 20, "altitude": 27000 },
+          { "time": 30, "altitude": 21000 },
+          { "time": 40, "altitude": 15000 },
+          { "time": 50, "altitude": 9000 },
+          { "time": 60, "altitude": 3000 }
+        ]
+      }
     },
     {
       "id": 17,
-      "text": "The function table below shows a company's revenue function (R) and expense function (E) for each month.\n Monthly Revenues and Expenses for months 1-12 provided.\n Which conclusion can be made about this function table?",
+      "text": "The function table below shows a company's revenue function (R) and expense function (E) for each month (m = 1 is January).\n\nMonth (m):   1     2     3     4     5     6     7     8      9      10     11     12\nR(m) ($):   2000  3220  2579  4100  5328  6745  5995 10200  9455  12337  10234   7195\nE(m) ($):   2200  3957  2504  1675  2122  1990  2111  3183   4129    927   3786   2199\n\nWhich conclusion can be made about this function table?",
       "options": [
         "Since R(11) is $10,234 and E(11) is $3,786, there was not a profit in November.",
         "The lowest profit occurred during May.",
@@ -757,11 +794,33 @@
         "profit",
         "compute"
       ],
-      "difficulty": 2
+      "difficulty": 2,
+      "tableData": {
+        "caption": "Monthly Revenue and Expenses",
+        "columns": [
+          { "key": "month", "label": "Month (m)" },
+          { "key": "revenue", "label": "R(m) ($)" },
+          { "key": "expense", "label": "E(m) ($)" }
+        ],
+        "rows": [
+          { "month": 1, "revenue": 2000, "expense": 2200 },
+          { "month": 2, "revenue": 3220, "expense": 3957 },
+          { "month": 3, "revenue": 2579, "expense": 2504 },
+          { "month": 4, "revenue": 4100, "expense": 1675 },
+          { "month": 5, "revenue": 5328, "expense": 2122 },
+          { "month": 6, "revenue": 6745, "expense": 1990 },
+          { "month": 7, "revenue": 5995, "expense": 2111 },
+          { "month": 8, "revenue": 10200, "expense": 3183 },
+          { "month": 9, "revenue": 9455, "expense": 4129 },
+          { "month": 10, "revenue": 12337, "expense": 927 },
+          { "month": 11, "revenue": 10234, "expense": 3786 },
+          { "month": 12, "revenue": 7195, "expense": 2199 }
+        ]
+      }
     },
     {
       "id": 18,
-      "text": "The original value of a company car bought in January of 2006 was $22,800. Below is a function table that tracks the value of the car V(y) as it depreciates from 2006 to 2015.\n Which other conclusion can be reached from this table?",
+      "text": "The original value of a company car bought in January of 2006 was $22,800. The table shows the value of the car V(y), in dollars, for years 2006-2015.\n\nYear (y): 2006 2007 2008 2009 2010 2011 2012 2013 2014 2015\nV(y):    22,800 18,240 15,504 13,178 11,101 9,346 7,864 6,613 5,571 4,970\n\nWhich other conclusion can be reached from this table?",
       "options": [
         "V(y) decreases the most from 2006 to 2007.",
         "V(y) decreases by the same amount each year.",
@@ -769,14 +828,33 @@
         "V($4,970) = 2015"
       ],
       "correctAnswer": 0,
-      "explanation": "From 2006 to 2007: $22,800 - $18,240 = $4,560 decrease. From 2007 to 2008: $18,240 - $15,504 = $2,736. Each subsequent year's decrease is smaller than $4,560, so the largest single-year decrease is from 2006 to 2007.",
+      "explanation": "Check the year-by-year changes from the table: 2006-2007 drops $4,560, while 2007-2008 drops $2,736 and every following year drops even less (e.g., 2008-2009 drops $2,326 and the final drop is only $601). Therefore the greatest decrease happens between 2006 and 2007, so option A is the only valid conclusion.",
       "category": "Rate of Change",
       "tags": [
         "rate-of-change",
         "depreciation",
         "maximum-change"
       ],
-      "difficulty": 2
+      "difficulty": 2,
+      "tableData": {
+        "caption": "Company Car Value by Year",
+        "columns": [
+          { "key": "year", "label": "Year" },
+          { "key": "value", "label": "V(y) ($)" }
+        ],
+        "rows": [
+          { "year": 2006, "value": 22800 },
+          { "year": 2007, "value": 18240 },
+          { "year": 2008, "value": 15504 },
+          { "year": 2009, "value": 13178 },
+          { "year": 2010, "value": 11101 },
+          { "year": 2011, "value": 9346 },
+          { "year": 2012, "value": 7864 },
+          { "year": 2013, "value": 6613 },
+          { "year": 2014, "value": 5571 },
+          { "year": 2015, "value": 4970 }
+        ]
+      }
     },
     {
       "id": 19,
@@ -1163,7 +1241,38 @@
         "polynomial",
         "compute"
       ],
-      "difficulty": 3
+      "difficulty": 3,
+      "graphData": {
+        "type": "line",
+        "title": "Hours of Sunlight",
+        "xLabel": "Month (0 = December)",
+        "yLabel": "Sunlight Hours",
+        "xMin": 0,
+        "xMax": 12,
+        "yMin": 6,
+        "yMax": 16,
+        "noFill": true,
+        "series": [
+          {
+            "label": "Sunlight",
+            "type": "line",
+            "data": [
+              { "x": 0, "y": 9 },
+              { "x": 1, "y": 9.5 },
+              { "x": 2, "y": 10.7 },
+              { "x": 3, "y": 12.5 },
+              { "x": 4, "y": 14.0 },
+              { "x": 5, "y": 15.0 },
+              { "x": 6, "y": 15.2 },
+              { "x": 7, "y": 14.5 },
+              { "x": 8, "y": 13.2 },
+              { "x": 9, "y": 12.0 },
+              { "x": 10, "y": 10.8 },
+              { "x": 11, "y": 9.6 }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": 29,
@@ -1913,7 +2022,20 @@
         "table",
         "interpolate"
       ],
-      "difficulty": 2
+      "difficulty": 2,
+      "tableData": {
+        "caption": "Cat Population Estimates",
+        "columns": [
+          { "key": "t", "label": "t (years since 2000)" },
+          { "key": "population", "label": "P(t)" }
+        ],
+        "rows": [
+          { "t": 1, "population": 24 },
+          { "t": 2, "population": 55 },
+          { "t": 3, "population": 103 },
+          { "t": 4, "population": 150 }
+        ]
+      }
     },
     {
       "id": 41,
@@ -2447,13 +2569,15 @@
       "tags": [
         "graph-reading",
         "spike",
-        "interpret-event"
+        "interpret-event",
+        "24h-tick-formatter"
       ],
       "difficulty": 2,
       "graphData": {
         "type": "line",
         "title": "Vending Machine Revenue",
         "xLabel": "Time (24-hour clock)",
+        "xTickFormat": "militaryClock",
         "yLabel": "Revenue ($)",
         "xMin": 700,
         "xMax": 2000,
@@ -2959,7 +3083,7 @@
     },
     {
       "id": 54,
-      "text": "In last week's sales meeting, a supervisor at a company stressed that current sales are increasing, but the graph of the sales is concave down. She seemed to emphasize this repeatedly to encourage the sales team to change the curvature of the sales.\n What could happen to the company sales if the sales graph keeps the trend of being concave down?",
+      "text": "In last week's sales meeting, a supervisor at a company stressed that current sales are increasing, but the graph of the sales is concave down. She seemed to emphasize this repeatedly to encourage the sales team to change the curvature of the sales.\n [Graph: Sales Trend (Concave Down)]\n What could happen to the company sales if the sales graph keeps the trend of being concave down?",
       "options": [
         "Sales could begin decreasing faster and faster, or sales could begin increasing faster and faster.",
         "Sales could begin decreasing slower and slower, or sales could begin decreasing faster and faster.",
@@ -2974,11 +3098,37 @@
         "concave-down",
         "prediction"
       ],
-      "difficulty": 3
+      "difficulty": 3,
+      "graphData": {
+        "type": "line",
+        "title": "Sales Trend (Concave Down)",
+        "xLabel": "Time (months)",
+        "yLabel": "Sales Index",
+        "xMin": 0,
+        "xMax": 12,
+        "yMin": 50,
+        "yMax": 140,
+        "noFill": true,
+        "series": [
+          {
+            "label": "Sales",
+            "type": "line",
+            "data": [
+              { "x": 0, "y": 60 },
+              { "x": 2, "y": 85 },
+              { "x": 4, "y": 105 },
+              { "x": 6, "y": 120 },
+              { "x": 8, "y": 128 },
+              { "x": 10, "y": 132 },
+              { "x": 12, "y": 130 }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": 55,
-      "text": "A technology firm in Erie, Pennsylvania, receives a contract to develop a computer program controlling the angle of a solar array on a daily basis. The firm first needs to model the hours of sunlight for every day of the year.\n From December to March, the hours of daylight are increasing faster and faster, and from March to June, they are increasing slower and slower.\n Which graph would be an appropriate model for this firm to use?",
+      "text": "A technology firm in Erie, Pennsylvania, receives a contract to develop a computer program controlling the angle of a solar array on a daily basis. The firm first needs to model the hours of sunlight for every day of the year.\n From December to March, the hours of daylight are increasing faster and faster, and from March to June, they are increasing slower and slower.\n [Graph: Hours of Sunlight]\n Which graph would be an appropriate model for this firm to use?",
       "options": [
         "Graph A",
         "Graph B",
@@ -2993,7 +3143,38 @@
         "inflection",
         "model-selection"
       ],
-      "difficulty": 3
+      "difficulty": 3,
+      "graphData": {
+        "type": "line",
+        "title": "Hours of Sunlight",
+        "xLabel": "Month (0 = December)",
+        "yLabel": "Sunlight Hours",
+        "xMin": 0,
+        "xMax": 12,
+        "yMin": 8,
+        "yMax": 16,
+        "noFill": true,
+        "series": [
+          {
+            "label": "Sunlight",
+            "type": "line",
+            "data": [
+              { "x": 0, "y": 9 },
+              { "x": 1, "y": 9.4 },
+              { "x": 2, "y": 11 },
+              { "x": 3, "y": 12.8 },
+              { "x": 4, "y": 14.2 },
+              { "x": 5, "y": 15.1 },
+              { "x": 6, "y": 15.3 },
+              { "x": 7, "y": 14.6 },
+              { "x": 8, "y": 13.5 },
+              { "x": 9, "y": 12.2 },
+              { "x": 10, "y": 11.0 },
+              { "x": 11, "y": 9.8 }
+            ]
+          }
+        ]
+      }
     },
     {
       "id": 56,
