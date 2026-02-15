@@ -2678,11 +2678,18 @@ const Gamification = {
             halo:       { name: 'Halo',       price: 150, icon: '😇' }
         },
         housing: {
-            tent:       { name: 'Tent',         price: 100,   icon: '⛺', desc: 'Basic shelter', tier: 1 },
-            cabin:      { name: 'Cabin',        price: 500,   icon: '🛖', desc: 'Cozy wooden cabin', tier: 2 },
-            house:      { name: 'House',        price: 1500,  icon: '🏠', desc: 'Comfortable home', tier: 3 },
-            mansion:    { name: 'Mansion',      price: 5000,  icon: '🏛️', desc: 'Luxurious estate', tier: 4 },
-            castle:     { name: 'Castle',       price: 15000, icon: '🏰', desc: 'Royal residence', tier: 5 }
+            tent:       { name: 'Tent',         price: 100,   icon: '⛺', desc: 'Basic shelter', tier: 1, decayRate: 0.5, repairCost: 10 },
+            cabin:      { name: 'Cabin',        price: 500,   icon: '🛖', desc: 'Cozy wooden cabin', tier: 2, decayRate: 0.4, repairCost: 25 },
+            house:      { name: 'House',        price: 1500,  icon: '🏠', desc: 'Comfortable home', tier: 3, decayRate: 0.3, repairCost: 75 },
+            mansion:    { name: 'Mansion',      price: 5000,  icon: '🏛️', desc: 'Luxurious estate', tier: 4, decayRate: 0.25, repairCost: 200 },
+            castle:     { name: 'Castle',       price: 15000, icon: '🏰', desc: 'Royal residence', tier: 5, decayRate: 0.2, repairCost: 500 }
+        },
+        services: {
+            laborer:    { name: 'Laborer (1 day)', price: 50,  icon: '👷', desc: 'Repairs 10% condition/day', duration: 1 },
+            handyman:   { name: 'Handyman (3 days)', price: 120, icon: '🔧', desc: 'Repairs 15% condition/day', duration: 3, repairRate: 15 },
+            contractor: { name: 'Contractor (7 days)', price: 250, icon: '🏗️', desc: 'Repairs 20% condition/day', duration: 7, repairRate: 20 },
+            repair:     { name: 'Quick Repair', price: 25, icon: '🔨', desc: 'Instantly repair 25% condition', instant: true, repairAmount: 25 },
+            fullRepair: { name: 'Full Renovation', price: 100, icon: '🏠', desc: 'Restore to 100% condition', instant: true, repairAmount: 100 }
         },
         furniture: {
             desk:       { name: 'Study Desk',   price: 100,  icon: '🪑', desc: '+1% XP bonus', xpBonus: 0.01 },
@@ -2754,7 +2761,7 @@ const Gamification = {
                 furniture: {},
                 vehicles: {}
             },
-            housing: { current: null, owned: [] },
+            housing: { current: null, owned: [], conditions: {}, lastDecayCheck: null, laborers: 0 },
             petCare: {
                 foodBowl: { level: 0, capacity: 0 },
                 waterBowl: { level: 0, capacity: 0 },
@@ -5291,12 +5298,22 @@ const House = {
         let html = '';
         
         // Current house display
+        const conditions = housing.conditions || {};
         if (housing.current) {
             const houseData = Gamification.SHOP.housing[housing.current];
+            const condition = conditions[housing.current] ?? 100;
+            const condColor = this.getConditionColor(condition);
+            const condLabel = this.getConditionLabel(condition);
             html += `<div class="house-display" style="text-align:center;padding:20px;background:linear-gradient(135deg,var(--navy),#1a1a2e);border-radius:16px;margin-bottom:20px">
                 <div style="font-size:64px">${houseData?.icon || '🏠'}</div>
                 <h2 style="color:var(--white);margin:8px 0">${houseData?.name || 'My Home'}</h2>
                 <p style="color:var(--gray-400)">${houseData?.desc || ''}</p>
+                <div style="margin-top:12px">
+                    <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:20px;overflow:hidden;margin:8px auto;max-width:200px">
+                        <div style="background:${condColor};height:100%;width:${condition}%;transition:width 0.3s"></div>
+                    </div>
+                    <span style="color:${condColor};font-weight:bold">${condLabel} (${Math.round(condition)}%)</span>
+                </div>
             </div>`;
         } else {
             html += `<div class="house-display" style="text-align:center;padding:20px;background:var(--gray-100);border-radius:16px;margin-bottom:20px">
@@ -5307,15 +5324,55 @@ const House = {
             </div>`;
         }
         
+        // Active services
+        const activeServices = housing.activeServices || [];
+        if (activeServices.length > 0) {
+            html += '<h3>👷 Active Workers</h3><div class="shop-grid">';
+            activeServices.forEach((svc, idx) => {
+                const svcData = Gamification.SHOP.services[svc.type];
+                const timeLeft = Math.max(0, svc.expiresAt - Date.now());
+                const hoursLeft = Math.floor(timeLeft / (1000 * 60 * 60));
+                const minsLeft = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                html += `<div class="shop-item">
+                    <div class="shop-item-icon">${svcData?.icon || '👷'}</div>
+                    <div class="shop-item-name">${svcData?.name || svc.type}</div>
+                    <div class="shop-item-desc">Working on: ${svc.houseId}</div>
+                    <div class="shop-item-owned" style="color:var(--green)">${hoursLeft}h ${minsLeft}m left</div>
+                </div>`;
+            });
+            html += '</div>';
+        }
+        
+        // Repair services
+        if (housing.current && (conditions[housing.current] ?? 100) < 100) {
+            html += '<h3>🔧 Repair Services</h3><div class="shop-grid">';
+            for (const [id, svc] of Object.entries(Gamification.SHOP.services)) {
+                const canAfford = coins >= svc.price;
+                html += `<div class="shop-item${!canAfford ? ' cant-afford' : ''}">
+                    <div class="shop-item-icon">${svc.icon}</div>
+                    <div class="shop-item-name">${svc.name}</div>
+                    <div class="shop-item-desc">${svc.desc}</div>
+                    <button class="shop-buy-btn" onclick="House.hireService('${id}')" ${!canAfford ? 'disabled' : ''}>&#x1FA99; ${svc.price}</button>
+                </div>`;
+            }
+            html += '</div>';
+        }
+        
         // Owned houses
         if (housing.owned.length > 0) {
             html += '<h3>🏘️ Your Properties</h3><div class="shop-grid">';
             housing.owned.forEach(houseId => {
                 const h = Gamification.SHOP.housing[houseId];
                 const isCurrent = housing.current === houseId;
+                const cond = conditions[houseId] ?? 100;
+                const condColor = this.getConditionColor(cond);
                 html += `<div class="shop-item${isCurrent ? ' active' : ''}" style="${isCurrent ? 'border:2px solid var(--green)' : ''}">
                     <div class="shop-item-icon">${h?.icon || '🏠'}</div>
                     <div class="shop-item-name">${h?.name || houseId}</div>
+                    <div style="background:rgba(0,0,0,0.1);border-radius:4px;height:8px;margin:4px 0">
+                        <div style="background:${condColor};height:100%;width:${cond}%;border-radius:4px"></div>
+                    </div>
+                    <div class="shop-item-desc" style="color:${condColor}">${Math.round(cond)}% condition</div>
                     ${isCurrent ? '<div class="shop-item-owned" style="color:var(--green)">Current Home</div>' : 
                         `<button class="shop-buy-btn" onclick="House.setCurrentHouse('${houseId}')">Move In</button>`}
                 </div>`;
@@ -5392,6 +5449,115 @@ const House = {
             }
         }
         return bonus;
+    },
+
+    decayHouses() {
+        const state = Gamification.getState();
+        const housing = state.housing || { current: null, owned: [], conditions: {}, lastDecayCheck: null, laborers: 0 };
+        const now = Date.now();
+        
+        if (!housing.owned || housing.owned.length === 0) return;
+        
+        // Initialize conditions for owned houses
+        housing.conditions = housing.conditions || {};
+        housing.owned.forEach(houseId => {
+            if (housing.conditions[houseId] === undefined) {
+                housing.conditions[houseId] = 100; // Start at 100%
+            }
+        });
+        
+        const lastCheck = housing.lastDecayCheck || now;
+        const hoursPassed = (now - lastCheck) / (1000 * 60 * 60);
+        
+        if (hoursPassed < 0.5) return; // Check every 30 min minimum
+        
+        // Process active laborers
+        housing.activeServices = housing.activeServices || [];
+        const expiredServices = [];
+        housing.activeServices.forEach((service, idx) => {
+            if (now >= service.expiresAt) {
+                expiredServices.push(idx);
+            } else {
+                // Apply repair per day (scaled to hours passed)
+                const repairPerHour = (service.repairRate || 10) / 24;
+                const repairAmount = repairPerHour * hoursPassed;
+                if (service.houseId && housing.conditions[service.houseId] !== undefined) {
+                    housing.conditions[service.houseId] = Math.min(100, housing.conditions[service.houseId] + repairAmount);
+                }
+            }
+        });
+        // Remove expired services
+        expiredServices.reverse().forEach(idx => housing.activeServices.splice(idx, 1));
+        
+        // Decay all owned houses
+        housing.owned.forEach(houseId => {
+            const houseData = Gamification.SHOP.housing[houseId];
+            if (!houseData) return;
+            
+            const decayRate = houseData.decayRate || 0.3; // % per day
+            const decayPerHour = decayRate / 24;
+            const decay = decayPerHour * hoursPassed;
+            
+            housing.conditions[houseId] = Math.max(0, (housing.conditions[houseId] || 100) - decay);
+        });
+        
+        housing.lastDecayCheck = now;
+        state.housing = housing;
+        Gamification.saveState(state);
+    },
+
+    getConditionColor(condition) {
+        if (condition >= 75) return 'var(--green)';
+        if (condition >= 50) return 'var(--orange)';
+        if (condition >= 25) return '#f59e0b';
+        return 'var(--red)';
+    },
+
+    getConditionLabel(condition) {
+        if (condition >= 90) return 'Excellent';
+        if (condition >= 75) return 'Good';
+        if (condition >= 50) return 'Fair';
+        if (condition >= 25) return 'Poor';
+        if (condition > 0) return 'Dilapidated';
+        return 'Condemned';
+    },
+
+    hireService(serviceId, houseId) {
+        const service = Gamification.SHOP.services[serviceId];
+        if (!service) return;
+        
+        const state = Gamification.getState();
+        if (!Gamification.spendCoins(service.price)) return;
+        
+        const housing = state.housing || { current: null, owned: [], conditions: {}, activeServices: [] };
+        housing.conditions = housing.conditions || {};
+        housing.activeServices = housing.activeServices || [];
+        
+        if (service.instant) {
+            // Instant repair
+            const targetHouse = houseId || housing.current;
+            if (targetHouse && housing.conditions[targetHouse] !== undefined) {
+                if (service.repairAmount === 100) {
+                    housing.conditions[targetHouse] = 100;
+                } else {
+                    housing.conditions[targetHouse] = Math.min(100, housing.conditions[targetHouse] + service.repairAmount);
+                }
+            }
+        } else {
+            // Hire laborer for duration
+            const expiresAt = Date.now() + (service.duration * 24 * 60 * 60 * 1000);
+            housing.activeServices.push({
+                type: serviceId,
+                houseId: houseId || housing.current,
+                repairRate: service.repairRate || 10,
+                expiresAt: expiresAt
+            });
+        }
+        
+        state.housing = housing;
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.render();
     }
 };
 
@@ -12584,7 +12750,7 @@ async function init() {
         Garden.decayWater();
         Garden.decayPetStats();
         Garden.idleGrow();
-        setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); Garden.idleGrow(); }, 15 * 1000);
+        setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); Garden.idleGrow(); House.decayHouses(); }, 15 * 1000);
 
         // Hide garden/shop/battle buttons if garden disabled
         const gState = Gamification.getState();
