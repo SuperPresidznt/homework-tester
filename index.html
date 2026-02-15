@@ -8195,8 +8195,10 @@ const SpeedMode = {
 
     renderQuestion() {
         const q = this.current.question;
-        const diffLabel = q.difficulty === 1 ? 'Easy' : q.difficulty === 3 ? 'Hard' : 'Medium';
-        const diffColor = q.difficulty === 1 ? 'var(--green)' : q.difficulty === 3 ? 'var(--red)' : 'var(--orange)';
+        const difficulty = q.difficulty || 2;
+        const diffLabel = difficulty === 1 ? 'Easy' : difficulty === 3 ? 'Hard' : 'Medium';
+        const diffColor = difficulty === 1 ? 'var(--green)' : difficulty === 3 ? 'var(--red)' : 'var(--orange)';
+        const diffMultiplier = difficulty === 3 ? '3x' : difficulty === 1 ? '1x' : '2x';
 
         const optionsHtml = q.options.map((opt, i) => `
             <button class="speed-option drill-option" onclick="SpeedMode.selectOption(${i})" data-idx="${i}">
@@ -8206,9 +8208,10 @@ const SpeedMode = {
         `).join('');
 
         document.getElementById('speedCard').innerHTML = `
-            <div style="margin-bottom:8px">
+            <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px">
                 <span style="font-size:11px;color:${diffColor};font-weight:bold">${diffLabel}</span>
-                <span style="font-size:11px;color:var(--gray-500);margin-left:8px">${this.maxTime}s</span>
+                <span style="font-size:10px;background:${diffColor};color:#fff;padding:2px 6px;border-radius:8px;font-weight:bold">${diffMultiplier} coins</span>
+                <span style="font-size:11px;color:var(--gray-500);margin-left:auto">${this.maxTime}s</span>
             </div>
             <div class="drill-question" style="font-size:16px;margin-bottom:16px">${escapeHtml(q.text)}</div>
             <div class="speed-options" style="display:flex;flex-direction:column;gap:8px">${optionsHtml}</div>
@@ -8239,19 +8242,24 @@ const SpeedMode = {
             this.streak++;
             this.questionsAnswered++;
 
-            // Calculate coin multiplier based on speed
-            let multiplier = 1;
-            if (timeRatio >= 0.8) multiplier = 4;      // Super fast (80%+ time left)
-            else if (timeRatio >= 0.6) multiplier = 3; // Fast (60%+ time left)
-            else if (timeRatio >= 0.4) multiplier = 2; // Good (40%+ time left)
-            else multiplier = 1;                        // Normal
+            // Base coins by difficulty (harder = more reward)
+            const difficulty = q.difficulty || 2;
+            const difficultyMultiplier = difficulty === 3 ? 3 : difficulty === 1 ? 1 : 2; // Hard=3x, Medium=2x, Easy=1x
+            const baseCoins = 5 * difficultyMultiplier;
+
+            // Calculate speed multiplier based on time remaining
+            let speedMultiplier = 1;
+            if (timeRatio >= 0.8) speedMultiplier = 4;      // Super fast (80%+ time left)
+            else if (timeRatio >= 0.6) speedMultiplier = 3; // Fast (60%+ time left)
+            else if (timeRatio >= 0.4) speedMultiplier = 2; // Good (40%+ time left)
+            else speedMultiplier = 1;                        // Normal
 
             // Streak bonus
-            if (this.streak >= 10) multiplier += 2;
-            else if (this.streak >= 5) multiplier += 1;
+            if (this.streak >= 10) speedMultiplier += 2;
+            else if (this.streak >= 5) speedMultiplier += 1;
 
-            const baseCoins = 5;
-            const earnedCoins = baseCoins * multiplier;
+            const earnedCoins = baseCoins * speedMultiplier;
+            const multiplier = difficultyMultiplier * speedMultiplier;
             this.coins += earnedCoins;
             this.score += Math.round(100 * timeRatio * multiplier);
 
@@ -12013,7 +12021,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.41</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.42</div>
 
 </body>
 </html>
