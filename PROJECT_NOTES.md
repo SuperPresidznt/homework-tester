@@ -120,11 +120,41 @@ Cleans AI responses:
 
 ## Version History
 
+- **v2.39**: Intelligent correlation detection with insights panel, improved AI text formatting
+- **v2.38**: Study time vs score correlation chart, project notes
 - **v2.37**: Adaptive AI drill, comprehensive metrics dashboard, study time vs score chart
 - **v2.36**: Enhanced Progress dashboard with gamification stats, time by category
 - **v2.35**: Per-category time tracking, comprehensive AI stats
 - **v2.34**: Activity-based time tracking, hours display, clear time button
 - **v2.33**: Metrics reset feature
+
+---
+
+## Correlation Detection System
+
+The app automatically detects and surfaces strong correlations (r ≥ 0.4) between:
+
+1. **Study Time vs Test Scores**: Does more study time = better scores?
+2. **Drill Practice vs Category Scores**: Do drilled categories perform better on tests?
+3. **AI Practice vs Improvement**: Is AI-targeted practice improving scores over time?
+4. **Streak vs Performance**: Does consistency correlate with better scores?
+5. **Time per Question vs Accuracy**: Should you take more time or trust instincts?
+
+Only shows insights when correlations are statistically meaningful (minimum data points required).
+
+---
+
+## Animated Backgrounds (SceneManager)
+
+Available backgrounds:
+- **Classic** (default): Clean, minimal
+- **Cozy Desk**: Warm study nook (unlocked)
+- **Night Sky**: Twinkling stars (unlock: Level 5)
+- **Rainy Window**: Canvas rain animation (unlock: 7-day streak)
+- **Forest Glade**: Sunlit particles (unlock: Level 10)
+- **Synthwave**: Retro neon grid (unlock: Night Owl achievement)
+
+Toggle animations in Settings or via SceneManager.toggleAnimation()
 
 ---
 

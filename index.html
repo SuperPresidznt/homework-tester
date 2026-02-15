@@ -9044,11 +9044,221 @@ const Progress = {
 
     render() {
         const content = document.getElementById('progressContent');
-        content.innerHTML = this.renderGamificationStats() + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderStudyTimeVsScore() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
+        content.innerHTML = this.renderInsights() + this.renderGamificationStats() + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderStudyTimeVsScore() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
         this._drawTrendChart();
         this._drawAccuracyChart();
         this._drawStudyVsScoreChart();
         this._renderOverallTrend();
+    },
+
+    // Intelligent correlation detection - only shows strong correlations
+    renderInsights() {
+        const insights = this._detectCorrelations();
+        if (insights.length === 0) return '';
+        
+        const insightItems = insights.map(i => {
+            const icon = i.positive ? '📈' : '📉';
+            const color = i.positive ? 'var(--green)' : 'var(--orange)';
+            return `<div style="padding:10px 14px;background:var(--gray-50);border-radius:8px;border-left:3px solid ${color};margin-bottom:8px">
+                <span style="font-size:16px">${icon}</span>
+                <strong style="color:${color}">${i.title}</strong>
+                <p style="margin:4px 0 0;font-size:13px;color:var(--gray-700)">${i.description}</p>
+                <span style="font-size:11px;color:var(--gray-500)">Correlation: ${i.strength} (r=${i.r.toFixed(2)})</span>
+            </div>`;
+        }).join('');
+        
+        return `<div class="progress-section">
+            <h3>💡 Insights</h3>
+            <p style="font-size:12px;color:var(--gray-600);margin-bottom:12px">Strong patterns detected in your data:</p>
+            ${insightItems}
+        </div>`;
+    },
+
+    _detectCorrelations() {
+        const insights = [];
+        const MIN_CORRELATION = 0.4; // Only show strong correlations
+        const MIN_DATA_POINTS = 5;
+        
+        // Gather all the data we need
+        const studyByDay = Store.get('studyByDay', {});
+        const drillProgress = Store.get('drillProgress', {});
+        const trackerData = Store.get('questionTracker', {});
+        const gamState = Gamification.getState();
+        
+        let allHistory = [];
+        for (const bank of BankManager.banks) {
+            const history = Store.get('testHistory_' + bank.bankId, []);
+            allHistory = allHistory.concat(history);
+        }
+        allHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        if (allHistory.length < MIN_DATA_POINTS) return insights;
+        
+        // 1. Study Time vs Test Scores
+        const studyScoreData = allHistory.map(test => {
+            const day = test.date.split('T')[0];
+            return { x: studyByDay[day] || 0, y: test.pct };
+        });
+        const studyScoreR = this._pearsonCorrelation(studyScoreData);
+        if (Math.abs(studyScoreR) >= MIN_CORRELATION) {
+            insights.push({
+                title: studyScoreR > 0 ? 'Study Time Pays Off!' : 'Quality Over Quantity',
+                description: studyScoreR > 0 
+                    ? 'The more time you study each day, the higher your test scores tend to be.'
+                    : 'More study time isn\'t improving scores. Try focusing on weak areas instead.',
+                r: studyScoreR,
+                strength: Math.abs(studyScoreR) > 0.7 ? 'Strong' : 'Moderate',
+                positive: studyScoreR > 0
+            });
+        }
+        
+        // 2. Drill Practice vs Test Scores (by category)
+        const drillCounts = {};
+        Object.entries(drillProgress).forEach(([qId, prog]) => {
+            if (prog.reps > 0) {
+                const found = QuestionTracker.findQuestion(qId);
+                if (found) {
+                    const cat = found.question.category || 'General';
+                    drillCounts[cat] = (drillCounts[cat] || 0) + prog.reps;
+                }
+            }
+        });
+        
+        // Get category accuracy from recent tests
+        const catTestScores = {};
+        allHistory.slice(-10).forEach(test => {
+            if (test.questions) {
+                test.questions.forEach(q => {
+                    const cat = q.category || 'General';
+                    if (!catTestScores[cat]) catTestScores[cat] = { correct: 0, total: 0 };
+                    catTestScores[cat].total++;
+                    if (q.correct) catTestScores[cat].correct++;
+                });
+            }
+        });
+        
+        const drillVsScoreData = [];
+        Object.keys(drillCounts).forEach(cat => {
+            if (catTestScores[cat] && catTestScores[cat].total >= 3) {
+                drillVsScoreData.push({
+                    x: drillCounts[cat],
+                    y: (catTestScores[cat].correct / catTestScores[cat].total) * 100
+                });
+            }
+        });
+        
+        if (drillVsScoreData.length >= 4) {
+            const drillR = this._pearsonCorrelation(drillVsScoreData);
+            if (Math.abs(drillR) >= MIN_CORRELATION) {
+                insights.push({
+                    title: drillR > 0 ? 'Drills Are Working!' : 'Try Different Drill Strategies',
+                    description: drillR > 0
+                        ? 'Categories you drill more have higher test scores. Keep it up!'
+                        : 'More drilling isn\'t translating to better scores. Try AI Practice for weak areas.',
+                    r: drillR,
+                    strength: Math.abs(drillR) > 0.7 ? 'Strong' : 'Moderate',
+                    positive: drillR > 0
+                });
+            }
+        }
+        
+        // 3. AI Practice vs Improvement
+        const aiPracticeCount = gamState.stats?.aiQuestionsAnswered || 0;
+        if (aiPracticeCount > 10 && allHistory.length >= 6) {
+            const firstHalf = allHistory.slice(0, Math.floor(allHistory.length / 2));
+            const secondHalf = allHistory.slice(Math.floor(allHistory.length / 2));
+            const firstAvg = firstHalf.reduce((s, h) => s + h.pct, 0) / firstHalf.length;
+            const secondAvg = secondHalf.reduce((s, h) => s + h.pct, 0) / secondHalf.length;
+            const improvement = secondAvg - firstAvg;
+            
+            if (improvement > 5) {
+                insights.push({
+                    title: 'AI Practice Is Boosting Scores!',
+                    description: `Your recent test average is ${Math.round(improvement)}% higher than earlier. AI-targeted practice is helping!`,
+                    r: 0.5,
+                    strength: 'Moderate',
+                    positive: true
+                });
+            }
+        }
+        
+        // 4. Streak vs Performance
+        const streakData = [];
+        let currentStreak = 0;
+        let lastDate = null;
+        allHistory.forEach(test => {
+            const day = test.date.split('T')[0];
+            if (lastDate) {
+                const diff = (new Date(day) - new Date(lastDate)) / (1000 * 60 * 60 * 24);
+                if (diff <= 1) currentStreak++;
+                else currentStreak = 1;
+            } else {
+                currentStreak = 1;
+            }
+            streakData.push({ x: currentStreak, y: test.pct });
+            lastDate = day;
+        });
+        
+        if (streakData.length >= MIN_DATA_POINTS) {
+            const streakR = this._pearsonCorrelation(streakData);
+            if (Math.abs(streakR) >= MIN_CORRELATION) {
+                insights.push({
+                    title: streakR > 0 ? 'Consistency Wins!' : 'Take Breaks When Needed',
+                    description: streakR > 0
+                        ? 'Longer study streaks correlate with better scores. Keep your streak going!'
+                        : 'Long streaks might be causing burnout. Quality rest can help.',
+                    r: streakR,
+                    strength: Math.abs(streakR) > 0.7 ? 'Strong' : 'Moderate',
+                    positive: streakR > 0
+                });
+            }
+        }
+        
+        // 5. Time per question vs accuracy
+        const timeAccuracyData = [];
+        Object.values(trackerData).forEach(qData => {
+            if (qData.history && qData.history.length >= 2) {
+                qData.history.forEach(attempt => {
+                    if (attempt.timeMs && attempt.timeMs > 1000 && attempt.timeMs < 300000) {
+                        timeAccuracyData.push({
+                            x: attempt.timeMs / 1000,
+                            y: attempt.correct ? 100 : 0
+                        });
+                    }
+                });
+            }
+        });
+        
+        if (timeAccuracyData.length >= 20) {
+            const timeR = this._pearsonCorrelation(timeAccuracyData);
+            if (Math.abs(timeR) >= 0.2) { // Lower threshold for this one
+                insights.push({
+                    title: timeR > 0 ? 'Take Your Time' : 'Trust Your Instincts',
+                    description: timeR > 0
+                        ? 'Spending more time on questions tends to improve accuracy. Don\'t rush!'
+                        : 'Your quick answers are often correct. Trust your first instinct.',
+                    r: timeR,
+                    strength: Math.abs(timeR) > 0.4 ? 'Moderate' : 'Weak',
+                    positive: timeR > 0
+                });
+            }
+        }
+        
+        return insights;
+    },
+
+    _pearsonCorrelation(data) {
+        if (data.length < 2) return 0;
+        const n = data.length;
+        const sumX = data.reduce((s, d) => s + d.x, 0);
+        const sumY = data.reduce((s, d) => s + d.y, 0);
+        const sumXY = data.reduce((s, d) => s + d.x * d.y, 0);
+        const sumX2 = data.reduce((s, d) => s + d.x * d.x, 0);
+        const sumY2 = data.reduce((s, d) => s + d.y * d.y, 0);
+        
+        const numerator = n * sumXY - sumX * sumY;
+        const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+        return denominator === 0 ? 0 : numerator / denominator;
     },
 
     renderStudyTimeVsScore() {
@@ -11373,7 +11583,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.38</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.39</div>
 
 </body>
 </html>
