@@ -1659,6 +1659,7 @@ button:focus-visible {
                 <button class="btn-nav" style="background:var(--green);border-color:var(--green)" id="btnGarden" onclick="Garden.show()">&#127793; Garden</button>
                 <button class="btn-nav" style="background:var(--orange);border-color:var(--orange)" id="btnShop" onclick="Shop.show()">&#128176; Shop</button>
                 <button class="btn-nav" style="background:#0ea5e9;border-color:#0ea5e9" id="btnHouse" onclick="House.show()">&#127968; My House</button>
+                <button class="btn-nav" style="background:#059669;border-color:#059669" id="btnBusiness" onclick="Business.show()">&#128188; Business</button>
                 <button class="btn-nav" style="background:var(--red);border-color:var(--red)" id="btnBattle" onclick="Battle.show()">&#9876;&#65039; Battle</button>
                 <button class="btn-nav" style="background:#a855f7;border-color:#a855f7" id="btnBackpack" onclick="Backpack.openModal()">&#127890; Backpack</button>
                 <button class="btn-nav" style="background:#6366f1;border-color:#6366f1" id="btnScenes" onclick="SceneManager.openModal()">&#127912; Backgrounds</button>
@@ -1694,6 +1695,16 @@ button:focus-visible {
         <span class="coin-display" id="houseCoins">&#x1FA99; 0</span>
     </div>
     <div id="houseContent"></div>
+</div>
+
+<!-- ========== BUSINESS SCREEN ========== -->
+<div class="screen" id="screen-business">
+    <div class="shop-header">
+        <button class="btn-nav btn-home" onclick="showScreen('home');Home.render()" style="margin-right:auto">Home</button>
+        <h2 style="flex:1;text-align:center;margin:0">💼 My Businesses</h2>
+        <span class="coin-display" id="businessCoins">&#x1FA99; 0</span>
+    </div>
+    <div id="businessContent" style="padding:16px"></div>
 </div>
 
 <!-- ========== GARDEN SCREEN ========== -->
@@ -2714,6 +2725,18 @@ const Gamification = {
             yacht:      { name: 'Yacht',        price: 25000, icon: '🛥️', desc: 'Luxury water vessel', tier: 6 },
             spaceship:  { name: 'Spaceship',    price: 50000, icon: '🚀', desc: 'To infinity!', tier: 7 }
         },
+        businesses: {
+            lemonade:   { name: 'Lemonade Stand',  price: 50,    icon: '🍋', desc: 'A humble beginning', baseIncome: 0.1, cycleTime: 60, managerCost: 100 },
+            newspaper:  { name: 'Paper Route',     price: 150,   icon: '📰', desc: 'Deliver the news', baseIncome: 0.3, cycleTime: 120, managerCost: 300 },
+            carwash:    { name: 'Car Wash',        price: 500,   icon: '🚿', desc: 'Sparkle and shine', baseIncome: 1, cycleTime: 180, managerCost: 1000 },
+            bakery:     { name: 'Bakery',          price: 1500,  icon: '🥐', desc: 'Fresh baked goods', baseIncome: 3, cycleTime: 300, managerCost: 3000 },
+            pizzeria:   { name: 'Pizzeria',        price: 4000,  icon: '🍕', desc: 'Slice of heaven', baseIncome: 8, cycleTime: 600, managerCost: 8000 },
+            arcade:     { name: 'Arcade',          price: 10000, icon: '🕹️', desc: 'Fun and games', baseIncome: 20, cycleTime: 900, managerCost: 20000 },
+            gym:        { name: 'Gym',             price: 25000, icon: '🏋️', desc: 'Fitness empire', baseIncome: 50, cycleTime: 1200, managerCost: 50000 },
+            hotel:      { name: 'Hotel',           price: 75000, icon: '🏨', desc: '5-star service', baseIncome: 150, cycleTime: 1800, managerCost: 150000 },
+            techStartup:{ name: 'Tech Startup',    price: 200000,icon: '💻', desc: 'Disrupt the market', baseIncome: 500, cycleTime: 3600, managerCost: 400000 },
+            spacePort:  { name: 'Space Port',      price: 1000000,icon: '🛸', desc: 'To the stars!', baseIncome: 2500, cycleTime: 7200, managerCost: 2000000 }
+        },
         plotExpansion: { name: 'Garden Plot', price: 100, icon: '🟫', desc: 'Unlock 1 additional garden plot' }
     },
 
@@ -2762,6 +2785,11 @@ const Gamification = {
                 vehicles: {}
             },
             housing: { current: null, owned: [], conditions: {}, lastDecayCheck: null, laborers: 0 },
+            businesses: {
+                owned: {},          // { businessId: { level: 1, hasManager: false, progress: 0, lastCollect: null } }
+                totalEarned: 0,
+                lastTick: null
+            },
             petCare: {
                 foodBowl: { level: 0, capacity: 0 },
                 waterBowl: { level: 0, capacity: 0 },
@@ -5558,6 +5586,205 @@ const House = {
         Gamification.saveState(state);
         SoundFX.play('purchase');
         this.render();
+    }
+};
+
+// =====================================================================
+// IDLE BUSINESS SYSTEM
+// =====================================================================
+const Business = {
+    show() {
+        this.tick(); // Update before showing
+        this.render();
+        showScreen('business');
+    },
+
+    tick() {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {}, totalEarned: 0, lastTick: null };
+        const now = Date.now();
+        
+        if (!biz.lastTick) biz.lastTick = now;
+        const elapsed = (now - biz.lastTick) / 1000; // seconds
+        
+        let totalCollected = 0;
+        
+        for (const [id, data] of Object.entries(biz.owned || {})) {
+            const bizData = Gamification.SHOP.businesses[id];
+            if (!bizData) continue;
+            
+            const cycleTime = bizData.cycleTime;
+            const income = bizData.baseIncome * (data.level || 1);
+            
+            if (data.hasManager) {
+                // Auto-collect: calculate cycles completed while away
+                const cycles = Math.floor(elapsed / cycleTime);
+                if (cycles > 0) {
+                    const earned = cycles * income;
+                    totalCollected += earned;
+                    data.progress = ((elapsed % cycleTime) / cycleTime) * 100;
+                } else {
+                    data.progress = Math.min(100, (data.progress || 0) + (elapsed / cycleTime) * 100);
+                }
+            } else {
+                // Manual: just update progress
+                data.progress = Math.min(100, (data.progress || 0) + (elapsed / cycleTime) * 100);
+            }
+        }
+        
+        if (totalCollected > 0) {
+            state.coins = (state.coins || 0) + Math.floor(totalCollected);
+            biz.totalEarned = (biz.totalEarned || 0) + Math.floor(totalCollected);
+        }
+        
+        biz.lastTick = now;
+        state.businesses = biz;
+        Gamification.saveState(state);
+    },
+
+    collect(businessId) {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {}, totalEarned: 0 };
+        const data = biz.owned[businessId];
+        if (!data || data.progress < 100) return;
+        
+        const bizData = Gamification.SHOP.businesses[businessId];
+        const income = Math.floor(bizData.baseIncome * (data.level || 1));
+        
+        state.coins = (state.coins || 0) + income;
+        biz.totalEarned = (biz.totalEarned || 0) + income;
+        data.progress = 0;
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('coin');
+        this.render();
+    },
+
+    buy(businessId) {
+        const bizData = Gamification.SHOP.businesses[businessId];
+        if (!bizData) return;
+        
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {}, totalEarned: 0 };
+        
+        // Calculate price (increases with level)
+        const currentLevel = biz.owned[businessId]?.level || 0;
+        const price = Math.floor(bizData.price * Math.pow(1.15, currentLevel));
+        
+        if (!Gamification.spendCoins(price)) return;
+        
+        if (!biz.owned[businessId]) {
+            biz.owned[businessId] = { level: 1, hasManager: false, progress: 0 };
+        } else {
+            biz.owned[businessId].level++;
+        }
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.render();
+    },
+
+    hireManager(businessId) {
+        const bizData = Gamification.SHOP.businesses[businessId];
+        if (!bizData) return;
+        
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data || data.hasManager) return;
+        
+        if (!Gamification.spendCoins(bizData.managerCost)) return;
+        
+        data.hasManager = true;
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.render();
+    },
+
+    getIncomePerSecond(state) {
+        const biz = state.businesses || { owned: {} };
+        let total = 0;
+        for (const [id, data] of Object.entries(biz.owned || {})) {
+            const bizData = Gamification.SHOP.businesses[id];
+            if (!bizData || !data.hasManager) continue;
+            const income = bizData.baseIncome * (data.level || 1);
+            total += income / bizData.cycleTime;
+        }
+        return total;
+    },
+
+    render() {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {}, totalEarned: 0 };
+        const coins = state.coins || 0;
+        
+        document.getElementById('businessCoins').innerHTML = '&#x1FA99; ' + coins.toLocaleString();
+        
+        const incomePerSec = this.getIncomePerSecond(state);
+        
+        let html = `<div style="text-align:center;padding:12px;background:linear-gradient(135deg,#059669,#10b981);border-radius:12px;margin-bottom:16px;color:white">
+            <div style="font-size:24px">💰 ${biz.totalEarned?.toLocaleString() || 0}</div>
+            <div style="font-size:12px;opacity:0.8">Total Earned from Businesses</div>
+            ${incomePerSec > 0 ? `<div style="margin-top:4px;font-size:14px">📈 +${incomePerSec.toFixed(2)}/sec (automated)</div>` : ''}
+        </div>`;
+        
+        html += '<h3>🏪 Your Businesses</h3><div class="shop-grid">';
+        
+        for (const [id, bizData] of Object.entries(Gamification.SHOP.businesses)) {
+            const owned = biz.owned[id];
+            const level = owned?.level || 0;
+            const hasManager = owned?.hasManager || false;
+            const progress = owned?.progress || 0;
+            const price = Math.floor(bizData.price * Math.pow(1.15, level));
+            const income = bizData.baseIncome * Math.max(1, level);
+            const canAfford = coins >= price;
+            const canAffordManager = coins >= bizData.managerCost;
+            
+            html += `<div class="shop-item" style="position:relative">
+                <div class="shop-item-icon">${bizData.icon}</div>
+                <div class="shop-item-name">${bizData.name}</div>
+                <div class="shop-item-desc">${bizData.desc}</div>`;
+            
+            if (level > 0) {
+                html += `<div style="font-size:12px;color:var(--green)">Level ${level} • 🪙${income.toFixed(1)}/${bizData.cycleTime}s</div>`;
+                
+                // Progress bar
+                html += `<div style="background:rgba(0,0,0,0.1);border-radius:4px;height:12px;margin:8px 0;overflow:hidden">
+                    <div style="background:${progress >= 100 ? 'var(--green)' : 'var(--blue)'};height:100%;width:${progress}%;transition:width 0.3s"></div>
+                </div>`;
+                
+                if (progress >= 100 && !hasManager) {
+                    html += `<button class="shop-buy-btn" style="background:var(--green)" onclick="Business.collect('${id}')">Collect 🪙${income.toFixed(0)}</button>`;
+                } else if (hasManager) {
+                    html += `<div style="font-size:11px;color:var(--green)">👔 Manager (Auto)</div>`;
+                }
+                
+                // Upgrade button
+                html += `<button class="shop-buy-btn" onclick="Business.buy('${id}')" ${!canAfford ? 'disabled' : ''} style="margin-top:4px">
+                    Upgrade &#x1FA99;${price.toLocaleString()}
+                </button>`;
+                
+                // Hire manager
+                if (!hasManager) {
+                    html += `<button class="shop-buy-btn" onclick="Business.hireManager('${id}')" ${!canAffordManager ? 'disabled' : ''} style="margin-top:4px;background:#7c3aed">
+                        👔 Manager &#x1FA99;${bizData.managerCost.toLocaleString()}
+                    </button>`;
+                }
+            } else {
+                html += `<button class="shop-buy-btn" onclick="Business.buy('${id}')" ${!canAfford ? 'disabled' : ''}>
+                    Buy &#x1FA99;${price.toLocaleString()}
+                </button>`;
+            }
+            
+            html += '</div>';
+        }
+        
+        html += '</div>';
+        
+        document.getElementById('businessContent').innerHTML = html;
     }
 };
 
@@ -12750,7 +12977,7 @@ async function init() {
         Garden.decayWater();
         Garden.decayPetStats();
         Garden.idleGrow();
-        setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); Garden.idleGrow(); House.decayHouses(); }, 15 * 1000);
+        setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); Garden.idleGrow(); House.decayHouses(); Business.tick(); }, 15 * 1000);
 
         // Hide garden/shop/battle buttons if garden disabled
         const gState = Gamification.getState();
