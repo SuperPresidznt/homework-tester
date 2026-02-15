@@ -13050,6 +13050,8 @@ const InlineChart = {
     },
 
     _fmtNum(v) {
+        // Don't abbreviate years (1900-2100 range)
+        if (v >= 1900 && v <= 2100 && Number.isInteger(v)) return v.toString();
         if (Math.abs(v) >= 1e6) return (v / 1e6).toFixed(1) + 'M';
         if (Math.abs(v) >= 1e3) return (v / 1e3).toFixed(v % 1000 === 0 ? 0 : 1) + 'K';
         if (Number.isInteger(v)) return v.toString();
