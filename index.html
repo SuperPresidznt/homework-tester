@@ -1951,6 +1951,10 @@ button:focus-visible {
                 <div class="hint">Removes all test history, drill progress, and stats.</div>
             </div>
             <div class="setting-row">
+                <button class="btn-nav" style="background:var(--gray-600);border-color:var(--gray-600)" onclick="Settings.clearTimeData()">Clear Study Time</button>
+                <div class="hint">Clears all study time tracking data (today and total). Useful if time seems inaccurate.</div>
+            </div>
+            <div class="setting-row">
                 <button class="btn-nav" style="background:var(--red);border-color:var(--red)" onclick="Settings.resetAllMetrics()">Reset All Metrics</button>
                 <div class="hint">Resets XP, level, coins, streaks, achievements, pet, garden, and all gamification data to defaults. Cannot be undone!</div>
             </div>
@@ -6485,16 +6489,51 @@ const SessionState = {
 };
 
 // =====================================================================
-// SESSION TIMER
+// SESSION TIMER (with activity detection)
 // =====================================================================
 const Session = {
     startTime: 0,
+    lastActivity: 0,
+    activeSeconds: 0,
+    activityInterval: null,
+    IDLE_TIMEOUT: 60000, // 1 minute of no activity = pause tracking
+
     start() {
         this.startTime = Date.now();
+        this.lastActivity = Date.now();
+        this.activeSeconds = 0;
+        this._bindActivityListeners();
+        this._startActivityCheck();
     },
+
+    _bindActivityListeners() {
+        const updateActivity = () => { this.lastActivity = Date.now(); };
+        ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+            document.addEventListener(evt, updateActivity, { passive: true });
+        });
+    },
+
+    _startActivityCheck() {
+        if (this.activityInterval) clearInterval(this.activityInterval);
+        this.activityInterval = setInterval(() => {
+            if (!this.startTime) return;
+            const now = Date.now();
+            const idleTime = now - this.lastActivity;
+            // Only count time if user was active in the last IDLE_TIMEOUT
+            if (idleTime < this.IDLE_TIMEOUT) {
+                this.activeSeconds += 1;
+            }
+        }, 1000);
+    },
+
     end() {
+        if (this.activityInterval) {
+            clearInterval(this.activityInterval);
+            this.activityInterval = null;
+        }
         if (!this.startTime) return;
-        const mins = Math.round((Date.now() - this.startTime) / 60000);
+        
+        const mins = Math.round(this.activeSeconds / 60);
         if (mins > 0) {
             // Update globalStats.totalStudyMins
             const stats = Store.get('globalStats', { totalStudyMins: 0 });
@@ -6509,12 +6548,30 @@ const Session = {
             Store.set('studyByDay', studyByDay);
         }
         this.startTime = 0;
+        this.activeSeconds = 0;
     },
+
     getTodayMins() {
         const d = new Date();
         const today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         const studyByDay = Store.get('studyByDay', {});
         return studyByDay[today] || 0;
+    },
+
+    formatTime(mins) {
+        if (mins >= 60) {
+            const hrs = Math.floor(mins / 60);
+            const remainMins = mins % 60;
+            return remainMins > 0 ? `${hrs}h ${remainMins}m` : `${hrs}h`;
+        }
+        return `${mins}m`;
+    },
+
+    clearAllTimeData() {
+        Store.set('studyByDay', {});
+        const stats = Store.get('globalStats', {});
+        stats.totalStudyMins = 0;
+        Store.set('globalStats', stats);
     }
 };
 
@@ -6660,8 +6717,8 @@ const Home = {
         const totalMins = stats.totalStudyMins || 0;
 
         document.getElementById('homeStats').innerHTML = `
-            <div class="stat-card"><div class="stat-val">${todayMins}m</div><div class="stat-lbl">Today</div></div>
-            <div class="stat-card"><div class="stat-val">${totalMins}m</div><div class="stat-lbl">Total Study</div></div>
+            <div class="stat-card"><div class="stat-val">${Session.formatTime(todayMins)}</div><div class="stat-lbl">Today</div></div>
+            <div class="stat-card"><div class="stat-val">${Session.formatTime(totalMins)}</div><div class="stat-lbl">Total Study</div></div>
             <div class="stat-card"><div class="stat-val">${stats.testsCompleted}</div><div class="stat-lbl">Tests Taken</div></div>
             <div class="stat-card"><div class="stat-val">${Math.round(stats.avgScore || 0)}%</div><div class="stat-lbl">Avg Score</div></div>
             <div class="stat-card"><div class="stat-val">${masteryPct}%</div><div class="stat-lbl">Mastery</div></div>
@@ -9167,7 +9224,7 @@ const Progress = {
             return '<div class="study-day"><div class="bar" style="height:' + height + 'px" title="' + d.mins + ' min"></div><span class="day-label">' + d.dayName + '</span></div>';
         }).join('');
 
-        return '<div class="progress-section"><h3>Study Time (Last 7 Days)</h3><div class="study-bars">' + bars + '</div><p style="text-align:center;font-size:12px;color:var(--gray-600);margin-top:8px">Total: ' + (stats.totalStudyMins || 0) + ' minutes</p></div>';
+        return '<div class="progress-section"><h3>Study Time (Last 7 Days)</h3><div class="study-bars">' + bars + '</div><p style="text-align:center;font-size:12px;color:var(--gray-600);margin-top:8px">Total: ' + Session.formatTime(stats.totalStudyMins || 0) + '</p></div>';
     }
 };
 
@@ -9309,6 +9366,13 @@ const Settings = {
         Gamification.renderXpBar();
         
         alert('All metrics have been reset to defaults.');
+        Home.render();
+    },
+
+    clearTimeData() {
+        if (!confirm('Clear all study time data? This will reset today\'s time and total study time to 0.')) return;
+        Session.clearAllTimeData();
+        alert('Study time data cleared.');
         Home.render();
     }
 };
@@ -10770,7 +10834,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.33</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.34</div>
 
 </body>
 </html>
