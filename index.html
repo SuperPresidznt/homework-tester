@@ -1801,7 +1801,10 @@ button:focus-visible {
 
 <!-- ========== PROGRESS SCREEN ========== -->
 <div class="screen" id="screen-progress">
-    <h2 style="color:var(--navy);margin-bottom:16px">Progress Dashboard</h2>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+        <h2 style="color:var(--navy);margin:0">📊 Metrics Dashboard</h2>
+        <div id="overallTrend" style="font-size:14px;font-weight:600"></div>
+    </div>
     <button class="btn-nav btn-home" onclick="showScreen('home');Home.render()" style="margin-bottom:16px">Back to Home</button>
     <div id="progressContent"></div>
 </div>
@@ -8354,6 +8357,11 @@ const AIPractice = {
         // Prioritize weak categories but occasionally mix in stronger ones
         const sessionCatStats = this.sessionStats.byCategory;
 
+        // Re-analyze weak areas periodically based on session performance
+        if (this.sessionStats.total > 0 && this.sessionStats.total % 5 === 0) {
+            this._updateWeakAreasFromSession();
+        }
+
         // Check if any weak categories are still below 80% in this session
         for (const wc of this.weakCategories) {
             const sessionData = sessionCatStats[wc.category];
@@ -8375,6 +8383,31 @@ const AIPractice = {
         return byAttempts[0]?.category || this.weakCategories[0]?.category || 'General';
     },
 
+    // Dynamically update weak areas based on session performance
+    _updateWeakAreasFromSession() {
+        const sessionCatStats = this.sessionStats.byCategory;
+        
+        // Recalculate weakness scores incorporating session data
+        this.weakCategories = this.weakCategories.map(wc => {
+            const sessionData = sessionCatStats[wc.category];
+            if (sessionData && sessionData.total >= 2) {
+                const sessionAccuracy = (sessionData.correct / sessionData.total) * 100;
+                // Blend original score with session performance (session weighted more)
+                const blendedScore = (wc.score * 0.3) + (sessionAccuracy * 0.7);
+                return { ...wc, score: blendedScore, sessionTotal: sessionData.total };
+            }
+            return wc;
+        });
+        
+        // Re-sort by weakness (lowest first)
+        this.weakCategories.sort((a, b) => a.score - b.score);
+        
+        // Clear buffer if performance changed significantly - new questions will target updated weak areas
+        if (this._questionBuffer.length > 1) {
+            this._questionBuffer = this._questionBuffer.slice(0, 1); // Keep only next question
+        }
+    },
+
     adjustDifficulty() {
         const cat = this.currentCategory;
         const catStats = this.sessionStats.byCategory[cat];
@@ -8386,8 +8419,8 @@ const AIPractice = {
 
         const recentAccuracy = catStats.correct / catStats.total;
 
-        // Adaptive difficulty
-        if (recentAccuracy >= 0.8 && this.currentDifficulty < 3) {
+        // Adaptive difficulty - more responsive
+        if (recentAccuracy >= 0.75 && this.currentDifficulty < 3) {
             this.currentDifficulty = Math.min(3, this.currentDifficulty + 1);
         } else if (recentAccuracy < 0.5 && this.currentDifficulty > 1) {
             this.currentDifficulty = Math.max(1, this.currentDifficulty - 1);
@@ -9011,8 +9044,183 @@ const Progress = {
 
     render() {
         const content = document.getElementById('progressContent');
-        content.innerHTML = this.renderGamificationStats() + this.renderOverallStats() + this.renderScoreTrend() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
+        content.innerHTML = this.renderGamificationStats() + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
         this._drawTrendChart();
+        this._drawAccuracyChart();
+        this._renderOverallTrend();
+    },
+
+    _renderOverallTrend() {
+        const el = document.getElementById('overallTrend');
+        if (!el) return;
+        
+        // Calculate overall trend from recent tests
+        let allHistory = [];
+        for (const bank of BankManager.banks) {
+            const history = Store.get('testHistory_' + bank.bankId, []);
+            allHistory = allHistory.concat(history);
+        }
+        allHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        if (allHistory.length < 3) {
+            el.innerHTML = '<span style="color:var(--gray-500)">Need more data for trend</span>';
+            return;
+        }
+        
+        // Compare recent 5 vs previous 5
+        const recent = allHistory.slice(-5);
+        const previous = allHistory.slice(-10, -5);
+        
+        const recentAvg = recent.reduce((sum, h) => sum + h.pct, 0) / recent.length;
+        const previousAvg = previous.length > 0 ? previous.reduce((sum, h) => sum + h.pct, 0) / previous.length : recentAvg;
+        
+        const diff = recentAvg - previousAvg;
+        const trend = diff > 2 ? 'up' : diff < -2 ? 'down' : 'stable';
+        
+        if (trend === 'up') {
+            el.innerHTML = `<span style="color:var(--green)">📈 Trending Up (+${Math.round(diff)}%)</span>`;
+        } else if (trend === 'down') {
+            el.innerHTML = `<span style="color:var(--red)">📉 Trending Down (${Math.round(diff)}%)</span>`;
+        } else {
+            el.innerHTML = `<span style="color:var(--blue)">➡️ Stable (${Math.round(recentAvg)}% avg)</span>`;
+        }
+    },
+
+    renderAccuracyOverTime() {
+        // Get daily accuracy data for last 14 days
+        const dailyData = this._getDailyAccuracyData(14);
+        if (dailyData.length < 2) return '';
+        
+        return `<div class="progress-section">
+            <h3>📈 Daily Accuracy Trend</h3>
+            <canvas id="accuracyChart" width="600" height="160" style="width:100%;max-height:160px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
+            <p style="font-size:11px;color:var(--gray-600);text-align:center;margin-top:4px">Last ${dailyData.length} days with activity</p>
+        </div>`;
+    },
+
+    _getDailyAccuracyData(days) {
+        const data = [];
+        const trackerData = Store.get('questionTracker', {});
+        
+        // Group attempts by day
+        const byDay = {};
+        Object.values(trackerData).forEach(qData => {
+            (qData.history || []).forEach(attempt => {
+                if (!attempt.date) return;
+                const day = attempt.date.split('T')[0];
+                if (!byDay[day]) byDay[day] = { correct: 0, total: 0 };
+                byDay[day].total++;
+                if (attempt.correct) byDay[day].correct++;
+            });
+        });
+        
+        // Get last N days with data
+        const sortedDays = Object.keys(byDay).sort().slice(-days);
+        sortedDays.forEach(day => {
+            const d = byDay[day];
+            data.push({
+                day: day,
+                accuracy: d.total > 0 ? Math.round((d.correct / d.total) * 100) : 0,
+                total: d.total
+            });
+        });
+        
+        return data;
+    },
+
+    _drawAccuracyChart() {
+        const canvas = document.getElementById('accuracyChart');
+        if (!canvas) return;
+        
+        const dailyData = this._getDailyAccuracyData(14);
+        if (dailyData.length < 2) return;
+        
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = canvas.offsetWidth * dpr;
+        canvas.height = canvas.offsetHeight * dpr;
+        ctx.scale(dpr, dpr);
+        const w = canvas.offsetWidth, h = canvas.offsetHeight;
+        const pad = { top: 15, right: 15, bottom: 25, left: 35 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+        
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+            (document.documentElement.getAttribute('data-theme') !== 'light' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+        
+        ctx.fillStyle = isDark ? '#16213e' : '#fff';
+        ctx.fillRect(0, 0, w, h);
+        
+        // Grid lines
+        ctx.strokeStyle = isDark ? '#374151' : '#eee';
+        ctx.lineWidth = 1;
+        for (let pct of [0, 50, 70, 100]) {
+            const y = pad.top + plotH - (pct / 100) * plotH;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, y);
+            ctx.lineTo(w - pad.right, y);
+            ctx.stroke();
+            ctx.fillStyle = isDark ? '#9ca3af' : '#999';
+            ctx.font = '9px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillText(pct + '%', pad.left - 3, y + 3);
+        }
+        
+        // Pass line at 70%
+        const passY = pad.top + plotH - (70 / 100) * plotH;
+        ctx.strokeStyle = isDark ? '#4ade80' : '#27ae60';
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, passY);
+        ctx.lineTo(w - pad.right, passY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Data points
+        const points = dailyData.map((d, i) => ({
+            x: pad.left + (i / (dailyData.length - 1)) * plotW,
+            y: pad.top + plotH - (d.accuracy / 100) * plotH,
+            accuracy: d.accuracy
+        }));
+        
+        // Area fill
+        const gradient = ctx.createLinearGradient(0, pad.top, 0, pad.top + plotH);
+        gradient.addColorStop(0, isDark ? 'rgba(139,92,246,.3)' : 'rgba(139,92,246,.15)');
+        gradient.addColorStop(1, isDark ? 'rgba(139,92,246,0)' : 'rgba(139,92,246,0)');
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, pad.top + plotH);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(points[points.length - 1].x, pad.top + plotH);
+        ctx.closePath();
+        ctx.fillStyle = gradient;
+        ctx.fill();
+        
+        // Line
+        ctx.strokeStyle = isDark ? '#8b5cf6' : '#7c3aed';
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.stroke();
+        
+        // Dots
+        points.forEach(p => {
+            const color = p.accuracy >= 70 ? (isDark ? '#4ade80' : '#27ae60') : (isDark ? '#ef4444' : '#c0392b');
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+        });
+        
+        // X axis labels (dates)
+        ctx.fillStyle = isDark ? '#9ca3af' : '#999';
+        ctx.font = '8px Arial';
+        ctx.textAlign = 'center';
+        const step = Math.max(1, Math.floor(dailyData.length / 5));
+        for (let i = 0; i < dailyData.length; i += step) {
+            const dateStr = dailyData[i].day.slice(5); // MM-DD
+            ctx.fillText(dateStr, points[i].x, h - 5);
+        }
     },
 
     renderGamificationStats() {
@@ -10991,7 +11199,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.36</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.37</div>
 
 </body>
 </html>
