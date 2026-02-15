@@ -103,6 +103,11 @@ button:active:not(:disabled){transform:scale(0.97)}
     .quick-actions .btn-nav{flex:1 1 150px}
 }
 
+@media(max-width:900px){
+    #bankList{grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+    .mode-buttons{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+}
+
 /* === STREAK & DAILY GOAL === */
 .streak-banner{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0;padding:16px;background:linear-gradient(135deg,#ff6b35,#f7931e);border-radius:12px;color:#fff;font-weight:bold}
 .streak-banner .streak-flame{font-size:32px;line-height:1}
@@ -123,7 +128,8 @@ button:active:not(:disabled){transform:scale(0.97)}
 .goal-celebration{text-align:center;padding:8px;margin-top:8px;background:#eafaf1;border-radius:6px;color:var(--green);font-weight:bold;animation:goalPulse .5s ease}
 @keyframes goalPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 
-.bank-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:20px;margin:16px 0;box-shadow:var(--shadow);transition:box-shadow .2s ease}
+#bankList{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;width:100%}
+.bank-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:20px;box-shadow:var(--shadow);transition:box-shadow .2s ease;height:100%;display:flex;flex-direction:column}
 .bank-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .bank-card h2{color:var(--navy);font-size:20px;margin-bottom:4px}
 .bank-card .bank-desc{color:#555;font-size:13px;margin-bottom:16px}
