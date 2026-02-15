@@ -1593,6 +1593,7 @@ button:focus-visible {
         </div>
         </button>
         <div class="header-actions">
+            <span id="headerCoins" class="coin-display" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:4px 10px;border-radius:12px;font-size:13px;font-weight:bold;cursor:pointer" onclick="Shop.show()" title="Open Shop">🪙 0</span>
             <button onclick="if(document.getElementById('screen-exam').classList.contains('active') && !App.submitted){App.exitToHome()}else{SessionState.clear();showScreen('home');Home.render()}">Home</button>
             <button onclick="if(App.timerInterval && !App.timerPaused){App.toggleTimer()}showScreen('settings')">Settings</button>
             <button onclick="document.getElementById('helpModal').classList.add('active')" title="Keyboard shortcuts (?)" aria-label="Help" style="font-size:14px;padding:5px 10px">?</button>
@@ -3524,8 +3525,17 @@ const Gamification = {
                 <div class="buddy-mini" onclick="Gamification.showBuddyInfo()" title="Buddy mood">
                     ${this.getSpeciesEmoji(state.studyBuddy.species, state.studyBuddy.stage)}
                 </div>
-            `;
+                `;
         this.renderMomentumPillsInto(document.getElementById('momentumPills'));
+        // Update header coins
+        this.updateHeaderCoins();
+    },
+
+    updateHeaderCoins() {
+        const state = this.getState();
+        const coins = state.coins || 0;
+        const headerCoins = document.getElementById('headerCoins');
+        if (headerCoins) headerCoins.textContent = '🪙 ' + coins.toLocaleString();
     },
 
     // Trigger confetti effect
@@ -6682,6 +6692,8 @@ function showScreen(name, showSubheader, showFooter) {
     // End session timer when returning home
     if (name === 'home') {
         Session.end();
+        // Reset combo when returning home so it doesn't persist
+        Gamification.resetCombo();
     }
 
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -6691,11 +6703,17 @@ function showScreen(name, showSubheader, showFooter) {
     document.getElementById('footerNav').style.display = showFooter ? '' : 'none';
 
     const chatFab = document.getElementById('chatFab');
-    if (name === 'exam' || name === 'drill' || name === 'ai-practice') {
+    if (name === 'exam' || name === 'drill' || name === 'ai-practice' || name === 'speed') {
         chatFab.style.display = '';
     } else {
         chatFab.style.display = 'none';
         Chat.close();
+    }
+
+    // Hide combo display on non-active screens
+    const comboEl = document.getElementById('comboDisplay');
+    if (comboEl && (name === 'home' || name === 'settings' || name === 'progress' || name === 'shop' || name === 'garden')) {
+        comboEl.classList.remove('active');
     }
 }
 
@@ -10584,6 +10602,66 @@ const Notes = {
 const Chat = {
     history: [],
     isOpen: false,
+    KNOWLEDGE_GAPS_KEY: 'wgu_knowledgeGaps',
+
+    // Knowledge gap tracking - saves what user doesn't understand
+    saveKnowledgeGap(topic, context) {
+        const gaps = Store.get(this.KNOWLEDGE_GAPS_KEY, []);
+        gaps.push({
+            topic: topic,
+            context: context,
+            timestamp: Date.now(),
+            category: this._getCurrentCategory(),
+            resolved: false
+        });
+        // Keep last 50 gaps
+        if (gaps.length > 50) gaps.shift();
+        Store.set(this.KNOWLEDGE_GAPS_KEY, gaps);
+    },
+
+    getKnowledgeGaps() {
+        return Store.get(this.KNOWLEDGE_GAPS_KEY, []);
+    },
+
+    getRelevantGaps(category) {
+        const gaps = this.getKnowledgeGaps();
+        const now = Date.now();
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        // Return gaps from same category or recent (within a week)
+        return gaps.filter(g => 
+            !g.resolved && 
+            (g.category === category || (now - g.timestamp) < oneWeek)
+        );
+    },
+
+    _getCurrentCategory() {
+        const ctx = App.getQuestionContext() || Drill.getQuestionContext() || AIPractice.getQuestionContext();
+        if (ctx && ctx.category) return ctx.category;
+        // Try to get from current question
+        if (App.questions && App.questions[App.currentQ]) return App.questions[App.currentQ].category || 'General';
+        if (Drill.current) return Drill.current.question.category || 'General';
+        if (AIPractice.currentQuestion) return AIPractice.currentQuestion.category || 'General';
+        return 'General';
+    },
+
+    _detectKnowledgeGap(userMessage) {
+        // Detect if user is expressing confusion or asking for help
+        const gapPhrases = [
+            /i don'?t understand/i,
+            /i'?m confused/i,
+            /what does .+ mean/i,
+            /can you explain/i,
+            /i don'?t get/i,
+            /i'?m not sure/i,
+            /help me understand/i,
+            /what is .+\?/i,
+            /how does .+ work/i,
+            /why is/i,
+            /i struggle with/i,
+            /i always get .+ wrong/i
+        ];
+        return gapPhrases.some(p => p.test(userMessage));
+    },
 
     toggle() {
         this.isOpen = !this.isOpen;
@@ -10677,11 +10755,27 @@ const Chat = {
 
         this.addMessage('user', text);
 
+        // Detect and save knowledge gaps
+        if (this._detectKnowledgeGap(text)) {
+            const ctx = App.getQuestionContext() || Drill.getQuestionContext() || AIPractice.getQuestionContext();
+            this.saveKnowledgeGap(text, ctx ? ctx.text : 'General question');
+        }
+
         // Build context
         let ctx = App.getQuestionContext() || Drill.getQuestionContext() || AIPractice.getQuestionContext();
         const comprehensiveStats = AIPractice.getComprehensiveStats ? AIPractice.getComprehensiveStats() : null;
+        const relevantGaps = this.getRelevantGaps(this._getCurrentCategory());
         
         let systemPrompt = 'You are a WGU tutor helping a student study for their assessment. Be concise and conversational. Use plain text only - no markdown, no asterisks, no bullet points, no bold/italic formatting. Write like you are talking to a friend. Keep explanations simple and easy to follow. If the student asks about a specific question, reference the question context provided.';
+        
+        // Add knowledge gaps context
+        if (relevantGaps.length > 0) {
+            systemPrompt += `\n\n=== STUDENT'S PREVIOUS KNOWLEDGE GAPS ===
+The student has previously expressed confusion about these topics. If the current question relates to any of these, provide extra context and connect the concepts:
+${relevantGaps.slice(-10).map(g => `- "${g.topic}" (${g.category}, ${new Date(g.timestamp).toLocaleDateString()})`).join('\n')}
+
+When explaining, reference these past struggles if relevant and help build connections.`;
+        }
         
         // Add comprehensive stats for summaries and analysis
         if (comprehensiveStats) {
@@ -11919,7 +12013,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.40</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.41</div>
 
 </body>
 </html>
