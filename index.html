@@ -9011,8 +9011,32 @@ const Progress = {
 
     render() {
         const content = document.getElementById('progressContent');
-        content.innerHTML = this.renderOverallStats() + this.renderScoreTrend() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
+        content.innerHTML = this.renderGamificationStats() + this.renderOverallStats() + this.renderScoreTrend() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
         this._drawTrendChart();
+    },
+
+    renderGamificationStats() {
+        const gamState = Gamification.getState();
+        const globalStats = DailyGoal.getStats();
+        
+        return `<div class="progress-section">
+            <h3>🎮 Player Stats</h3>
+            <div class="mastery-grid" style="grid-template-columns:repeat(auto-fit,minmax(100px,1fr))">
+                <div class="mastery-item mastered"><div class="value">Lv ${gamState.level}</div><div class="label">${gamState.currentTitle || 'Student'}</div></div>
+                <div class="mastery-item learning"><div class="value">${gamState.xp}</div><div class="label">Current XP</div></div>
+                <div class="mastery-item new"><div class="value">${gamState.stats?.totalXpEarned || 0}</div><div class="label">Total XP</div></div>
+                <div class="mastery-item mastered"><div class="value">${gamState.coins || 0}</div><div class="label">Coins</div></div>
+                <div class="mastery-item learning"><div class="value">${globalStats.streak || 0}</div><div class="label">Day Streak</div></div>
+                <div class="mastery-item new"><div class="value">${gamState.stats?.longestStreak || 0}</div><div class="label">Best Combo</div></div>
+                <div class="mastery-item mastered"><div class="value">${gamState.stats?.questionsAnswered || 0}</div><div class="label">Questions</div></div>
+                <div class="mastery-item learning"><div class="value">${globalStats.testsCompleted || 0}</div><div class="label">Tests</div></div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+                ${Object.entries(gamState.achievements || {}).length > 0 ? 
+                    `<span style="font-size:12px;color:var(--gray-600)">🏆 ${Object.keys(gamState.achievements).length} achievements unlocked</span>` : 
+                    '<span style="font-size:12px;color:var(--gray-500)">No achievements yet</span>'}
+            </div>
+        </div>`;
     },
 
     renderScoreTrend() {
@@ -9226,6 +9250,42 @@ const Progress = {
         }).join('');
 
         return '<div class="progress-section"><h3>Test History (Last 10)</h3><table class="progress-table"><thead><tr><th>Date</th><th>Score</th><th>Mode</th><th>Time</th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+    },
+
+    renderCategoryTimeBreakdown() {
+        const gamState = Gamification.getState();
+        const categoryMastery = gamState.categoryMastery || {};
+        const entries = Object.entries(categoryMastery).filter(([_, d]) => d.total > 0);
+        
+        if (entries.length === 0) {
+            return '<div class="progress-section"><h3>⏱️ Time by Category</h3><p style="color:var(--gray-600)">Answer some questions to see time breakdown.</p></div>';
+        }
+        
+        // Sort by total time (most time first)
+        entries.sort((a, b) => (b[1].totalTimeMs || 0) - (a[1].totalTimeMs || 0));
+        
+        const maxTime = Math.max(...entries.map(([_, d]) => d.totalTimeMs || 0), 1);
+        
+        const rows = entries.map(([cat, data]) => {
+            const totalMins = Math.round((data.totalTimeMs || 0) / 60000);
+            const avgSecs = data.total > 0 ? Math.round((data.totalTimeMs || 0) / data.total / 1000) : 0;
+            const accuracy = data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0;
+            const barWidth = Math.round(((data.totalTimeMs || 0) / maxTime) * 100);
+            const colorClass = accuracy >= 70 ? 'good' : accuracy >= 50 ? 'warn' : 'bad';
+            const levelBadge = data.level ? ` <span style="background:${data.level === 'platinum' ? '#e5e4e2' : data.level === 'gold' ? '#ffd700' : data.level === 'silver' ? '#c0c0c0' : '#cd7f32'};color:#333;padding:1px 5px;border-radius:6px;font-size:9px;font-weight:bold">${data.level.toUpperCase()}</span>` : '';
+            
+            return `<div class="chart-row">
+                <span class="chart-label" style="min-width:120px">${escapeHtml(cat)}${levelBadge}</span>
+                <div class="chart-bar-bg"><div class="chart-bar-fill ${colorClass}" style="width:${barWidth}%"></div></div>
+                <span class="chart-value" style="min-width:140px;text-align:right">${Session.formatTime(totalMins)} | ${avgSecs}s/q | ${accuracy}%</span>
+            </div>`;
+        }).join('');
+        
+        return `<div class="progress-section">
+            <h3>⏱️ Time by Category</h3>
+            <p style="font-size:12px;color:var(--gray-600);margin-bottom:8px">Total time spent, avg per question, and accuracy</p>
+            <div class="progress-chart">${rows}</div>
+        </div>`;
     },
 
     renderCategoryPerformance() {
@@ -10931,7 +10991,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.35</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.36</div>
 
 </body>
 </html>
