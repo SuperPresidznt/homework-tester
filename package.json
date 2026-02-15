@@ -1,0 +1,27 @@
+{
+  "name": "wgu-practice",
+  "version": "1.0.0",
+  "description": "Gamified study tool for WGU students with spaced repetition, AI questions, and pet/garden systems",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "npx serve .",
+    "lint": "eslint js/**/*.js",
+    "format": "prettier --write js/**/*.js"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "eslint": "^8.56.0",
+    "prettier": "^3.2.0"
+  },
+  "keywords": [
+    "wgu",
+    "study",
+    "gamification",
+    "spaced-repetition",
+    "education"
+  ],
+  "license": "MIT"
+}

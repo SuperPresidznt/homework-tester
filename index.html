@@ -8,6 +8,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
     <style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap');
 /* === RESET & VARIABLES === */
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -28,8 +29,12 @@ button:active:not(:disabled){transform:scale(0.97)}
 /* === HEADER === */
 .main-header{background:linear-gradient(to bottom,var(--navy),var(--navy-dark));color:#fff;border-bottom:3px solid var(--blue)}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:8px 20px;min-height:55px}
+.logo-link{background:transparent;border:none;padding:0;margin:0;cursor:pointer;color:inherit;font:inherit}
+.logo-link:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:8px}
 .logo-area{display:flex;align-items:center;gap:12px}
-.logo-text{font-size:18px;font-weight:bold;letter-spacing:.5px}
+.logo-mark{width:52px;height:52px;flex-shrink:0;filter:drop-shadow(0 6px 12px rgba(255,255,255,.25)) drop-shadow(0 12px 24px rgba(14,17,33,.35));}
+.logo-text{font-family:'Space Grotesk','Segoe UI',sans-serif;font-size:20px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;line-height:1}
+.logo-text::after{content:'BETA';font-size:10px;font-weight:600;margin-left:8px;padding:2px 6px;background:rgba(255,255,255,.15);border-radius:99px;letter-spacing:.6px}
 .header-actions{display:flex;align-items:center;gap:12px}
 .header-actions button{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:var(--radius);font-size:12px}
 .header-actions button:hover{background:rgba(255,255,255,.1)}
@@ -54,15 +59,49 @@ button:active:not(:disabled){transform:scale(0.97)}
 @keyframes screenIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* === HOME SCREEN === */
-.home-hero{text-align:center;padding:30px 0 20px}
+.home-layout{display:flex;gap:28px;align-items:flex-start;padding:10px 0}
+.home-main{flex:1;min-width:0}
+.home-side{width:320px;flex-shrink:0;display:flex;flex-direction:column;gap:16px;position:sticky;top:90px}
+.home-hero{text-align:center;padding:30px 0 10px}
 .home-hero h1{color:var(--navy);font-size:28px;margin-bottom:8px}
 .home-hero p{color:var(--gray-600);font-size:15px}
+.bank-list-header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin:10px 0 6px}
+.bank-list-header h2{font-size:18px;color:var(--navy);margin:0}
+.bank-list-header p{font-size:13px;color:var(--gray-600);margin:4px 0 0}
+.bank-list-subtle{font-size:12px;color:var(--gray-500);font-weight:600;text-transform:uppercase}
+.quick-actions{display:flex;flex-direction:column;gap:10px}
+.quick-actions .btn-nav{width:100%}
 
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin:20px 0}
+.stats-panel{background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:0 16px;margin:20px 0;box-shadow:0 4px 18px rgba(15,23,42,.05)}
+.stats-panel summary{list-style:none;display:flex;align-items:center;justify-content:space-between;font-size:15px;font-weight:600;color:var(--navy);cursor:pointer;padding:16px 0;margin:0}
+.stats-panel summary::-webkit-details-marker{display:none}
+.stats-panel summary .summary-caret{font-size:18px;color:var(--gray-500);transition:transform .2s ease}
+.stats-panel:not([open]) summary .summary-caret{transform:rotate(-90deg)}
+.stats-panel[open] summary{border-bottom:1px solid var(--gray-100);margin-bottom:12px}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;max-height:240px;overflow-y:auto;padding:12px 6px 16px}
+.meta-panel{background:var(--white);border:1px solid var(--gray-200);border-radius:12px;margin:12px 0 20px;padding:0 16px;box-shadow:0 10px 30px rgba(15,23,42,.05)}
+.meta-panel summary{list-style:none;display:flex;align-items:center;justify-content:space-between;font-size:14px;font-weight:600;color:var(--navy);cursor:pointer;padding:14px 0;margin:0}
+.meta-panel summary::-webkit-details-marker{display:none}
+.meta-panel summary .summary-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.meta-panel summary .summary-caret{font-size:16px;color:var(--gray-500);transition:transform .2s ease}
+.meta-panel:not([open]) summary .summary-caret{transform:rotate(-90deg)}
+.meta-panel[open]{padding-bottom:12px}
+.meta-panel[open] summary{border-bottom:1px solid var(--gray-100);margin-bottom:12px}
+.meta-glance{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.meta-pill{background:rgba(15,23,42,.08);color:var(--navy);font-size:12px;padding:6px 12px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.meta-pill span{font-weight:500;color:var(--gray-600)}
+.meta-pill .pill-source{font-size:10px;color:var(--gray-500);font-weight:500}
 .stat-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:16px;text-align:center;transition:transform .2s ease,box-shadow .2s ease}
 .stat-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.08)}
 .stat-card .stat-val{font-size:28px;font-weight:bold;color:var(--navy)}
 .stat-card .stat-lbl{font-size:12px;color:var(--gray-600);margin-top:4px}
+
+@media(max-width:1100px){
+    .home-layout{flex-direction:column}
+    .home-side{width:100%;position:static}
+    .quick-actions{flex-direction:row;flex-wrap:wrap;justify-content:center}
+    .quick-actions .btn-nav{flex:1 1 150px}
+}
 
 /* === STREAK & DAILY GOAL === */
 .streak-banner{display:flex;align-items:center;justify-content:center;gap:12px;margin:16px 0;padding:16px;background:linear-gradient(135deg,#ff6b35,#f7931e);border-radius:12px;color:#fff;font-weight:bold}
@@ -205,14 +244,18 @@ button:active:not(:disabled){transform:scale(0.97)}
 [data-theme="dark"] .ai-session-summary .summary-score { color: #a78bfa; }
 
 /* === QUESTION CONTAINER === */
-.question-container{background:#fff;border:1px solid var(--gray-300);border-radius:var(--radius);padding:25px 30px;margin-bottom:15px;min-height:250px}
-.question-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--gray-100);flex-wrap:wrap;gap:8px}
+.question-container{background:#fff;border:1px solid var(--gray-200);border-radius:var(--radius);padding:24px;margin-bottom:20px;box-shadow:var(--shadow);max-width:100%;box-sizing:border-box;overflow:hidden}
+.question-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:15px;padding-bottom:10px;border-bottom:1px solid var(--gray-100)}
 .question-number{font-weight:bold;color:var(--navy);font-size:14px}
 .question-actions{display:flex;gap:8px}
 .btn-bookmark,.btn-clear{padding:4px 14px;border:1px solid var(--gray-500);border-radius:3px;background:#f0f0f0;font-size:12px;color:#333}
 .btn-bookmark:hover,.btn-clear:hover{background:#e0e0e0}
 .btn-bookmark.flagged{background:#fff3cd;border-color:var(--orange);color:#856404}
-.question-text{font-size:15px;line-height:1.7;margin-bottom:20px;color:var(--gray-900);word-break:normal;overflow-wrap:break-word;white-space:normal}
+.question-text{font-size:15px;line-height:1.7;margin-bottom:18px;color:var(--gray-900);overflow-wrap:break-word}
+.question-text strong{color:var(--navy)}
+.question-text img,.question-text canvas{max-width:100%;height:auto}
+.question-text [data-graph]{display:block;width:100%;max-width:100%}
+.question-text,.option-label,.explanation-panel,.explanation-panel p{word-break:normal;overflow-wrap:break-word;white-space:normal}
 .question-text p{margin-bottom:8px;word-break:normal;white-space:normal}
 
 /* === OPTIONS === */
@@ -866,6 +909,13 @@ button:focus-visible {
 .xp-info{text-align:right;min-width:100px}
 .xp-text{color:#fff;font-size:12px;opacity:.9}
 .xp-title{color:var(--yellow);font-size:11px;font-weight:bold;margin-top:2px}
+.momentum-pill-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-left:auto}
+.momentum-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);color:#fff;font-size:11px;padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25);backdrop-filter:blur(4px)}
+.momentum-pill.secondary{background:rgba(255,255,255,.08);border-style:dashed}
+.momentum-pill.muted{color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.15)}
+.qcount-tier-pill,.batch-preview-pill{display:inline-flex;align-items:center;gap:6px;background:var(--navy);color:#fff;font-size:11px;padding:4px 10px;border-radius:999px;margin-top:6px}
+.batch-preview{margin-top:12px;padding:10px;background:var(--gray-100);border-radius:10px;border:1px solid var(--gray-200)}
+.batch-preview-pill{background:var(--blue);}
 .xp-bar-container .buddy-mini{font-size:24px;margin-left:8px;cursor:pointer;transition:transform .2s}
 .xp-bar-container .buddy-mini:hover{transform:scale(1.2)}
 
@@ -1447,6 +1497,61 @@ button:focus-visible {
     .pet-modal-emoji{font-size:48px}
     .pet-food-grid{grid-template-columns:1fr}
 }
+
+/* ========== SCENE BACKGROUNDS ========== */
+#sceneCanvas{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:0;display:none}
+#deskTrinkets{position:fixed;bottom:0;left:0;right:0;height:100px;pointer-events:none;z-index:1}
+.desk-trinket{position:absolute;font-size:28px;transform:translateX(-50%);filter:drop-shadow(0 2px 4px rgba(0,0,0,.2));animation:trinketBob 3s ease-in-out infinite}
+@keyframes trinketBob{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-4px)}}
+
+.scene-default{background:var(--bg)}
+.scene-cozy-desk{background:linear-gradient(135deg,#2d1f1a 0%,#3d2a1f 50%,#4a3728 100%)}
+.scene-cozy-desk::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 20%,rgba(255,200,100,.08) 0%,transparent 50%);pointer-events:none;z-index:0}
+.scene-night-sky{background:linear-gradient(180deg,#0a0a1a 0%,#1a1a3a 50%,#0f0f2f 100%)}
+.scene-night-sky.scene-animated::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(2px 2px at 20% 30%,white,transparent),radial-gradient(2px 2px at 40% 70%,white,transparent),radial-gradient(1px 1px at 50% 20%,white,transparent),radial-gradient(2px 2px at 60% 50%,white,transparent),radial-gradient(1px 1px at 70% 80%,white,transparent),radial-gradient(2px 2px at 80% 10%,white,transparent),radial-gradient(1px 1px at 90% 40%,white,transparent);animation:twinkle 4s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes twinkle{0%{opacity:.6}100%{opacity:1}}
+.scene-rain-window{background:linear-gradient(180deg,#2a3a4a 0%,#1a2a3a 100%)}
+.scene-forest-glade{background:linear-gradient(180deg,#1a3a2a 0%,#2a4a3a 50%,#1a3020 100%)}
+.scene-forest-glade.scene-animated::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 60% 30%,rgba(255,255,200,.15) 0%,transparent 40%);animation:sunbeam 6s ease-in-out infinite alternate;pointer-events:none;z-index:0}
+@keyframes sunbeam{0%{opacity:.8;transform:scale(1)}100%{opacity:1;transform:scale(1.1)}}
+.scene-synthwave{background:linear-gradient(180deg,#1a0a2e 0%,#2d1b4e 40%,#1a0a2e 100%)}
+.scene-synthwave::before{content:'';position:fixed;bottom:0;left:0;right:0;height:50%;background:linear-gradient(90deg,transparent 49%,rgba(255,0,255,.1) 50%,transparent 51%),linear-gradient(0deg,transparent 49%,rgba(0,255,255,.1) 50%,transparent 51%);background-size:60px 60px;transform:perspective(500px) rotateX(60deg);transform-origin:bottom;pointer-events:none;z-index:0}
+.scene-synthwave.scene-animated::before{animation:gridScroll 2s linear infinite}
+@keyframes gridScroll{0%{background-position:0 0}100%{background-position:0 60px}}
+@media(prefers-reduced-motion:reduce){.scene-animated::before,.scene-animated::after{animation:none!important}}
+
+/* ========== BACKPACK & TRINKETS ========== */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px)}
+.modal-overlay.active{display:flex}
+.backpack-modal{background:var(--white);border-radius:16px;max-width:600px;width:90vw;max-height:80vh;overflow-y:auto;padding:24px;position:relative}
+.backpack-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.backpack-header h2{margin:0;font-size:1.5rem}
+.backpack-close{background:none;border:none;font-size:24px;cursor:pointer;color:var(--gray-500);padding:4px 8px;border-radius:4px}
+.backpack-close:hover{background:var(--gray-100);color:var(--gray-800)}
+.backpack-desk{background:var(--gray-100);border-radius:12px;padding:16px;margin-bottom:20px}
+.backpack-desk h3{margin:0 0 12px;font-size:1rem;color:var(--gray-600)}
+.desk-slots{position:relative;height:120px;background:linear-gradient(180deg,var(--gray-100) 0%,var(--gray-200) 100%);border-radius:8px;border:2px dashed var(--gray-300)}
+.desk-slot{position:absolute;width:48px;height:48px;transform:translate(-50%,-50%);background:var(--white);border:2px dashed var(--gray-300);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s ease}
+.desk-slot:hover{border-color:var(--blue);transform:translate(-50%,-50%) scale(1.1)}
+.desk-slot .trinket-icon{font-size:24px}
+.desk-slot .slot-empty{font-size:20px;color:var(--gray-400)}
+.backpack-inventory h3{margin:0 0 12px;font-size:1rem;color:var(--gray-600)}
+.trinket-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px}
+.trinket-card{background:var(--gray-50);border:2px solid var(--gray-200);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all .2s ease;position:relative}
+.trinket-card:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.15)}
+.trinket-card.equipped{background:rgba(41,128,185,.1)}
+.trinket-card.locked{opacity:.5;cursor:not-allowed}
+.trinket-card .trinket-icon{font-size:32px;display:block;margin-bottom:8px}
+.trinket-card .trinket-name{font-size:12px;font-weight:600;display:block;margin-bottom:4px}
+.trinket-card .trinket-rarity{font-size:10px;text-transform:uppercase;letter-spacing:.5px}
+.trinket-card .new-badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px}
+.empty-inventory{color:var(--gray-500);text-align:center;padding:24px;font-style:italic}
+.trinket-toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--white);border-radius:12px;padding:16px 24px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:1001;opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1)}
+.trinket-toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.trinket-toast .toast-icon{font-size:36px}
+.trinket-toast .toast-content{text-align:left}
+.trinket-toast .toast-title{font-weight:700;font-size:14px}
+.trinket-toast .toast-subtitle{font-size:12px;color:var(--gray-500)}
 </style>
 </head>
 <body>
@@ -1454,10 +1559,31 @@ button:focus-visible {
 <!-- HEADER -->
 <div class="main-header">
     <div class="header-top">
+        <button class="logo-link" onclick="SessionState.clear();showScreen('home');Home.render()" aria-label="Go to home">
         <div class="logo-area">
-            <svg width="36" height="36" viewBox="0 0 40 44" fill="none"><defs><linearGradient id="hsg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#8b5cf6"/><stop offset="100%" stop-color="#ec4899"/></linearGradient><filter id="hglow"><feGaussianBlur stdDeviation="1" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><path d="M20 3L35 10V23C35 31 28 37 20 40 12 37 5 31 5 23V10Z" fill="url(#hsg)" filter="url(#hglow)"/><path d="M14 15L26 28M26 15L14 28" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/></svg>
+            <svg class="logo-mark" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="logo-bg" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#f472b6"/>
+                        <stop offset="100%" stop-color="#a855f7"/>
+                    </linearGradient>
+                    <linearGradient id="logo-cut" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fde047"/>
+                        <stop offset="100%" stop-color="#f97316"/>
+                    </linearGradient>
+                    <filter id="logo-glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#f472b6" flood-opacity="0.5"/>
+                    </filter>
+                </defs>
+                <path d="M60 8L108 32V76C108 95 88 111 60 120 32 111 12 95 12 76V32Z" fill="url(#logo-bg)" filter="url(#logo-glow)" stroke="rgba(255,255,255,.3)" stroke-width="2"/>
+                <path d="M40 42L80 78M80 42L40 78" stroke="url(#logo-cut)" stroke-width="10" stroke-linecap="round"/>
+                <circle cx="60" cy="25" r="6" fill="#fff" opacity="0.6"/>
+                <circle cx="95" cy="40" r="5" fill="#fff" opacity="0.5"/>
+                <circle cx="25" cy="40" r="5" fill="#fff" opacity="0.5"/>
+            </svg>
             <span class="logo-text">Xooper's Battleground</span>
         </div>
+        </button>
         <div class="header-actions">
             <button onclick="if(document.getElementById('screen-exam').classList.contains('active') && !App.submitted){App.exitToHome()}else{SessionState.clear();showScreen('home');Home.render()}">Home</button>
             <button onclick="if(App.timerInterval && !App.timerPaused){App.toggleTimer()}showScreen('settings')">Settings</button>
@@ -1478,6 +1604,11 @@ button:focus-visible {
     </div>
 </div>
 
+<!-- Canvas for animated backgrounds -->
+<canvas id="sceneCanvas"></canvas>
+<!-- Desk trinkets container -->
+<div id="deskTrinkets"></div>
+
 <!-- ========== HOME SCREEN ========== -->
 <div class="screen active" id="screen-home">
     <div class="home-hero">
@@ -1486,20 +1617,50 @@ button:focus-visible {
         <p>Choose a question bank and study mode</p>
     </div>
 
-    <div id="streakBanner"></div>
-    <div id="dailyGoalCard"></div>
-    <div id="xpBarContainer"></div>
+    <div class="home-layout">
+        <div class="home-main">
+            <div class="bank-list-header">
+                <div>
+                    <div class="bank-list-subtle">Pick a path</div>
+                    <h2>Question Banks</h2>
+                </div>
+                <p>Start with a full test, practice set, drill, review, or AI run.</p>
+            </div>
+            <div id="bankList"></div>
+        </div>
+        <div class="home-side">
+            <div class="meta-panel" id="homeMetaPanel">
+                <summary>
+                    <div class="summary-meta">
+                        <span id="metaSummaryTitle">Daily Momentum</span>
+                        <small id="metaSummaryBody" style="color:var(--gray-500);font-weight:400">Loading…</small>
+                        <div class="meta-glance" id="metaBuffGlance" aria-label="Active buffs" role="list"></div>
+                    </div>
+                    <span class="summary-caret">⌃</span>
+                </summary>
+                <div id="streakBanner"></div>
+                <div id="dailyGoalCard"></div>
+                <div id="xpBarContainer"></div>
+            </div>
 
-    <div class="stats-row" id="homeStats"></div>
+            <div class="quick-actions">
+                <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Progress.show()">View Progress</button>
+                <button class="btn-nav" style="background:var(--green);border-color:var(--green)" id="btnGarden" onclick="Garden.show()">&#127793; Garden</button>
+                <button class="btn-nav" style="background:var(--orange);border-color:var(--orange)" id="btnShop" onclick="Shop.show()">&#128176; Shop</button>
+                <button class="btn-nav" style="background:var(--red);border-color:var(--red)" id="btnBattle" onclick="Battle.show()">&#9876;&#65039; Battle</button>
+                <button class="btn-nav" style="background:#a855f7;border-color:#a855f7" id="btnBackpack" onclick="Backpack.openModal()">&#127890; Backpack</button>
+                <button class="btn-nav" style="background:#6366f1;border-color:#6366f1" id="btnScenes" onclick="SceneManager.openModal()">&#127912; Backgrounds</button>
+            </div>
 
-    <div style="text-align:center;margin:16px 0;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
-        <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Progress.show()">View Progress</button>
-        <button class="btn-nav" style="background:var(--green);border-color:var(--green)" id="btnGarden" onclick="Garden.show()">&#127793; Garden</button>
-        <button class="btn-nav" style="background:var(--orange);border-color:var(--orange)" id="btnShop" onclick="Shop.show()">&#128176; Shop</button>
-        <button class="btn-nav" style="background:var(--red);border-color:var(--red)" id="btnBattle" onclick="Battle.show()">&#9876;&#65039; Battle</button>
+            <details class="stats-panel" id="homeStatsPanel">
+                <summary>
+                    <span>Performance Snapshot</span>
+                    <span class="summary-caret">⌃</span>
+                </summary>
+                <div class="stats-row" id="homeStats"></div>
+            </details>
+        </div>
     </div>
-
-    <div id="bankList"></div>
 </div>
 
 <!-- ========== SHOP SCREEN ========== -->
@@ -1749,6 +1910,7 @@ button:focus-visible {
                 <label><input type="checkbox" id="gamifyXpPopups" checked onchange="Gamification.updateSettings()"> XP Popups</label>
                 <label><input type="checkbox" id="gamifyPet" checked onchange="Gamification.updateSettings()"> Study Buddy</label>
                 <label><input type="checkbox" id="gamifyGarden" checked onchange="Gamification.updateSettings()"> Garden System</label>
+                <label><input type="checkbox" id="gamifyPetBuffs" checked onchange="Gamification.updateSettings()"> Pet/Garden Buffs</label>
                 <label><input type="checkbox" id="gamifyCoinPopups" checked onchange="Gamification.updateSettings()"> Coin Popups</label>
                 <label><input type="checkbox" id="gamifyPixelArt" onchange="Gamification.updateSettings()"> Pixel Art Mode</label>
                 <div class="volume-row">
@@ -1923,6 +2085,7 @@ button:focus-visible {
         <h3 style="color:var(--navy);margin-bottom:4px" id="qCountTitle">How many questions?</h3>
         <p style="color:var(--gray-600);font-size:13px;margin-bottom:16px" id="qCountSubtitle"></p>
         <div class="qcount-options" id="qCountOptions"></div>
+        <div class="batch-preview" id="batchRewardPreview" aria-live="polite"></div>
         <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">
             <button class="btn-nav" onclick="App.closeCountPicker()" style="background:var(--gray-300);color:var(--gray-800)">Cancel</button>
             <button class="btn-nav" id="qCountStart" onclick="App.confirmStart()" style="background:var(--blue);color:#fff">Start</button>
@@ -1975,6 +2138,21 @@ function escapeHtml(str) {
 // =====================================================================
 // GAMIFICATION SYSTEM
 // =====================================================================
+/**
+ * @namespace Gamification
+ * @description Core gamification engine managing XP, coins, levels, achievements,
+ * combo streaks, momentum buffs, pet/garden systems, and reward calculations.
+ * 
+ * State persisted to localStorage key: `wgu_gamification`
+ * 
+ * Key methods:
+ * - awardXp(action, options) - Grant XP for actions with multipliers
+ * - awardCoins(action, options) - Grant coins with buff scaling
+ * - getActiveBuffs() - Returns array of active pet/garden buffs
+ * - applyBuffScalars(baseAmount) - Applies buff multipliers to rewards
+ * - activateBatchMomentum(batchSize) - Activates batch-tier momentum
+ * - handleMomentumBreak(reason) - Revokes momentum on combo break/exit
+ */
 const Gamification = {
     // XP Values for different actions
     XP_VALUES: {
@@ -1988,6 +2166,170 @@ const Gamification = {
         dailyGoalReached: 100,
         weeklyGoalReached: 300,
         loginBonus: 25
+    },
+
+    getDefaultMomentumState() {
+        return {
+            active: false,
+            tierId: null,
+            label: 'Standard Pace',
+            xpMultiplier: 1,
+            coinMultiplier: 1,
+            batchSize: null,
+            questionGoal: 0,
+            questionsCompleted: 0,
+            pillIcon: '📦',
+            description: '',
+            source: null,
+            startedAt: null,
+            clearedAt: null,
+            lastUpdated: null,
+            lastClearedReason: null
+        };
+    },
+
+    getBatchTier(count) {
+        if (!count) return null;
+        const tiers = [...this.BATCH_TIERS].sort((a, b) => b.minQuestions - a.minQuestions);
+        return tiers.find(t => count >= t.minQuestions) || null;
+    },
+
+    activateBatchMomentum(batchSize, options = {}) {
+        const state = this.getState();
+        const tier = this.getBatchTier(batchSize);
+        if (!tier) {
+            state.momentum = { ...this.getDefaultMomentumState(), batchSize: batchSize || null, questionGoal: batchSize || 0 };
+            this.saveState(state);
+            this.renderXpBar();
+            return { ...state.momentum };
+        }
+
+        state.momentum = {
+            active: true,
+            tierId: tier.id,
+            label: tier.label,
+            xpMultiplier: tier.xpMultiplier,
+            coinMultiplier: tier.coinMultiplier,
+            batchSize: batchSize || tier.minQuestions,
+            questionGoal: options.questionGoal || batchSize || tier.minQuestions,
+            questionsCompleted: 0,
+            pillIcon: tier.pillIcon,
+            description: tier.description,
+            source: 'batch',
+            startedAt: Date.now(),
+            clearedAt: null,
+            lastUpdated: Date.now(),
+            lastClearedReason: null
+        };
+        this.saveState(state);
+        this.renderXpBar();
+        return { ...state.momentum };
+    },
+
+    syncMomentum(meta) {
+        const state = this.getState();
+        if (!meta || !meta.active) {
+            state.momentum = { ...this.getDefaultMomentumState(), batchSize: meta?.batchSize || null };
+            this.saveState(state);
+            return { ...state.momentum };
+        }
+
+        state.momentum = {
+            ...this.getDefaultMomentumState(),
+            ...meta,
+            active: true,
+            startedAt: meta.startedAt || Date.now(),
+            lastUpdated: Date.now(),
+            source: meta.source || 'batch'
+        };
+        this.saveState(state);
+        this.renderXpBar();
+        return { ...state.momentum };
+    },
+
+    clearMomentum(reason = 'manual') {
+        const state = this.getState();
+        state.momentum = {
+            ...this.getDefaultMomentumState(),
+            clearedAt: Date.now(),
+            lastClearedReason: reason
+        };
+        this.saveState(state);
+        this.renderXpBar();
+        return { ...state.momentum };
+    },
+
+    getMomentumState() {
+        const state = this.getState();
+        return { ...state.momentum };
+    },
+
+    getActiveMomentum(state) {
+        const src = state || this.getState();
+        return src.momentum && src.momentum.active ? src.momentum : null;
+    },
+
+    showMomentumToast(message, icon = '⚠️') {
+        const toast = document.getElementById('momentumToast');
+        if (!toast) return;
+        const iconEl = document.getElementById('momentumToastIcon');
+        const textEl = document.getElementById('momentumToastText');
+        iconEl.textContent = icon;
+        textEl.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(this._momentumToastTimer);
+        this._momentumToastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    },
+
+    incrementMomentumProgress(delta = 1) {
+        const state = this.getState();
+        if (!state.momentum || !state.momentum.active) return { ...state.momentum };
+        state.momentum.questionsCompleted = Math.max(0, (state.momentum.questionsCompleted || 0) + (delta || 0));
+        state.momentum.lastUpdated = Date.now();
+        this.saveState(state);
+        this.renderXpBar();
+        return { ...state.momentum };
+    },
+
+    handleMomentumBreak(reason) {
+        const state = this.getState();
+        if (!state.momentum || !state.momentum.active) return;
+        const label = state.momentum?.label || 'Momentum';
+        this.clearMomentum(reason);
+        const reasonText = {
+            incorrect: 'Momentum lost on a miss.',
+            exit: 'Momentum dropped when you left the run.',
+            combo: 'Combo broke, so boosts reset.',
+            session_end: 'Session ended, boosts cleared.',
+            manual: 'Momentum cleared.'
+        }[reason] || 'Momentum expired.';
+        this.showMomentumToast(`${label} ended · ${reasonText}`);
+    },
+
+    getMomentumPillMarkup(meta) {
+        const tier = meta && meta.active ? meta : this.getMomentumState();
+        if (tier && tier.active) {
+            const pct = Math.round(((tier.xpMultiplier || 1) - 1) * 100);
+            const goal = tier.questionGoal || tier.batchSize || null;
+            const progress = goal ? Math.min(goal, tier.questionsCompleted || 0) : (tier.questionsCompleted || 0);
+            const tooltipParts = [];
+            if (tier.description) tooltipParts.push(tier.description);
+            if (goal) tooltipParts.push(`Progress ${progress}/${goal} questions`);
+            tooltipParts.push('Miss a question or exit to lose this boost.');
+            const tooltip = tooltipParts.join(' · ');
+            const pills = [];
+            pills.push(`<span class="momentum-pill" title="${escapeHtml(tooltip)}">${tier.pillIcon || '🔥'} Momentum x${(tier.xpMultiplier || 1).toFixed(2)} · +${pct}%</span>`);
+            if (tier.batchSize) {
+                pills.push(`<span class="momentum-pill secondary" title="Batch goal ${tier.batchSize} questions">📦 Batch ${tier.batchSize}</span>`);
+            }
+            return pills.join('');
+        }
+        return '<span class="momentum-pill muted">🚶 No active boosts</span>';
+    },
+
+    renderMomentumPillsInto(el, meta) {
+        if (!el) return;
+        el.innerHTML = this.getMomentumPillMarkup(meta);
     },
 
     // Level titles
@@ -2103,6 +2445,90 @@ const Gamification = {
         return sp ? sp.difficulty : 1.0;
     },
 
+    applyBuffScalars(type, baseAmount) {
+        const state = this.getState();
+        if (!state.settings?.petBuffs) {
+            return { amount: baseAmount, amountDelta: 0, breakdown: '' };
+        }
+        let amount = baseAmount;
+        const buffs = this.getActiveBuffs();
+        const parts = [];
+        buffs.forEach(buff => {
+            const pct = /([0-9]{1,3})%/.exec(buff.value || '');
+            if (!pct) return;
+            const delta = Math.floor((amount * parseInt(pct[1], 10)) / 100);
+            if (delta <= 0) return;
+            const appliesXp = type === 'xp' && /xp/i.test(buff.value || buff.description || '');
+            const appliesCoin = type === 'coin' && /coin|yield|water/i.test(buff.value || buff.description || '');
+            if ((appliesXp && type === 'xp') || (appliesCoin && type === 'coin')) {
+                amount += delta;
+                parts.push(`${buff.label} +${pct[1]}%`);
+            }
+        });
+        return {
+            amount,
+            amountDelta: amount - baseAmount,
+            breakdown: parts.length ? `(${parts.join(', ')})` : ''
+        };
+    },
+
+    getActiveBuffs() {
+        const state = this.getState();
+        const buffs = [];
+        if (!state.settings?.petBuffs) return buffs;
+
+        const buddy = state.studyBuddy;
+        if (state.settings.pet && buddy) {
+            const happy = buddy.happiness ?? 0;
+            const hunger = buddy.hunger ?? 0;
+            const moodBonus = Math.max(0, Math.floor(((happy + hunger) / 200) * 10));
+            if (moodBonus >= 2) {
+                buffs.push({
+                    icon: '🦴',
+                    label: 'Buddy Boost',
+                    value: `+${moodBonus}% XP`,
+                    description: 'Happy, well-fed pets share their energy for extra XP.',
+                    source: buddy.species === 'dragon' ? 'Dragon' : 'Buddy'
+                });
+            }
+            const speciesMeta = this.PET_SPECIES[buddy.species] || this.PET_SPECIES.bird;
+            if (speciesMeta && speciesMeta.difficulty >= 1.5) {
+                buffs.push({
+                    icon: '🐉',
+                    label: `${speciesMeta.name} Focus`,
+                    value: '+5% combo cap',
+                    description: 'Challenging pets raise your focus window before combos drop.',
+                    source: speciesMeta.name
+                });
+            }
+        }
+
+        const plots = state.garden?.plots || [];
+        const sprouting = plots.filter(p => p && p.seedType).length;
+        if (state.settings.garden && sprouting >= 3) {
+            const pct = sprouting * 2;
+            buffs.push({
+                icon: '🌿',
+                label: 'Garden Groove',
+                value: `+${pct}% coin yield`,
+                description: 'Multiple thriving crops improve coin harvests.',
+                source: 'Garden'
+            });
+        }
+
+        if ((state.garden?.decorations || []).includes('fountain')) {
+            buffs.push({
+                icon: '⛲',
+                label: 'Fountain Flow',
+                value: '+5 water/question',
+                description: 'Fountain keeps crops hydrated automatically.',
+                source: 'Decoration'
+            });
+        }
+
+        return buffs.slice(0, 4);
+    },
+
     // Get default state
     // Coin values for different actions
     COIN_VALUES: {
@@ -2115,6 +2541,14 @@ const Gamification = {
         loginBonus: 10,
         harvest: 0 // varies per plant
     },
+
+    // Batch tiers for momentum rewards
+    BATCH_TIERS: [
+        { id: 'batch5', minQuestions: 5, label: 'Batch 5', xpMultiplier: 1.05, coinMultiplier: 1.05, pillIcon: '📦', description: '+5% rewards for 5-question runs.' },
+        { id: 'batch10', minQuestions: 10, label: 'Batch 10', xpMultiplier: 1.12, coinMultiplier: 1.12, pillIcon: '🚀', description: '+12% rewards for double-digit focus.' },
+        { id: 'batch15', minQuestions: 15, label: 'Batch 15', xpMultiplier: 1.2, coinMultiplier: 1.2, pillIcon: '🔥', description: '+20% rewards once you clear 15.' },
+        { id: 'batch20', minQuestions: 20, label: 'Batch 20+', xpMultiplier: 1.35, coinMultiplier: 1.35, pillIcon: '🌩️', description: '+35% rewards for marathon batches.' }
+    ],
 
     // Shop catalog
     SHOP: {
@@ -2216,6 +2650,7 @@ const Gamification = {
                 xpPopups: true,
                 pet: true,
                 garden: true,
+                petBuffs: true,
                 coinPopups: true,
                 pixelArt: false,
                 volume: 50,
@@ -2232,7 +2667,8 @@ const Gamification = {
                 lastActiveTimestamp: null
             },
             doubleXpRemaining: 0,
-            questionStartTime: null
+            questionStartTime: null,
+            momentum: this.getDefaultMomentumState()
         };
     },
 
@@ -2242,6 +2678,7 @@ const Gamification = {
     _state: null,
     _saveTimeout: null,
     _rewardToastTimer: null,
+    _momentumToastTimer: null,
 
     // Get current state (reads localStorage only on first call, then returns cached)
     getState() {
@@ -2271,7 +2708,8 @@ const Gamification = {
                     powerUpInventory: m(defaults.powerUpInventory, saved.powerUpInventory),
                     garden: m(defaults.garden, saved.garden),
                     inventory: mDeep(defaults.inventory, saved.inventory),
-                    battle: m(defaults.battle, saved.battle)
+                    battle: m(defaults.battle, saved.battle),
+                    momentum: m(defaults.momentum, saved.momentum)
                 };
                 // Multi-pet sync: migrate and sync active pet
                 const st = this._state;
@@ -2350,14 +2788,23 @@ const Gamification = {
 
         const state = this.getState();
         let xpAmount = this.XP_VALUES[action] || 0;
+        const momentum = this.getActiveMomentum(state);
 
         // Apply multipliers
         if (options.multiplier) xpAmount = Math.floor(xpAmount * options.multiplier);
+        let appliedMomentum = null;
+        if (momentum && momentum.xpMultiplier && momentum.xpMultiplier !== 1) {
+            xpAmount = Math.floor(xpAmount * momentum.xpMultiplier);
+            appliedMomentum = momentum;
+        }
         if (state.combo.multiplier > 1) xpAmount = Math.floor(xpAmount * state.combo.multiplier);
         if (state.doubleXpRemaining > 0) {
             xpAmount *= 2;
             state.doubleXpRemaining--;
         }
+
+        const buffInfo = this.applyBuffScalars('xp', xpAmount);
+        xpAmount = buffInfo.amount;
 
         // Add combo bonus
         if (options.withCombo && state.combo.current > 0) {
@@ -2417,7 +2864,7 @@ const Gamification = {
         // Award coins alongside XP
         const coinAction = this.COIN_VALUES[action];
         if (coinAction !== undefined && coinAction > 0) {
-            this.awardCoins(coinAction, action);
+            this.awardCoins(coinAction, action, appliedMomentum, buffInfo);
         }
 
         // Update home XP bar if visible
@@ -2427,22 +2874,38 @@ const Gamification = {
     },
 
     // Award coins
-    awardCoins(amount, reason) {
+    awardCoins(amount, reason, momentum, xpBuffInfo) {
         if (!this.isEnabled() || amount <= 0) return 0;
 
         const state = this.getState();
-        state.coins = (state.coins || 0) + amount;
-        state.totalCoinsEarned = (state.totalCoinsEarned || 0) + amount;
-        this.saveState(state);
-
-        if (state.totalCoinsEarned >= 1000) this.unlockAchievement('big_spender');
-
-        if (state.settings.coinPopups) {
-            this.showCoinPopup(amount);
+        let coinsToAdd = amount;
+        if (momentum && momentum.coinMultiplier && momentum.coinMultiplier !== 1) {
+            coinsToAdd = Math.floor(coinsToAdd * momentum.coinMultiplier);
         }
-
+        const coinBuff = this.applyBuffScalars('coin', coinsToAdd);
+        coinsToAdd = coinBuff.amount;
+        state.coins = (state.coins || 0) + coinsToAdd;
+        state.totalCoinsEarned = (state.totalCoinsEarned || 0) + coinsToAdd;
+        this.saveState(state);
+        if (state.totalCoinsEarned >= 1000) this.unlockAchievement('big_spender');
+        if (state.settings.coinPopups) {
+            this.showCoinPopup(coinsToAdd);
+        }
         this.renderXpBar();
-        return amount;
+        const xpBuffGain = xpBuffInfo && xpBuffInfo.amountDelta > 0;
+        const coinBuffGain = coinBuff.amountDelta > 0;
+        if (reason === 'correctAnswer' && (xpBuffGain || coinBuffGain)) {
+            this.showAnswerReward({
+                icon: '✨',
+                title: 'Buff stacking!',
+                xp: xpBuffGain ? xpBuffInfo.amountDelta : null,
+                xpBreakdown: xpBuffInfo?.breakdown,
+                coins: coinBuffGain ? coinBuff.amountDelta : null,
+                coinBreakdown: coinBuff.breakdown,
+                note: 'Pet & garden boosts applied.'
+            });
+        }
+        return coinsToAdd;
     },
 
     // Spend coins (returns true if successful)
@@ -2487,6 +2950,9 @@ const Gamification = {
 
         this.saveState(state);
         this.updateComboDisplay();
+        if (state.momentum && state.momentum.active) {
+            this.incrementMomentumProgress(1);
+        }
 
         // Check streak achievements
         if (state.combo.current === 10) this.unlockAchievement('ten_streak');
@@ -2507,6 +2973,7 @@ const Gamification = {
         state.combo.multiplier = 1.0;
         this.saveState(state);
         this.updateComboDisplay();
+        this.handleMomentumBreak('combo');
     },
 
     // Update combo display
@@ -2548,6 +3015,17 @@ const Gamification = {
         const state = this.getState();
         if (state.settings.sounds) SoundFX.play('levelUp');
         if (state.settings.confetti) this.triggerConfetti();
+
+        // Award trinket on level up (guaranteed every 5 levels, 20% chance otherwise)
+        if (state.settings.trinketsEnabled !== false) {
+            const guaranteedTrinket = level % 5 === 0;
+            if (guaranteedTrinket || Math.random() < 0.2) {
+                const trinket = Backpack.awardRandomTrinket();
+                if (trinket) {
+                    setTimeout(() => Backpack.showTrinketToast(trinket), 2500);
+                }
+            }
+        }
     },
 
     // Close level up modal
@@ -2608,6 +3086,14 @@ const Gamification = {
         // Play sound
         if (state.settings.sounds) SoundFX.play('achievement');
         if (state.settings.confetti) this.triggerConfetti();
+
+        // Award random trinket on achievement unlock (30% chance)
+        if (state.settings.trinketsEnabled !== false && Math.random() < 0.3) {
+            const trinket = Backpack.awardRandomTrinket();
+            if (trinket && trinket.isNew) {
+                setTimeout(() => Backpack.showTrinketToast(trinket), 2000);
+            }
+        }
     },
 
     // Show achievement toast
@@ -2786,6 +3272,12 @@ const Gamification = {
         const moodDisplay = buddy.sick ? 'Sick \ud83e\udd12' : moodStr.charAt(0).toUpperCase() + moodStr.slice(1);
         document.getElementById('buddyMood').textContent = moodDisplay;
 
+        const buffWrap = document.getElementById('buddyBuffs');
+        if (buffWrap) {
+            const buffs = this.getActiveBuffs();
+            buffWrap.innerHTML = buffs.length ? buffs.map(buff => `<div class="buddy-buff" title="${escapeHtml(buff.description)}">${buff.icon} ${buff.label} <span>${buff.value}</span></div>`).join('') : '<div class="buddy-buff muted">No active buffs</div>';
+        }
+
         // Progress to next stage
         if (nextStage) {
             const currentXp = buddy.totalXpFed - stage.xpNeeded;
@@ -2894,9 +3386,16 @@ const Gamification = {
         iconEl.textContent = reward.icon || (reward.isCorrect ? '⚔️' : '🛡️');
         titleEl.textContent = reward.title || (reward.isCorrect ? 'Great strike!' : 'Keep going!');
         const parts = [];
-        if (reward.xp) parts.push(`<span>⭐ ${reward.xp} XP</span>`);
-        if (reward.coins) parts.push(`<span>🪙 ${reward.coins} coins</span>`);
+        if (reward.xp) {
+            const xpText = reward.xpBreakdown ? `${reward.xp} XP ${reward.xpBreakdown}` : `${reward.xp} XP`;
+            parts.push(`<span>⭐ ${xpText}</span>`);
+        }
+        if (reward.coins) {
+            const coinText = reward.coinBreakdown ? `${reward.coins} coins ${reward.coinBreakdown}` : `${reward.coins} coins`;
+            parts.push(`<span>🪙 ${coinText}</span>`);
+        }
         if (reward.combo) parts.push(`<span>🔥 x${reward.combo.toFixed(1)} combo</span>`);
+        if (reward.note) parts.push(`<span>${escapeHtml(reward.note)}</span>`);
         breakdownEl.innerHTML = parts.join('');
         toast.classList.add('show');
         clearTimeout(this._rewardToastTimer);
@@ -2961,18 +3460,24 @@ const Gamification = {
         const coins = state.coins || 0;
         el.innerHTML = `
             <div class="xp-bar-container">
-                <div class="xp-level">Lv. ${state.level}</div>
+                <div class="xp-level">
+                    <div>Lv ${state.level}</div>
+                    <div class="xp-title">${escapeHtml(state.currentTitle || this.getTitleForLevel(state.level))}</div>
+                </div>
                 <div class="xp-bar">
-                    <div class="xp-fill" style="width: ${pct}%"></div>
+                    <div class="xp-fill" style="width:${Math.min(100, pct)}%"></div>
                 </div>
                 <div class="xp-info">
-                    <div class="xp-text">${state.xp.toLocaleString()} / ${threshold.toLocaleString()} XP</div>
-                    <div class="xp-title">${state.currentTitle}</div>
+                    <div class="xp-text">${state.xp} / ${threshold} XP</div>
+                    <div class="xp-title">${stage ? stage.stageName || 'Companion' : 'Companion'}</div>
                 </div>
-                <span class="coin-display" title="Coins">&#x1FA99; ${coins.toLocaleString()}</span>
-                <span class="buddy-mini" onclick="event.stopPropagation();Gamification.showBuddyInfo()">${Sprites.petSprite(state.studyBuddy.stage, this.getSpeciesEmoji(state.studyBuddy.species, state.studyBuddy.stage), 24)}</span>
-            </div>
-        `;
+                <div class="coin-display">🪙 ${coins}</div>
+                <div class="momentum-pill-wrap" id="momentumPills"></div>
+                <div class="buddy-mini" onclick="Gamification.showBuddyInfo()" title="Buddy mood">
+                    ${this.getSpeciesEmoji(state.studyBuddy.species, state.studyBuddy.stage)}
+                </div>
+            `;
+        this.renderMomentumPillsInto(document.getElementById('momentumPills'));
     },
 
     // Trigger confetti effect
@@ -3196,6 +3701,13 @@ const Gamification = {
         if (isPerfect) {
             this.awardXp('perfectTest');
             this.unlockAchievement('perfect_test');
+            // Guaranteed trinket for perfect test
+            if (state.settings.trinketsEnabled !== false) {
+                const trinket = Backpack.awardRandomTrinket();
+                if (trinket) {
+                    setTimeout(() => Backpack.showTrinketToast(trinket), 1500);
+                }
+            }
         }
     },
 
@@ -3724,6 +4236,385 @@ const SoundFX = {
                 });
                 break;
         }
+    }
+};
+
+// =====================================================================
+// SCENE MANAGER (Animated Backgrounds)
+// =====================================================================
+/**
+ * @namespace SceneManager
+ * @description Manages animated backgrounds with CSS/Canvas layers.
+ */
+const SceneManager = {
+    STORAGE_KEY: 'wgu_scene',
+    currentBackground: 'default',
+    animationEnabled: true,
+    canvasCtx: null,
+    animationFrame: null,
+
+    BACKGROUNDS: [
+        { id: 'default', name: 'Classic', description: 'Clean, minimal background', unlocked: true, css: 'scene-default', animated: false },
+        { id: 'cozy-desk', name: 'Cozy Desk', description: 'Warm study nook with soft lighting', unlocked: true, css: 'scene-cozy-desk', animated: false },
+        { id: 'night-sky', name: 'Night Sky', description: 'Twinkling stars and gentle aurora', unlocked: false, unlockCondition: { type: 'level', value: 5 }, css: 'scene-night-sky', animated: true, animationType: 'css' },
+        { id: 'rain-window', name: 'Rainy Window', description: 'Peaceful rain on glass', unlocked: false, unlockCondition: { type: 'streak', value: 7 }, css: 'scene-rain-window', animated: true, animationType: 'canvas' },
+        { id: 'forest-glade', name: 'Forest Glade', description: 'Sunlit clearing with floating particles', unlocked: false, unlockCondition: { type: 'level', value: 10 }, css: 'scene-forest-glade', animated: true, animationType: 'css' },
+        { id: 'synthwave', name: 'Synthwave', description: 'Retro neon grid with pulsing colors', unlocked: false, unlockCondition: { type: 'achievement', value: 'night_owl' }, css: 'scene-synthwave', animated: true, animationType: 'css' }
+    ],
+
+    init() {
+        const saved = Store.get(this.STORAGE_KEY, {});
+        this.currentBackground = saved.background || 'default';
+        this.animationEnabled = saved.animationEnabled !== false;
+        this.applyBackground(this.currentBackground);
+        window.addEventListener('resize', () => this.handleResize());
+    },
+
+    getState() {
+        return { background: this.currentBackground, animationEnabled: this.animationEnabled };
+    },
+
+    saveState() {
+        Store.set(this.STORAGE_KEY, this.getState());
+    },
+
+    getBackgrounds(gamificationState = {}) {
+        return this.BACKGROUNDS.map(bg => {
+            let unlocked = bg.unlocked;
+            if (!unlocked && bg.unlockCondition) {
+                const cond = bg.unlockCondition;
+                if (cond.type === 'level' && gamificationState.level >= cond.value) unlocked = true;
+                else if (cond.type === 'streak' && gamificationState.streak >= cond.value) unlocked = true;
+                else if (cond.type === 'achievement' && gamificationState.achievements?.includes(cond.value)) unlocked = true;
+            }
+            return { ...bg, unlocked };
+        });
+    },
+
+    applyBackground(backgroundId) {
+        const bg = this.BACKGROUNDS.find(b => b.id === backgroundId);
+        if (!bg) return;
+        const body = document.body;
+        this.BACKGROUNDS.forEach(b => body.classList.remove(b.css));
+        this.stopCanvasAnimation();
+        body.classList.add(bg.css);
+        this.currentBackground = backgroundId;
+        if (this.animationEnabled && bg.animated) {
+            if (bg.animationType === 'canvas') this.startCanvasAnimation(bg.id);
+            body.classList.add('scene-animated');
+        } else {
+            body.classList.remove('scene-animated');
+        }
+        this.saveState();
+    },
+
+    toggleAnimation() {
+        this.animationEnabled = !this.animationEnabled;
+        this.applyBackground(this.currentBackground);
+        return this.animationEnabled;
+    },
+
+    startCanvasAnimation(backgroundId) {
+        const canvas = document.getElementById('sceneCanvas');
+        if (!canvas) return;
+        canvas.style.display = 'block';
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        this.canvasCtx = canvas.getContext('2d');
+        if (backgroundId === 'rain-window') this.runRainAnimation();
+    },
+
+    stopCanvasAnimation() {
+        if (this.animationFrame) {
+            cancelAnimationFrame(this.animationFrame);
+            this.animationFrame = null;
+        }
+        const canvas = document.getElementById('sceneCanvas');
+        if (canvas) canvas.style.display = 'none';
+    },
+
+    runRainAnimation() {
+        const ctx = this.canvasCtx;
+        const canvas = ctx.canvas;
+        const drops = [];
+        for (let i = 0; i < 100; i++) {
+            drops.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, length: Math.random() * 20 + 10, speed: Math.random() * 5 + 5, opacity: Math.random() * 0.3 + 0.1 });
+        }
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = 'rgba(174, 194, 224, 0.5)';
+            ctx.lineWidth = 1;
+            drops.forEach(drop => {
+                ctx.globalAlpha = drop.opacity;
+                ctx.beginPath();
+                ctx.moveTo(drop.x, drop.y);
+                ctx.lineTo(drop.x, drop.y + drop.length);
+                ctx.stroke();
+                drop.y += drop.speed;
+                if (drop.y > canvas.height) { drop.y = -drop.length; drop.x = Math.random() * canvas.width; }
+            });
+            ctx.globalAlpha = 1;
+            this.animationFrame = requestAnimationFrame(animate);
+        };
+        animate();
+    },
+
+    handleResize() {
+        const canvas = document.getElementById('sceneCanvas');
+        if (canvas && canvas.style.display !== 'none') {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+    },
+
+    openModal() {
+        let modal = document.getElementById('sceneModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'sceneModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+        const state = Gamification.getState();
+        const backgrounds = this.getBackgrounds(state);
+        let html = `<div class="backpack-modal"><div class="backpack-header"><h2>🎨 Backgrounds</h2><button class="backpack-close" onclick="SceneManager.closeModal()">&times;</button></div>`;
+        html += `<div style="margin-bottom:16px"><label><input type="checkbox" ${this.animationEnabled ? 'checked' : ''} onchange="SceneManager.toggleAnimation()"> Enable animations</label></div>`;
+        html += `<div class="trinket-grid">`;
+        backgrounds.forEach(bg => {
+            const selected = bg.id === this.currentBackground;
+            html += `<div class="trinket-card ${selected ? 'equipped' : ''} ${!bg.unlocked ? 'locked' : ''}" onclick="${bg.unlocked ? `SceneManager.applyBackground('${bg.id}');SceneManager.openModal()` : ''}" style="border-color:${selected ? 'var(--accent)' : 'var(--border)'}">
+                <span class="trinket-icon">${bg.animated ? '✨' : '🖼️'}</span>
+                <span class="trinket-name">${bg.name}</span>
+                <span class="trinket-rarity" style="color:${bg.unlocked ? 'var(--green)' : 'var(--gray-500)'}">${bg.unlocked ? (selected ? 'Active' : 'Unlocked') : this.getUnlockText(bg.unlockCondition)}</span>
+            </div>`;
+        });
+        html += `</div></div>`;
+        modal.innerHTML = html;
+        modal.classList.add('active');
+    },
+
+    getUnlockText(cond) {
+        if (!cond) return 'Locked';
+        if (cond.type === 'level') return `Level ${cond.value}`;
+        if (cond.type === 'streak') return `${cond.value}-day streak`;
+        if (cond.type === 'achievement') return `Achievement`;
+        return 'Locked';
+    },
+
+    closeModal() {
+        const modal = document.getElementById('sceneModal');
+        if (modal) modal.classList.remove('active');
+    }
+};
+
+// =====================================================================
+// BACKPACK (Trinket Inventory)
+// =====================================================================
+/**
+ * @namespace Backpack
+ * @description Trinket inventory and desk placement system.
+ */
+const Backpack = {
+    STORAGE_KEY: 'wgu_trinkets',
+    RARITY: {
+        common: { label: 'Common', color: '#9ca3af', weight: 60 },
+        uncommon: { label: 'Uncommon', color: '#22c55e', weight: 25 },
+        rare: { label: 'Rare', color: '#3b82f6', weight: 10 },
+        epic: { label: 'Epic', color: '#a855f7', weight: 4 },
+        legendary: { label: 'Legendary', color: '#f59e0b', weight: 1 }
+    },
+    TRINKETS: [
+        { id: 'pencil', name: 'Pencil', icon: '✏️', rarity: 'common', description: 'A trusty #2 pencil.' },
+        { id: 'eraser', name: 'Eraser', icon: '🧽', rarity: 'common', description: 'For those inevitable mistakes.' },
+        { id: 'paperclip', name: 'Paperclip', icon: '📎', rarity: 'common', description: 'Keeps things together.' },
+        { id: 'sticky-note', name: 'Sticky Note', icon: '📝', rarity: 'common', description: 'Don\'t forget!' },
+        { id: 'coffee-cup', name: 'Coffee Cup', icon: '☕', rarity: 'common', description: 'Fuel for late nights.' },
+        { id: 'calculator', name: 'Calculator', icon: '🔢', rarity: 'uncommon', description: 'Crunch those numbers.' },
+        { id: 'globe', name: 'Mini Globe', icon: '🌍', rarity: 'uncommon', description: 'The world at your fingertips.' },
+        { id: 'plant', name: 'Desk Plant', icon: '🪴', rarity: 'uncommon', description: 'A touch of green.' },
+        { id: 'lamp', name: 'Desk Lamp', icon: '💡', rarity: 'uncommon', description: 'Light up your studies.' },
+        { id: 'trophy', name: 'Mini Trophy', icon: '🏆', rarity: 'rare', description: 'You earned this!' },
+        { id: 'snow-globe', name: 'Snow Globe', icon: '🔮', rarity: 'rare', description: 'Shake it up.' },
+        { id: 'hourglass', name: 'Hourglass', icon: '⏳', rarity: 'rare', description: 'Time is precious.' },
+        { id: 'crystal', name: 'Study Crystal', icon: '💎', rarity: 'epic', description: 'Radiates focus energy.' },
+        { id: 'owl-statue', name: 'Owl Statue', icon: '🦉', rarity: 'epic', description: 'Wisdom incarnate.' },
+        { id: 'golden-pen', name: 'Golden Pen', icon: '🖊️', rarity: 'legendary', description: 'Writes destiny itself.' },
+        { id: 'phoenix-feather', name: 'Phoenix Feather', icon: '🪶', rarity: 'legendary', description: 'Rise from any failure.' }
+    ],
+    DESK_SLOTS: [
+        { id: 'slot-1', label: 'Left', x: 10, y: 80 },
+        { id: 'slot-2', label: 'Center-Left', x: 30, y: 85 },
+        { id: 'slot-3', label: 'Center', x: 50, y: 80 },
+        { id: 'slot-4', label: 'Center-Right', x: 70, y: 85 },
+        { id: 'slot-5', label: 'Right', x: 90, y: 80 }
+    ],
+
+    getState() {
+        return Store.get(this.STORAGE_KEY, { inventory: [], equipped: {}, seen: [] });
+    },
+
+    saveState(state) {
+        Store.set(this.STORAGE_KEY, state);
+    },
+
+    getInventory() {
+        const state = this.getState();
+        return state.inventory.map(id => {
+            const trinket = this.TRINKETS.find(t => t.id === id);
+            if (!trinket) return null;
+            return { ...trinket, rarityData: this.RARITY[trinket.rarity], isNew: !state.seen.includes(id), isEquipped: Object.values(state.equipped).includes(id) };
+        }).filter(Boolean);
+    },
+
+    addTrinket(trinketId) {
+        const state = this.getState();
+        if (!state.inventory.includes(trinketId)) {
+            state.inventory.push(trinketId);
+            this.saveState(state);
+        }
+    },
+
+    markSeen(trinketId) {
+        const state = this.getState();
+        if (!state.seen.includes(trinketId)) {
+            state.seen.push(trinketId);
+            this.saveState(state);
+        }
+    },
+
+    equip(trinketId, slotId) {
+        const state = this.getState();
+        Object.keys(state.equipped).forEach(slot => { if (state.equipped[slot] === trinketId) delete state.equipped[slot]; });
+        state.equipped[slotId] = trinketId;
+        this.saveState(state);
+        this.renderDeskTrinkets();
+    },
+
+    unequip(trinketId) {
+        const state = this.getState();
+        Object.keys(state.equipped).forEach(slot => { if (state.equipped[slot] === trinketId) delete state.equipped[slot]; });
+        this.saveState(state);
+        this.renderDeskTrinkets();
+    },
+
+    getEquipped() {
+        const state = this.getState();
+        const equipped = [];
+        this.DESK_SLOTS.forEach(slot => {
+            const trinketId = state.equipped[slot.id];
+            if (trinketId) {
+                const trinket = this.TRINKETS.find(t => t.id === trinketId);
+                if (trinket) equipped.push({ ...trinket, slot, rarityData: this.RARITY[trinket.rarity] });
+            }
+        });
+        return equipped;
+    },
+
+    rollTrinket() {
+        const totalWeight = Object.values(this.RARITY).reduce((sum, r) => sum + r.weight, 0);
+        let roll = Math.random() * totalWeight;
+        let selectedRarity = 'common';
+        for (const [rarity, data] of Object.entries(this.RARITY)) {
+            roll -= data.weight;
+            if (roll <= 0) { selectedRarity = rarity; break; }
+        }
+        const pool = this.TRINKETS.filter(t => t.rarity === selectedRarity);
+        return pool[Math.floor(Math.random() * pool.length)];
+    },
+
+    awardRandomTrinket() {
+        const trinket = this.rollTrinket();
+        const state = this.getState();
+        const isNew = !state.inventory.includes(trinket.id);
+        this.addTrinket(trinket.id);
+        return { ...trinket, rarityData: this.RARITY[trinket.rarity], isNew };
+    },
+
+    openModal() {
+        let modal = document.getElementById('backpackModal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'backpackModal';
+            modal.className = 'modal-overlay';
+            document.body.appendChild(modal);
+        }
+        const inventory = this.getInventory();
+        const equipped = this.getEquipped();
+        let html = `<div class="backpack-modal"><div class="backpack-header"><h2>🎒 Backpack</h2><button class="backpack-close" onclick="Backpack.closeModal()">&times;</button></div>`;
+        html += `<div class="backpack-desk"><h3>Your Desk</h3><div class="desk-slots">`;
+        this.DESK_SLOTS.forEach(slot => {
+            const trinket = equipped.find(t => t.slot.id === slot.id);
+            html += `<div class="desk-slot" data-slot="${slot.id}" style="left:${slot.x}%;top:${slot.y}%" onclick="Backpack.handleSlotClick('${slot.id}')">
+                ${trinket ? `<span class="trinket-icon" style="color:${trinket.rarityData.color}" title="${trinket.name}">${trinket.icon}</span>` : `<span class="slot-empty">+</span>`}
+            </div>`;
+        });
+        html += `</div></div><div class="backpack-inventory"><h3>Inventory (${inventory.length})</h3><div class="trinket-grid">`;
+        if (inventory.length === 0) {
+            html += `<p class="empty-inventory">No trinkets yet! Complete achievements to earn some.</p>`;
+        } else {
+            inventory.forEach(trinket => {
+                html += `<div class="trinket-card ${trinket.isEquipped ? 'equipped' : ''}" data-trinket="${trinket.id}" style="border-color:${trinket.rarityData.color}" onclick="Backpack.handleTrinketClick('${trinket.id}')">
+                    ${trinket.isNew ? '<span class="new-badge">NEW</span>' : ''}
+                    <span class="trinket-icon">${trinket.icon}</span>
+                    <span class="trinket-name">${trinket.name}</span>
+                    <span class="trinket-rarity" style="color:${trinket.rarityData.color}">${trinket.rarityData.label}</span>
+                </div>`;
+            });
+        }
+        html += `</div></div></div>`;
+        modal.innerHTML = html;
+        modal.classList.add('active');
+        inventory.forEach(t => this.markSeen(t.id));
+    },
+
+    selectedTrinket: null,
+
+    handleTrinketClick(trinketId) {
+        this.selectedTrinket = trinketId;
+        const state = this.getState();
+        const isEquipped = Object.values(state.equipped).includes(trinketId);
+        if (isEquipped) {
+            this.unequip(trinketId);
+            this.openModal();
+        }
+    },
+
+    handleSlotClick(slotId) {
+        if (this.selectedTrinket) {
+            this.equip(this.selectedTrinket, slotId);
+            this.selectedTrinket = null;
+            this.openModal();
+        }
+    },
+
+    closeModal() {
+        const modal = document.getElementById('backpackModal');
+        if (modal) modal.classList.remove('active');
+        this.selectedTrinket = null;
+    },
+
+    renderDeskTrinkets() {
+        const container = document.getElementById('deskTrinkets');
+        if (!container) return;
+        const equipped = this.getEquipped();
+        container.innerHTML = equipped.map(trinket => `
+            <div class="desk-trinket" style="left:${trinket.slot.x}%;bottom:${100 - trinket.slot.y}%" title="${trinket.name}: ${trinket.description}">
+                <span style="color:${trinket.rarityData.color}">${trinket.icon}</span>
+            </div>
+        `).join('');
+    },
+
+    showTrinketToast(trinket) {
+        let toast = document.getElementById('trinketToast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'trinketToast';
+            toast.className = 'trinket-toast';
+            document.body.appendChild(toast);
+        }
+        toast.innerHTML = `<span class="toast-icon" style="color:${trinket.rarityData.color}">${trinket.icon}</span><div class="toast-content"><div class="toast-title">New Trinket!</div><div class="toast-subtitle" style="color:${trinket.rarityData.color}">${trinket.rarityData.label} - ${trinket.name}</div></div>`;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
     }
 };
 
@@ -5272,7 +6163,8 @@ const SessionState = {
                     startTime: App.startTime,
                     answerHistory: App.answerHistory,
                     confidence: App.confidence,
-                    eliminatedOptions: App._eliminatedOptions || {}
+                    eliminatedOptions: App._eliminatedOptions || {},
+                    sessionMeta: App.sessionMeta
                 },
                 // Drill state
                 drill: {
@@ -5378,6 +6270,8 @@ const SessionState = {
             App.answerHistory = state.app.answerHistory || {};
             App.confidence = state.app.confidence || {};
             App._eliminatedOptions = state.app.eliminatedOptions || {};
+            App.sessionMeta = state.app.sessionMeta || App._getDefaultSessionMeta();
+            Gamification.syncMomentum(App.sessionMeta?.momentum || null);
 
             // Restore Metrics
             if (state.metrics) {
@@ -5634,6 +6528,19 @@ const DailyGoal = {
 // =====================================================================
 // BANK MANAGER
 // =====================================================================
+/**
+ * @namespace BankManager
+ * @description Loads and manages question bank JSON files from /banks/.
+ * Provides fallback embedded data for file:// protocol.
+ * 
+ * State:
+ * - banks: Array of loaded bank objects
+ * - manifest: List of available banks with metadata
+ * 
+ * Key methods:
+ * - loadAll() - Fetch all banks from manifest
+ * - getBank(bankId) - Retrieve a specific bank by ID
+ */
 const BankManager = {
     banks: [],
     manifest: [
@@ -5694,12 +6601,42 @@ function showScreen(name, showSubheader, showFooter) {
 // =====================================================================
 // HOME SCREEN
 // =====================================================================
+/**
+ * @namespace Home
+ * @description Renders the home screen including question bank cards,
+ * stats sidebar, daily goal progress, and buff summary pills.
+ * 
+ * Key methods:
+ * - render() - Full home screen refresh
+ * - renderBanks() - Renders question bank cards with mode buttons
+ * - renderStats() - Updates stats sidebar
+ * - updateMetaSummary() - Refreshes buff pills and streak info
+ */
 const Home = {
     render() {
         DailyGoal.renderStreakBanner();
         DailyGoal.renderDailyGoalCard();
+        this.updateMetaSummary();
         this.renderStats();
         this.renderBanks();
+    },
+
+    updateMetaSummary() {
+        const stats = DailyGoal.getStats();
+        const title = document.getElementById('metaSummaryTitle');
+        const body = document.getElementById('metaSummaryBody');
+        const glance = document.getElementById('metaBuffGlance');
+        if (!title || !body) return;
+        const streak = stats.streak || 0;
+        const today = stats.questionsToday || 0;
+        const goal = stats.dailyGoal || 10;
+        const pct = Math.min(100, Math.round((Math.min(today, goal) / goal) * 100));
+        title.textContent = streak > 0 ? `🔥 ${streak}-day streak` : 'Start your streak!';
+        body.textContent = `${today}/${goal} questions · ${pct}% of goal`;
+        if (glance) {
+            const buffs = Gamification.getActiveBuffs();
+            glance.innerHTML = buffs.length ? buffs.map(buff => `<span class="meta-pill" role="listitem" title="${escapeHtml(buff.description)}">${buff.icon} ${buff.label} <span>${buff.value}</span><span class="pill-source">${buff.source}</span></span>`).join('') : '<span class="meta-pill">✨ No active buffs</span>';
+        }
     },
 
     renderStats() {
@@ -5790,6 +6727,24 @@ const Home = {
 // =====================================================================
 // MAIN APP (Test & Practice Engine)
 // =====================================================================
+/**
+ * @namespace App
+ * @description Main study engine for Test, Practice, and Review modes.
+ * Handles question rendering, answer submission, scoring, and session flow.
+ * 
+ * State:
+ * - bank: Current question bank object
+ * - questions: Array of questions for this session
+ * - mode: 'test' | 'practice' | 'review-after'
+ * - currentQ: Current question index
+ * - answers: User's selected answers by question index
+ * 
+ * Key methods:
+ * - start(bank, mode, questionCount) - Initialize a study session
+ * - render() - Render current question
+ * - submitTest() - Score and show results
+ * - startReview() - Enter review mode for completed session
+ */
 const App = {
     bank: null,
     questions: [],
@@ -5808,16 +6763,128 @@ const App = {
     startTime: 0,
     answerHistory: {},    // { qIndex: [firstAnswer, ...changesArray] }
     confidence: {},       // { qIndex: 1|2|3 } (1=Maybe, 2=Probably, 3=Definitely)
+    sessionMeta: null,
 
     // Pending start state for question count picker
     _pendingBankId: null,
     _pendingMode: null,
     _pendingCount: null,
+    _pendingBatchTier: null,
+
+    _getDefaultSessionMeta() {
+        return {
+            batchSize: null,
+            questionGoal: 0,
+            batchTierId: null,
+            batchLabel: 'Standard Pace',
+            xpMultiplier: 1,
+            coinMultiplier: 1,
+            momentum: null,
+            startedAt: null
+        };
+    },
+
+    _applyBatchMeta(questionCount) {
+        const count = Math.max(0, questionCount || (this.questions ? this.questions.length : 0) || 0);
+        const momentum = Gamification.activateBatchMomentum(count, { questionGoal: count });
+        this.sessionMeta = {
+            batchSize: count,
+            questionGoal: count,
+            batchTierId: momentum.tierId || null,
+            batchLabel: momentum.label || 'Standard Pace',
+            xpMultiplier: momentum.xpMultiplier || 1,
+            coinMultiplier: momentum.coinMultiplier || 1,
+            momentum,
+            startedAt: momentum.startedAt || Date.now()
+        };
+    },
+
+    _previewBatchTier(count) {
+        this._pendingBatchTier = Gamification.getBatchTier(count);
+    },
+
+    _selectQuestionIndices(mode, count, bank) {
+        const total = bank.questions.length;
+        const targetCount = Math.min(count, total);
+        if (mode !== 'practice') {
+            return this._randomIndices(total).slice(0, targetCount);
+        }
+
+        const trackerData = (typeof QuestionTracker !== 'undefined' && QuestionTracker._getData)
+            ? QuestionTracker._getData()
+            : {};
+        const weights = bank.questions.map(q => this._computeQuestionWeight(q, trackerData[q.id]));
+        return this._weightedSample(weights, targetCount);
+    },
+
+    _computeQuestionWeight(question, trackerEntry) {
+        let weight = 1.0;
+        if (!trackerEntry || trackerEntry.attempts === 0) {
+            return weight + 0.5; // unseen questions get slight boost
+        }
+
+        const attempts = trackerEntry.attempts || 1;
+        const incorrectRatio = trackerEntry.incorrect / attempts;
+        const recent = trackerEntry.history ? trackerEntry.history.slice(-3) : [];
+        const recentMiss = recent.some(h => h && h.correct === false);
+
+        weight += incorrectRatio * 4; // heavily prioritize missed items
+        if (recentMiss) weight += 1.5;
+        if (trackerEntry.incorrect === 0 && attempts >= 5) {
+            weight *= 0.25; // de-prioritize mastered items
+        }
+        if (attempts < 3) weight += 0.5; // lightly practiced items get mild boost
+
+        return Math.max(weight, 0.1);
+    },
+
+    _weightedSample(weights, count) {
+        const available = weights.map((weight, index) => ({ index, weight: Math.max(weight, 0.01) }));
+        const selected = [];
+        while (selected.length < count && available.length > 0) {
+            const totalWeight = available.reduce((sum, item) => sum + item.weight, 0);
+            if (totalWeight <= 0) break;
+            let r = Math.random() * totalWeight;
+            let chosen = 0;
+            for (let i = 0; i < available.length; i++) {
+                r -= available[i].weight;
+                if (r <= 0) {
+                    chosen = i;
+                    break;
+                }
+            }
+            selected.push(available[chosen].index);
+            available.splice(chosen, 1);
+        }
+
+        if (selected.length < count) {
+            const remaining = [];
+            for (let i = 0; i < weights.length; i++) {
+                if (!selected.includes(i)) remaining.push(i);
+            }
+            while (selected.length < count && remaining.length) {
+                const idx = Math.floor(Math.random() * remaining.length);
+                selected.push(remaining.splice(idx, 1)[0]);
+            }
+        }
+        return selected;
+    },
+
+    _randomIndices(total) {
+        const indices = Array.from({ length: total }, (_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        return indices;
+    },
 
     start(bankId, mode) {
         const bank = BankManager.getBank(bankId);
         if (!bank || !bank.questions || bank.questions.length === 0) return;
         const total = bank.questions.length;
+
+        this._previewBatchTier(total);
 
         // If 15 or fewer questions, skip the picker
         if (total <= 15) {
@@ -5843,26 +6910,33 @@ const App = {
         container.innerHTML = opts.map(n => {
             const label = n === total ? 'All' : n;
             const sublabel = n === total ? `${total} questions` : 'Random';
+            const tier = Gamification.getBatchTier(n);
+            const pill = tier ? `<span class="qcount-tier-pill">${tier.pillIcon} ${tier.label} · +${Math.round((tier.xpMultiplier - 1) * 100)}%</span>` : '';
             const sel = n === 10 ? ' selected' : '';
             return `<button class="qcount-opt${sel}" data-count="${n}" onclick="App.selectCount(${n}, this)">
                 <div>${label}</div>
                 <div class="qcount-label">${sublabel}</div>
+                ${pill}
             </button>`;
         }).join('');
 
         document.getElementById('qCountModal').style.display = 'flex';
+        this._renderBatchPreview();
     },
 
     selectCount(n, btn) {
         this._pendingCount = n;
+        this._previewBatchTier(n);
         document.querySelectorAll('.qcount-opt').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
+        this._renderBatchPreview();
     },
 
     closeCountPicker() {
         document.getElementById('qCountModal').style.display = 'none';
         this._pendingBankId = null;
         this._pendingMode = null;
+        this._pendingBatchTier = null;
     },
 
     confirmStart() {
@@ -5876,19 +6950,17 @@ const App = {
         this._reviewFilter = null;
         Session.start(); // Start session timer
 
+        this.sessionMeta = this._getDefaultSessionMeta();
+
         // Clear any saved session so we don't restore stale state on reload
         SessionState.clear();
 
-        // Shuffle indices and pick requested number of questions
-        let indices = this.bank.questions.map((_, i) => i);
-        // Fisher-Yates shuffle
-        for (let i = indices.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [indices[i], indices[j]] = [indices[j], indices[i]];
-        }
-        indices = indices.slice(0, Math.min(count, indices.length));
+        const indices = this._selectQuestionIndices(mode, count, this.bank);
         this._questionIndices = indices;
         this.questions = indices.map(i => this.bank.questions[i]);
+
+        this._applyBatchMeta(this.questions.length);
+        this._renderMomentumPills();
 
         // Shuffle answer options for each question (keeps correctAnswer mapping)
         this._optionMaps = {};
@@ -6028,6 +7100,7 @@ const App = {
         if (q.graphData) InlineChart.renderInElement(document.getElementById('questionText'), q.graphData);
         // Render power-up bar
         this.renderPowerups();
+        this._renderMomentumPills();
 
         const list = document.getElementById('optionsList');
         list.innerHTML = '';
@@ -6109,6 +7182,26 @@ const App = {
 
         this.updatePalette();
         this.renderMath();
+    },
+
+    _renderBatchPreview() {
+        const tier = this._pendingBatchTier;
+        const previewEl = document.getElementById('batchRewardPreview');
+        if (!previewEl) return;
+        if (!tier) {
+            previewEl.innerHTML = '<span class="batch-preview-pill">🚶 Standard Pace · 0% boost</span>';
+            return;
+        }
+        const pct = Math.round((tier.xpMultiplier - 1) * 100);
+        previewEl.innerHTML = `<span class="batch-preview-pill" title="${tier.description}">${tier.pillIcon} ${tier.label} · +${pct}% XP/coins</span>`;
+    },
+
+    _renderMomentumPills() {
+        const wrap = document.getElementById('momentumPills');
+        if (!wrap) return;
+        const meta = this.sessionMeta;
+        const tier = meta && meta.momentum ? meta.momentum : Gamification.getMomentumState();
+        Gamification.renderMomentumPillsInto(wrap, tier);
     },
 
     selectOption(i) {
@@ -6593,6 +7686,22 @@ const App = {
 // =====================================================================
 // DRILL MODE (SM-2 Spaced Repetition)
 // =====================================================================
+/**
+ * @namespace Drill
+ * @description Spaced repetition drill mode using SM-2 algorithm.
+ * Focuses on weak questions with adaptive scheduling.
+ * 
+ * State:
+ * - bank: Current question bank
+ * - queue: Questions scheduled for review
+ * - current: Currently displayed question
+ * 
+ * Key methods:
+ * - start(bankId, questionIds) - Initialize drill session
+ * - render() - Display current drill card
+ * - grade(quality) - SM-2 grading (0-5 scale)
+ * - next() - Advance to next scheduled question
+ */
 const Drill = {
     bank: null,
     queue: [],
@@ -7018,6 +8127,25 @@ const Theme = {
 // =====================================================================
 // AI PRACTICE MODE
 // =====================================================================
+/**
+ * @namespace AIPractice
+ * @description AI-powered practice mode that generates questions dynamically
+ * using an LLM API. Includes preloading buffer, weak area analysis, and
+ * confidence-based question weighting.
+ * 
+ * State:
+ * - bank: Reference bank for context
+ * - currentQuestion: Currently displayed AI question
+ * - sessionStats: { total, correct, byCategory }
+ * - weakCategories: Categories needing more practice
+ * - questionBuffer: Preloaded questions for instant display
+ * 
+ * Key methods:
+ * - start(bank) - Initialize AI practice session
+ * - generateQuestion() - Generate next question via API
+ * - checkAnswer() - Validate user's answer
+ * - analyzeWeakAreas() - Identify categories needing focus
+ */
 const AIPractice = {
     bank: null,
     currentQuestion: null,
@@ -7029,6 +8157,9 @@ const AIPractice = {
     currentCategory: null,
     currentDifficulty: 2,
     startingWeakness: {},
+    BUFFER_SIZE: 3,
+    _questionBuffer: [],
+    _prefetchInFlight: 0,
 
     async start(bankId) {
         if (this.isGenerating) return; // Prevent double-start while generating
@@ -7049,6 +8180,8 @@ const AIPractice = {
         this.selectedOption = null;
         this.isChecked = false;
         this.currentDifficulty = 2;
+        this._questionBuffer = [];
+        this._prefetchInFlight = 0;
 
         this.analyzeWeakAreas();
         this.startingWeakness = {};
@@ -7190,6 +8323,7 @@ const AIPractice = {
     },
 
     async generateNext() {
+        if (this.isGenerating) return;
         if (!navigator.onLine) {
             this.renderError('You are offline. AI Practice requires an internet connection.');
             return;
@@ -7199,28 +8333,66 @@ const AIPractice = {
         this.selectedOption = null;
         this.isChecked = false;
 
-        this.currentCategory = this.pickNextCategory();
-        this.adjustDifficulty();
-
         this.renderProgress();
         this.renderLoading();
 
         try {
-            const question = await this.generateQuestion(this.currentCategory, this.currentDifficulty);
-            if (question) {
-                this.currentQuestion = question;
-                this.renderQuestion();
-                Gamification.startQuestionTimer();
-            } else {
-                throw new Error('Failed to generate question');
-            }
+            await this._ensureBuffer();
+            const payload = this._questionBuffer.shift();
+            if (!payload) throw new Error('Failed to load question');
+            this.currentQuestion = payload.question;
+            this.currentCategory = payload.category;
+            this.currentDifficulty = payload.difficulty;
+            this.renderQuestion();
+            Gamification.startQuestionTimer();
             SessionState.save();
+            this._prefillBuffer();
         } catch (err) {
-            // AI Practice error handled in UI
             this.renderError(err.message || 'Failed to generate question. Please try again.');
         }
 
         this.isGenerating = false;
+    },
+
+    _planNextTarget() {
+        const category = this.pickNextCategory();
+        let difficulty = 2;
+        const catStats = this.sessionStats.byCategory[category];
+        if (catStats && catStats.total >= 2) {
+            const recentAccuracy = catStats.correct / catStats.total;
+            if (recentAccuracy >= 0.8) difficulty = Math.min(3, (this.currentDifficulty || 2) + 1);
+            else if (recentAccuracy < 0.5) difficulty = Math.max(1, (this.currentDifficulty || 2) - 1);
+        }
+        return { category, difficulty };
+    },
+
+    async _ensureBuffer() {
+        if (!this._questionBuffer) this._questionBuffer = [];
+        if (this._questionBuffer.length > 0) return;
+        await this._queueFetch(true);
+        if (this._questionBuffer.length === 0) throw new Error('Unable to preload question.');
+    },
+
+    _prefillBuffer() {
+        if (!this._questionBuffer) this._questionBuffer = [];
+        while (this._questionBuffer.length + this._prefetchInFlight < this.BUFFER_SIZE) {
+            this._queueFetch(false);
+        }
+    },
+
+    async _queueFetch(blocking) {
+        const target = this._planNextTarget();
+        if (!target.category) return;
+        this._prefetchInFlight++;
+        try {
+            const question = await this.generateQuestion(target.category, target.difficulty);
+            this._questionBuffer.push({ question, ...target });
+        } catch (err) {
+            if (blocking) throw err;
+            console.warn('Prefetch failed:', err?.message || err);
+        } finally {
+            this._prefetchInFlight = Math.max(0, this._prefetchInFlight - 1);
+        }
     },
 
     async generateQuestion(category, difficulty) {
@@ -9199,6 +10371,19 @@ const Metrics = {
 // =====================================================================
 // PER-QUESTION PERFORMANCE TRACKER
 // =====================================================================
+/**
+ * @namespace QuestionTracker
+ * @description Tracks per-question performance for spaced repetition.
+ * Stores streak, ease factor, interval, and next due date.
+ * 
+ * State persisted to localStorage key: `wgu_questionTracker`
+ * 
+ * Key methods:
+ * - record(bankId, questionId, correct, confidence) - Log attempt
+ * - getStats(bankId, questionId) - Get question performance data
+ * - getDueQuestions(bankId) - Get questions due for review
+ * - getSummary(bankId) - Aggregate stats for a bank
+ */
 const QuestionTracker = {
     _key: 'questionTracker',
 
@@ -9220,7 +10405,11 @@ const QuestionTracker = {
                 data[r.qId] = {
                     attempts: 0, correct: 0, incorrect: 0, skipped: 0,
                     totalTime: 0, category: r.category || 'General',
-                    history: []
+                    history: [],
+                    streak: 0,
+                    ease: 2.5,
+                    interval: 1,
+                    nextDue: now
                 };
             }
             const entry = data[r.qId];
@@ -9230,10 +10419,18 @@ const QuestionTracker = {
             else { entry.incorrect++; }
             entry.totalTime += r.timeSpent || 0;
             if (r.category) entry.category = r.category;
+            if (r.confidence != null) {
+                entry.confidenceSum = (entry.confidenceSum || 0) + r.confidence;
+                entry.confidenceCount = (entry.confidenceCount || 0) + 1;
+                entry.lastConfidence = r.confidence;
+            }
+            entry.lastResult = r.correct;
+            this._updateScheduling(entry, r.correct, r.confidence);
             // Keep last 20 attempts
             entry.history.push({
                 date: now, correct: r.correct, answered: r.answered,
-                chosen: r.chosen, time: r.timeSpent || 0
+                chosen: r.chosen, time: r.timeSpent || 0,
+                confidence: r.confidence == null ? undefined : r.confidence
             });
             if (entry.history.length > 20) entry.history = entry.history.slice(-20);
         }
@@ -9241,11 +10438,42 @@ const QuestionTracker = {
     },
 
     // Record a single question attempt (for drill and AI practice)
-    recordSingle(qId, category, isCorrect, timeSpent) {
+    recordSingle(qId, category, isCorrect, timeSpent, meta = {}) {
         this.recordResults([{
-            qId, category, correct: isCorrect, answered: true,
-            chosen: null, correctAnswer: null, timeSpent: timeSpent || 0
+            qId,
+            category,
+            correct: isCorrect,
+            answered: true,
+            chosen: null,
+            correctAnswer: null,
+            timeSpent: timeSpent || 0,
+            confidence: meta.confidence ?? null,
+            mode: meta.mode || 'practice'
         }]);
+    },
+
+    _updateScheduling(entry, isCorrect, confidence) {
+        const now = Date.now();
+        entry.ease = entry.ease || 2.5;
+        entry.interval = entry.interval || 1;
+        entry.streak = entry.streak || 0;
+
+        const confBoost = confidence != null ? (confidence - 2) * 0.15 : 0;
+
+        if (isCorrect) {
+            entry.streak++;
+            entry.ease = Math.min(3.7, entry.ease + 0.05 + confBoost);
+            const intervalHours = entry.streak <= 1 ? 1 : Math.max(1, entry.interval * entry.ease);
+            entry.interval = intervalHours;
+        } else {
+            entry.streak = 0;
+            const penalty = 0.3 + (confidence != null && confidence >= 3 ? 0.3 : 0);
+            entry.ease = Math.max(1.3, entry.ease - penalty);
+            entry.interval = 1;
+        }
+
+        const hours = Math.max(1, entry.interval);
+        entry.nextDue = now + hours * 60 * 60 * 1000;
     },
 
     // Get most missed questions (sorted by miss rate, min 2 attempts)
@@ -9368,70 +10596,88 @@ document.addEventListener('keydown', (e) => {
 // INIT
 // =====================================================================
 async function init() {
-    // Load theme early to prevent flash of wrong theme
-    Theme.load();
-    Settings.load();
-
-    // Initialize gamification system
-    Gamification.init();
-
-    // Initialize garden decay timers — checks every 60s for live feel
-    Garden.decayWater();
-    Garden.decayPetStats();
-    Garden.idleGrow();
-    setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); Garden.idleGrow(); }, 15 * 1000);
-
-    // Hide garden/shop/battle buttons if garden disabled
-    const gState = Gamification.getState();
-    const btnGarden = document.getElementById('btnGarden');
-    const btnShop = document.getElementById('btnShop');
-    const btnBattle = document.getElementById('btnBattle');
-    if (btnGarden) btnGarden.style.display = gState.settings.garden ? '' : 'none';
-    if (btnShop) btnShop.style.display = gState.settings.garden ? '' : 'none';
-    if (btnBattle) btnBattle.style.display = gState.settings.garden ? '' : 'none';
-
-    // Try loading the embedded fallback
     try {
-        const script = document.getElementById('bankFallback');
-        if (script) BANK_DATA = JSON.parse(script.textContent);
-    } catch {}
+        // Load theme early to prevent flash of wrong theme
+        Theme.load();
+        Settings.load();
 
-    await BankManager.loadAll();
+        // Initialize gamification system
+        Gamification.init();
 
-    // If no banks loaded via fetch and no embedded data, try to load from BANK_DATA global
-    if (BankManager.banks.length === 0) {
-        // Last resort: show error
-        document.getElementById('bankList').innerHTML = '<p style="text-align:center;color:var(--red);padding:40px">Could not load question banks. If using file:// protocol, the embedded bank data is needed.</p>';
-    }
+        // Initialize scene manager and trinkets
+        SceneManager.init();
+        Backpack.renderDeskTrinkets();
 
-    // Check for saved session and offer to resume
-    if (SessionState.hasSavedSession()) {
-        const shouldResume = await SessionState.showResumePrompt();
-        if (shouldResume) {
-            const state = SessionState.get();
-            if (state) {
-                // Determine which mode to restore based on screen
-                const screen = state.app ? state.app.screen : 'home';
-                if (screen === 'drill') {
-                    if (SessionState.restoreDrill(state)) {
-                        return; // Successfully restored drill session
-                    }
-                } else if (screen === 'exam') {
-                    if (SessionState.restoreApp(state)) {
-                        return; // Successfully restored app session
-                    }
-                } else if (screen === 'ai-practice') {
-                    if (SessionState.restoreAIPractice(state)) {
-                        return; // Successfully restored AI Practice session
+        // Initialize garden decay timers — checks every 60s for live feel
+        Garden.decayWater();
+        Garden.decayPetStats();
+        Garden.idleGrow();
+        setInterval(() => { Garden.decayWater(); Garden.decayPetStats(); Garden.idleGrow(); }, 15 * 1000);
+
+        // Hide garden/shop/battle buttons if garden disabled
+        const gState = Gamification.getState();
+        const btnGarden = document.getElementById('btnGarden');
+        const btnShop = document.getElementById('btnShop');
+        const btnBattle = document.getElementById('btnBattle');
+        if (btnGarden) btnGarden.style.display = gState.settings.garden ? '' : 'none';
+        if (btnShop) btnShop.style.display = gState.settings.garden ? '' : 'none';
+        if (btnBattle) btnBattle.style.display = gState.settings.garden ? '' : 'none';
+
+        // Try loading the embedded fallback
+        try {
+            const script = document.getElementById('bankFallback');
+            if (script) BANK_DATA = JSON.parse(script.textContent);
+        } catch {}
+
+        await BankManager.loadAll();
+
+        // If no banks loaded via fetch and no embedded data, try to load from BANK_DATA global
+        if (BankManager.banks.length === 0) {
+            // Last resort: show error
+            document.getElementById('bankList').innerHTML = '<p style="text-align:center;color:var(--red);padding:40px">Could not load question banks. If using file:// protocol, the embedded bank data is needed.</p>';
+        }
+
+        // Check for saved session and offer to resume
+        if (SessionState.hasSavedSession()) {
+            const shouldResume = await SessionState.showResumePrompt();
+            if (shouldResume) {
+                const state = SessionState.get();
+                if (state) {
+                    // Determine which mode to restore based on screen
+                    const screen = state.app ? state.app.screen : 'home';
+                    if (screen === 'drill') {
+                        if (SessionState.restoreDrill(state)) {
+                            return; // Successfully restored drill session
+                        }
+                    } else if (screen === 'exam') {
+                        if (SessionState.restoreApp(state)) {
+                            return; // Successfully restored app session
+                        }
+                    } else if (screen === 'ai-practice') {
+                        if (SessionState.restoreAIPractice(state)) {
+                            return; // Successfully restored AI Practice session
+                        }
                     }
                 }
+                // If restoration failed, clear and show home
+                SessionState.clear();
             }
-            // If restoration failed, clear and show home
-            SessionState.clear();
         }
-    }
 
-    Home.render();
+        Home.render();
+    } catch (err) {
+        console.error('Init failed', err);
+        const target = document.getElementById('bankList');
+        if (target) {
+            target.innerHTML = `<div class="bank-card" style="border-color:var(--red);background:#fff5f5">
+                <h2 style="color:var(--red)">Startup error</h2>
+                <p style="color:var(--gray-700)">${escapeHtml(err?.message || String(err))}</p>
+                <pre style="white-space:pre-wrap;font-size:11px;margin-top:8px;color:var(--gray-600)">${escapeHtml(err?.stack || '')}</pre>
+            </div>`;
+        }
+        const metaBody = document.getElementById('metaSummaryBody');
+        if (metaBody) metaBody.textContent = 'App failed to initialize.';
+    }
 }
 
 document.addEventListener('DOMContentLoaded', init);
