@@ -12337,6 +12337,11 @@ const Chat = {
     close() {
         this.isOpen = false;
         document.getElementById('chatPanel').classList.remove('open');
+        // Stop any ongoing speech
+        if ('speechSynthesis' in window && speechSynthesis.speaking) {
+            speechSynthesis.cancel();
+            document.querySelectorAll('.chat-tts-btn.speaking').forEach(b => b.classList.remove('speaking'));
+        }
     },
 
     clearHistory() {
