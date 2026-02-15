@@ -20,7 +20,8 @@
     --gray-700:#555;--gray-800:#333;--gray-900:#222;
     --radius:4px;--shadow:0 2px 8px rgba(0,0,0,.12);
 }
-body{font-family:Arial,Helvetica,sans-serif;font-size:14px;background:var(--bg);color:var(--gray-800);min-height:100vh;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;max-width:100vw;overflow-x:hidden}
+body{font-family:Arial,Helvetica,sans-serif;font-size:14px;background:var(--bg);color:var(--gray-800);min-height:100vh;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 a{color:var(--blue);text-decoration:none}
 a:hover{text-decoration:underline}
 button{font-family:inherit;cursor:pointer;transition:transform .1s ease}
@@ -53,13 +54,13 @@ button:active:not(:disabled){transform:scale(0.97)}
 .timer-toggle{color:#1a5276;cursor:pointer;font-size:12px;font-weight:bold}
 
 /* === SCREENS === */
-.screen{display:none;width:100%;max-width:100%;margin:0 auto;padding:clamp(12px,3vw,24px);min-height:calc(100vh - 200px);opacity:0;transform:translateY(6px);transition:opacity .25s ease,transform .25s ease}
+.screen{display:none;width:100vw;max-width:100vw;margin:0;padding:clamp(8px,2vw,20px);min-height:calc(100vh - 200px);opacity:0;transform:translateY(6px);transition:opacity .25s ease,transform .25s ease;box-sizing:border-box}
 .screen.active{display:block;opacity:1;transform:translateY(0)}
 .screen.active{animation:screenIn .25s ease forwards}
 @keyframes screenIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* === HOME SCREEN === */
-.home-layout{display:flex;flex-wrap:wrap;gap:clamp(16px,3vw,32px);align-items:flex-start;padding:10px 0}
+.home-layout{display:flex;flex-direction:column;gap:16px;align-items:stretch;padding:8px 0;width:100%}
 .home-main{flex:1 1 100%;min-width:0}
 .home-side{flex:1 1 100%;width:100%;display:flex;flex-direction:column;gap:16px;position:static}
 .home-hero{text-align:center;padding:30px 0 10px}
@@ -1573,32 +1574,19 @@ button:focus-visible {
     <div class="header-top">
         <button class="logo-link" onclick="SessionState.clear();showScreen('home');Home.render()" aria-label="Go to home">
         <div class="logo-area">
-            <svg class="logo-mark" viewBox="0 0 150 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Xooper crest">
+            <svg class="logo-mark" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Xooper logo">
                 <defs>
-                    <linearGradient id="crestGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stop-color="#a5b4fc"/>
-                        <stop offset="100%" stop-color="#4c1d95"/>
+                    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#c084fc"/>
+                        <stop offset="100%" stop-color="#7c3aed"/>
                     </linearGradient>
-                    <linearGradient id="crestBlade" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stop-color="#fcd34d"/>
+                    <linearGradient id="xGrad" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#fde047"/>
                         <stop offset="100%" stop-color="#f97316"/>
                     </linearGradient>
-                    <filter id="crestShadow" x="-30%" y="-30%" width="160%" height="160%">
-                        <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#3730a3" flood-opacity="0.4"/>
-                    </filter>
                 </defs>
-                <g filter="url(#crestShadow)">
-                    <path d="M30 20C30 14 34.5 9 40.5 8.3L107.5 0.7C113.6 0 118.8 4.7 119.4 10.8L129.4 103.1C130 109.3 125.2 114.7 119 115.3L32.6 123.3C26.4 123.9 21.1 119.1 20.5 112.9L10.5 20.6C10 14.4 14.7 8.9 20.9 8.3L30 20Z" fill="url(#crestGradient)" stroke="#dbeafe" stroke-width="2"/>
-                    <path d="M58 26L92 94" stroke="#60a5fa" stroke-width="6" stroke-linecap="round" opacity="0.85"/>
-                    <path d="M92 26L58 94" stroke="#93c5fd" stroke-width="8" stroke-linecap="round" opacity="0.8"/>
-                    <circle cx="50" cy="18" r="6" fill="#f97316" opacity="0.8"/>
-                    <circle cx="102" cy="24" r="5" fill="#fcd34d" opacity="0.8"/>
-                    <path d="M75 15L88 0L101 15" stroke="#fde68a" stroke-width="4" stroke-linecap="round"/>
-                    <path d="M120 105L138 120" stroke="#f87171" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
-                    <path d="M86 45C110 48 128 63 134 84L116 87C110 70 98 57 82 51L86 45Z" fill="rgba(255,255,255,0.15)"/>
-                    <path d="M63 74C46 76 33 87 26 104L44 101C50 90 59 82 71 78L63 74Z" fill="rgba(255,255,255,0.12)"/>
-                </g>
-                <path d="M18 30C18 27.2 20.3 25 23.2 25H126.8C129.7 25 132 27.2 132 30V90C132 92.8 129.7 95 126.8 95H23.2C20.3 95 18 92.8 18 90V30Z" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-dasharray="8 10"/>
+                <path d="M28 4L50 16V34C50 44 40 52 28 56C16 52 6 44 6 34V16L28 4Z" fill="url(#shieldGrad)" stroke="#e9d5ff" stroke-width="2"/>
+                <path d="M18 18L38 38M38 18L18 38" stroke="url(#xGrad)" stroke-width="6" stroke-linecap="round"/>
             </svg>
             <div class="logo-text">Xooper's Battleground</div>
         </div>
