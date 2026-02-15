@@ -5923,19 +5923,26 @@ const Shop = {
 
         // Show adoptable species (allow buying same species multiple times)
         html += '<h3>Adopt New Pet</h3><div class="shop-grid">';
+        const speciesDeathCount = state.speciesDeathCount || {};
         for (const [id, sp] of Object.entries(Gamification.PET_SPECIES)) {
             const levelOk = state.level >= sp.unlockLevel;
-            const canAfford = coins >= sp.price;
+            // Price increases by 25% for each death of same species
+            const deathPenalty = speciesDeathCount[id] || 0;
+            const adjustedPrice = Math.round(sp.price * Math.pow(1.25, deathPenalty));
+            const canAfford = coins >= adjustedPrice;
             const full = pets.length >= maxPets;
             const disabled = !levelOk || !canAfford || full;
+            const priceLabel = adjustedPrice > 0 ? '&#x1FA99; ' + adjustedPrice : 'Free!';
+            const deathPenaltyLabel = deathPenalty > 0 ? `<div class="shop-item-desc" style="color:#f87171">+${Math.round((Math.pow(1.25, deathPenalty) - 1) * 100)}% (${deathPenalty} lost)</div>` : '';
             html += `<div class="shop-item${!levelOk ? ' locked-item' : ''}${!canAfford && levelOk ? ' cant-afford' : ''}">
                 <div class="shop-item-icon">${sp.emojis[sp.emojis.length - 1]}</div>
                 <div class="shop-item-name">${sp.name}</div>
                 <div class="shop-item-desc">Difficulty: ${'★'.repeat(Math.ceil(sp.difficulty * 2))}${'☆'.repeat(4 - Math.ceil(sp.difficulty * 2))}</div>
                 <div class="shop-item-desc">${sp.stages.join(' → ')}</div>
+                ${deathPenaltyLabel}
                 ${!levelOk ? `<div class="shop-item-lock">Unlocks at Lv. ${sp.unlockLevel}</div>` : ''}
                 ${full ? `<div class="shop-item-lock">Pet roster full (${maxPets})</div>` : ''}
-                ${!disabled ? `<button class="shop-buy-btn" onclick="Shop.adoptPet('${id}')">${sp.price > 0 ? '&#x1FA99; ' + sp.price : 'Free!'}</button>` : ''}
+                ${!disabled ? `<button class="shop-buy-btn" onclick="Shop.adoptPet('${id}')">${priceLabel}</button>` : ''}
             </div>`;
         }
         html += '</div>';
@@ -5947,11 +5954,14 @@ const Shop = {
             graveyard.forEach(grave => {
                 const sp = Gamification.PET_SPECIES[grave.species] || Gamification.PET_SPECIES.bird;
                 const diedDate = new Date(grave.diedAt).toLocaleDateString();
+                const ageLabel = grave.ageAtDeath ? `Age: ${grave.ageAtDeath} days` : '';
+                const causeLabel = grave.diedOfAge ? '🕊️ Natural causes' : '💔 Neglect';
                 html += `<div class="shop-item" style="opacity:0.7;background:linear-gradient(135deg,#2d2d3a,#1a1a2e)">
                     <div class="shop-item-icon" style="filter:grayscale(1)">${Gamification.getSpeciesEmoji(grave.species, grave.stage)}</div>
                     <div class="shop-item-name">${grave.name}</div>
                     <div class="shop-item-desc">${sp.name} Stage ${grave.stage}</div>
-                    <div class="shop-item-desc" style="color:#888">Passed: ${diedDate}</div>
+                    ${ageLabel ? `<div class="shop-item-desc" style="color:#9ca3af">${ageLabel}</div>` : ''}
+                    <div class="shop-item-desc" style="color:#888">${causeLabel} • ${diedDate}</div>
                     <div class="shop-item-desc" style="color:#666">XP Fed: ${grave.totalXpFed || 0}</div>
                 </div>`;
             });
@@ -5997,7 +6007,11 @@ const Shop = {
         if (pets.length >= 4) return;
         // Allow buying same species again (removed species restriction)
         if (state.level < sp.unlockLevel) return;
-        if (sp.price > 0 && !Gamification.spendCoins(sp.price)) return;
+        // Price increases by 25% for each death of same species
+        const speciesDeathCount = state.speciesDeathCount || {};
+        const deathPenalty = speciesDeathCount[speciesId] || 0;
+        const adjustedPrice = Math.round(sp.price * Math.pow(1.25, deathPenalty));
+        if (adjustedPrice > 0 && !Gamification.spendCoins(adjustedPrice)) return;
 
         // Check for retired names AND current pet names
         const retiredNames = state.retiredNames || [];
@@ -7595,6 +7609,10 @@ const Garden = {
                 const birthDate = deadPet.birthDate || (now - 7 * 24 * 60 * 60 * 1000);
                 const ageAtDeath = Math.floor((now - birthDate) / (1000 * 60 * 60 * 24));
                 const diedOfAge = deadPet.diedOfAge || false;
+                
+                // Track species death count for price increase
+                state.speciesDeathCount = state.speciesDeathCount || {};
+                state.speciesDeathCount[deadPet.species] = (state.speciesDeathCount[deadPet.species] || 0) + 1;
                 
                 // Add to graveyard
                 state.graveyard.push({
