@@ -53,15 +53,15 @@ button:active:not(:disabled){transform:scale(0.97)}
 .timer-toggle{color:#1a5276;cursor:pointer;font-size:12px;font-weight:bold}
 
 /* === SCREENS === */
-.screen{display:none;width:100%;max-width:1200px;margin:0 auto;padding:clamp(16px,4vw,32px);min-height:calc(100vh - 200px);opacity:0;transform:translateY(6px);transition:opacity .25s ease,transform .25s ease}
+.screen{display:none;width:100%;max-width:100%;margin:0 auto;padding:clamp(12px,3vw,24px);min-height:calc(100vh - 200px);opacity:0;transform:translateY(6px);transition:opacity .25s ease,transform .25s ease}
 .screen.active{display:block;opacity:1;transform:translateY(0)}
 .screen.active{animation:screenIn .25s ease forwards}
 @keyframes screenIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
 /* === HOME SCREEN === */
 .home-layout{display:flex;flex-wrap:wrap;gap:clamp(16px,3vw,32px);align-items:flex-start;padding:10px 0}
-.home-main{flex:1 1 clamp(320px,60%,900px);min-width:280px}
-.home-side{flex:0 1 320px;width:min(320px,100%);display:flex;flex-direction:column;gap:16px;position:sticky;top:90px}
+.home-main{flex:1 1 100%;min-width:0}
+.home-side{flex:1 1 100%;width:100%;display:flex;flex-direction:column;gap:16px;position:static}
 .home-hero{text-align:center;padding:30px 0 10px}
 .home-hero h1{color:var(--navy);font-size:28px;margin-bottom:8px}
 .home-hero p{color:var(--gray-600);font-size:15px}
@@ -134,7 +134,7 @@ button:active:not(:disabled){transform:scale(0.97)}
 .goal-celebration{text-align:center;padding:8px;margin-top:8px;background:#eafaf1;border-radius:6px;color:var(--green);font-weight:bold;animation:goalPulse .5s ease}
 @keyframes goalPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 
-#bankList{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:24px;width:100%}
+#bankList{display:grid;grid-template-columns:1fr;gap:16px;width:100%}
 .bank-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:20px;box-shadow:var(--shadow);transition:box-shadow .2s ease;height:100%;display:flex;flex-direction:column}
 .bank-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .bank-card h2{color:var(--navy);font-size:20px;margin-bottom:4px}
