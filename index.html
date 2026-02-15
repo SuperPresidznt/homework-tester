@@ -1690,6 +1690,7 @@ button:focus-visible {
                 <button class="btn-nav" style="background:var(--red);border-color:var(--red)" id="btnBattle" onclick="Battle.show()">&#9876;&#65039; Battle</button>
                 <button class="btn-nav" style="background:#a855f7;border-color:#a855f7" id="btnBackpack" onclick="Backpack.openModal()">&#127890; Backpack</button>
                 <button class="btn-nav" style="background:#6366f1;border-color:#6366f1" id="btnScenes" onclick="SceneManager.openModal()">&#127912; Backgrounds</button>
+                <button class="btn-nav" style="background:#14b8a6;border-color:#14b8a6" id="btnLearn" onclick="LearnMode.show()">&#128218; Learn</button>
             </div>
 
             <details class="stats-panel" id="homeStatsPanel">
@@ -1732,6 +1733,16 @@ button:focus-visible {
         <span class="coin-display" id="businessCoins">&#x1FA99; 0</span>
     </div>
     <div id="businessContent" style="padding:16px"></div>
+</div>
+
+<!-- ========== LEARN MODE SCREEN ========== -->
+<div class="screen" id="screen-learn">
+    <div class="shop-header">
+        <button class="btn-nav btn-home" onclick="showScreen('home');Home.render()" style="margin-right:auto">Home</button>
+        <h2 style="flex:1;text-align:center;margin:0">📚 Learning Mode</h2>
+        <span class="coin-display" id="learnCoins">&#x1FA99; 0</span>
+    </div>
+    <div id="learnContent" style="padding:16px"></div>
 </div>
 
 <!-- ========== GARDEN SCREEN ========== -->
@@ -8465,6 +8476,11 @@ const BankManager = {
 // SCREEN ROUTER
 // =====================================================================
 function showScreen(name, showSubheader, showFooter) {
+    // Track Learn Mode time when leaving
+    if (typeof LearnMode !== 'undefined' && LearnMode.sessionStart) {
+        LearnMode.trackTimeSpent();
+    }
+    
     // End session timer when returning home
     if (name === 'home') {
         Session.end();
@@ -9864,6 +9880,341 @@ const Drill = {
             userAnswer: this.selectedOption,
             userAnswerText: this.selectedOption !== null ? q.options[this.selectedOption] : null
         };
+    }
+};
+
+// =====================================================================
+// LEARN MODE - Concept-first learning with AI Q&A
+// =====================================================================
+const LearnMode = {
+    STORAGE_KEY: 'wgu_learnMode',
+    currentTopic: null,
+    currentCategory: null,
+    sessionStart: null,
+    
+    getState() {
+        const raw = localStorage.getItem(this.STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {
+            topicsViewed: [],           // { topic, category, viewedAt, timeSpent }
+            questionsAsked: [],         // { question, category, askedAt }
+            categoryProgress: {},       // { [cat]: { topicsViewed: n, questionsAsked: n, timeSpent: n } }
+            totalTimeSpent: 0,
+            totalTopicsViewed: 0,
+            totalQuestionsAsked: 0
+        };
+    },
+    
+    saveState(state) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(state));
+    },
+    
+    show() {
+        this.render();
+        showScreen('learn');
+        document.getElementById('learnCoins').innerHTML = '&#x1FA99; ' + Gamification.getState().coins;
+    },
+    
+    render() {
+        const el = document.getElementById('learnContent');
+        const state = this.getState();
+        const banks = window.questionBanks || [];
+        
+        // Get all unique categories across all banks
+        const allCategories = new Set();
+        banks.forEach(bank => {
+            (bank.questions || []).forEach(q => {
+                if (q.category) allCategories.add(q.category);
+            });
+        });
+        
+        let html = `
+            <div style="margin-bottom:20px">
+                <h3 style="color:var(--navy);margin-bottom:8px">📖 Learn by Topic</h3>
+                <p style="color:var(--gray-600);font-size:14px;margin-bottom:16px">
+                    Select a category to learn concepts first, then ask questions to the AI tutor.
+                    Your learning progress is tracked separately from practice tests.
+                </p>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px">
+        `;
+        
+        const catProgress = state.categoryProgress || {};
+        for (const cat of allCategories) {
+            const prog = catProgress[cat] || { topicsViewed: 0, questionsAsked: 0, timeSpent: 0 };
+            const timeMin = Math.round(prog.timeSpent / 60000);
+            html += `
+                <div class="shop-item" style="cursor:pointer" onclick="LearnMode.selectCategory('${cat.replace(/'/g, "\\'")}')">
+                    <div class="shop-item-icon">📂</div>
+                    <div class="shop-item-name">${cat}</div>
+                    <div class="shop-item-desc">${prog.topicsViewed} topics • ${prog.questionsAsked} questions</div>
+                    <div class="shop-item-desc" style="color:var(--gray-500)">${timeMin}m studied</div>
+                </div>
+            `;
+        }
+        html += '</div>';
+        
+        // Learning stats summary
+        html += `
+            <div style="background:var(--gray-100);border-radius:12px;padding:16px;margin-bottom:20px">
+                <h4 style="margin:0 0 8px 0;color:var(--navy)">📊 Learning Stats</h4>
+                <div style="display:flex;gap:24px;flex-wrap:wrap">
+                    <div><strong>${state.totalTopicsViewed}</strong> <span style="color:var(--gray-600)">topics viewed</span></div>
+                    <div><strong>${state.totalQuestionsAsked}</strong> <span style="color:var(--gray-600)">questions asked</span></div>
+                    <div><strong>${Math.round(state.totalTimeSpent / 60000)}m</strong> <span style="color:var(--gray-600)">total study time</span></div>
+                </div>
+            </div>
+        `;
+        
+        // Recent activity
+        if (state.topicsViewed.length > 0) {
+            html += `<h4 style="color:var(--navy);margin-bottom:8px">🕐 Recent Topics</h4><div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">`;
+            const recent = state.topicsViewed.slice(-5).reverse();
+            recent.forEach(t => {
+                const ago = this._timeAgo(t.viewedAt);
+                html += `<div style="background:#fff;padding:10px 14px;border-radius:8px;border:1px solid var(--gray-200)">
+                    <strong>${t.topic}</strong> <span style="color:var(--gray-500);font-size:12px">• ${t.category} • ${ago}</span>
+                </div>`;
+            });
+            html += '</div>';
+        }
+        
+        el.innerHTML = html;
+    },
+    
+    selectCategory(category) {
+        this.currentCategory = category;
+        this.sessionStart = Date.now();
+        this.renderCategoryTopics(category);
+    },
+    
+    renderCategoryTopics(category) {
+        const el = document.getElementById('learnContent');
+        const banks = window.questionBanks || [];
+        
+        // Get all questions in this category
+        const questions = [];
+        banks.forEach(bank => {
+            (bank.questions || []).forEach(q => {
+                if (q.category === category) questions.push(q);
+            });
+        });
+        
+        // Group by unique concepts/topics (use question text as topic identifier)
+        const topics = [];
+        const seen = new Set();
+        questions.forEach(q => {
+            // Extract a topic from the question - use first 60 chars as identifier
+            const topicKey = (q.question || '').slice(0, 60);
+            if (!seen.has(topicKey)) {
+                seen.add(topicKey);
+                topics.push({
+                    question: q.question,
+                    answer: q.answer,
+                    explanation: q.explanation || '',
+                    options: q.options || [],
+                    difficulty: q.difficulty || 2
+                });
+            }
+        });
+        
+        let html = `
+            <div style="margin-bottom:16px">
+                <button class="btn-nav" onclick="LearnMode.render()" style="margin-right:12px">← Back</button>
+                <span style="font-size:18px;font-weight:600;color:var(--navy)">📂 ${category}</span>
+                <span style="color:var(--gray-500);margin-left:8px">(${topics.length} concepts)</span>
+            </div>
+            
+            <div style="background:linear-gradient(135deg,#14b8a6,#0d9488);color:#fff;padding:16px;border-radius:12px;margin-bottom:20px">
+                <h4 style="margin:0 0 8px 0">💡 Learning Mode</h4>
+                <p style="margin:0;font-size:14px;opacity:0.9">
+                    Click on a concept to learn it. The AI tutor will explain it, and you can ask follow-up questions.
+                    This is tracked separately from your practice tests.
+                </p>
+            </div>
+            
+            <div style="display:flex;flex-direction:column;gap:10px">
+        `;
+        
+        topics.forEach((t, i) => {
+            const diffLabel = ['', 'Easy', 'Medium', 'Hard'][t.difficulty] || 'Medium';
+            const diffColor = ['', '#22c55e', '#f59e0b', '#ef4444'][t.difficulty] || '#f59e0b';
+            html += `
+                <div class="shop-item" style="cursor:pointer;text-align:left;padding:14px" onclick="LearnMode.viewTopic(${i}, '${category.replace(/'/g, "\\'")}')">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+                        <div style="flex:1">
+                            <div style="font-weight:600;color:var(--navy);margin-bottom:4px">${t.question.slice(0, 100)}${t.question.length > 100 ? '...' : ''}</div>
+                            <div style="font-size:12px;color:var(--gray-500)">Click to learn this concept</div>
+                        </div>
+                        <span style="background:${diffColor};color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${diffLabel}</span>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        el.innerHTML = html;
+        
+        // Store topics for later reference
+        this._currentTopics = topics;
+    },
+    
+    viewTopic(index, category) {
+        const topic = this._currentTopics[index];
+        if (!topic) return;
+        
+        this.currentTopic = topic;
+        const el = document.getElementById('learnContent');
+        
+        // Track this topic view
+        const state = this.getState();
+        state.topicsViewed.push({
+            topic: topic.question.slice(0, 60),
+            category: category,
+            viewedAt: Date.now(),
+            timeSpent: 0
+        });
+        state.totalTopicsViewed++;
+        state.categoryProgress[category] = state.categoryProgress[category] || { topicsViewed: 0, questionsAsked: 0, timeSpent: 0 };
+        state.categoryProgress[category].topicsViewed++;
+        this.saveState(state);
+        
+        // Award XP for learning
+        Gamification.awardXP(5, 'Learned a concept');
+        
+        const correctAnswer = topic.options[topic.answer] || topic.options[0] || '';
+        
+        let html = `
+            <div style="margin-bottom:16px">
+                <button class="btn-nav" onclick="LearnMode.renderCategoryTopics('${category.replace(/'/g, "\\'")}')" style="margin-right:12px">← Back to Topics</button>
+            </div>
+            
+            <div style="background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,0.08);margin-bottom:20px">
+                <h3 style="color:var(--navy);margin:0 0 16px 0">📖 Concept</h3>
+                <p style="font-size:16px;line-height:1.6;color:var(--gray-800);margin-bottom:20px">${topic.question}</p>
+                
+                <div style="background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;padding:16px;border-radius:12px;margin-bottom:16px">
+                    <h4 style="margin:0 0 8px 0">✅ Answer</h4>
+                    <p style="margin:0;font-size:15px">${correctAnswer}</p>
+                </div>
+                
+                ${topic.explanation ? `
+                <div style="background:var(--gray-100);padding:16px;border-radius:12px;margin-bottom:16px">
+                    <h4 style="margin:0 0 8px 0;color:var(--navy)">💡 Explanation</h4>
+                    <p style="margin:0;color:var(--gray-700);line-height:1.6">${topic.explanation}</p>
+                </div>
+                ` : ''}
+                
+                <div style="background:var(--gray-50);padding:16px;border-radius:12px">
+                    <h4 style="margin:0 0 12px 0;color:var(--navy)">📝 All Options</h4>
+                    <ul style="margin:0;padding-left:20px;color:var(--gray-700)">
+                        ${topic.options.map((opt, i) => `<li style="margin-bottom:6px;${i === topic.answer ? 'font-weight:600;color:var(--green)' : ''}">${opt}${i === topic.answer ? ' ✓' : ''}</li>`).join('')}
+                    </ul>
+                </div>
+            </div>
+            
+            <div style="background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;padding:20px;border-radius:16px;margin-bottom:20px">
+                <h4 style="margin:0 0 12px 0">🤖 Ask the AI Tutor</h4>
+                <p style="margin:0 0 12px 0;font-size:14px;opacity:0.9">Have questions about this concept? Ask the AI tutor for clarification.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    <button class="btn-nav" style="background:#fff;color:#4f46e5;border:none" onclick="LearnMode.askAI('Explain this concept in simpler terms')">Simplify</button>
+                    <button class="btn-nav" style="background:#fff;color:#4f46e5;border:none" onclick="LearnMode.askAI('Give me a real-world example')">Example</button>
+                    <button class="btn-nav" style="background:#fff;color:#4f46e5;border:none" onclick="LearnMode.askAI('Why is this important?')">Why Important</button>
+                    <button class="btn-nav" style="background:#fff;color:#4f46e5;border:none" onclick="LearnMode.askAI('What are common mistakes?')">Common Mistakes</button>
+                </div>
+                <div style="margin-top:12px">
+                    <input type="text" id="learnAskInput" placeholder="Or type your own question..." style="width:100%;padding:10px 14px;border-radius:8px;border:none;font-size:14px" onkeypress="if(event.key==='Enter')LearnMode.askCustom()">
+                </div>
+            </div>
+            
+            <div id="learnAIResponse" style="display:none;background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.08)">
+                <h4 style="margin:0 0 12px 0;color:var(--navy)">🤖 AI Response</h4>
+                <div id="learnAIContent" style="color:var(--gray-700);line-height:1.6"></div>
+            </div>
+        `;
+        
+        el.innerHTML = html;
+    },
+    
+    askAI(prompt) {
+        const topic = this.currentTopic;
+        if (!topic) return;
+        
+        // Track question
+        const state = this.getState();
+        state.questionsAsked.push({
+            question: prompt,
+            category: this.currentCategory,
+            askedAt: Date.now()
+        });
+        state.totalQuestionsAsked++;
+        if (this.currentCategory) {
+            state.categoryProgress[this.currentCategory] = state.categoryProgress[this.currentCategory] || { topicsViewed: 0, questionsAsked: 0, timeSpent: 0 };
+            state.categoryProgress[this.currentCategory].questionsAsked++;
+        }
+        this.saveState(state);
+        
+        // Show response area
+        const responseEl = document.getElementById('learnAIResponse');
+        const contentEl = document.getElementById('learnAIContent');
+        responseEl.style.display = 'block';
+        contentEl.innerHTML = '<div style="color:var(--gray-500)">Thinking...</div>';
+        
+        // Build context for AI
+        const context = `
+The student is learning about this concept:
+Question: ${topic.question}
+Correct Answer: ${topic.options[topic.answer] || ''}
+${topic.explanation ? 'Explanation: ' + topic.explanation : ''}
+
+The student asks: "${prompt}"
+
+Please provide a helpful, educational response. Be concise but thorough. Use simple language.
+        `.trim();
+        
+        // Use the existing Chat AI if available
+        if (typeof Chat !== 'undefined' && Chat.sendToAI) {
+            Chat.sendToAI(context).then(response => {
+                contentEl.innerHTML = response.replace(/\n/g, '<br>');
+            }).catch(err => {
+                contentEl.innerHTML = '<span style="color:var(--red)">Error getting response. Please try again.</span>';
+            });
+        } else {
+            contentEl.innerHTML = 'AI tutor not available. Please check your API settings.';
+        }
+    },
+    
+    askCustom() {
+        const input = document.getElementById('learnAskInput');
+        const question = input.value.trim();
+        if (!question) return;
+        input.value = '';
+        this.askAI(question);
+    },
+    
+    _timeAgo(ts) {
+        const diff = Date.now() - ts;
+        const mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'just now';
+        if (mins < 60) return mins + 'm ago';
+        const hrs = Math.floor(mins / 60);
+        if (hrs < 24) return hrs + 'h ago';
+        const days = Math.floor(hrs / 24);
+        return days + 'd ago';
+    },
+    
+    // Track time spent when leaving
+    trackTimeSpent() {
+        if (this.sessionStart && this.currentCategory) {
+            const elapsed = Date.now() - this.sessionStart;
+            const state = this.getState();
+            state.totalTimeSpent += elapsed;
+            if (state.categoryProgress[this.currentCategory]) {
+                state.categoryProgress[this.currentCategory].timeSpent += elapsed;
+            }
+            this.saveState(state);
+            this.sessionStart = null;
+        }
     }
 };
 
