@@ -4536,7 +4536,7 @@ const SceneManager = {
 
     BACKGROUNDS: [
         { id: 'default', name: 'Classic', description: 'Clean, minimal background', unlocked: true, css: 'scene-default', animated: false },
-        { id: 'cozy-desk', name: 'Cozy Desk', description: 'Warm study nook with soft lighting', unlocked: true, css: 'scene-cozy-desk', animated: false },
+        { id: 'cozy-desk', name: 'Cozy Desk', description: 'Warm study nook with soft lighting', unlocked: false, unlockCondition: { type: 'level', value: 2 }, css: 'scene-cozy-desk', animated: false },
         { id: 'night-sky', name: 'Night Sky', description: 'Twinkling stars and gentle aurora', unlocked: false, unlockCondition: { type: 'level', value: 5 }, css: 'scene-night-sky', animated: true, animationType: 'css' },
         { id: 'rain-window', name: 'Rainy Window', description: 'Peaceful rain on glass', unlocked: false, unlockCondition: { type: 'streak', value: 7 }, css: 'scene-rain-window', animated: true, animationType: 'canvas' },
         { id: 'forest-glade', name: 'Forest Glade', description: 'Sunlit clearing with floating particles', unlocked: false, unlockCondition: { type: 'level', value: 10 }, css: 'scene-forest-glade', animated: true, animationType: 'css' },
@@ -4547,7 +4547,7 @@ const SceneManager = {
         { id: 'fireflies', name: 'Fireflies', description: 'Glowing fireflies in a summer night', unlocked: false, unlockCondition: { type: 'level', value: 7 }, css: 'scene-fireflies', animated: true, animationType: 'canvas' },
         { id: 'snowfall', name: 'Snowfall', description: 'Gentle snow drifting down', unlocked: false, unlockCondition: { type: 'streak', value: 3 }, css: 'scene-snowfall', animated: true, animationType: 'canvas' },
         { id: 'aurora', name: 'Aurora Borealis', description: 'Dancing northern lights', unlocked: false, unlockCondition: { type: 'level', value: 15 }, css: 'scene-aurora', animated: true, animationType: 'canvas' },
-        { id: 'bubbles', name: 'Bubbles', description: 'Floating soap bubbles', unlocked: true, css: 'scene-bubbles', animated: true, animationType: 'canvas' },
+        { id: 'bubbles', name: 'Bubbles', description: 'Floating soap bubbles', unlocked: false, unlockCondition: { type: 'level', value: 4 }, css: 'scene-bubbles', animated: true, animationType: 'canvas' },
         { id: 'matrix', name: 'Matrix', description: 'Digital rain code', unlocked: false, unlockCondition: { type: 'level', value: 12 }, css: 'scene-matrix', animated: true, animationType: 'canvas' },
         { id: 'jellyfish', name: 'Jellyfish', description: 'Graceful jellyfish floating', unlocked: false, unlockCondition: { type: 'gems', value: 15 }, css: 'scene-jellyfish', animated: true, animationType: 'canvas', premium: true },
         { id: 'campfire', name: 'Campfire', description: 'Cozy crackling fire with sparks', unlocked: false, unlockCondition: { type: 'streak', value: 14 }, css: 'scene-campfire', animated: true, animationType: 'canvas' },

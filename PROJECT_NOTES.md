@@ -1,6 +1,6 @@
 # WGU Practice App - Project Notes
 
-**Current Version: v2.50** | Last Updated: Feb 15, 2026
+**Current Version: v2.51** | Last Updated: Feb 15, 2026
 
 ## Overview
 A comprehensive study tool for WGU assessments with gamification, AI-powered practice, Elden Ring-style boss battles, idle business system, housing, animated backgrounds, and detailed metrics tracking.
@@ -443,3 +443,24 @@ const correlation = (n * sumXY - sumX * sumY) /
 - AI Drill already exists for pure AI practice - this would be for "sprinkling" into regular practice
 
 **Current State**: AI Drill mode exists for dedicated AI-generated questions. This feature would integrate AI questions into standard practice/test modes to combat memorization.
+
+### Unified Chart Rendering
+**Problem**: Progress dashboard charts (`_drawTrendChart`, `_drawAccuracyChart`, `_drawStudyVsScoreChart`) use slightly different padding, font sizes, and styling.
+
+**Proposed Solution**:
+- Create a shared `ChartUtils` object with common chart rendering functions
+- Standardize padding: `{ top: 20, right: 20, bottom: 30, left: 40 }`
+- Standardize fonts, colors, grid lines, dark mode handling
+- Reduce code duplication and ensure visual consistency
+
+---
+
+## Version History
+
+### v2.51 (Feb 15, 2026)
+- Fixed: Only 1 background (Classic) is now free; others require unlocking
+  - Cozy Desk: Level 2
+  - Bubbles: Level 4
+- Added: Skip question feature with lower mastery weight
+- Added: Footer stats bar showing Answered/Skipped/Unanswered/Flagged counts
+- Added: AI question injection feature ideas documented
