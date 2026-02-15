@@ -1658,6 +1658,7 @@ button:focus-visible {
                 <button class="btn-nav" style="background:var(--blue);border-color:var(--blue)" onclick="Progress.show()">View Progress</button>
                 <button class="btn-nav" style="background:var(--green);border-color:var(--green)" id="btnGarden" onclick="Garden.show()">&#127793; Garden</button>
                 <button class="btn-nav" style="background:var(--orange);border-color:var(--orange)" id="btnShop" onclick="Shop.show()">&#128176; Shop</button>
+                <button class="btn-nav" style="background:#0ea5e9;border-color:#0ea5e9" id="btnHouse" onclick="House.show()">&#127968; My House</button>
                 <button class="btn-nav" style="background:var(--red);border-color:var(--red)" id="btnBattle" onclick="Battle.show()">&#9876;&#65039; Battle</button>
                 <button class="btn-nav" style="background:#a855f7;border-color:#a855f7" id="btnBackpack" onclick="Backpack.openModal()">&#127890; Backpack</button>
                 <button class="btn-nav" style="background:#6366f1;border-color:#6366f1" id="btnScenes" onclick="SceneManager.openModal()">&#127912; Backgrounds</button>
@@ -1683,6 +1684,16 @@ button:focus-visible {
     </div>
     <div class="shop-tabs" id="shopTabs"></div>
     <div class="shop-items" id="shopItems"></div>
+</div>
+
+<!-- ========== MY HOUSE SCREEN ========== -->
+<div class="screen" id="screen-house">
+    <div class="shop-header">
+        <button class="btn-nav btn-home" onclick="showScreen('home');Home.render()" style="margin-right:auto">Home</button>
+        <h2 style="flex:1;text-align:center;margin:0">🏠 My House</h2>
+        <span class="coin-display" id="houseCoins">&#x1FA99; 0</span>
+    </div>
+    <div id="houseContent"></div>
 </div>
 
 <!-- ========== GARDEN SCREEN ========== -->
@@ -2603,7 +2614,9 @@ const Gamification = {
             kibble:  { name: 'Kibble',    price: 10,  icon: '🍖', hunger: 10, happiness: 4,  careBonus: 4 },
             treat:   { name: 'Treat',     price: 25,  icon: '🍪', hunger: 20, happiness: 10, careBonus: 8 },
             feast:   { name: 'Feast',     price: 60,  icon: '🍗', hunger: 40, happiness: 22, careBonus: 15 },
-            goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 35, happiness: 35, careBonus: 12 }
+            goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 35, happiness: 35, careBonus: 12 },
+            premiumSteak: { name: 'Premium Steak', price: 200, icon: '🥩', hunger: 60, happiness: 50, careBonus: 25 },
+            magicBerry:   { name: 'Magic Berry',   price: 150, icon: '🫐', hunger: 30, happiness: 60, careBonus: 20 }
         },
         seeds: {
             sunflower: { name: 'Sunflower',     price: 15,  icon: '🌻', gpNeeded: 10, stages: 4, coinReward: 10, xpReward: 25,
@@ -2615,7 +2628,9 @@ const Gamification = {
             crystal:   { name: 'Crystal Bloom', price: 75,  icon: '💎', gpNeeded: 40, stages: 5, coinReward: 50, xpReward: 120,
                          emojis: ['🫘','🌱','🪴','💠','💎'] },
             rainbow:   { name: 'Rainbow Rose',  price: 120, icon: '🌈', gpNeeded: 60, stages: 6, coinReward: 100, xpReward: 250,
-                         emojis: ['🫘','🌱','🌿','🪻','🌹','🌈'] }
+                         emojis: ['🫘','🌱','🌿','🪻','🌹','🌈'] },
+            moneyTree: { name: 'Money Tree',    price: 300, icon: '💰', gpNeeded: 100, stages: 7, coinReward: 250, xpReward: 500,
+                         emojis: ['🫘','🌱','🌿','🪴','🌳','💵','💰'] }
         },
         gardenItems: {
             water:      { name: 'Watering Can', price: 5,   icon: '💧', desc: '+25 water level' },
@@ -2624,20 +2639,73 @@ const Gamification = {
             evoStone:   { name: 'Evolution Stone', price: 150, icon: '🪨', desc: '+60 care minutes for pet evolution' },
             healthPotion: { name: 'Health Potion', price: 30, icon: '🧃', desc: 'Heal pet 40 HP mid-battle' },
             shieldCharm:  { name: 'Shield Charm',  price: 50, icon: '🛡️', desc: 'Block next enemy attack 100%' },
-            powerBerry:   { name: 'Power Berry',   price: 40, icon: '🫐', desc: '+50% ATK for 3 questions' }
+            powerBerry:   { name: 'Power Berry',   price: 40, icon: '🫐', desc: '+50% ATK for 3 questions' },
+            superFertilizer: { name: 'Super Fertilizer', price: 75, icon: '💊', desc: '3x growth for 1 plant' },
+            rainCloud:    { name: 'Rain Cloud',   price: 100, icon: '🌧️', desc: 'Auto-water all plants for 1 hour' }
+        },
+        petHousing: {
+            basicBed:    { name: 'Pet Bed',       price: 50,   icon: '🛏️', desc: 'Slows happiness decay 10%', comfortBonus: 0.10 },
+            cozyBed:     { name: 'Cozy Bed',      price: 150,  icon: '🛋️', desc: 'Slows happiness decay 20%', comfortBonus: 0.20 },
+            luxuryBed:   { name: 'Luxury Bed',    price: 400,  icon: '👑', desc: 'Slows happiness decay 35%', comfortBonus: 0.35 },
+            foodBowl:    { name: 'Food Bowl',     price: 75,   icon: '🥣', desc: 'Auto-feed when away (holds 3 meals)', capacity: 3, type: 'food' },
+            waterBowl:   { name: 'Water Bowl',    price: 60,   icon: '🫗', desc: 'Auto-hydrate when away (holds 5 drinks)', capacity: 5, type: 'water' },
+            largeFoodBowl:  { name: 'Large Food Bowl',  price: 200, icon: '🍲', desc: 'Auto-feed (holds 8 meals)', capacity: 8, type: 'food' },
+            largeWaterBowl: { name: 'Large Water Bowl', price: 150, icon: '🪣', desc: 'Auto-hydrate (holds 12 drinks)', capacity: 12, type: 'water' },
+            petHouse:    { name: 'Pet House',     price: 300,  icon: '🏠', desc: 'Slows all decay 25%, +comfort', comfortBonus: 0.25, allDecay: true },
+            deluxePetHouse: { name: 'Deluxe Pet House', price: 800, icon: '🏰', desc: 'Slows all decay 40%, max comfort', comfortBonus: 0.40, allDecay: true },
+            toyBox:      { name: 'Toy Box',       price: 100,  icon: '🧸', desc: '+5 happiness per study session', happinessBonus: 5 },
+            scratchPost: { name: 'Scratch Post',  price: 80,   icon: '🪵', desc: '+3 happiness per question', happinessPerQ: 3 }
         },
         decorations: {
             fountain: { name: 'Fountain',     price: 80,  icon: '⛲', desc: '+5 water per question (passive)', effect: 'autoWater' },
             gnome:    { name: 'Garden Gnome',  price: 25,  icon: '🧑‍🌾', desc: 'Decorative' },
             lantern:  { name: 'Lantern',       price: 35,  icon: '🏮', desc: 'Decorative' },
-            bench:    { name: 'Garden Bench',  price: 40,  icon: '🪑', desc: 'Decorative' }
+            bench:    { name: 'Garden Bench',  price: 40,  icon: '🪑', desc: 'Decorative' },
+            statue:   { name: 'Scholar Statue', price: 200, icon: '🗿', desc: '+2% XP bonus', xpBonus: 0.02 },
+            windmill: { name: 'Windmill',      price: 150, icon: '🎡', desc: 'Decorative, animated' },
+            pond:     { name: 'Koi Pond',      price: 250, icon: '🐠', desc: '+1 coin per correct answer', coinBonus: 1 }
         },
         cosmetics: {
             hat:        { name: 'Hat',        price: 50,  icon: '🎩' },
             crown:      { name: 'Crown',      price: 100, icon: '👑' },
             scarf:      { name: 'Scarf',      price: 30,  icon: '🧣' },
             sunglasses: { name: 'Sunglasses', price: 40,  icon: '🕶️' },
-            cape:       { name: 'Cape',       price: 75,  icon: '🦸' }
+            cape:       { name: 'Cape',       price: 75,  icon: '🦸' },
+            bowtie:     { name: 'Bow Tie',    price: 35,  icon: '🎀' },
+            glasses:    { name: 'Glasses',    price: 45,  icon: '👓' },
+            headphones: { name: 'Headphones', price: 60,  icon: '🎧' },
+            wings:      { name: 'Wings',      price: 200, icon: '🪽' },
+            halo:       { name: 'Halo',       price: 150, icon: '😇' }
+        },
+        housing: {
+            tent:       { name: 'Tent',         price: 100,   icon: '⛺', desc: 'Basic shelter', tier: 1 },
+            cabin:      { name: 'Cabin',        price: 500,   icon: '🛖', desc: 'Cozy wooden cabin', tier: 2 },
+            house:      { name: 'House',        price: 1500,  icon: '🏠', desc: 'Comfortable home', tier: 3 },
+            mansion:    { name: 'Mansion',      price: 5000,  icon: '🏛️', desc: 'Luxurious estate', tier: 4 },
+            castle:     { name: 'Castle',       price: 15000, icon: '🏰', desc: 'Royal residence', tier: 5 }
+        },
+        furniture: {
+            desk:       { name: 'Study Desk',   price: 100,  icon: '🪑', desc: '+1% XP bonus', xpBonus: 0.01 },
+            bookshelf:  { name: 'Bookshelf',    price: 150,  icon: '📚', desc: '+2% XP bonus', xpBonus: 0.02 },
+            lamp:       { name: 'Desk Lamp',    price: 50,   icon: '💡', desc: 'Decorative' },
+            plant:      { name: 'House Plant',  price: 40,   icon: '🪴', desc: 'Decorative' },
+            rug:        { name: 'Cozy Rug',     price: 75,   icon: '🟫', desc: 'Decorative' },
+            painting:   { name: 'Painting',     price: 120,  icon: '🖼️', desc: 'Decorative' },
+            tv:         { name: 'Television',   price: 300,  icon: '📺', desc: 'Entertainment' },
+            computer:   { name: 'Computer',     price: 500,  icon: '💻', desc: '+3% XP bonus', xpBonus: 0.03 },
+            aquarium:   { name: 'Aquarium',     price: 250,  icon: '🐠', desc: 'Relaxing' },
+            fireplace:  { name: 'Fireplace',    price: 400,  icon: '🔥', desc: 'Cozy warmth' },
+            bed:        { name: 'Bed',          price: 200,  icon: '🛏️', desc: 'Rest well' },
+            couch:      { name: 'Couch',        price: 175,  icon: '🛋️', desc: 'Comfortable seating' }
+        },
+        vehicles: {
+            bicycle:    { name: 'Bicycle',      price: 200,   icon: '🚲', desc: 'Eco-friendly transport', tier: 1 },
+            scooter:    { name: 'Scooter',      price: 500,   icon: '🛵', desc: 'Quick around town', tier: 2 },
+            car:        { name: 'Car',          price: 2000,  icon: '🚗', desc: 'Reliable sedan', tier: 3 },
+            sportsCar:  { name: 'Sports Car',   price: 5000,  icon: '🏎️', desc: 'Fast and stylish', tier: 4 },
+            helicopter: { name: 'Helicopter',   price: 15000, icon: '🚁', desc: 'Sky travel', tier: 5 },
+            yacht:      { name: 'Yacht',        price: 25000, icon: '🛥️', desc: 'Luxury water vessel', tier: 6 },
+            spaceship:  { name: 'Spaceship',    price: 50000, icon: '🚀', desc: 'To infinity!', tier: 7 }
         },
         plotExpansion: { name: 'Garden Plot', price: 100, icon: '🟫', desc: 'Unlock 1 additional garden plot' }
     },
@@ -2681,8 +2749,20 @@ const Gamification = {
                 gardenItems: { water: 5, fertilizer: 0, magicDust: 0, evoStone: 0 },
                 battleItems: { healthPotion: 0, shieldCharm: 0, powerBerry: 0 },
                 decorations: [],
-                petAccessories: []
+                petAccessories: [],
+                petHousing: {},
+                furniture: {},
+                vehicles: {}
             },
+            housing: { current: null, owned: [] },
+            petCare: {
+                foodBowl: { level: 0, capacity: 0 },
+                waterBowl: { level: 0, capacity: 0 },
+                comfortBonus: 0,
+                allDecayReduction: 0
+            },
+            graveyard: [],
+            retiredNames: [],
             battle: {
                 currentChapter: 1,
                 currentEnemy: 0,
@@ -4821,13 +4901,20 @@ const Backpack = {
 // =====================================================================
 const Shop = {
     currentTab: 'food',
-    TABS: ['food','seeds','gardenItems','decorations','cosmetics','adoptPet'],
-    TAB_LABELS: { food:'Food', seeds:'Seeds', gardenItems:'Garden', decorations:'Decor', cosmetics:'Cosmetics', adoptPet:'Pets' },
-    TAB_ICONS: { food:'🍖', seeds:'🌱', gardenItems:'💧', decorations:'⛲', cosmetics:'🎩', adoptPet:'🐾' },
+    TABS: ['food','seeds','gardenItems','petHousing','decorations','cosmetics','housing','furniture','vehicles','adoptPet'],
+    TAB_LABELS: { food:'Food', seeds:'Seeds', gardenItems:'Garden', petHousing:'Pet Home', decorations:'Decor', cosmetics:'Cosmetics', housing:'Houses', furniture:'Furniture', vehicles:'Vehicles', adoptPet:'Pets' },
+    TAB_ICONS: { food:'🍖', seeds:'🌱', gardenItems:'💧', petHousing:'🏠', decorations:'⛲', cosmetics:'🎩', housing:'🏛️', furniture:'🪑', vehicles:'🚗', adoptPet:'🐾' },
 
     show() {
         this.render();
         showScreen('shop');
+    },
+
+    switchTab(tab) {
+        if (this.TABS.includes(tab)) {
+            this.currentTab = tab;
+            this.render();
+        }
     },
 
     render() {
@@ -4910,6 +4997,10 @@ const Shop = {
         if (tab === 'gardenItems') return state.inventory.gardenItems[id] || 0;
         if (tab === 'decorations') return state.inventory.decorations.filter(d => d === id).length;
         if (tab === 'cosmetics') return state.inventory.petAccessories.includes(id) ? 'Yes' : null;
+        if (tab === 'petHousing') return (state.inventory.petHousing || {})[id] || 0;
+        if (tab === 'furniture') return (state.inventory.furniture || {})[id] || 0;
+        if (tab === 'vehicles') return (state.inventory.vehicles || {})[id] || 0;
+        if (tab === 'housing') return (state.housing?.owned || []).includes(id) ? 'Yes' : null;
         return null;
     },
 
@@ -4955,6 +5046,23 @@ const Shop = {
             if (!state.inventory.petAccessories.includes(id)) {
                 state.inventory.petAccessories.push(id);
             }
+        } else if (tab === 'petHousing') {
+            state.inventory.petHousing = state.inventory.petHousing || {};
+            state.inventory.petHousing[id] = (state.inventory.petHousing[id] || 0) + 1;
+            // Apply pet housing effects
+            this.applyPetHousingEffects(state, id, item);
+        } else if (tab === 'furniture') {
+            state.inventory.furniture = state.inventory.furniture || {};
+            state.inventory.furniture[id] = (state.inventory.furniture[id] || 0) + 1;
+        } else if (tab === 'vehicles') {
+            state.inventory.vehicles = state.inventory.vehicles || {};
+            state.inventory.vehicles[id] = (state.inventory.vehicles[id] || 0) + 1;
+        } else if (tab === 'housing') {
+            state.housing = state.housing || { current: null, owned: [] };
+            if (!state.housing.owned.includes(id)) {
+                state.housing.owned.push(id);
+                if (!state.housing.current) state.housing.current = id;
+            }
         }
 
         Gamification.saveState(state);
@@ -4970,6 +5078,60 @@ const Shop = {
         state.garden.unlockedPlots++;
         Gamification.saveState(state);
         SoundFX.play('purchase');
+        this.render();
+    },
+
+    applyPetHousingEffects(state, id, item) {
+        state.petCare = state.petCare || { foodBowl: { level: 0, capacity: 0 }, waterBowl: { level: 0, capacity: 0 }, comfortBonus: 0, allDecayReduction: 0 };
+        
+        // Food/water bowls
+        if (item.type === 'food') {
+            state.petCare.foodBowl.capacity = Math.max(state.petCare.foodBowl.capacity, item.capacity);
+        } else if (item.type === 'water') {
+            state.petCare.waterBowl.capacity = Math.max(state.petCare.waterBowl.capacity, item.capacity);
+        }
+        
+        // Comfort bonus (beds, houses)
+        if (item.comfortBonus) {
+            state.petCare.comfortBonus = Math.min(0.5, state.petCare.comfortBonus + item.comfortBonus);
+        }
+        
+        // All decay reduction (pet houses)
+        if (item.allDecay && item.comfortBonus) {
+            state.petCare.allDecayReduction = Math.min(0.5, state.petCare.allDecayReduction + item.comfortBonus);
+        }
+    },
+
+    fillFoodBowl() {
+        const state = Gamification.getState();
+        if (!state.petCare?.foodBowl?.capacity) return;
+        const capacity = state.petCare.foodBowl.capacity;
+        const current = state.petCare.foodBowl.level || 0;
+        const needed = capacity - current;
+        if (needed <= 0) return;
+        
+        // Use kibble from inventory
+        const available = state.inventory.petFood.kibble || 0;
+        const toUse = Math.min(available, needed);
+        if (toUse > 0) {
+            state.inventory.petFood.kibble -= toUse;
+            state.petCare.foodBowl.level = current + toUse;
+            Gamification.saveState(state);
+            this.render();
+        }
+    },
+
+    fillWaterBowl() {
+        const state = Gamification.getState();
+        if (!state.petCare?.waterBowl?.capacity) return;
+        const capacity = state.petCare.waterBowl.capacity;
+        const current = state.petCare.waterBowl.level || 0;
+        const needed = capacity - current;
+        if (needed <= 0) return;
+        
+        // Water is free to fill
+        state.petCare.waterBowl.level = capacity;
+        Gamification.saveState(state);
         this.render();
     },
 
@@ -4995,26 +5157,71 @@ const Shop = {
             html += '</div>';
         }
 
-        // Show adoptable species
+        // Show adoptable species (allow buying same species multiple times)
         html += '<h3>Adopt New Pet</h3><div class="shop-grid">';
         for (const [id, sp] of Object.entries(Gamification.PET_SPECIES)) {
-            const owned = ownedSpecies.includes(id);
             const levelOk = state.level >= sp.unlockLevel;
             const canAfford = coins >= sp.price;
             const full = pets.length >= maxPets;
-            const disabled = owned || !levelOk || !canAfford || full;
-            html += `<div class="shop-item${!levelOk ? ' locked-item' : ''}${owned ? ' sold-out' : ''}${!canAfford && levelOk && !owned ? ' cant-afford' : ''}">
+            const disabled = !levelOk || !canAfford || full;
+            html += `<div class="shop-item${!levelOk ? ' locked-item' : ''}${!canAfford && levelOk ? ' cant-afford' : ''}">
                 <div class="shop-item-icon">${sp.emojis[sp.emojis.length - 1]}</div>
                 <div class="shop-item-name">${sp.name}</div>
                 <div class="shop-item-desc">Difficulty: ${'★'.repeat(Math.ceil(sp.difficulty * 2))}${'☆'.repeat(4 - Math.ceil(sp.difficulty * 2))}</div>
                 <div class="shop-item-desc">${sp.stages.join(' → ')}</div>
                 ${!levelOk ? `<div class="shop-item-lock">Unlocks at Lv. ${sp.unlockLevel}</div>` : ''}
-                ${owned ? '<div class="shop-item-owned">Owned</div>' : ''}
-                ${full && !owned ? '<div class="shop-item-lock">Pet roster full (${maxPets})</div>' : ''}
+                ${full ? `<div class="shop-item-lock">Pet roster full (${maxPets})</div>` : ''}
                 ${!disabled ? `<button class="shop-buy-btn" onclick="Shop.adoptPet('${id}')">${sp.price > 0 ? '&#x1FA99; ' + sp.price : 'Free!'}</button>` : ''}
             </div>`;
         }
-        html += '</div></div>';
+        html += '</div>';
+        
+        // Show graveyard if any pets have died
+        const graveyard = state.graveyard || [];
+        if (graveyard.length > 0) {
+            html += '<h3>🪦 Pet Graveyard</h3><div class="shop-grid">';
+            graveyard.forEach(grave => {
+                const sp = Gamification.PET_SPECIES[grave.species] || Gamification.PET_SPECIES.bird;
+                const diedDate = new Date(grave.diedAt).toLocaleDateString();
+                html += `<div class="shop-item" style="opacity:0.7;background:linear-gradient(135deg,#2d2d3a,#1a1a2e)">
+                    <div class="shop-item-icon" style="filter:grayscale(1)">${Gamification.getSpeciesEmoji(grave.species, grave.stage)}</div>
+                    <div class="shop-item-name">${grave.name}</div>
+                    <div class="shop-item-desc">${sp.name} Stage ${grave.stage}</div>
+                    <div class="shop-item-desc" style="color:#888">Passed: ${diedDate}</div>
+                    <div class="shop-item-desc" style="color:#666">XP Fed: ${grave.totalXpFed || 0}</div>
+                </div>`;
+            });
+            html += '</div>';
+        }
+        
+        // Show pet care status
+        const petCare = state.petCare || {};
+        if (petCare.foodBowl?.capacity > 0 || petCare.waterBowl?.capacity > 0) {
+            html += '<h3>🏠 Pet Care Station</h3><div class="shop-grid">';
+            if (petCare.foodBowl?.capacity > 0) {
+                const foodLevel = petCare.foodBowl.level || 0;
+                const foodCap = petCare.foodBowl.capacity;
+                html += `<div class="shop-item">
+                    <div class="shop-item-icon">🥣</div>
+                    <div class="shop-item-name">Food Bowl</div>
+                    <div class="shop-item-desc">${foodLevel}/${foodCap} meals</div>
+                    <button class="shop-buy-btn" onclick="Shop.fillFoodBowl()" ${foodLevel >= foodCap ? 'disabled' : ''}>Fill (uses kibble)</button>
+                </div>`;
+            }
+            if (petCare.waterBowl?.capacity > 0) {
+                const waterLevel = Math.round(petCare.waterBowl.level || 0);
+                const waterCap = petCare.waterBowl.capacity;
+                html += `<div class="shop-item">
+                    <div class="shop-item-icon">🫗</div>
+                    <div class="shop-item-name">Water Bowl</div>
+                    <div class="shop-item-desc">${waterLevel}/${waterCap} drinks</div>
+                    <button class="shop-buy-btn" onclick="Shop.fillWaterBowl()" ${waterLevel >= waterCap ? 'disabled' : ''}>Fill (free)</button>
+                </div>`;
+            }
+            html += '</div>';
+        }
+        
+        html += '</div>';
         el.innerHTML = html;
     },
 
@@ -5024,11 +5231,17 @@ const Shop = {
         const state = Gamification.getState();
         const pets = state.pets || [];
         if (pets.length >= 4) return;
-        if (pets.some(p => p.species === speciesId)) return;
+        // Allow buying same species again (removed species restriction)
         if (state.level < sp.unlockLevel) return;
         if (sp.price > 0 && !Gamification.spendCoins(sp.price)) return;
 
-        const name = prompt('Name your new ' + sp.name + ':') || sp.name;
+        // Check for retired names
+        const retiredNames = state.retiredNames || [];
+        let name = prompt('Name your new ' + sp.name + ':') || sp.name;
+        while (retiredNames.includes(name)) {
+            name = prompt('That name is retired (belonged to a deceased pet). Choose another name:') || sp.name;
+            if (!retiredNames.includes(name)) break;
+        }
         const newPet = {
             name: name.slice(0, 20), species: speciesId, stage: 1, totalXpFed: 0,
             mood: 'sleepy', lastFed: null, hunger: 100, happiness: 100,
@@ -5054,6 +5267,131 @@ const Shop = {
         Gamification.updateBuddyWidget();
         Gamification.renderXpBar();
         this.render();
+    }
+};
+
+// =====================================================================
+// HOUSE SYSTEM
+// =====================================================================
+const House = {
+    show() {
+        this.render();
+        showScreen('house');
+    },
+
+    render() {
+        const state = Gamification.getState();
+        const housing = state.housing || { current: null, owned: [] };
+        const furniture = state.inventory?.furniture || {};
+        const vehicles = state.inventory?.vehicles || {};
+        const coins = state.coins || 0;
+        
+        document.getElementById('houseCoins').innerHTML = '&#x1FA99; ' + coins.toLocaleString();
+        
+        let html = '';
+        
+        // Current house display
+        if (housing.current) {
+            const houseData = Gamification.SHOP.housing[housing.current];
+            html += `<div class="house-display" style="text-align:center;padding:20px;background:linear-gradient(135deg,var(--navy),#1a1a2e);border-radius:16px;margin-bottom:20px">
+                <div style="font-size:64px">${houseData?.icon || '🏠'}</div>
+                <h2 style="color:var(--white);margin:8px 0">${houseData?.name || 'My Home'}</h2>
+                <p style="color:var(--gray-400)">${houseData?.desc || ''}</p>
+            </div>`;
+        } else {
+            html += `<div class="house-display" style="text-align:center;padding:20px;background:var(--gray-100);border-radius:16px;margin-bottom:20px">
+                <div style="font-size:48px;opacity:0.5">🏕️</div>
+                <h3 style="color:var(--gray-500)">No Home Yet</h3>
+                <p style="color:var(--gray-400)">Buy a house from the Shop!</p>
+                <button class="btn-primary" onclick="Shop.show();Shop.switchTab('housing')">Browse Houses</button>
+            </div>`;
+        }
+        
+        // Owned houses
+        if (housing.owned.length > 0) {
+            html += '<h3>🏘️ Your Properties</h3><div class="shop-grid">';
+            housing.owned.forEach(houseId => {
+                const h = Gamification.SHOP.housing[houseId];
+                const isCurrent = housing.current === houseId;
+                html += `<div class="shop-item${isCurrent ? ' active' : ''}" style="${isCurrent ? 'border:2px solid var(--green)' : ''}">
+                    <div class="shop-item-icon">${h?.icon || '🏠'}</div>
+                    <div class="shop-item-name">${h?.name || houseId}</div>
+                    ${isCurrent ? '<div class="shop-item-owned" style="color:var(--green)">Current Home</div>' : 
+                        `<button class="shop-buy-btn" onclick="House.setCurrentHouse('${houseId}')">Move In</button>`}
+                </div>`;
+            });
+            html += '</div>';
+        }
+        
+        // Furniture inventory
+        const furnitureItems = Object.entries(furniture).filter(([k, v]) => v > 0);
+        if (furnitureItems.length > 0) {
+            html += '<h3>🪑 Furniture</h3><div class="shop-grid">';
+            furnitureItems.forEach(([id, count]) => {
+                const f = Gamification.SHOP.furniture[id];
+                html += `<div class="shop-item">
+                    <div class="shop-item-icon">${f?.icon || '📦'}</div>
+                    <div class="shop-item-name">${f?.name || id}</div>
+                    <div class="shop-item-desc">${f?.desc || ''}</div>
+                    <div class="shop-item-owned">Owned: ${count}</div>
+                </div>`;
+            });
+            html += '</div>';
+        }
+        
+        // Vehicles inventory
+        const vehicleItems = Object.entries(vehicles).filter(([k, v]) => v > 0);
+        if (vehicleItems.length > 0) {
+            html += '<h3>🚗 Garage</h3><div class="shop-grid">';
+            vehicleItems.forEach(([id, count]) => {
+                const v = Gamification.SHOP.vehicles[id];
+                html += `<div class="shop-item">
+                    <div class="shop-item-icon">${v?.icon || '🚗'}</div>
+                    <div class="shop-item-name">${v?.name || id}</div>
+                    <div class="shop-item-desc">${v?.desc || ''}</div>
+                    <div class="shop-item-owned">Owned: ${count}</div>
+                </div>`;
+            });
+            html += '</div>';
+        }
+        
+        // XP bonuses from furniture
+        const xpBonus = this.calculateXpBonus(state);
+        if (xpBonus > 0) {
+            html += `<div style="text-align:center;padding:12px;background:var(--green-light);border-radius:8px;margin-top:16px">
+                <strong>📚 Study Bonus:</strong> +${(xpBonus * 100).toFixed(0)}% XP from furniture
+            </div>`;
+        }
+        
+        // Shop link
+        html += `<div style="text-align:center;margin-top:20px">
+            <button class="btn-primary" onclick="Shop.show();Shop.switchTab('furniture')">🛒 Shop Furniture</button>
+            <button class="btn-primary" onclick="Shop.show();Shop.switchTab('vehicles')" style="margin-left:8px">🚗 Shop Vehicles</button>
+        </div>`;
+        
+        document.getElementById('houseContent').innerHTML = html;
+    },
+
+    setCurrentHouse(houseId) {
+        const state = Gamification.getState();
+        state.housing = state.housing || { current: null, owned: [] };
+        if (state.housing.owned.includes(houseId)) {
+            state.housing.current = houseId;
+            Gamification.saveState(state);
+            this.render();
+        }
+    },
+
+    calculateXpBonus(state) {
+        const furniture = state.inventory?.furniture || {};
+        let bonus = 0;
+        for (const [id, count] of Object.entries(furniture)) {
+            const f = Gamification.SHOP.furniture[id];
+            if (f?.xpBonus && count > 0) {
+                bonus += f.xpBonus; // Only count once per type
+            }
+        }
+        return bonus;
     }
 };
 
@@ -5993,10 +6331,19 @@ const Garden = {
         const timeScale = Math.max(1, Gamification.PET_DECAY_TIMESCALE || 1);
         const pets = state.pets || [state.studyBuddy];
         const petCount = pets.length;
+        
+        // Get pet care bonuses
+        const petCare = state.petCare || { foodBowl: { level: 0, capacity: 0 }, waterBowl: { level: 0, capacity: 0 }, comfortBonus: 0, allDecayReduction: 0 };
+        const comfortReduction = petCare.comfortBonus || 0;
+        const allDecayReduction = petCare.allDecayReduction || 0;
 
         let anyChanged = false;
+        let petsToRemove = [];
         const lastActiveTs = state.stats?.lastActiveTimestamp || now;
-        pets.forEach(pet => {
+        
+        pets.forEach((pet, idx) => {
+            if (pet.dead) return; // Skip dead pets
+            
             const baseline = pet.lastDecayCheck ?? lastActiveTs;
             const rawHours = (now - baseline) / (1000 * 60 * 60);
             const scaledHours = rawHours * timeScale;
@@ -6010,9 +6357,29 @@ const Garden = {
             const crowdPenalty = 1 + (petCount - 1) * 0.15;
             const stageMultiplier = 1 + Math.max(0, (pet.stage || 1) - 1) * 0.25;
             const decayRate = diff * crowdPenalty * stageMultiplier;
+            
+            // Apply comfort and decay reduction from pet housing
+            const hungerReduction = 1 - allDecayReduction;
+            const happyReduction = 1 - Math.max(comfortReduction, allDecayReduction);
 
-            const hungerDecay = scaledHours * 12 * decayRate;
-            const happyDecay = scaledHours * 8 * decayRate;
+            let hungerDecay = scaledHours * 12 * decayRate * hungerReduction;
+            let happyDecay = scaledHours * 8 * decayRate * happyReduction;
+            
+            // Auto-feed from food bowl while away
+            if (petCare.foodBowl.level > 0 && pet.hunger < 50) {
+                const mealsNeeded = Math.ceil((50 - pet.hunger) / 10);
+                const mealsUsed = Math.min(mealsNeeded, petCare.foodBowl.level);
+                if (mealsUsed > 0) {
+                    pet.hunger = Math.min(100, pet.hunger + mealsUsed * 10);
+                    petCare.foodBowl.level -= mealsUsed;
+                }
+            }
+            
+            // Auto-hydrate from water bowl (reduces happiness decay)
+            if (petCare.waterBowl.level > 0) {
+                happyDecay *= 0.5; // Water bowl halves happiness decay
+                petCare.waterBowl.level = Math.max(0, petCare.waterBowl.level - scaledHours * 0.5);
+            }
 
             pet.hunger = Math.max(0, (pet.hunger ?? 100) - hungerDecay);
             pet.happiness = Math.max(0, (pet.happiness ?? 100) - happyDecay);
@@ -6024,13 +6391,61 @@ const Garden = {
             // Sickness at both below 15
             if (pet.hunger < 15 && pet.happiness < 15) pet.sick = true;
             if (pet.sick) {
-                pet.hunger = Math.max(0, pet.hunger - scaledHours * 4 * decayRate);
-                pet.happiness = Math.max(0, pet.happiness - scaledHours * 4 * decayRate);
+                pet.hunger = Math.max(0, pet.hunger - scaledHours * 4 * decayRate * hungerReduction);
+                pet.happiness = Math.max(0, pet.happiness - scaledHours * 4 * decayRate * happyReduction);
+            }
+            
+            // Pet death check - if hunger AND happiness are 0 for too long while sick
+            if (pet.sick && pet.hunger <= 0 && pet.happiness <= 0) {
+                pet.deathTimer = (pet.deathTimer || 0) + scaledHours;
+                if (pet.deathTimer >= 2) { // 2 scaled hours at 0/0 while sick = death
+                    petsToRemove.push(idx);
+                }
+            } else {
+                pet.deathTimer = 0;
             }
 
             pet.lastDecayCheck = now;
             anyChanged = true;
         });
+        
+        // Handle pet deaths
+        if (petsToRemove.length > 0) {
+            state.graveyard = state.graveyard || [];
+            state.retiredNames = state.retiredNames || [];
+            
+            petsToRemove.reverse().forEach(idx => {
+                const deadPet = pets[idx];
+                // Add to graveyard
+                state.graveyard.push({
+                    name: deadPet.name,
+                    species: deadPet.species,
+                    stage: deadPet.stage,
+                    diedAt: now,
+                    totalXpFed: deadPet.totalXpFed,
+                    careMinutes: deadPet.careMinutes
+                });
+                // Retire the name
+                if (!state.retiredNames.includes(deadPet.name)) {
+                    state.retiredNames.push(deadPet.name);
+                }
+                // Remove from pets array
+                pets.splice(idx, 1);
+                // Show death notification
+                Gamification.showAchievementToast({ 
+                    icon: '💀', 
+                    name: deadPet.name + ' has passed away', 
+                    desc: 'Visit the graveyard to remember them', 
+                    xp: 0 
+                });
+            });
+            
+            // Adjust active pet index
+            if (state.activePetIdx >= pets.length) {
+                state.activePetIdx = Math.max(0, pets.length - 1);
+            }
+            anyChanged = true;
+        }
 
         // Bonuses (active pet only)
         const buddy = state.studyBuddy;
