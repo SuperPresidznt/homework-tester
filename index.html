@@ -1156,6 +1156,7 @@ button:focus-visible {
 .study-buddy.sick{animation:buddySick 1s ease-in-out infinite;border-color:#f59e0b;background:#fffbeb}
 @keyframes buddyPulse{0%,100%{transform:scale(1);box-shadow:0 4px 12px rgba(0,0,0,.1)}50%{transform:scale(1.08);box-shadow:0 4px 16px rgba(239,68,68,.3)}}
 @keyframes buddySick{0%,100%{transform:rotate(0deg)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+@keyframes speedFeedback{0%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-80%) scale(1.5)}}
 .buddy-progress{width:60px;height:4px;background:var(--gray-200);border-radius:2px;margin:6px auto 0;overflow:hidden}
 .buddy-progress-fill{height:100%;background:var(--green);border-radius:2px}
 
@@ -1776,6 +1777,31 @@ button:focus-visible {
     <div class="drill-container">
         <div class="drill-progress" id="drillProgress"></div>
         <div class="drill-card" id="drillCard"></div>
+    </div>
+</div>
+
+<!-- ========== SPEED MODE SCREEN ========== -->
+<div class="screen" id="screen-speed">
+    <div class="speed-container" style="max-width:700px;margin:0 auto;padding:20px">
+        <div class="speed-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <div>
+                <span id="speedScore" style="font-size:24px;font-weight:bold;color:var(--navy)">0</span>
+                <span style="font-size:14px;color:var(--gray-600)">pts</span>
+                <span id="speedCoins" style="margin-left:12px;font-size:18px;color:var(--orange)">🪙 0</span>
+            </div>
+            <div id="speedTimer" style="font-size:32px;font-weight:bold;color:var(--red);font-family:monospace">30</div>
+            <div>
+                <span id="speedStreak" style="font-size:18px">🔥 0</span>
+                <span id="speedMultiplier" style="margin-left:8px;font-size:14px;background:var(--green);color:#fff;padding:2px 8px;border-radius:12px">1x</span>
+            </div>
+        </div>
+        <div class="speed-progress-bar" style="height:6px;background:var(--gray-200);border-radius:3px;margin-bottom:20px;overflow:hidden">
+            <div id="speedTimerBar" style="height:100%;background:linear-gradient(90deg,var(--green),var(--orange),var(--red));width:100%;transition:width 0.1s linear"></div>
+        </div>
+        <div id="speedCard" class="drill-card"></div>
+        <div style="text-align:center;margin-top:16px">
+            <button class="btn-nav" onclick="SpeedMode.end()" style="background:var(--gray-400)">End Session</button>
+        </div>
     </div>
 </div>
 
@@ -6768,6 +6794,9 @@ const Home = {
                     <button class="mode-btn m-ai" onclick="AIPractice.start('${escapeHtml(bank.bankId)}')">
                         <h3>AI Practice</h3><p>AI generates new questions targeting your weak areas.</p>
                     </button>
+                    <button class="mode-btn m-speed" onclick="SpeedMode.start('${escapeHtml(bank.bankId)}')" style="background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff">
+                        <h3>⚡ Speed Mode</h3><p>Race the clock! Fast answers = more coins.</p>
+                    </button>
                 </div>
                 ${Home.renderWeakAreasBadge(bank)}
             </div>`;
@@ -8037,6 +8066,313 @@ const Drill = {
             userAnswer: this.selectedOption,
             userAnswerText: this.selectedOption !== null ? q.options[this.selectedOption] : null
         };
+    }
+};
+
+// =====================================================================
+// SPEED MODE (Rush/Hot Seat)
+// =====================================================================
+/**
+ * @namespace SpeedMode
+ * @description Timed speed drill mode. Answer fast for coin multipliers.
+ * Questions weighted by mastery - weak questions appear more often.
+ */
+const SpeedMode = {
+    bank: null,
+    queue: [],
+    current: null,
+    score: 0,
+    coins: 0,
+    streak: 0,
+    questionsAnswered: 0,
+    timerInterval: null,
+    timeRemaining: 0,
+    maxTime: 30,
+    selectedOption: null,
+
+    // Time limits by difficulty (seconds)
+    TIME_LIMITS: { easy: 30, medium: 20, hard: 15 },
+
+    start(bankId) {
+        this.bank = BankManager.getBank(bankId);
+        if (!this.bank) return;
+
+        Session.start();
+        this.score = 0;
+        this.coins = 0;
+        this.streak = 0;
+        this.questionsAnswered = 0;
+        this.selectedOption = null;
+
+        this.buildQueue();
+        if (this.queue.length === 0) {
+            alert('No questions available for Speed Mode.');
+            return;
+        }
+
+        showScreen('speed', false, false);
+        this.updateDisplay();
+        this.nextQuestion();
+    },
+
+    buildQueue() {
+        const drillProgress = Store.get('drillProgress', {});
+        const now = Date.now();
+
+        // Weight questions by weakness (lower EF = higher weight)
+        const weighted = this.bank.questions.map(q => {
+            const prog = drillProgress[q.id] || { ef: 2.5, reps: 0 };
+            // Weight: new questions = 3, weak (low EF) = 2-3, mastered = 1
+            let weight = 1;
+            if (prog.reps === 0) weight = 3;
+            else if (prog.ef < 2.0) weight = 3;
+            else if (prog.ef < 2.5) weight = 2;
+            else weight = 1;
+
+            return { question: q, weight, ef: prog.ef };
+        });
+
+        // Shuffle with weighting
+        this.queue = [];
+        const pool = [...weighted];
+        while (pool.length > 0 && this.queue.length < 50) {
+            const totalWeight = pool.reduce((s, p) => s + p.weight, 0);
+            let rand = Math.random() * totalWeight;
+            for (let i = 0; i < pool.length; i++) {
+                rand -= pool[i].weight;
+                if (rand <= 0) {
+                    this.queue.push(pool[i]);
+                    pool.splice(i, 1);
+                    break;
+                }
+            }
+        }
+    },
+
+    nextQuestion() {
+        this.stopTimer();
+
+        if (this.queue.length === 0) {
+            this.buildQueue(); // Refill if empty
+        }
+
+        if (this.queue.length === 0) {
+            this.end();
+            return;
+        }
+
+        this.current = this.queue.shift();
+        this.selectedOption = null;
+
+        // Determine time based on question difficulty
+        const difficulty = this.current.question.difficulty || 2;
+        if (difficulty === 1) this.maxTime = this.TIME_LIMITS.easy;
+        else if (difficulty === 3) this.maxTime = this.TIME_LIMITS.hard;
+        else this.maxTime = this.TIME_LIMITS.medium;
+
+        this.timeRemaining = this.maxTime;
+        this.renderQuestion();
+        this.startTimer();
+    },
+
+    renderQuestion() {
+        const q = this.current.question;
+        const diffLabel = q.difficulty === 1 ? 'Easy' : q.difficulty === 3 ? 'Hard' : 'Medium';
+        const diffColor = q.difficulty === 1 ? 'var(--green)' : q.difficulty === 3 ? 'var(--red)' : 'var(--orange)';
+
+        const optionsHtml = q.options.map((opt, i) => `
+            <button class="speed-option drill-option" onclick="SpeedMode.selectOption(${i})" data-idx="${i}">
+                <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+                <span class="option-text">${escapeHtml(opt)}</span>
+            </button>
+        `).join('');
+
+        document.getElementById('speedCard').innerHTML = `
+            <div style="margin-bottom:8px">
+                <span style="font-size:11px;color:${diffColor};font-weight:bold">${diffLabel}</span>
+                <span style="font-size:11px;color:var(--gray-500);margin-left:8px">${this.maxTime}s</span>
+            </div>
+            <div class="drill-question" style="font-size:16px;margin-bottom:16px">${escapeHtml(q.text)}</div>
+            <div class="speed-options" style="display:flex;flex-direction:column;gap:8px">${optionsHtml}</div>
+        `;
+
+        this.renderMath();
+    },
+
+    selectOption(idx) {
+        if (this.selectedOption !== null) return; // Already answered
+        this.selectedOption = idx;
+        this.stopTimer();
+
+        const q = this.current.question;
+        const isCorrect = idx === q.correctAnswer;
+        const timeUsed = this.maxTime - this.timeRemaining;
+        const timeRatio = this.timeRemaining / this.maxTime;
+
+        // Highlight answer
+        const options = document.querySelectorAll('.speed-option');
+        options.forEach((opt, i) => {
+            opt.disabled = true;
+            if (i === q.correctAnswer) opt.classList.add('correct');
+            else if (i === idx && !isCorrect) opt.classList.add('incorrect');
+        });
+
+        if (isCorrect) {
+            this.streak++;
+            this.questionsAnswered++;
+
+            // Calculate coin multiplier based on speed
+            let multiplier = 1;
+            if (timeRatio >= 0.8) multiplier = 4;      // Super fast (80%+ time left)
+            else if (timeRatio >= 0.6) multiplier = 3; // Fast (60%+ time left)
+            else if (timeRatio >= 0.4) multiplier = 2; // Good (40%+ time left)
+            else multiplier = 1;                        // Normal
+
+            // Streak bonus
+            if (this.streak >= 10) multiplier += 2;
+            else if (this.streak >= 5) multiplier += 1;
+
+            const baseCoins = 5;
+            const earnedCoins = baseCoins * multiplier;
+            this.coins += earnedCoins;
+            this.score += Math.round(100 * timeRatio * multiplier);
+
+            // Award actual coins
+            Gamification.awardCoins(earnedCoins);
+            Gamification.incrementCombo();
+            SoundFX.play('correct');
+
+            // Show feedback
+            this.showFeedback(`+${earnedCoins} 🪙`, 'var(--green)', multiplier);
+        } else {
+            this.streak = 0;
+            Gamification.resetCombo();
+            SoundFX.play('incorrect');
+            this.showFeedback('Miss!', 'var(--red)', 0);
+        }
+
+        // Track question
+        QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeUsed * 1000);
+        Gamification.updateCategoryMastery(q.category || 'General', isCorrect);
+        DailyGoal.recordQuestion();
+
+        this.updateDisplay();
+
+        // Auto-advance after brief delay
+        setTimeout(() => this.nextQuestion(), isCorrect ? 800 : 1500);
+    },
+
+    showFeedback(text, color, multiplier) {
+        const feedback = document.createElement('div');
+        feedback.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:bold;color:${color};text-shadow:2px 2px 4px rgba(0,0,0,.3);z-index:9999;animation:speedFeedback 0.8s ease-out forwards;pointer-events:none`;
+        feedback.textContent = text;
+        if (multiplier > 1) {
+            feedback.innerHTML += `<div style="font-size:24px">${multiplier}x MULTIPLIER!</div>`;
+        }
+        document.body.appendChild(feedback);
+        setTimeout(() => feedback.remove(), 800);
+    },
+
+    startTimer() {
+        this.updateTimerDisplay();
+        this.timerInterval = setInterval(() => {
+            this.timeRemaining -= 0.1;
+            this.updateTimerDisplay();
+
+            if (this.timeRemaining <= 0) {
+                this.timeUp();
+            }
+        }, 100);
+    },
+
+    stopTimer() {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    },
+
+    timeUp() {
+        this.stopTimer();
+        if (this.selectedOption !== null) return;
+
+        // Time ran out - mark as wrong
+        this.streak = 0;
+        Gamification.resetCombo();
+        SoundFX.play('incorrect');
+
+        const q = this.current.question;
+        const options = document.querySelectorAll('.speed-option');
+        options.forEach((opt, i) => {
+            opt.disabled = true;
+            if (i === q.correctAnswer) opt.classList.add('correct');
+        });
+
+        QuestionTracker.recordSingle(q.id, q.category || 'General', false, this.maxTime * 1000);
+        this.showFeedback('⏱️ TIME!', 'var(--red)', 0);
+        this.updateDisplay();
+
+        setTimeout(() => this.nextQuestion(), 1500);
+    },
+
+    updateTimerDisplay() {
+        const timerEl = document.getElementById('speedTimer');
+        const barEl = document.getElementById('speedTimerBar');
+        if (timerEl) timerEl.textContent = Math.ceil(this.timeRemaining);
+        if (barEl) barEl.style.width = `${(this.timeRemaining / this.maxTime) * 100}%`;
+
+        // Color based on time
+        if (timerEl) {
+            if (this.timeRemaining <= 5) timerEl.style.color = 'var(--red)';
+            else if (this.timeRemaining <= 10) timerEl.style.color = 'var(--orange)';
+            else timerEl.style.color = 'var(--green)';
+        }
+    },
+
+    updateDisplay() {
+        document.getElementById('speedScore').textContent = this.score;
+        document.getElementById('speedCoins').textContent = `🪙 ${this.coins}`;
+        document.getElementById('speedStreak').textContent = `🔥 ${this.streak}`;
+
+        let mult = 1;
+        if (this.streak >= 10) mult = 3;
+        else if (this.streak >= 5) mult = 2;
+        document.getElementById('speedMultiplier').textContent = `${mult}x`;
+    },
+
+    end() {
+        this.stopTimer();
+        Session.end();
+
+        document.getElementById('speedCard').innerHTML = `
+            <div class="drill-session-done" style="text-align:center;padding:30px">
+                <h2>🏁 Speed Round Complete!</h2>
+                <div style="font-size:48px;margin:20px 0">${this.score}</div>
+                <p style="font-size:14px;color:var(--gray-600)">points</p>
+                <div style="margin:20px 0;font-size:24px;color:var(--orange)">🪙 ${this.coins} coins earned!</div>
+                <p>${this.questionsAnswered} questions answered</p>
+                <p>Best streak: 🔥 ${this.streak}</p>
+                <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+                    <button class="drill-btn btn-show" onclick="SpeedMode.start('${escapeHtml(this.bank.bankId)}')">Play Again</button>
+                    <button class="btn-nav btn-home" onclick="showScreen('home');Home.render()">Home</button>
+                </div>
+            </div>
+        `;
+    },
+
+    renderMath() {
+        if (window.renderMathInElement) {
+            try {
+                renderMathInElement(document.getElementById('speedCard'), {
+                    delimiters: [
+                        { left: "\\[", right: "\\]", display: true },
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                    ]
+                });
+            } catch {}
+        }
     }
 };
 
@@ -11583,7 +11919,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.39</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.40</div>
 
 </body>
 </html>
