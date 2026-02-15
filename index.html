@@ -377,6 +377,7 @@ button:active:not(:disabled){transform:scale(0.97)}
 .q-num.current{background:var(--navy);color:#fff;border-color:var(--navy)}
 .q-num.answered{background:var(--green);color:#fff;border-color:var(--green)}
 .q-num.visited{color:#996600}
+.q-num.skipped{background:#f59e0b;color:#fff;border-color:#f59e0b}
 .q-num.flagged{position:relative}
 .q-num.flagged::after{content:'';position:absolute;top:-2px;right:-2px;width:8px;height:8px;background:var(--orange);border-radius:50%}
 /* Practice palette colors */
@@ -389,8 +390,19 @@ button:active:not(:disabled){transform:scale(0.97)}
 .legend-dot{width:12px;height:12px;border-radius:2px;border:1px solid var(--gray-500)}
 .legend-dot.lg-current{background:var(--navy);border-color:var(--navy)}
 .legend-dot.lg-answered{background:var(--green);border-color:var(--green)}
+.legend-dot.lg-skipped{background:#f59e0b;border-color:#f59e0b}
 .legend-dot.lg-unanswered{background:#fff;border:2px solid #666}
 .legend-dot.lg-flagged{background:var(--orange);border-color:var(--orange)}
+
+/* === PALETTE STATS BAR === */
+.palette-stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;font-size:11px;margin-top:6px;padding:4px 8px;background:var(--gray-100);border-radius:6px}
+.stat-item{display:flex;align-items:center;gap:4px;color:var(--gray-600)}
+.stat-item .stat-dot{width:8px;height:8px;border-radius:2px}
+.stat-answered .stat-dot{background:var(--green)}
+.stat-skipped .stat-dot{background:#f59e0b}
+.stat-unanswered .stat-dot{background:var(--gray-400)}
+.stat-flagged .stat-dot{background:var(--orange)}
+.stat-item strong{color:var(--gray-800)}
 
 /* === MINI PALETTE (shows ~5 around current) === */
 .palette-mini{display:flex;gap:4px;justify-content:center;align-items:center;margin-bottom:6px}
@@ -2149,6 +2161,7 @@ button:focus-visible {
             </div>
             <button class="btn-nav btn-home" onclick="App.exitToHome()">Exit</button>
             <button class="btn-nav" id="btnPrev" onclick="App.prev()" disabled>&laquo; Prev</button>
+            <button class="btn-nav" id="btnSkip" onclick="App.skipQuestion()" style="background:#f59e0b;border-color:#f59e0b" title="Skip this question (lowers mastery weight)">Skip</button>
             <button class="btn-nav" id="btnNext" onclick="App.next()">Next &raquo;</button>
             <button class="btn-nav btn-submit" id="btnSubmit" onclick="App.showSubmitModal()">Submit</button>
         </div>
@@ -2156,9 +2169,16 @@ button:focus-visible {
             <div class="palette-mini" id="paletteMini"></div>
             <button class="palette-expand-btn" id="paletteExpandBtn" onclick="App.togglePalette()">Show All</button>
             <div class="question-palette collapsed" id="questionPalette"></div>
+            <div class="palette-stats" id="paletteStats">
+                <span class="stat-item stat-answered"><span class="stat-dot"></span>Answered: <strong id="statAnswered">0</strong></span>
+                <span class="stat-item stat-skipped"><span class="stat-dot"></span>Skipped: <strong id="statSkipped">0</strong></span>
+                <span class="stat-item stat-unanswered"><span class="stat-dot"></span>Unanswered: <strong id="statUnanswered">0</strong></span>
+                <span class="stat-item stat-flagged"><span class="stat-dot"></span>Flagged: <strong id="statFlagged">0</strong></span>
+            </div>
             <div class="palette-legend" id="paletteLegend" style="display:none">
                 <div class="legend-item"><div class="legend-dot lg-current"></div>Current</div>
                 <div class="legend-item"><div class="legend-dot lg-answered"></div>Answered</div>
+                <div class="legend-item"><div class="legend-dot lg-skipped"></div>Skipped</div>
                 <div class="legend-item"><div class="legend-dot lg-unanswered"></div>Not Visited</div>
                 <div class="legend-item"><div class="legend-dot lg-flagged"></div>Flagged</div>
             </div>
@@ -7997,6 +8017,7 @@ const SessionState = {
                     answers: App.answers,
                     bookmarked: App.bookmarked,
                     visited: App.visited,
+                    skipped: App.skipped,
                     practiceChecked: App.practiceChecked,
                     practiceResults: App.practiceResults,
                     timerSeconds: App.timerSeconds,
@@ -8104,6 +8125,7 @@ const SessionState = {
             App.answers = state.app.answers || {};
             App.bookmarked = state.app.bookmarked || {};
             App.visited = state.app.visited || { 0: true };
+            App.skipped = state.app.skipped || {};
             App.practiceChecked = state.app.practiceChecked || {};
             App.practiceResults = state.app.practiceResults || {};
             App.timerSeconds = state.app.timerSeconds || 0;
@@ -8894,6 +8916,7 @@ const App = {
         this.answers = {};
         this.bookmarked = {};
         this.visited = { 0: true };
+        this.skipped = {};
         this.practiceChecked = {};
         this.practiceResults = {};
         this.submitted = false;
@@ -8953,6 +8976,8 @@ const App = {
         document.getElementById('questionPalette').className = 'question-palette collapsed';
         document.getElementById('paletteLegend').style.display = 'none';
         document.getElementById('paletteExpandBtn').textContent = 'Show All';
+        this.buildMiniPalette();
+        this.updateStats();
     },
 
     buildMiniPalette() {
@@ -8990,6 +9015,8 @@ const App = {
             cls = 'p-' + this.practiceResults[i];
         } else if (i === this.currentQ) {
             cls = 'current';
+        } else if (this.skipped[i]) {
+            cls = 'skipped';
         } else if (this.answers[i] !== undefined) {
             cls = 'answered';
         } else if (this.visited[i]) {
@@ -9137,6 +9164,7 @@ const App = {
 
         this.answers[qIdx] = i;
         this.renderQuestion();
+        this.updatePalette();
         SessionState.save();
     },
 
@@ -9144,6 +9172,7 @@ const App = {
         if (this.submitted || this.practiceChecked[this.currentQ]) return;
         delete this.answers[this.currentQ];
         this.renderQuestion();
+        this.updatePalette();
         SessionState.save();
     },
 
@@ -9151,6 +9180,7 @@ const App = {
         this.bookmarked[this.currentQ] = !this.bookmarked[this.currentQ];
         if (!this.bookmarked[this.currentQ]) delete this.bookmarked[this.currentQ];
         this.renderQuestion();
+        this.updatePalette();
         SessionState.save();
     },
 
@@ -9261,6 +9291,7 @@ const App = {
         // Start tracking time on new question
         Metrics.startQuestion(idx);
         this.renderQuestion();
+        this.updatePalette();
         document.getElementById('questionContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
         SessionState.save();
     },
@@ -9278,6 +9309,33 @@ const App = {
         } else if (this.currentQ < this.questions.length - 1) this.goTo(this.currentQ + 1);
     },
 
+    skipped: {},
+    
+    skipQuestion() {
+        if (this.submitted) return;
+        const qIdx = this.currentQ;
+        const q = this.questions[qIdx];
+        
+        // Mark as skipped
+        this.skipped[qIdx] = true;
+        
+        // Record negative mastery impact (treat as wrong answer for mastery tracking)
+        if (q.id && typeof Mastery !== 'undefined') {
+            Mastery.record(q.id, false, q.category);
+        }
+        
+        // Move to next question
+        if (this.currentQ < this.questions.length - 1) {
+            this.next();
+        } else {
+            // If last question, just update UI
+            this.renderQuestion();
+            this.updatePalette();
+        }
+        
+        SessionState.save();
+    },
+
     updatePalette() {
         // Update full palette
         for (let i = 0; i < this.questions.length; i++) {
@@ -9287,6 +9345,26 @@ const App = {
         }
         // Update mini palette
         this.buildMiniPalette();
+        // Update stats bar
+        this.updateStats();
+    },
+
+    updateStats() {
+        const total = this.questions.length;
+        const answered = Object.keys(this.answers).length;
+        const skipped = Object.keys(this.skipped || {}).length;
+        const flagged = Object.keys(this.bookmarked).length;
+        const unanswered = total - answered - skipped;
+
+        const elAnswered = document.getElementById('statAnswered');
+        const elSkipped = document.getElementById('statSkipped');
+        const elUnanswered = document.getElementById('statUnanswered');
+        const elFlagged = document.getElementById('statFlagged');
+
+        if (elAnswered) elAnswered.textContent = answered;
+        if (elSkipped) elSkipped.textContent = skipped;
+        if (elUnanswered) elUnanswered.textContent = Math.max(0, unanswered);
+        if (elFlagged) elFlagged.textContent = flagged;
     },
 
     // Timer
