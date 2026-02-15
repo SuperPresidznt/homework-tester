@@ -2649,12 +2649,12 @@ const Gamification = {
     // Shop catalog
     SHOP: {
         food: {
-            kibble:  { name: 'Kibble',    price: 10,  icon: '🍖', hunger: 10, happiness: 4,  careBonus: 4 },
-            treat:   { name: 'Treat',     price: 25,  icon: '🍪', hunger: 20, happiness: 10, careBonus: 8 },
-            feast:   { name: 'Feast',     price: 60,  icon: '🍗', hunger: 40, happiness: 22, careBonus: 15 },
-            goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 35, happiness: 35, careBonus: 12 },
-            premiumSteak: { name: 'Premium Steak', price: 200, icon: '🥩', hunger: 60, happiness: 50, careBonus: 25 },
-            magicBerry:   { name: 'Magic Berry',   price: 150, icon: '🫐', hunger: 30, happiness: 60, careBonus: 20 }
+            kibble:  { name: 'Kibble',    price: 10,  icon: '🍖', hunger: 10, happiness: 4,  careBonus: 4, healthy: true, decayMod: 0.8 },
+            treat:   { name: 'Treat',     price: 25,  icon: '🍪', hunger: 20, happiness: 10, careBonus: 8, healthy: false, decayMod: 1.3 },
+            feast:   { name: 'Feast',     price: 60,  icon: '🍗', hunger: 40, happiness: 22, careBonus: 15, healthy: false, decayMod: 1.4 },
+            goldfish:{ name: 'Gold Fish', price: 100, icon: '🐟', hunger: 35, happiness: 35, careBonus: 12, healthy: true, decayMod: 0.7 },
+            premiumSteak: { name: 'Premium Steak', price: 200, icon: '🥩', hunger: 60, happiness: 50, careBonus: 25, healthy: false, decayMod: 1.5 },
+            magicBerry:   { name: 'Magic Berry',   price: 150, icon: '🫐', hunger: 30, happiness: 60, careBonus: 20, healthy: true, decayMod: 0.6 }
         },
         seeds: {
             sunflower: { name: 'Sunflower',     price: 15,  icon: '🌻', gpNeeded: 10, stages: 4, coinReward: 10, xpReward: 25,
@@ -7508,7 +7508,15 @@ const Garden = {
             const diff = Gamification.getSpeciesDifficulty(pet.species);
             const crowdPenalty = 1 + (petCount - 1) * 0.15;
             const stageMultiplier = 1 + Math.max(0, (pet.stage || 1) - 1) * 0.25;
-            const decayRate = diff * crowdPenalty * stageMultiplier;
+            const foodDecayMod = pet.foodDecayMod || 1.0; // Food quality affects decay rate
+            const decayRate = diff * crowdPenalty * stageMultiplier * foodDecayMod;
+            
+            // Gradually normalize food decay modifier back to 1.0 over time (food digests)
+            if (pet.foodDecayMod && pet.foodDecayMod !== 1.0) {
+                const digestRate = 0.1 * scaledHours; // ~10% per hour back toward normal
+                pet.foodDecayMod = pet.foodDecayMod + (1.0 - pet.foodDecayMod) * digestRate;
+                if (Math.abs(pet.foodDecayMod - 1.0) < 0.01) pet.foodDecayMod = 1.0;
+            }
             
             // Apply comfort and decay reduction from pet housing
             const hungerReduction = 1 - allDecayReduction;
@@ -7761,7 +7769,9 @@ const PetModal = {
         let foodHtml = '<div class="pet-food-grid">';
         for (const [id, item] of Object.entries(Gamification.SHOP.food)) {
             const count = inv[id] || 0;
-            foodHtml += `<button class="pet-food-btn" onclick="PetModal.feed('${id}')" ${count <= 0 ? 'disabled' : ''} title="+${item.hunger} hunger, +${item.happiness} happy, +${item.careBonus || 0} growth">${item.icon} ${item.name} <span class="pet-food-count">x${count}</span>${item.careBonus ? '<span class="food-growth">+' + item.careBonus + ' growth</span>' : ''}</button>`;
+            const healthLabel = item.healthy ? '🥗 Healthy (slow decay)' : '🍬 Indulgent (fast decay)';
+            const decayInfo = item.decayMod < 1 ? `${Math.round((1-item.decayMod)*100)}% slower decay` : `${Math.round((item.decayMod-1)*100)}% faster decay`;
+            foodHtml += `<button class="pet-food-btn${item.healthy ? ' healthy' : ' unhealthy'}" onclick="PetModal.feed('${id}')" ${count <= 0 ? 'disabled' : ''} title="${healthLabel} | +${item.hunger} hunger, +${item.happiness} happy, +${item.careBonus || 0} growth | ${decayInfo}">${item.icon} ${item.name} <span class="pet-food-count">x${count}</span>${item.careBonus ? '<span class="food-growth">+' + item.careBonus + ' growth</span>' : ''}</button>`;
         }
         foodHtml += '</div>';
 
@@ -7875,6 +7885,13 @@ const PetModal = {
         buddy.totalMealsEaten = (buddy.totalMealsEaten || 0) + 1;
         buddy.lastFed = Date.now();
         buddy.lastInteraction = Date.now();
+        
+        // Track food decay modifier - weighted average based on hunger portion fed
+        const currentDecayMod = buddy.foodDecayMod || 1.0;
+        const hungerPortion = item.hunger / 100; // How much of the hunger bar this food fills
+        const newDecayMod = item.decayMod || 1.0;
+        // Blend the decay modifier based on how much food was given
+        buddy.foodDecayMod = currentDecayMod * (1 - hungerPortion) + newDecayMod * hungerPortion;
 
         // Feeding gives care minutes toward evolution
         if (item.careBonus) {
