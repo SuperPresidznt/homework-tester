@@ -1,7 +1,9 @@
 # WGU Practice App - Project Notes
 
+**Current Version: v2.44** | Last Updated: Feb 15, 2026
+
 ## Overview
-A comprehensive study tool for WGU assessments with gamification, AI-powered practice, and detailed metrics tracking.
+A comprehensive study tool for WGU assessments with gamification, AI-powered practice, Elden Ring-style boss battles, and detailed metrics tracking.
 
 ---
 
@@ -12,11 +14,16 @@ A comprehensive study tool for WGU assessments with gamification, AI-powered pra
 - **Drill Mode**: Spaced repetition with SM-2 algorithm
 - **Review Mode**: Browse all questions with filters
 - **AI Practice Mode**: AI-generated questions targeting weak areas
+- **Speed Mode**: Timed hot-seat questions with coin multipliers based on answer speed
+- **Boss Battle Mode**: Elden Ring-style battles where correct answers deal damage
 
 ### 2. Gamification System (`Gamification` object)
 - **XP & Levels**: Earn XP for correct answers, level up
 - **Coins**: Currency for vending machine rewards
-- **Streaks & Combos**: Daily streaks, answer combos
+- **💎 Gems**: Premium currency (harder to earn)
+  - Earn: Level up (2/level, 7 every 5 levels), achievements (1), perfect tests (5), boss kills (10)
+  - Spend: Premium backgrounds, future premium items
+- **Streaks & Combos**: Daily streaks, answer combos with multipliers
 - **Achievements**: Unlock badges for milestones
 - **Titles**: Earn titles based on level
 - **Pet System**: Virtual study buddy with moods
@@ -84,6 +91,27 @@ Located at: Progress button on home screen
   - Per-category stats with time
   - Weak areas
   - Current session stats
+- **Knowledge Gaps**: Tracks user confusion phrases and provides context on similar questions
+
+### Response Style (v2.44+)
+- MAX 2-3 sentences unless detail requested
+- Answer first, then brief explanation
+- No filler phrases ("Great question!", etc.)
+- Talks like a friend, not a textbook
+
+### 📊 Chart Rendering
+AI can generate charts in responses using syntax:
+```
+[CHART:type:title:label1,value1;label2,value2;...]
+```
+- **Types**: `bar`, `pie`, `line`
+- **Example**: `[CHART:bar:Category Scores:Algebra,85;Geometry,72;Stats,90]`
+- Renders as canvas chart in chat
+
+### 🔊 Text-to-Speech
+- Prefers Google/Microsoft/Samantha/Alex voices
+- Rate: 1.0, Pitch: 1.0, Volume: 1.0
+- Click speaker icon on any AI response
 
 ### Text Formatting (`_stripMarkdown`)
 Cleans AI responses:
@@ -120,6 +148,11 @@ Cleans AI responses:
 
 ## Version History
 
+- **v2.44**: AI chat charts, concise responses, better TTS voice selection
+- **v2.43**: Gems premium currency, lava lamp background, gem earning conditions
+- **v2.42**: Header gems/coins display, scene purchase system
+- **v2.41**: Speed Mode with timed questions and coin multipliers
+- **v2.40**: Knowledge gap tracking in AI chat, combo display fixes
 - **v2.39**: Intelligent correlation detection with insights panel, improved AI text formatting
 - **v2.38**: Study time vs score correlation chart, project notes
 - **v2.37**: Adaptive AI drill, comprehensive metrics dashboard, study time vs score chart
@@ -153,8 +186,13 @@ Available backgrounds:
 - **Rainy Window**: Canvas rain animation (unlock: 7-day streak)
 - **Forest Glade**: Sunlit particles (unlock: Level 10)
 - **Synthwave**: Retro neon grid (unlock: Night Owl achievement)
+- **🌈 Lava Lamp** (Premium): Floating colorful blobs (unlock: 25 💎 gems)
 
 Toggle animations in Settings or via SceneManager.toggleAnimation()
+
+### Premium Scene Purchases
+- Gem-based scenes stored in `wgu_purchased_scenes`
+- `SceneManager.purchaseScene(sceneId)` deducts gems and unlocks
 
 ---
 
@@ -191,9 +229,65 @@ const correlation = (n * sumXY - sumX * sumY) /
 
 ---
 
-## Outstanding Items (from memory)
-1. Batch-size rewards with momentum UI feedback
+---
+
+## Speed Mode (`SpeedMode` object)
+
+### Time Limits by Difficulty
+- **Easy**: 30 seconds
+- **Medium**: 20 seconds  
+- **Hard**: 15 seconds
+
+### Coin Multipliers (based on remaining time)
+- **4x**: 80%+ time remaining
+- **3x**: 60%+ time remaining
+- **2x**: 40%+ time remaining
+- **1x**: Otherwise
+
+### Streak Bonuses
+- **5+ streak**: +1 multiplier
+- **10+ streak**: +2 multiplier
+
+### Question Selection
+- Weighted by mastery from drill progress (SM-2 data)
+- Lower ease factor = higher selection weight
+
+---
+
+## Boss Battle System (`Battle` object)
+
+### Mechanics
+- Elden Ring-style boss encounters
+- Correct answers deal damage to boss
+- Wrong answers = boss attacks player
+- Boss HP scales with difficulty
+- Player has limited HP
+
+### Rewards
+- **10 gems** per boss defeated
+- XP and coins based on performance
+- Achievement unlocks
+
+---
+
+## UI Components
+
+### Header (visible on all pages)
+- **💎 Gems**: Purple gradient badge, click to open shop
+- **🪙 Coins**: Gold gradient badge, click to open shop
+- Home, Settings, Help buttons
+
+### Combo Display
+- Shows current combo multiplier during active sessions
+- Resets when returning to home screen
+- Hidden on non-question screens
+
+---
+
+## Outstanding Items
+1. ~~Batch-size rewards with momentum UI feedback~~ (partially done)
 2. Surface pet/garden buffs and linkage
-3. Implement animated backgrounds plus trinkets/backpack UI
-4. Add project decision bullet doc
-5. Final git push
+3. ~~Implement animated backgrounds~~ ✅ (6 backgrounds + lava lamp)
+4. ~~Trinkets/backpack UI~~ ✅
+5. ~~Add project decision bullet doc~~ ✅
+6. Final polish and testing
