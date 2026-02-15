@@ -1951,6 +1951,10 @@ button:focus-visible {
                 <div class="hint">Removes all test history, drill progress, and stats.</div>
             </div>
             <div class="setting-row">
+                <button class="btn-nav" style="background:var(--red);border-color:var(--red)" onclick="Settings.resetAllMetrics()">Reset All Metrics</button>
+                <div class="hint">Resets XP, level, coins, streaks, achievements, pet, garden, and all gamification data to defaults. Cannot be undone!</div>
+            </div>
+            <div class="setting-row">
                 <button class="btn-nav btn-home" onclick="showScreen('home');Home.render()">Back to Home</button>
             </div>
         </div>
@@ -9282,6 +9286,30 @@ const Settings = {
         Settings.load();
         alert('All progress cleared. Settings preserved.');
         Home.render();
+    },
+
+    resetAllMetrics() {
+        if (!confirm('⚠️ RESET ALL METRICS?\n\nThis will reset:\n• XP, Level, Coins\n• Streaks & Combos\n• Achievements\n• Pet & Garden\n• Daily Goals\n• All gamification data\n\nThis CANNOT be undone!')) return;
+        if (!confirm('Are you absolutely sure? Type OK to confirm.')) return;
+        
+        // Clear gamification state completely
+        localStorage.removeItem('wgu_gamification');
+        Gamification._state = null;
+        
+        // Clear daily goal / streak stats
+        const stats = DailyGoal.getDefaultStats();
+        Store.set('globalStats', stats);
+        
+        // Clear study time tracking
+        localStorage.removeItem('wgu_studyByDay');
+        localStorage.removeItem('wgu_session');
+        
+        // Reinitialize gamification with fresh defaults
+        Gamification.getState();
+        Gamification.renderXpBar();
+        
+        alert('All metrics have been reset to defaults.');
+        Home.render();
     }
 };
 
@@ -10742,7 +10770,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.32</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.33</div>
 
 </body>
 </html>
