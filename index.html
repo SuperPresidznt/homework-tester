@@ -9762,8 +9762,82 @@ const SpeedMode = {
     maxTime: 30,
     selectedOption: null,
 
-    // Time limits by difficulty (seconds)
+    // Fallback time limits by difficulty (seconds) - used when no baseline exists
     TIME_LIMITS: { easy: 30, medium: 20, hard: 15 },
+    
+    // Difficulty modifiers (reduce baseline time by this percentage)
+    DIFFICULTY_MODIFIERS: { easy: 0.10, medium: 0.20, hard: 0.35 },
+    
+    // Minimum time allowed (seconds)
+    MIN_TIME: 8,
+    // Maximum time allowed (seconds)  
+    MAX_TIME: 60,
+
+    /**
+     * Get baseline time for a category from rolling last 10 attempts
+     * @param {string} category - The question category
+     * @returns {number|null} Average time in seconds, or null if no data
+     */
+    getCategoryBaseline(category) {
+        const trackerData = Store.get('questionTracker', {});
+        const times = [];
+        
+        // Collect times from questions in this category
+        Object.entries(trackerData).forEach(([qId, qData]) => {
+            if (!qData.history) return;
+            // Use question's stored category or check each attempt
+            const qCategory = qData.category || 'General';
+            
+            qData.history.forEach(attempt => {
+                // Check if this attempt matches the category (from attempt or question)
+                const attemptCategory = attempt.category || qCategory;
+                // Support both timeMs (new) and time (old) fields
+                const timeMs = attempt.timeMs || attempt.time || 0;
+                
+                if (attemptCategory === category && timeMs > 0) {
+                    times.push({ time: timeMs, date: attempt.date });
+                }
+            });
+        });
+        
+        if (times.length === 0) return null;
+        
+        // Sort by date (most recent first) and take last 10
+        times.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const recent = times.slice(0, 10);
+        
+        // Calculate average time in seconds
+        const avgMs = recent.reduce((sum, t) => sum + t.time, 0) / recent.length;
+        return Math.round(avgMs / 1000);
+    },
+
+    /**
+     * Calculate adaptive time limit based on category baseline and difficulty
+     * @param {string} category - The question category
+     * @param {number} difficulty - 1=easy, 2=medium, 3=hard
+     * @returns {number} Time limit in seconds
+     */
+    getAdaptiveTimeLimit(category, difficulty) {
+        const baseline = this.getCategoryBaseline(category);
+        
+        if (!baseline) {
+            // No baseline data - use fallback time limits
+            if (difficulty === 1) return this.TIME_LIMITS.easy;
+            if (difficulty === 3) return this.TIME_LIMITS.hard;
+            return this.TIME_LIMITS.medium;
+        }
+        
+        // Apply difficulty modifier to baseline
+        let modifier;
+        if (difficulty === 1) modifier = this.DIFFICULTY_MODIFIERS.easy;      // -10%
+        else if (difficulty === 3) modifier = this.DIFFICULTY_MODIFIERS.hard; // -35%
+        else modifier = this.DIFFICULTY_MODIFIERS.medium;                      // -20%
+        
+        const adjustedTime = Math.round(baseline * (1 - modifier));
+        
+        // Clamp to min/max bounds
+        return Math.max(this.MIN_TIME, Math.min(this.MAX_TIME, adjustedTime));
+    },
 
     start(bankId) {
         this.bank = BankManager.getBank(bankId);
@@ -9836,11 +9910,13 @@ const SpeedMode = {
         this.current = this.queue.shift();
         this.selectedOption = null;
 
-        // Determine time based on question difficulty
-        const difficulty = this.current.question.difficulty || 2;
-        if (difficulty === 1) this.maxTime = this.TIME_LIMITS.easy;
-        else if (difficulty === 3) this.maxTime = this.TIME_LIMITS.hard;
-        else this.maxTime = this.TIME_LIMITS.medium;
+        // Determine time based on category baseline and difficulty
+        const q = this.current.question;
+        const difficulty = q.difficulty || 2;
+        const category = q.category || 'General';
+        
+        // Use adaptive timing based on your historical performance
+        this.maxTime = this.getAdaptiveTimeLimit(category, difficulty);
 
         this.timeRemaining = this.maxTime;
         this.renderQuestion();
@@ -9850,9 +9926,16 @@ const SpeedMode = {
     renderQuestion() {
         const q = this.current.question;
         const difficulty = q.difficulty || 2;
+        const category = q.category || 'General';
         const diffLabel = difficulty === 1 ? 'Easy' : difficulty === 3 ? 'Hard' : 'Medium';
         const diffColor = difficulty === 1 ? 'var(--green)' : difficulty === 3 ? 'var(--red)' : 'var(--orange)';
         const diffMultiplier = difficulty === 3 ? '3x' : difficulty === 1 ? '1x' : '2x';
+        
+        // Check if using adaptive timing
+        const baseline = this.getCategoryBaseline(category);
+        const isAdaptive = baseline !== null;
+        const timingLabel = isAdaptive ? `⚡${this.maxTime}s` : `${this.maxTime}s`;
+        const timingTitle = isAdaptive ? `Based on your avg ${baseline}s in ${category}` : 'Default timing';
 
         const optionsHtml = q.options.map((opt, i) => `
             <button class="speed-option drill-option" onclick="SpeedMode.selectOption(${i})" data-idx="${i}">
@@ -9862,10 +9945,11 @@ const SpeedMode = {
         `).join('');
 
         document.getElementById('speedCard').innerHTML = `
-            <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px">
+            <div style="margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <span style="font-size:11px;color:${diffColor};font-weight:bold">${diffLabel}</span>
                 <span style="font-size:10px;background:${diffColor};color:#fff;padding:2px 6px;border-radius:8px;font-weight:bold">${diffMultiplier} coins</span>
-                <span style="font-size:11px;color:var(--gray-500);margin-left:auto">${this.maxTime}s</span>
+                <span style="font-size:10px;color:var(--gray-500)">${escapeHtml(category)}</span>
+                <span style="font-size:11px;color:var(--gray-500);margin-left:auto;cursor:help" title="${timingTitle}">${timingLabel}</span>
             </div>
             <div class="drill-question" style="font-size:16px;margin-bottom:16px">${escapeHtml(q.text)}</div>
             <div class="speed-options" style="display:flex;flex-direction:column;gap:8px">${optionsHtml}</div>
@@ -13503,8 +13587,9 @@ const QuestionTracker = {
             // Keep last 20 attempts
             entry.history.push({
                 date: now, correct: r.correct, answered: r.answered,
-                chosen: r.chosen, time: r.timeSpent || 0,
-                confidence: r.confidence == null ? undefined : r.confidence
+                chosen: r.chosen, timeMs: r.timeSpent || 0,
+                confidence: r.confidence == null ? undefined : r.confidence,
+                category: r.category || entry.category || 'General'
             });
             if (entry.history.length > 20) entry.history = entry.history.slice(-20);
         }
