@@ -9044,10 +9044,165 @@ const Progress = {
 
     render() {
         const content = document.getElementById('progressContent');
-        content.innerHTML = this.renderGamificationStats() + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
+        content.innerHTML = this.renderGamificationStats() + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderStudyTimeVsScore() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
         this._drawTrendChart();
         this._drawAccuracyChart();
+        this._drawStudyVsScoreChart();
         this._renderOverallTrend();
+    },
+
+    renderStudyTimeVsScore() {
+        const correlation = this._getStudyTimeScoreCorrelation();
+        if (correlation.data.length < 3) return '';
+        
+        const insight = correlation.correlation > 0.3 ? 
+            `<span style="color:var(--green)">📈 More study time = better scores! (r=${correlation.correlation.toFixed(2)})</span>` :
+            correlation.correlation < -0.3 ?
+            `<span style="color:var(--orange)">⚠️ Quality over quantity - focus on weak areas</span>` :
+            `<span style="color:var(--blue)">➡️ Mixed results - try targeted practice</span>`;
+        
+        return `<div class="progress-section">
+            <h3>📚 Study Time vs Test Scores</h3>
+            <p style="font-size:12px;color:var(--gray-600);margin-bottom:8px">${insight}</p>
+            <canvas id="studyVsScoreChart" width="600" height="180" style="width:100%;max-height:180px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
+            <p style="font-size:11px;color:var(--gray-600);text-align:center;margin-top:4px">Each dot = one test day (study mins that day vs score)</p>
+        </div>`;
+    },
+
+    _getStudyTimeScoreCorrelation() {
+        const studyByDay = Store.get('studyByDay', {});
+        let allHistory = [];
+        for (const bank of BankManager.banks) {
+            const history = Store.get('testHistory_' + bank.bankId, []);
+            allHistory = allHistory.concat(history);
+        }
+        
+        // Group tests by day and match with study time
+        const data = [];
+        allHistory.forEach(test => {
+            const day = test.date.split('T')[0];
+            const studyMins = studyByDay[day] || 0;
+            data.push({ day, studyMins, score: test.pct });
+        });
+        
+        if (data.length < 2) return { data: [], correlation: 0 };
+        
+        // Calculate Pearson correlation
+        const n = data.length;
+        const sumX = data.reduce((s, d) => s + d.studyMins, 0);
+        const sumY = data.reduce((s, d) => s + d.score, 0);
+        const sumXY = data.reduce((s, d) => s + d.studyMins * d.score, 0);
+        const sumX2 = data.reduce((s, d) => s + d.studyMins * d.studyMins, 0);
+        const sumY2 = data.reduce((s, d) => s + d.score * d.score, 0);
+        
+        const numerator = n * sumXY - sumX * sumY;
+        const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+        const correlation = denominator === 0 ? 0 : numerator / denominator;
+        
+        return { data, correlation };
+    },
+
+    _drawStudyVsScoreChart() {
+        const canvas = document.getElementById('studyVsScoreChart');
+        if (!canvas) return;
+        
+        const { data } = this._getStudyTimeScoreCorrelation();
+        if (data.length < 2) return;
+        
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = canvas.offsetWidth * dpr;
+        canvas.height = canvas.offsetHeight * dpr;
+        ctx.scale(dpr, dpr);
+        const w = canvas.offsetWidth, h = canvas.offsetHeight;
+        const pad = { top: 15, right: 15, bottom: 30, left: 40 };
+        const plotW = w - pad.left - pad.right;
+        const plotH = h - pad.top - pad.bottom;
+        
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark' ||
+            (document.documentElement.getAttribute('data-theme') !== 'light' && window.matchMedia('(prefers-color-scheme:dark)').matches);
+        
+        ctx.fillStyle = isDark ? '#16213e' : '#fff';
+        ctx.fillRect(0, 0, w, h);
+        
+        const maxMins = Math.max(...data.map(d => d.studyMins), 30);
+        const maxScore = 100;
+        
+        // Grid
+        ctx.strokeStyle = isDark ? '#374151' : '#eee';
+        ctx.lineWidth = 1;
+        for (let pct of [0, 50, 70, 100]) {
+            const y = pad.top + plotH - (pct / maxScore) * plotH;
+            ctx.beginPath();
+            ctx.moveTo(pad.left, y);
+            ctx.lineTo(w - pad.right, y);
+            ctx.stroke();
+            ctx.fillStyle = isDark ? '#9ca3af' : '#999';
+            ctx.font = '9px Arial';
+            ctx.textAlign = 'right';
+            ctx.fillText(pct + '%', pad.left - 3, y + 3);
+        }
+        
+        // Pass line
+        const passY = pad.top + plotH - (70 / maxScore) * plotH;
+        ctx.strokeStyle = isDark ? '#4ade80' : '#27ae60';
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, passY);
+        ctx.lineTo(w - pad.right, passY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // X axis labels
+        ctx.fillStyle = isDark ? '#9ca3af' : '#999';
+        ctx.font = '9px Arial';
+        ctx.textAlign = 'center';
+        for (let mins of [0, Math.round(maxMins / 2), maxMins]) {
+            const x = pad.left + (mins / maxMins) * plotW;
+            ctx.fillText(mins + 'm', x, h - 5);
+        }
+        ctx.fillText('Study Time →', pad.left + plotW / 2, h - 15);
+        
+        // Scatter points
+        data.forEach(d => {
+            const x = pad.left + (d.studyMins / maxMins) * plotW;
+            const y = pad.top + plotH - (d.score / maxScore) * plotH;
+            const color = d.score >= 70 ? (isDark ? '#4ade80' : '#27ae60') : (isDark ? '#ef4444' : '#c0392b');
+            
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.strokeStyle = isDark ? '#16213e' : '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        });
+        
+        // Trend line (linear regression)
+        if (data.length >= 3) {
+            const n = data.length;
+            const sumX = data.reduce((s, d) => s + d.studyMins, 0);
+            const sumY = data.reduce((s, d) => s + d.score, 0);
+            const sumXY = data.reduce((s, d) => s + d.studyMins * d.score, 0);
+            const sumX2 = data.reduce((s, d) => s + d.studyMins * d.studyMins, 0);
+            
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            const x1 = pad.left;
+            const x2 = pad.left + plotW;
+            const y1 = pad.top + plotH - (intercept / maxScore) * plotH;
+            const y2 = pad.top + plotH - ((slope * maxMins + intercept) / maxScore) * plotH;
+            
+            ctx.strokeStyle = isDark ? 'rgba(251,191,36,.6)' : 'rgba(245,158,11,.6)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(x1, Math.max(pad.top, Math.min(pad.top + plotH, y1)));
+            ctx.lineTo(x2, Math.max(pad.top, Math.min(pad.top + plotH, y2)));
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
     },
 
     _renderOverallTrend() {
@@ -9934,6 +10089,25 @@ const Chat = {
             .replace(/^\d+\.\s+/gm, (m) => m)     // numbered lists stay
             .replace(/`([^`]+)`/g, '$1')           // `code`
             .replace(/```[\s\S]*?```/g, (m) => m.replace(/```\w*\n?/g, '').trim()) // code blocks
+            // Clean up LaTeX/math formatting
+            .replace(/\$([^$]+)\$/g, '$1')         // $math$ inline
+            .replace(/\\\(/g, '').replace(/\\\)/g, '') // \( \) delimiters
+            .replace(/\\\[/g, '').replace(/\\\]/g, '') // \[ \] delimiters
+            .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1/$2)') // \frac{a}{b} -> (a/b)
+            .replace(/\\times/g, '×')              // \times -> ×
+            .replace(/\\div/g, '÷')                // \div -> ÷
+            .replace(/\\pm/g, '±')                 // \pm -> ±
+            .replace(/\\sqrt\{([^}]+)\}/g, '√($1)') // \sqrt{x} -> √(x)
+            .replace(/\\[a-zA-Z]+/g, '')           // Remove other LaTeX commands
+            .replace(/\{([^}]+)\}/g, '$1')         // {content} -> content
+            // Clean up repeated/concatenated text patterns
+            .replace(/(\d+),(\d+)−\1,\2−/g, '$1,$2 - ') // Fix $45,000−$45,000− pattern
+            .replace(/(\d+)\)incorrectly/g, '$1) incorrectly') // Fix )incorrectly
+            .replace(/(\d+)\)appears/g, '$1) appears')
+            .replace(/(\d+)\)without/g, '$1) without')
+            .replace(/(\w)Option/g, '$1. Option')  // Fix missing periods before Option
+            .replace(/(\d)insteadof(\d)/g, '$1 instead of $2') // Fix insteadof
+            .replace(/\s{2,}/g, ' ')               // Collapse multiple spaces
             .trim();
     },
 
@@ -11199,7 +11373,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.37</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.38</div>
 
 </body>
 </html>
