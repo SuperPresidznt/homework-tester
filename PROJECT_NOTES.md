@@ -1,6 +1,6 @@
 # WGU Practice App - Project Notes
 
-**Current Version: v2.51** | Last Updated: Feb 15, 2026
+**Current Version: v2.52** | Last Updated: Feb 15, 2026
 
 ## Overview
 A comprehensive study tool for WGU assessments with gamification, AI-powered practice, Elden Ring-style boss battles, idle business system, housing, animated backgrounds, and detailed metrics tracking.
@@ -456,6 +456,19 @@ const correlation = (n * sumXY - sumX * sumY) /
 ---
 
 ## Version History
+
+### v2.52 (Feb 15, 2026)
+- Added: AI Personality System with 8 personalities:
+  - 😊 Friendly (default) - Warm, encouraging, supportive
+  - 🎓 Strict Professor - Formal, demanding, no-nonsense
+  - 😏 Sarcastic - Witty, dry humor, playfully mocking
+  - 🔥 Street Smart - Casual, real talk, slang
+  - 🪖 Drill Sergeant - Intense, motivational, tough love
+  - 🧘 Zen Master - Calm, philosophical, patient
+  - 🎮 Gamer Buddy - Gaming references, hype, GG
+  - 🇬🇧 British Tutor - Proper, polite, dry wit
+- UI: Personality picker in chat header (🎭 button)
+- Storage: `wgu_aiPersonality` localStorage key
 
 ### v2.51 (Feb 15, 2026)
 - Fixed: Only 1 background (Classic) is now free; others require unlocking
