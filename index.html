@@ -1532,6 +1532,7 @@ button:focus-visible {
 .scene-synthwave::before{content:'';position:fixed;bottom:0;left:0;right:0;height:50%;background:linear-gradient(90deg,transparent 49%,rgba(255,0,255,.1) 50%,transparent 51%),linear-gradient(0deg,transparent 49%,rgba(0,255,255,.1) 50%,transparent 51%);background-size:60px 60px;transform:perspective(500px) rotateX(60deg);transform-origin:bottom;pointer-events:none;z-index:0}
 .scene-synthwave.scene-animated::before{animation:gridScroll 2s linear infinite}
 @keyframes gridScroll{0%{background-position:0 0}100%{background-position:0 60px}}
+.scene-lava-lamp{background:linear-gradient(180deg,#1a0a2e 0%,#0d0520 100%)}
 @media(prefers-reduced-motion:reduce){.scene-animated::before,.scene-animated::after{animation:none!important}}
 
 /* ========== BACKPACK & TRINKETS ========== */
@@ -1593,6 +1594,7 @@ button:focus-visible {
         </div>
         </button>
         <div class="header-actions">
+            <span id="headerGems" class="coin-display" style="background:linear-gradient(135deg,#a855f7,#7c3aed);color:#fff;padding:4px 10px;border-radius:12px;font-size:13px;font-weight:bold;cursor:pointer" onclick="Shop.show()" title="Premium Currency">💎 0</span>
             <span id="headerCoins" class="coin-display" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:4px 10px;border-radius:12px;font-size:13px;font-weight:bold;cursor:pointer" onclick="Shop.show()" title="Open Shop">🪙 0</span>
             <button onclick="if(document.getElementById('screen-exam').classList.contains('active') && !App.submitted){App.exitToHome()}else{SessionState.clear();showScreen('home');Home.render()}">Home</button>
             <button onclick="if(App.timerInterval && !App.timerPaused){App.toggleTimer()}showScreen('settings')">Settings</button>
@@ -2648,7 +2650,9 @@ const Gamification = {
             xp: 0,
             level: 1,
             coins: 0,
+            gems: 0,
             totalCoinsEarned: 0,
+            totalGemsEarned: 0,
             combo: { current: 0, best: 0, multiplier: 1.0, lastCorrectTime: null },
             achievements: {},
             powerUpInventory: { fiftyFifty: 1, skipQuestion: 1, extraTime: 2, doubleXp: 0, showHint: 1 },
@@ -2963,6 +2967,40 @@ const Gamification = {
         return true;
     },
 
+    // Award gems (premium currency - harder to earn)
+    awardGems(amount, reason) {
+        if (!this.isEnabled() || amount <= 0) return 0;
+        const state = this.getState();
+        state.gems = (state.gems || 0) + amount;
+        state.totalGemsEarned = (state.totalGemsEarned || 0) + amount;
+        this.saveState(state);
+        this.showGemPopup(amount);
+        this.renderXpBar();
+        return amount;
+    },
+
+    // Spend gems (returns true if successful)
+    spendGems(amount) {
+        const state = this.getState();
+        if ((state.gems || 0) < amount) return false;
+        state.gems -= amount;
+        this.saveState(state);
+        this.renderXpBar();
+        return true;
+    },
+
+    // Show gem popup
+    showGemPopup(amount) {
+        const popup = document.createElement('div');
+        popup.className = 'xp-popup';
+        popup.style.background = 'linear-gradient(135deg, #a855f7, #7c3aed)';
+        popup.textContent = '+' + amount + ' 💎';
+        popup.style.left = (Math.random() * 60 + 20) + '%';
+        popup.style.top = (window.scrollY + window.innerHeight * 0.35) + 'px';
+        document.body.appendChild(popup);
+        setTimeout(() => popup.remove(), 1500);
+    },
+
     // Show coin popup
     showCoinPopup(amount) {
         const popup = document.createElement('div');
@@ -3061,6 +3099,10 @@ const Gamification = {
         if (state.settings.sounds) SoundFX.play('levelUp');
         if (state.settings.confetti) this.triggerConfetti();
 
+        // Award gems on level up (2 gems per level, bonus 5 every 5 levels)
+        const gemReward = level % 5 === 0 ? 7 : 2;
+        this.awardGems(gemReward, 'levelUp');
+
         // Award trinket on level up (guaranteed every 5 levels, 20% chance otherwise)
         if (state.settings.trinketsEnabled !== false) {
             const guaranteedTrinket = level % 5 === 0;
@@ -3131,6 +3173,9 @@ const Gamification = {
         // Play sound
         if (state.settings.sounds) SoundFX.play('achievement');
         if (state.settings.confetti) this.triggerConfetti();
+
+        // Award 1 gem for each achievement unlock (premium currency)
+        this.awardGems(1, 'achievement');
 
         // Award random trinket on achievement unlock (30% chance)
         if (state.settings.trinketsEnabled !== false && Math.random() < 0.3) {
@@ -3534,8 +3579,11 @@ const Gamification = {
     updateHeaderCoins() {
         const state = this.getState();
         const coins = state.coins || 0;
+        const gems = state.gems || 0;
         const headerCoins = document.getElementById('headerCoins');
+        const headerGems = document.getElementById('headerGems');
         if (headerCoins) headerCoins.textContent = '🪙 ' + coins.toLocaleString();
+        if (headerGems) headerGems.textContent = '💎 ' + gems.toLocaleString();
     },
 
     // Trigger confetti effect
@@ -3759,6 +3807,8 @@ const Gamification = {
         if (isPerfect) {
             this.awardXp('perfectTest');
             this.unlockAchievement('perfect_test');
+            // Award gems for perfect test (premium currency)
+            this.awardGems(5, 'perfectTest');
             // Guaranteed trinket for perfect test
             if (state.settings.trinketsEnabled !== false) {
                 const trinket = Backpack.awardRandomTrinket();
@@ -4317,7 +4367,8 @@ const SceneManager = {
         { id: 'night-sky', name: 'Night Sky', description: 'Twinkling stars and gentle aurora', unlocked: false, unlockCondition: { type: 'level', value: 5 }, css: 'scene-night-sky', animated: true, animationType: 'css' },
         { id: 'rain-window', name: 'Rainy Window', description: 'Peaceful rain on glass', unlocked: false, unlockCondition: { type: 'streak', value: 7 }, css: 'scene-rain-window', animated: true, animationType: 'canvas' },
         { id: 'forest-glade', name: 'Forest Glade', description: 'Sunlit clearing with floating particles', unlocked: false, unlockCondition: { type: 'level', value: 10 }, css: 'scene-forest-glade', animated: true, animationType: 'css' },
-        { id: 'synthwave', name: 'Synthwave', description: 'Retro neon grid with pulsing colors', unlocked: false, unlockCondition: { type: 'achievement', value: 'night_owl' }, css: 'scene-synthwave', animated: true, animationType: 'css' }
+        { id: 'synthwave', name: 'Synthwave', description: 'Retro neon grid with pulsing colors', unlocked: false, unlockCondition: { type: 'achievement', value: 'night_owl' }, css: 'scene-synthwave', animated: true, animationType: 'css' },
+        { id: 'lava-lamp', name: 'Lava Lamp', description: 'Mesmerizing floating blobs (Premium)', unlocked: false, unlockCondition: { type: 'gems', value: 25 }, css: 'scene-lava-lamp', animated: true, animationType: 'canvas', premium: true }
     ],
 
     init() {
@@ -4337,6 +4388,7 @@ const SceneManager = {
     },
 
     getBackgrounds(gamificationState = {}) {
+        const purchased = Store.get('wgu_purchased_scenes', []);
         return this.BACKGROUNDS.map(bg => {
             let unlocked = bg.unlocked;
             if (!unlocked && bg.unlockCondition) {
@@ -4344,9 +4396,23 @@ const SceneManager = {
                 if (cond.type === 'level' && gamificationState.level >= cond.value) unlocked = true;
                 else if (cond.type === 'streak' && gamificationState.streak >= cond.value) unlocked = true;
                 else if (cond.type === 'achievement' && gamificationState.achievements?.includes(cond.value)) unlocked = true;
+                else if (cond.type === 'gems' && purchased.includes(bg.id)) unlocked = true;
             }
             return { ...bg, unlocked };
         });
+    },
+
+    purchaseScene(sceneId) {
+        const bg = this.BACKGROUNDS.find(b => b.id === sceneId);
+        if (!bg || !bg.unlockCondition || bg.unlockCondition.type !== 'gems') return false;
+        const cost = bg.unlockCondition.value;
+        if (!Gamification.spendGems(cost)) return false;
+        const purchased = Store.get('wgu_purchased_scenes', []);
+        if (!purchased.includes(sceneId)) {
+            purchased.push(sceneId);
+            Store.set('wgu_purchased_scenes', purchased);
+        }
+        return true;
     },
 
     applyBackground(backgroundId) {
@@ -4380,6 +4446,7 @@ const SceneManager = {
         canvas.height = window.innerHeight;
         this.canvasCtx = canvas.getContext('2d');
         if (backgroundId === 'rain-window') this.runRainAnimation();
+        else if (backgroundId === 'lava-lamp') this.runLavaLampAnimation();
     },
 
     stopCanvasAnimation() {
@@ -4417,6 +4484,70 @@ const SceneManager = {
         animate();
     },
 
+    runLavaLampAnimation() {
+        const ctx = this.canvasCtx;
+        const canvas = ctx.canvas;
+        const blobs = [];
+        const colors = ['#ff6b6b', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff', '#5f27cd'];
+        
+        // Create floating blobs
+        for (let i = 0; i < 8; i++) {
+            blobs.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 80 + 40,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.3 - 0.2,
+                color: colors[i % colors.length],
+                phase: Math.random() * Math.PI * 2,
+                wobbleSpeed: Math.random() * 0.02 + 0.01
+            });
+        }
+
+        const animate = () => {
+            ctx.fillStyle = 'rgba(26, 10, 46, 0.15)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            blobs.forEach(blob => {
+                blob.phase += blob.wobbleSpeed;
+                const wobble = Math.sin(blob.phase) * 15;
+                
+                // Draw blob with gradient
+                const gradient = ctx.createRadialGradient(
+                    blob.x, blob.y, 0,
+                    blob.x, blob.y, blob.radius + wobble
+                );
+                gradient.addColorStop(0, blob.color);
+                gradient.addColorStop(0.7, blob.color + '88');
+                gradient.addColorStop(1, 'transparent');
+
+                ctx.beginPath();
+                ctx.arc(blob.x, blob.y, blob.radius + wobble, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Move blob
+                blob.x += blob.vx;
+                blob.y += blob.vy;
+
+                // Bounce off edges
+                if (blob.x < -blob.radius) blob.x = canvas.width + blob.radius;
+                if (blob.x > canvas.width + blob.radius) blob.x = -blob.radius;
+                if (blob.y < -blob.radius) blob.y = canvas.height + blob.radius;
+                if (blob.y > canvas.height + blob.radius) blob.y = -blob.radius;
+
+                // Slight random drift
+                blob.vx += (Math.random() - 0.5) * 0.02;
+                blob.vy += (Math.random() - 0.5) * 0.02;
+                blob.vx = Math.max(-1, Math.min(1, blob.vx));
+                blob.vy = Math.max(-0.8, Math.min(0.8, blob.vy));
+            });
+
+            this.animationFrame = requestAnimationFrame(animate);
+        };
+        animate();
+    },
+
     handleResize() {
         const canvas = document.getElementById('sceneCanvas');
         if (canvas && canvas.style.display !== 'none') {
@@ -4440,10 +4571,18 @@ const SceneManager = {
         html += `<div class="trinket-grid">`;
         backgrounds.forEach(bg => {
             const selected = bg.id === this.currentBackground;
-            html += `<div class="trinket-card ${selected ? 'equipped' : ''} ${!bg.unlocked ? 'locked' : ''}" onclick="${bg.unlocked ? `SceneManager.applyBackground('${bg.id}');SceneManager.openModal()` : ''}" style="border-color:${selected ? 'var(--accent)' : 'var(--border)'}">
-                <span class="trinket-icon">${bg.animated ? '✨' : '🖼️'}</span>
+            const isPremium = bg.unlockCondition?.type === 'gems';
+            const canPurchase = isPremium && !bg.unlocked && (state.gems || 0) >= bg.unlockCondition.value;
+            let onclick = '';
+            if (bg.unlocked) {
+                onclick = `SceneManager.applyBackground('${bg.id}');SceneManager.openModal()`;
+            } else if (canPurchase) {
+                onclick = `SceneManager.purchaseScene('${bg.id}');SceneManager.openModal()`;
+            }
+            html += `<div class="trinket-card ${selected ? 'equipped' : ''} ${!bg.unlocked ? 'locked' : ''} ${isPremium ? 'premium' : ''}" onclick="${onclick}" style="border-color:${selected ? 'var(--accent)' : isPremium ? '#a855f7' : 'var(--border)'};cursor:${onclick ? 'pointer' : 'not-allowed'}">
+                <span class="trinket-icon">${bg.animated ? '✨' : '🖼️'}${isPremium ? '💎' : ''}</span>
                 <span class="trinket-name">${bg.name}</span>
-                <span class="trinket-rarity" style="color:${bg.unlocked ? 'var(--green)' : 'var(--gray-500)'}">${bg.unlocked ? (selected ? 'Active' : 'Unlocked') : this.getUnlockText(bg.unlockCondition)}</span>
+                <span class="trinket-rarity" style="color:${bg.unlocked ? 'var(--green)' : isPremium ? '#a855f7' : 'var(--gray-500)'}">${bg.unlocked ? (selected ? 'Active' : 'Unlocked') : this.getUnlockText(bg.unlockCondition, canPurchase)}</span>
             </div>`;
         });
         html += `</div></div>`;
@@ -4451,11 +4590,12 @@ const SceneManager = {
         modal.classList.add('active');
     },
 
-    getUnlockText(cond) {
+    getUnlockText(cond, canPurchase) {
         if (!cond) return 'Locked';
         if (cond.type === 'level') return `Level ${cond.value}`;
         if (cond.type === 'streak') return `${cond.value}-day streak`;
         if (cond.type === 'achievement') return `Achievement`;
+        if (cond.type === 'gems') return canPurchase ? `Buy ${cond.value} 💎` : `${cond.value} 💎`;
         return 'Locked';
     },
 
@@ -5306,6 +5446,10 @@ const Battle = {
 
         Gamification.awardCoins(coins);
         Gamification.awardXp(xp);
+        // Award gems for boss defeats (premium currency)
+        if (enemy.boss) {
+            Gamification.awardGems(10, 'bossDefeat');
+        }
         bs.totalWins = (bs.totalWins || 0) + 1;
 
         SoundFX.play('battleWin');
@@ -12021,7 +12165,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.42</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.43</div>
 
 </body>
 </html>
