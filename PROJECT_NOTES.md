@@ -409,3 +409,37 @@ const correlation = (n * sumXY - sumX * sumY) /
 6. ~~Housing system with deterioration~~ ✅
 7. ~~Idle business system~~ ✅
 8. Final polish and testing
+
+---
+
+## Future Feature Ideas
+
+### AI Question Injection in Practice/Test Mode
+**Problem**: Static question banks lead to memorization of specific answers rather than true concept mastery. Users recognize questions by their exact wording/numbers.
+
+**Proposed Solutions**:
+
+1. **AI Question Sprinkles** (Recommended)
+   - During practice/test mode, randomly inject AI-generated questions (weighted, e.g., 10-20% of questions)
+   - AI questions target same category/concept as surrounding questions
+   - Marked subtly so user knows it's AI-generated
+   - Prevents pure memorization by introducing novel variations
+
+2. **Number/Value Manipulation**
+   - AI modifies numerical values in existing questions while keeping the concept intact
+   - E.g., "Calculate 15% of 200" becomes "Calculate 18% of 350"
+   - Requires recalculating correct answers dynamically
+   - More complex to implement but maintains question structure
+
+3. **Hybrid Approach**
+   - Use existing AI Drill for dedicated AI practice
+   - Add "Mixed Mode" option that blends bank questions with AI-generated ones
+   - User can set AI injection percentage (0%, 10%, 25%, 50%)
+
+**Implementation Notes**:
+- Could leverage existing `AIPractice` pre-generation buffer
+- Weight AI questions toward categories with high accuracy (user has "memorized" those)
+- Track separately: bank question accuracy vs AI question accuracy
+- AI Drill already exists for pure AI practice - this would be for "sprinkling" into regular practice
+
+**Current State**: AI Drill mode exists for dedicated AI-generated questions. This feature would integrate AI questions into standard practice/test modes to combat memorization.
