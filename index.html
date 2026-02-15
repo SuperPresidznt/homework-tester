@@ -3167,11 +3167,15 @@ const Gamification = {
 
         const state = this.getState();
         if (!state.categoryMastery[category]) {
-            state.categoryMastery[category] = { correct: 0, total: 0, level: null };
+            state.categoryMastery[category] = { correct: 0, total: 0, level: null, totalTimeMs: 0 };
         }
 
         state.categoryMastery[category].total++;
         if (isCorrect) state.categoryMastery[category].correct++;
+        
+        // Track time spent per category
+        const timeSpent = this.getQuestionTime() || 0;
+        state.categoryMastery[category].totalTimeMs = (state.categoryMastery[category].totalTimeMs || 0) + timeSpent;
 
         const cm = state.categoryMastery[category];
         const accuracy = cm.total > 0 ? (cm.correct / cm.total) * 100 : 0;
@@ -8922,6 +8926,76 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
             userAnswer: this.selectedOption,
             userAnswerText: this.selectedOption !== null ? q.options[this.selectedOption] : null
         };
+    },
+
+    // Get comprehensive stats for AI summaries and analysis
+    getComprehensiveStats() {
+        const gamState = Gamification.getState();
+        const globalStats = DailyGoal.getStats();
+        const drillData = Store.get('drillProgress', {});
+        const questionTracker = QuestionTracker.getSummary();
+        
+        // Category breakdown with time
+        const categoryStats = {};
+        Object.entries(gamState.categoryMastery || {}).forEach(([cat, data]) => {
+            const totalTimeMins = Math.round((data.totalTimeMs || 0) / 60000);
+            const avgTimePerQ = data.total > 0 ? Math.round((data.totalTimeMs || 0) / data.total / 1000) : 0;
+            categoryStats[cat] = {
+                correct: data.correct,
+                total: data.total,
+                accuracy: data.total > 0 ? Math.round((data.correct / data.total) * 100) : 0,
+                level: data.level,
+                totalTimeMinutes: totalTimeMins,
+                avgTimePerQuestionSeconds: avgTimePerQ
+            };
+        });
+
+        // Session stats
+        const sessionStats = {
+            correct: this.sessionStats.correct,
+            total: this.sessionStats.total,
+            accuracy: this.sessionStats.total > 0 ? Math.round((this.sessionStats.correct / this.sessionStats.total) * 100) : 0,
+            byCategory: this.sessionStats.byCategory
+        };
+
+        return {
+            // Overall progress
+            level: gamState.level,
+            xp: gamState.xp,
+            totalXpEarned: gamState.stats?.totalXpEarned || 0,
+            coins: gamState.coins,
+            
+            // Streaks and combos
+            currentCombo: gamState.combo?.current || 0,
+            bestCombo: gamState.combo?.best || 0,
+            longestStreak: gamState.stats?.longestStreak || 0,
+            dailyStreak: globalStats.streak || 0,
+            
+            // Activity
+            questionsAnswered: gamState.stats?.questionsAnswered || 0,
+            testsCompleted: globalStats.testsCompleted || 0,
+            questionsToday: globalStats.questionsToday || 0,
+            dailyGoal: globalStats.dailyGoal || 10,
+            
+            // Time tracking
+            totalStudyMinutes: globalStats.totalStudyMins || 0,
+            todayStudyMinutes: Session.getTodayMins(),
+            
+            // Per-category breakdown (with time)
+            categoryStats: categoryStats,
+            
+            // Current session
+            currentSession: sessionStats,
+            weakCategories: this.weakCategories.slice(0, 5).map(wc => ({
+                category: wc.category,
+                score: Math.round(wc.score)
+            })),
+            
+            // Question tracker summary
+            overallAccuracy: questionTracker.accuracy,
+            totalAttempts: questionTracker.totalAttempts,
+            questionsTracked: questionTracker.questionsTracked
+        };
     }
 };
 
@@ -9617,7 +9691,30 @@ const Chat = {
 
         // Build context
         let ctx = App.getQuestionContext() || Drill.getQuestionContext() || AIPractice.getQuestionContext();
+        const comprehensiveStats = AIPractice.getComprehensiveStats ? AIPractice.getComprehensiveStats() : null;
+        
         let systemPrompt = 'You are a WGU tutor helping a student study for their assessment. Be concise and conversational. Use plain text only - no markdown, no asterisks, no bullet points, no bold/italic formatting. Write like you are talking to a friend. Keep explanations simple and easy to follow. If the student asks about a specific question, reference the question context provided.';
+        
+        // Add comprehensive stats for summaries and analysis
+        if (comprehensiveStats) {
+            systemPrompt += `\n\n=== STUDENT PERFORMANCE DATA ===
+Level: ${comprehensiveStats.level} | XP: ${comprehensiveStats.xp} | Coins: ${comprehensiveStats.coins}
+Daily Streak: ${comprehensiveStats.dailyStreak} days | Best Combo: ${comprehensiveStats.bestCombo}
+Questions Answered: ${comprehensiveStats.questionsAnswered} | Tests Completed: ${comprehensiveStats.testsCompleted}
+Today: ${comprehensiveStats.questionsToday}/${comprehensiveStats.dailyGoal} questions | Study Time: ${comprehensiveStats.todayStudyMinutes}m today, ${comprehensiveStats.totalStudyMinutes}m total
+Overall Accuracy: ${comprehensiveStats.overallAccuracy}%
+
+Per-Category Performance:
+${Object.entries(comprehensiveStats.categoryStats).map(([cat, d]) => 
+    `- ${cat}: ${d.accuracy}% (${d.correct}/${d.total}) | Time: ${d.totalTimeMinutes}m total, ${d.avgTimePerQuestionSeconds}s avg${d.level ? ' | ' + d.level.toUpperCase() : ''}`
+).join('\n')}
+
+Weak Areas (lowest scores first): ${comprehensiveStats.weakCategories.map(w => w.category + ' (' + w.score + '%)').join(', ')}
+
+Current Session: ${comprehensiveStats.currentSession.correct}/${comprehensiveStats.currentSession.total} (${comprehensiveStats.currentSession.accuracy}%)
+
+If the student asks for a summary, analysis, or graph, use this data. For graphs, you can describe what a chart would show or create ASCII art representations.`
+        }
 
         if (ctx) {
             systemPrompt += `\n\nCurrent question (#${ctx.number}):\n"${ctx.text}"\n\nOptions:\n${ctx.options.map((o, i) => `${String.fromCharCode(65+i)}. ${o}`).join('\n')}\n\nCorrect answer: ${String.fromCharCode(65+ctx.correctAnswer)}. ${ctx.correctText}`;
@@ -10834,7 +10931,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.34</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.35</div>
 
 </body>
 </html>
