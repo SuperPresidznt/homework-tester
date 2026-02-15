@@ -442,6 +442,13 @@ button:active:not(:disabled){transform:scale(0.97)}
 .drill-card{background:#fff;border:1px solid var(--gray-300);border-radius:8px;padding:30px;min-height:300px;box-shadow:var(--shadow);animation:cardSlideIn .3s ease}
 @keyframes cardSlideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 .drill-card .question-text{font-size:16px}
+.speed-option{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--gray-300);border-radius:var(--radius);background:#fff;cursor:pointer;transition:all .15s;width:100%;text-align:left;font-size:14px}
+.speed-option:hover:not(:disabled){background:#f0f7ff;border-color:var(--blue)}
+.speed-option:disabled{cursor:default;opacity:0.9}
+.speed-option.correct{background:#d4edda;border-color:var(--green);color:#155724}
+.speed-option.wrong{background:#f8d7da;border-color:var(--red);color:#721c24}
+.speed-option .option-letter{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:var(--gray-100);font-weight:bold;color:var(--navy);flex-shrink:0}
+.speed-option .option-text{flex:1;line-height:1.4}
 .drill-answer{display:none;margin-top:20px;padding-top:20px;border-top:2px solid var(--gray-200)}
 .drill-answer.show{display:block}
 .drill-answer .correct-label{font-weight:bold;color:var(--green);font-size:15px;margin-bottom:8px}
@@ -663,6 +670,11 @@ button:focus-visible {
     body:not([data-theme="light"]) .option-item.selected { background: #1e3a5f; }
     body:not([data-theme="light"]) .option-item.correct-answer { background: #064e3b; border-color: var(--green); }
     body:not([data-theme="light"]) .option-item.wrong-answer { background: #7f1d1d; border-color: var(--red); }
+    body:not([data-theme="light"]) .speed-option { background: #1f2937; border-color: #374151; color: #d1d5db; }
+    body:not([data-theme="light"]) .speed-option:hover:not(:disabled) { background: #1e3a5f; border-color: var(--blue); }
+    body:not([data-theme="light"]) .speed-option.correct { background: #064e3b; border-color: var(--green); color: #a7f3d0; }
+    body:not([data-theme="light"]) .speed-option.wrong { background: #7f1d1d; border-color: var(--red); color: #fecaca; }
+    body:not([data-theme="light"]) .speed-option .option-letter { background: #374151; color: #93c5fd; }
     body:not([data-theme="light"]) .explanation-panel { background: #064e3b; border-color: #065f46; color: #a7f3d0; }
     body:not([data-theme="light"]) .explanation-panel.incorrect { background: #7f1d1d; border-color: #991b1b; color: #fecaca; }
     body:not([data-theme="light"]) .subheader { background: #1f2937; border-color: #374151; }
@@ -702,6 +714,11 @@ button:focus-visible {
 [data-theme="dark"] .option-item.selected { background: #1e3a5f; }
 [data-theme="dark"] .option-item.correct-answer { background: #064e3b; border-color: var(--green); }
 [data-theme="dark"] .option-item.wrong-answer { background: #7f1d1d; border-color: var(--red); }
+[data-theme="dark"] .speed-option { background: #1f2937; border-color: #374151; color: #d1d5db; }
+[data-theme="dark"] .speed-option:hover:not(:disabled) { background: #1e3a5f; border-color: var(--blue); }
+[data-theme="dark"] .speed-option.correct { background: #064e3b; border-color: var(--green); color: #a7f3d0; }
+[data-theme="dark"] .speed-option.wrong { background: #7f1d1d; border-color: var(--red); color: #fecaca; }
+[data-theme="dark"] .speed-option .option-letter { background: #374151; color: #93c5fd; }
 [data-theme="dark"] .explanation-panel { background: #064e3b; border-color: #065f46; color: #a7f3d0; }
 [data-theme="dark"] .explanation-panel.incorrect { background: #7f1d1d; border-color: #991b1b; color: #fecaca; }
 [data-theme="dark"] .subheader { background: #1f2937; border-color: #374151; }
@@ -1417,6 +1434,11 @@ button:focus-visible {
 [data-theme="cengage-dark"] .option-item.selected { background: #1a3366; border-color: #4d9fff; }
 [data-theme="cengage-dark"] .option-item.correct-answer { background: #0d3b2e; border-color: #20c997; }
 [data-theme="cengage-dark"] .option-item.wrong-answer { background: #4a1a1a; border-color: #ff6b6b; }
+[data-theme="cengage-dark"] .speed-option { background: #2f2f42; border-color: #3a3a50; color: #e5e7eb; border-radius: 2px; }
+[data-theme="cengage-dark"] .speed-option:hover:not(:disabled) { background: #35355a; border-color: #4d9fff; }
+[data-theme="cengage-dark"] .speed-option.correct { background: #0d3b2e; border-color: #20c997; color: #a7f3d0; }
+[data-theme="cengage-dark"] .speed-option.wrong { background: #4a1a1a; border-color: #ff6b6b; color: #fecaca; }
+[data-theme="cengage-dark"] .speed-option .option-letter { background: #3a3a50; color: #6db3ff; }
 [data-theme="cengage-dark"] .btn-nav { border-radius: 2px; }
 [data-theme="cengage-dark"] .explanation-panel { background: #0d3b2e; border-color: #20c997; color: #a7f3d0; }
 [data-theme="cengage-dark"] .explanation-panel.incorrect { background: #4a1a1a; border-color: #ff6b6b; color: #fecaca; }
@@ -1455,6 +1477,11 @@ button:focus-visible {
 [data-theme="synthwave"] .option-item.selected { background: #2a1060; border-color: #d53369; box-shadow: 0 0 10px rgba(213,51,105,0.3); }
 [data-theme="synthwave"] .option-item.correct-answer { background: #0a3020; border-color: #00ff88; box-shadow: 0 0 10px rgba(0,255,136,0.2); }
 [data-theme="synthwave"] .option-item.wrong-answer { background: #3a0a20; border-color: #ff2a6d; box-shadow: 0 0 10px rgba(255,42,109,0.2); }
+[data-theme="synthwave"] .speed-option { background: #1f1f35; border-color: #3a3a55; color: #e8e8ff; }
+[data-theme="synthwave"] .speed-option:hover:not(:disabled) { background: #2a2050; border-color: #00d4ff; box-shadow: 0 0 8px rgba(0,212,255,0.2); }
+[data-theme="synthwave"] .speed-option.correct { background: #0a3020; border-color: #00ff88; color: #aaffcc; box-shadow: 0 0 10px rgba(0,255,136,0.2); }
+[data-theme="synthwave"] .speed-option.wrong { background: #3a0a20; border-color: #ff2a6d; color: #ffaacc; box-shadow: 0 0 10px rgba(255,42,109,0.2); }
+[data-theme="synthwave"] .speed-option .option-letter { background: #3a3a55; color: #00d4ff; }
 [data-theme="synthwave"] .btn-nav { border-radius: 8px; }
 [data-theme="synthwave"] .btn-nav:hover { box-shadow: 0 0 8px rgba(0,212,255,0.3); }
 [data-theme="synthwave"] .explanation-panel { background: #0a3020; border-color: #00ff88; color: #aaffcc; }
@@ -5972,19 +5999,24 @@ const Shop = {
         if (state.level < sp.unlockLevel) return;
         if (sp.price > 0 && !Gamification.spendCoins(sp.price)) return;
 
-        // Check for retired names
+        // Check for retired names AND current pet names
         const retiredNames = state.retiredNames || [];
+        const currentPetNames = pets.map(p => p.name.toLowerCase());
+        const isNameTaken = (n) => retiredNames.map(r => r.toLowerCase()).includes(n.toLowerCase()) || currentPetNames.includes(n.toLowerCase());
         let name = prompt('Name your new ' + sp.name + ':') || sp.name;
-        while (retiredNames.includes(name)) {
-            name = prompt('That name is retired (belonged to a deceased pet). Choose another name:') || sp.name;
-            if (!retiredNames.includes(name)) break;
+        while (isNameTaken(name)) {
+            const reason = currentPetNames.includes(name.toLowerCase()) ? 'already in use by another pet' : 'retired (belonged to a deceased pet)';
+            name = prompt(`That name is ${reason}. Choose another name:`) || sp.name;
+            if (!isNameTaken(name)) break;
         }
         const newPet = {
             name: name.slice(0, 20), species: speciesId, stage: 1, totalXpFed: 0,
             mood: 'sleepy', lastFed: null, hunger: 100, happiness: 100,
             lastDecayCheck: Date.now(), careMinutes: 0, lastCareCheck: null,
             studyMinutes: 0, sick: false, lastInteraction: Date.now(),
-            accessories: [], totalMealsEaten: 0
+            accessories: [], totalMealsEaten: 0,
+            birthDate: Date.now(), // Pet age tracking
+            lifespan: 30 + Math.floor(Math.random() * 15) // 30-45 days lifespan
         };
         state.pets.push(newPet);
         Gamification.saveState(state);
@@ -6562,12 +6594,37 @@ const Battle = {
         const hunger = Math.min(100, Math.max(0, pet.hunger || 0));
         const happiness = Math.min(100, Math.max(0, pet.happiness || 0));
         const diff = Gamification.getSpeciesDifficulty(pet.species);
-        const hp = Math.round(50 + (stage * 30) + (hunger / 5) + (happiness / 5));
-        const atk = Math.round(10 + (stage * 8) + (diff * 5));
-        const def = Math.round(3 + (stage * 3) + (happiness / 10));
+        
+        // Age-based strength curve
+        const now = Date.now();
+        const birthDate = pet.birthDate || (now - 7 * 24 * 60 * 60 * 1000);
+        const lifespan = pet.lifespan || 37;
+        const ageInDays = (now - birthDate) / (1000 * 60 * 60 * 24);
+        const ageRatio = ageInDays / lifespan; // 0 to 1+ (can exceed 1 if past lifespan)
+        
+        // Strength curve: builds up to peak at 50% of lifespan, then declines
+        // Peak multiplier is 1.3x at mid-life, starts at 0.7x, ends at 0.5x
+        let ageMultiplier;
+        if (ageRatio <= 0.5) {
+            // Growing phase: 0.7 -> 1.3 (linear increase to peak)
+            ageMultiplier = 0.7 + (ageRatio * 1.2); // 0.7 at birth, 1.3 at mid-life
+        } else {
+            // Declining phase: 1.3 -> 0.5 (gradual decline)
+            const declineRatio = (ageRatio - 0.5) / 0.5; // 0 at mid-life, 1 at end
+            ageMultiplier = 1.3 - (declineRatio * 0.8); // 1.3 at mid-life, 0.5 at end
+            ageMultiplier = Math.max(0.4, ageMultiplier); // Floor at 0.4x
+        }
+        
+        const baseHp = 50 + (stage * 30) + (hunger / 5) + (happiness / 5);
+        const baseAtk = 10 + (stage * 8) + (diff * 5);
+        const baseDef = 3 + (stage * 3) + (happiness / 10);
+        
+        const hp = Math.round(baseHp * ageMultiplier);
+        const atk = Math.round(baseAtk * ageMultiplier);
+        const def = Math.round(baseDef * ageMultiplier);
         const emoji = Gamification.getSpeciesEmoji(pet.species, stage);
         const name = pet.name || 'Pet';
-        return { hp, atk, def, emoji, name, stage };
+        return { hp, atk, def, emoji, name, stage, ageInDays: Math.floor(ageInDays), ageMultiplier };
     },
 
     show() {
@@ -7490,6 +7547,22 @@ const Garden = {
                 pet.happiness = Math.max(0, pet.happiness - scaledHours * 4 * decayRate * happyReduction);
             }
             
+            // Pet age calculation (in days)
+            const birthDate = pet.birthDate || (now - 7 * 24 * 60 * 60 * 1000); // Default 7 days old for legacy pets
+            const ageInDays = (now - birthDate) / (1000 * 60 * 60 * 24);
+            const lifespan = pet.lifespan || 37; // Default 37 days for legacy pets
+            
+            // Natural death from old age (after lifespan expires)
+            if (ageInDays >= lifespan) {
+                pet.dyingOfAge = true;
+                // Gradual decline after lifespan - pet has 3-5 more days
+                const overAge = ageInDays - lifespan;
+                if (overAge >= 3 + Math.random() * 2) {
+                    petsToRemove.push(idx);
+                    pet.diedOfAge = true;
+                }
+            }
+            
             // Pet death check - if hunger AND happiness are 0 for too long while sick
             if (pet.sick && pet.hunger <= 0 && pet.happiness <= 0) {
                 pet.deathTimer = (pet.deathTimer || 0) + scaledHours;
@@ -7511,6 +7584,10 @@ const Garden = {
             
             petsToRemove.reverse().forEach(idx => {
                 const deadPet = pets[idx];
+                const birthDate = deadPet.birthDate || (now - 7 * 24 * 60 * 60 * 1000);
+                const ageAtDeath = Math.floor((now - birthDate) / (1000 * 60 * 60 * 24));
+                const diedOfAge = deadPet.diedOfAge || false;
+                
                 // Add to graveyard
                 state.graveyard.push({
                     name: deadPet.name,
@@ -7518,7 +7595,9 @@ const Garden = {
                     stage: deadPet.stage,
                     diedAt: now,
                     totalXpFed: deadPet.totalXpFed,
-                    careMinutes: deadPet.careMinutes
+                    careMinutes: deadPet.careMinutes,
+                    ageAtDeath: ageAtDeath,
+                    diedOfAge: diedOfAge
                 });
                 // Retire the name
                 if (!state.retiredNames.includes(deadPet.name)) {
@@ -7527,10 +7606,16 @@ const Garden = {
                 // Remove from pets array
                 pets.splice(idx, 1);
                 // Show death notification
+                const deathMsg = diedOfAge 
+                    ? `${deadPet.name} passed away peacefully at age ${ageAtDeath} days`
+                    : `${deadPet.name} has passed away`;
+                const deathDesc = diedOfAge 
+                    ? 'They lived a full life. Visit the graveyard to remember them.'
+                    : 'Visit the graveyard to remember them';
                 Gamification.showAchievementToast({ 
-                    icon: '💀', 
-                    name: deadPet.name + ' has passed away', 
-                    desc: 'Visit the graveyard to remember them', 
+                    icon: diedOfAge ? '🕊️' : '💀', 
+                    name: deathMsg, 
+                    desc: deathDesc, 
                     xp: 0 
                 });
             });
@@ -7729,6 +7814,7 @@ const PetModal = {
                 <h4>Accessories</h4>
                 ${accessoryHtml}
                 <div class="pet-modal-stats">
+                    <span>Age: ${(() => { const bd = buddy.birthDate || (Date.now() - 7*24*60*60*1000); const age = Math.floor((Date.now() - bd) / (1000*60*60*24)); const ls = buddy.lifespan || 37; const pct = Math.round((age/ls)*100); return age + ' days (' + pct + '% of lifespan)'; })()}${buddy.dyingOfAge ? ' ⚠️' : ''}</span>
                     <span>Meals eaten: ${buddy.totalMealsEaten || 0}</span>
                     <span>Total XP fed: ${buddy.totalXpFed.toLocaleString()}</span>
                     <span>Study time: ${Math.floor((buddy.studyMinutes || 0) / 60)}h ${(buddy.studyMinutes || 0) % 60}m</span>
@@ -8102,10 +8188,11 @@ const SessionState = {
                     document.getElementById('drillAnswer').classList.add('show');
                 }
 
-                // Render inline chart if question has graphData
-                if (q.graphData) {
+                // Render inline chart if question has graphData or [Graph:...] placeholder
+                if (q.graphData || q.text.includes('[Graph:')) {
                     const qtEl = document.querySelector('#drillCard .question-text');
-                    if (qtEl) InlineChart.renderInElement(qtEl, q.graphData);
+                    const graphData = q.graphData || InlineChart.generatePlaceholderGraph(q.text);
+                    if (qtEl && graphData) InlineChart.renderInElement(qtEl, graphData);
                 }
 
                 document.getElementById('chatFab').classList.add('has-context');
@@ -8872,8 +8959,11 @@ const App = {
         const q = this.questions[this.currentQ];
         document.getElementById('questionNumber').textContent = `Question ${this.currentQ + 1} of ${this.questions.length}`;
         document.getElementById('questionText').innerHTML = escapeHtml(q.text).replace(/\n/g, '<br>');
-        // Render inline chart if question has graphData
-        if (q.graphData) InlineChart.renderInElement(document.getElementById('questionText'), q.graphData);
+        // Render inline chart if question has graphData or [Graph:...] placeholder
+        if (q.graphData || q.text.includes('[Graph:')) {
+            const graphData = q.graphData || InlineChart.generatePlaceholderGraph(q.text);
+            if (graphData) InlineChart.renderInElement(document.getElementById('questionText'), graphData);
+        }
         // Render power-up bar
         this.renderPowerups();
         this._renderMomentumPills();
@@ -9588,10 +9678,11 @@ const Drill = {
             </div>
         `;
 
-        // Render inline chart if question has graphData
-        if (q.graphData) {
+        // Render inline chart if question has graphData or [Graph:...] placeholder
+        if (q.graphData || q.text.includes('[Graph:')) {
             const qtEl = document.querySelector('#drillCard .question-text');
-            if (qtEl) InlineChart.renderInElement(qtEl, q.graphData);
+            const graphData = q.graphData || InlineChart.generatePlaceholderGraph(q.text);
+            if (qtEl && graphData) InlineChart.renderInElement(qtEl, graphData);
         }
 
         // Update chat context
@@ -9951,11 +10042,18 @@ const SpeedMode = {
                 <span style="font-size:10px;color:var(--gray-500)">${escapeHtml(category)}</span>
                 <span style="font-size:11px;color:var(--gray-500);margin-left:auto;cursor:help" title="${timingTitle}">${timingLabel}</span>
             </div>
-            <div class="drill-question" style="font-size:16px;margin-bottom:16px">${escapeHtml(q.text)}</div>
+            <div class="drill-question speed-question-text" style="font-size:16px;margin-bottom:16px">${escapeHtml(q.text)}</div>
             <div class="speed-options" style="display:flex;flex-direction:column;gap:8px">${optionsHtml}</div>
         `;
 
         this.renderMath();
+        
+        // Render inline chart if question has graphData or [Graph:...] placeholder
+        const qtEl = document.querySelector('.speed-question-text');
+        if (qtEl && (q.graphData || q.text.includes('[Graph:'))) {
+            const graphData = q.graphData || InlineChart.generatePlaceholderGraph(q.text);
+            if (graphData) InlineChart.renderInElement(qtEl, graphData);
+        }
     },
 
     selectOption(idx) {
@@ -10221,9 +10319,10 @@ const Review = {
 
         // Render inline charts in review mode
         filtered.forEach(q => {
-            if (q.graphData) {
+            if (q.graphData || q.text.includes('[Graph:')) {
                 const el = document.querySelector(`.rq-text[data-qid="${q.id}"]`);
-                if (el) InlineChart.renderInElement(el, q.graphData);
+                const graphData = q.graphData || InlineChart.generatePlaceholderGraph(q.text);
+                if (el && graphData) InlineChart.renderInElement(el, graphData);
             }
         });
 
@@ -12834,6 +12933,88 @@ const Calc = {
 // INLINE CHART RENDERER (Canvas 2D)
 // =====================================================================
 const InlineChart = {
+    /**
+     * Generate placeholder graph data from question text containing [Graph: title]
+     * Creates a reasonable sample graph based on the title/context
+     */
+    generatePlaceholderGraph(questionText) {
+        const match = questionText.match(/\[Graph:\s*([^\]]+)\]/i);
+        if (!match) return null;
+        
+        const title = match[1].trim();
+        const lowerTitle = title.toLowerCase();
+        
+        // Try to infer graph type from title
+        let graphData = {
+            title: title,
+            xLabel: 'x',
+            yLabel: 'y',
+            series: [{ data: [], color: '#2980b9' }]
+        };
+        
+        // Profit/Revenue graphs - typically parabola or linear
+        if (lowerTitle.includes('profit') || lowerTitle.includes('revenue') || lowerTitle.includes('cost')) {
+            // Parabola: profit = -ax² + bx - c (opens downward)
+            graphData.xLabel = lowerTitle.includes('dishwasher') ? 'Dishwashers (hundreds)' : 'Units';
+            graphData.yLabel = 'Profit ($1000s)';
+            graphData.xMin = 0;
+            graphData.yMin = -20;
+            // Generate parabola: P(x) = -0.5x² + 10x - 20 (max at x=10, P=30)
+            for (let x = 0; x <= 20; x += 1) {
+                const y = -0.5 * x * x + 10 * x - 20;
+                graphData.series[0].data.push({ x, y });
+            }
+            // Add horizontal line at y=80 for reference
+            graphData.asymptotes = [{ y: 80, label: '$80,000' }];
+            graphData.yMax = 100;
+        }
+        // Supply/Demand graphs
+        else if (lowerTitle.includes('supply') || lowerTitle.includes('demand')) {
+            graphData.xLabel = 'Quantity';
+            graphData.yLabel = 'Price';
+            graphData.series = [
+                { data: [], color: '#2980b9', label: 'Demand' },
+                { data: [], color: '#e67e22', label: 'Supply' }
+            ];
+            for (let x = 0; x <= 100; x += 10) {
+                graphData.series[0].data.push({ x, y: 100 - x }); // Demand: downward
+                graphData.series[1].data.push({ x, y: x });       // Supply: upward
+            }
+        }
+        // Distance/Time graphs
+        else if (lowerTitle.includes('distance') || lowerTitle.includes('time') || lowerTitle.includes('speed')) {
+            graphData.xLabel = 'Time (hours)';
+            graphData.yLabel = 'Distance (miles)';
+            for (let x = 0; x <= 10; x += 1) {
+                graphData.series[0].data.push({ x, y: 50 * x });
+            }
+        }
+        // Population/Growth graphs
+        else if (lowerTitle.includes('population') || lowerTitle.includes('growth')) {
+            graphData.xLabel = 'Years';
+            graphData.yLabel = 'Population';
+            for (let x = 0; x <= 10; x += 1) {
+                graphData.series[0].data.push({ x, y: 1000 * Math.pow(1.1, x) });
+            }
+        }
+        // Temperature graphs
+        else if (lowerTitle.includes('temperature') || lowerTitle.includes('temp')) {
+            graphData.xLabel = 'Time';
+            graphData.yLabel = 'Temperature (°F)';
+            for (let x = 0; x <= 24; x += 2) {
+                graphData.series[0].data.push({ x, y: 60 + 15 * Math.sin((x - 6) * Math.PI / 12) });
+            }
+        }
+        // Default: simple linear graph
+        else {
+            for (let x = 0; x <= 10; x += 1) {
+                graphData.series[0].data.push({ x, y: 2 * x + 5 });
+            }
+        }
+        
+        return graphData;
+    },
+
     // Replace [Graph: ...] placeholders with rendered charts
     renderInElement(el, graphData) {
         if (!graphData || !el) return;
