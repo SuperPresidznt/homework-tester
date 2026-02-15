@@ -1,9 +1,9 @@
 # WGU Practice App - Project Notes
 
-**Current Version: v2.44** | Last Updated: Feb 15, 2026
+**Current Version: v2.50** | Last Updated: Feb 15, 2026
 
 ## Overview
-A comprehensive study tool for WGU assessments with gamification, AI-powered practice, Elden Ring-style boss battles, and detailed metrics tracking.
+A comprehensive study tool for WGU assessments with gamification, AI-powered practice, Elden Ring-style boss battles, idle business system, housing, animated backgrounds, and detailed metrics tracking.
 
 ---
 
@@ -19,16 +19,18 @@ A comprehensive study tool for WGU assessments with gamification, AI-powered pra
 
 ### 2. Gamification System (`Gamification` object)
 - **XP & Levels**: Earn XP for correct answers, level up
-- **Coins**: Currency for vending machine rewards
+- **Coins**: Currency for shop, housing, businesses
 - **💎 Gems**: Premium currency (harder to earn)
   - Earn: Level up (2/level, 7 every 5 levels), achievements (1), perfect tests (5), boss kills (10)
-  - Spend: Premium backgrounds, future premium items
+  - Spend: Premium backgrounds, premium businesses, future items
 - **Streaks & Combos**: Daily streaks, answer combos with multipliers
 - **Achievements**: Unlock badges for milestones
 - **Titles**: Earn titles based on level
-- **Pet System**: Virtual study buddy with moods
+- **Pet System**: Virtual study buddies with moods, hunger, happiness, sickness, death
 - **Garden**: Plant and grow items with coins
 - **Category Mastery**: Bronze/Silver/Gold/Platinum badges per category
+- **Housing System**: Buy houses with XP bonuses, deterioration, repair services
+- **Idle Business System**: Passive income from businesses with automation
 
 ### 3. AI Practice Mode (`AIPractice` object)
 - **Pre-generation Buffer**: Generates 2-3 questions ahead (`BUFFER_SIZE: 3`)
@@ -148,6 +150,12 @@ Cleans AI responses:
 
 ## Version History
 
+- **v2.50**: Idle business system, 12 new animated backgrounds, graph year fix
+- **v2.49**: Housing deterioration system with laborers and repair services
+- **v2.48**: Pet housing, user housing, furniture, vehicles, pet death/graveyard
+- **v2.47**: Shop expansion with multiple categories
+- **v2.46**: Backpack/trinkets system, scene manager improvements
+- **v2.45**: Boss battle system enhancements
 - **v2.44**: AI chat charts, concise responses, better TTS voice selection
 - **v2.43**: Gems premium currency, lava lamp background, gem earning conditions
 - **v2.42**: Header gems/coins display, scene purchase system
@@ -179,14 +187,30 @@ Only shows insights when correlations are statistically meaningful (minimum data
 
 ## Animated Backgrounds (SceneManager)
 
-Available backgrounds:
+### Static Backgrounds
 - **Classic** (default): Clean, minimal
 - **Cozy Desk**: Warm study nook (unlocked)
+
+### CSS Animated
 - **Night Sky**: Twinkling stars (unlock: Level 5)
-- **Rainy Window**: Canvas rain animation (unlock: 7-day streak)
 - **Forest Glade**: Sunlit particles (unlock: Level 10)
 - **Synthwave**: Retro neon grid (unlock: Night Owl achievement)
-- **🌈 Lava Lamp** (Premium): Floating colorful blobs (unlock: 25 💎 gems)
+
+### Canvas Animated (Live Wallpapers)
+- **Rainy Window**: Rain drops on glass (unlock: 7-day streak)
+- **🌈 Lava Lamp** (Premium): Floating colorful blobs (25 💎)
+- **🐟 Aquarium**: Swimming fish with bubbles (Level 3)
+- **✨ Fireflies**: Glowing fireflies in summer night (Level 7)
+- **❄️ Snowfall**: Gentle snow drifting down (3-day streak)
+- **🌌 Aurora Borealis**: Dancing northern lights (Level 15)
+- **🫧 Bubbles**: Floating rainbow soap bubbles (Free)
+- **💻 Matrix**: Digital rain code (Level 12)
+- **🪼 Jellyfish** (Premium): Graceful jellyfish floating (15 💎)
+- **🔥 Campfire**: Crackling fire with sparks (14-day streak)
+- **🌊 Ocean Waves**: Calming layered ocean waves (Level 8)
+- **🌸 Cherry Blossom** (Premium): Falling sakura petals (20 💎)
+- **🌌 Galaxy**: Swirling cosmic nebula with stars (Level 20)
+- **🐠 Koi Pond** (Premium): Colorful koi with lily pads (30 💎)
 
 Toggle animations in Settings or via SceneManager.toggleAnimation()
 
@@ -284,10 +308,104 @@ const correlation = (n * sumXY - sumX * sumY) /
 
 ---
 
+## Housing System (`House` object)
+
+### Available Houses
+| House | Price | XP Bonus | Decay Rate |
+|-------|-------|----------|------------|
+| 🏕️ Tent | 100 | +2% | 0.5%/day |
+| 🏠 Cabin | 500 | +5% | 0.4%/day |
+| 🏡 House | 2,000 | +10% | 0.3%/day |
+| 🏰 Mansion | 10,000 | +20% | 0.25%/day |
+| 🏯 Castle | 50,000 | +35% | 0.2%/day |
+
+### Deterioration System
+- Houses decay over time (condition 0-100%)
+- Condition affects XP bonus
+- Visual condition bar with color coding:
+  - Green (75-100%): Excellent/Good
+  - Orange (50-75%): Fair
+  - Yellow (25-50%): Poor
+  - Red (0-25%): Dilapidated/Condemned
+
+### Repair Services
+| Service | Cost | Effect |
+|---------|------|--------|
+| Laborer (1 day) | 50 | +10%/day |
+| Handyman (3 days) | 120 | +15%/day |
+| Contractor (7 days) | 250 | +20%/day |
+| Quick Repair | 25 | Instant +25% |
+| Full Renovation | 100 | Restore to 100% |
+
+---
+
+## Idle Business System (`Business` object)
+
+### Available Businesses
+| Business | Price | Income | Cycle | Manager Cost |
+|----------|-------|--------|-------|--------------|
+| 🍋 Lemonade Stand | 50 | 0.1 | 60s | 100 |
+| 📰 Paper Route | 150 | 0.3 | 120s | 300 |
+| 🚿 Car Wash | 500 | 1 | 180s | 1,000 |
+| 🥐 Bakery | 1,500 | 3 | 300s | 3,000 |
+| 🍕 Pizzeria | 4,000 | 8 | 600s | 8,000 |
+| 🕹️ Arcade | 10,000 | 20 | 900s | 20,000 |
+| 🏋️ Gym | 25,000 | 50 | 1,200s | 50,000 |
+| 🏨 Hotel | 75,000 | 150 | 1,800s | 150,000 |
+| 💻 Tech Startup | 200,000 | 500 | 3,600s | 400,000 |
+| 🛸 Space Port | 1,000,000 | 2,500 | 7,200s | 2,000,000 |
+
+### Mechanics
+- **Manual Collection**: Progress bar fills, click to collect when full
+- **Upgrades**: Each level costs 15% more, increases income proportionally
+- **Managers**: Hire to auto-collect income even while away
+- **Passive Income**: Automated businesses generate coins/sec
+- **Offline Progress**: Calculates income earned while away
+
+---
+
+## Pet System (`Garden.decayPetStats`)
+
+### Pet Stats
+- **Hunger**: Decays over time, feed to restore
+- **Happiness**: Decays over time, play/interact to restore
+- **Sickness**: Triggers when both hunger & happiness < 15%
+- **Death**: Pets can die from prolonged neglect (moved to graveyard)
+
+### Pet Housing Items
+- Food bowls, water bowls, beds, toys
+- Reduce decay rates and provide comfort bonuses
+
+### Graveyard
+- Deceased pets are memorialized
+- Names are retired (can't reuse)
+
+---
+
+## Shop Categories
+
+### Consumables
+- **Food**: Feed pets (apple, fish, steak, cake, golden apple)
+- **Seeds**: Plant in garden (sunflower, cactus, bonsai, crystal, rainbow)
+- **Garden Items**: Water, fertilizer, magic dust, evo stone
+- **Battle Items**: Health potion, shield charm, power berry
+
+### Permanent Items
+- **Pet Housing**: Food bowls, water bowls, beds, toys
+- **User Housing**: Tent, cabin, house, mansion, castle
+- **Furniture**: Desk, lamp, bookshelf, bed, couch
+- **Vehicles**: Bicycle → Spaceship (7 tiers)
+- **Decorations**: Cosmetic items
+- **Pet Accessories**: Hats, collars, etc.
+
+---
+
 ## Outstanding Items
 1. ~~Batch-size rewards with momentum UI feedback~~ (partially done)
 2. Surface pet/garden buffs and linkage
-3. ~~Implement animated backgrounds~~ ✅ (6 backgrounds + lava lamp)
+3. ~~Implement animated backgrounds~~ ✅ (19 backgrounds)
 4. ~~Trinkets/backpack UI~~ ✅
 5. ~~Add project decision bullet doc~~ ✅
-6. Final polish and testing
+6. ~~Housing system with deterioration~~ ✅
+7. ~~Idle business system~~ ✅
+8. Final polish and testing
