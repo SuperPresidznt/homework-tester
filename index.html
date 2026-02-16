@@ -205,6 +205,18 @@ button:active:not(:disabled){transform:scale(0.97)}
 [data-theme="dark"] .analytics-goal{background:#1f2937}
 [data-theme="dark"] .goal-label{color:#9ca3af}
 [data-theme="dark"] .goal-bar-mini{background:#374151}
+
+/* === GARDEN GRAVEYARD === */
+.garden-graveyard{text-align:center;padding:12px;background:linear-gradient(135deg,#1f2937,#374151);border-radius:12px}
+.graveyard-header{font-size:14px;font-weight:600;color:#9ca3af;margin-bottom:8px}
+.graveyard-list{display:flex;flex-direction:column;gap:4px}
+.graveyard-pet{display:flex;align-items:center;gap:8px;padding:6px 10px;background:rgba(0,0,0,0.2);border-radius:6px;cursor:pointer;transition:background 0.2s}
+.graveyard-pet:hover{background:rgba(99,102,241,0.3)}
+.graveyard-icon{font-size:16px}
+.graveyard-name{font-size:12px;color:#d1d5db}
+.graveyard-footer{font-size:11px;color:#6b7280;margin-top:8px}
+.garden-no-pet{text-align:center;padding:16px}
+
 [data-theme="dark"] .daily-challenges-card h3{color:#93c5fd}
 [data-theme="dark"] .challenge-item{background:#1f2937;border-color:#374151}
 [data-theme="dark"] .challenge-item:hover{background:#1e3a5f;border-color:#60a5fa}
@@ -5660,12 +5672,19 @@ const SceneManager = {
             const isPremium = bg.unlockCondition?.type === 'gems';
             const canPurchase = isPremium && !bg.unlocked && (state.gems || 0) >= bg.unlockCondition.value;
             let onclick = '';
+            let isClickable = false;
             if (bg.unlocked) {
                 onclick = `SceneManager.applyBackground('${bg.id}');SceneManager.openModal()`;
+                isClickable = true;
             } else if (canPurchase) {
                 onclick = `SceneManager.purchaseScene('${bg.id}');SceneManager.openModal()`;
+                isClickable = true;
+            } else {
+                // Show info about how to unlock
+                onclick = `SceneManager.showUnlockInfo('${bg.id}')`;
+                isClickable = true;
             }
-            html += `<div class="trinket-card ${selected ? 'equipped' : ''} ${!bg.unlocked ? 'locked' : ''} ${isPremium ? 'premium' : ''}" onclick="${onclick}" style="border-color:${selected ? 'var(--accent)' : isPremium ? '#a855f7' : 'var(--border)'};cursor:${onclick ? 'pointer' : 'not-allowed'}">
+            html += `<div class="trinket-card ${selected ? 'equipped' : ''} ${!bg.unlocked ? 'locked' : ''} ${isPremium ? 'premium' : ''}" onclick="${onclick}" style="border-color:${selected ? 'var(--accent)' : isPremium ? '#a855f7' : 'var(--border)'};cursor:pointer">
                 <span class="trinket-icon">${bg.animated ? '✨' : '🖼️'}${isPremium ? '💎' : ''}</span>
                 <span class="trinket-name">${bg.name}</span>
                 <span class="trinket-rarity" style="color:${bg.unlocked ? 'var(--green)' : isPremium ? '#a855f7' : 'var(--gray-500)'}">${bg.unlocked ? (selected ? 'Active' : 'Unlocked') : this.getUnlockText(bg.unlockCondition, canPurchase)}</span>
@@ -5683,6 +5702,31 @@ const SceneManager = {
         if (cond.type === 'achievement') return `Achievement`;
         if (cond.type === 'gems') return canPurchase ? `Buy ${cond.value} 💎` : `${cond.value} 💎`;
         return 'Locked';
+    },
+
+    showUnlockInfo(bgId) {
+        const bg = this.BACKGROUNDS.find(b => b.id === bgId);
+        if (!bg) return;
+        const state = Gamification.getState();
+        const cond = bg.unlockCondition;
+        let msg = `🎨 ${bg.name}\n\n${bg.description}\n\n`;
+        
+        if (!cond) {
+            msg += '🔒 This background is locked.';
+        } else if (cond.type === 'level') {
+            const currentLevel = state.level || 1;
+            msg += `🔒 Unlock at Level ${cond.value}\n\nYour level: ${currentLevel}`;
+        } else if (cond.type === 'streak') {
+            const currentStreak = DailyGoal.getStats().streak || 0;
+            msg += `🔒 Unlock with a ${cond.value}-day study streak\n\nYour streak: ${currentStreak} days`;
+        } else if (cond.type === 'achievement') {
+            msg += `🔒 Unlock by earning the "${cond.value}" achievement`;
+        } else if (cond.type === 'gems') {
+            const gems = state.gems || 0;
+            msg += `💎 Purchase for ${cond.value} gems\n\nYour gems: ${gems}`;
+        }
+        
+        alert(msg);
     },
 
     closeModal() {
@@ -7805,7 +7849,48 @@ const Garden = {
     renderPet(state) {
         const el = document.getElementById('gardenPet');
         if (!el) return;
+        
         const buddy = state.studyBuddy;
+        const pets = state.pets || [];
+        const graveyard = state.graveyard || [];
+        
+        // Check if buddy is dead or no pets exist
+        if (buddy.dead || pets.length === 0) {
+            // Show graveyard if there are dead pets
+            if (graveyard.length > 0) {
+                const resStones = state.inventory?.battleItems?.resStone || 0;
+                el.innerHTML = `
+                    <div class="garden-graveyard">
+                        <div class="graveyard-header">🪦 Pet Graveyard</div>
+                        <div class="graveyard-list">
+                            ${graveyard.slice(0, 3).map((grave, idx) => {
+                                const sp = Gamification.PET_SPECIES[grave.species] || Gamification.PET_SPECIES.bird;
+                                return `<div class="graveyard-pet" onclick="Pets.resurrectPet(${idx})" title="Click to resurrect (needs 💎)">
+                                    <span class="graveyard-icon">🪦</span>
+                                    <span class="graveyard-name">${grave.name}</span>
+                                </div>`;
+                            }).join('')}
+                        </div>
+                        <div class="graveyard-footer">
+                            💎 ${resStones} Resurrection Stone${resStones !== 1 ? 's' : ''}
+                            ${graveyard.length > 3 ? `<br><small>+${graveyard.length - 3} more</small>` : ''}
+                        </div>
+                        <button class="btn-sm" onclick="Pets.show()" style="margin-top:8px">View All Pets</button>
+                    </div>
+                `;
+            } else {
+                // No pets and no graveyard - prompt to get a pet
+                el.innerHTML = `
+                    <div class="garden-no-pet">
+                        <div style="font-size:32px;opacity:0.5">🐣</div>
+                        <div style="font-size:12px;color:var(--gray-500)">No pet yet!</div>
+                        <button class="btn-sm" onclick="Shop.show();Shop.switchTab('pets')" style="margin-top:8px">Get a Pet</button>
+                    </div>
+                `;
+            }
+            return;
+        }
+        
         const accessories = buddy.accessories || [];
         const moodText = this.getMoodLabel(buddy);
         el.innerHTML = `
@@ -16569,7 +16654,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.61</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.62</div>
 
 </body>
 </html>
