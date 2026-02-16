@@ -135,6 +135,35 @@ button:active:not(:disabled){transform:scale(0.97)}
 .goal-celebration{text-align:center;padding:8px;margin-top:8px;background:#eafaf1;border-radius:6px;color:var(--green);font-weight:bold;animation:goalPulse .5s ease}
 @keyframes goalPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
 
+/* === DAILY CHALLENGES === */
+.daily-challenges-card{background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:16px;margin:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.daily-challenges-card h3{font-size:15px;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between}
+.challenges-reset{font-size:11px;color:var(--gray-500);font-weight:normal}
+.challenges-list{display:flex;flex-direction:column;gap:10px}
+.challenge-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-200);transition:all .2s ease}
+.challenge-item:hover{border-color:var(--blue-light);background:#f8fafc}
+.challenge-item.completed{background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-color:#86efac}
+.challenge-icon{font-size:24px;width:36px;text-align:center}
+.challenge-info{flex:1;min-width:0}
+.challenge-name{font-weight:600;color:var(--navy);font-size:13px}
+.challenge-desc{font-size:11px;color:var(--gray-600);margin:2px 0 6px}
+.challenge-progress-bar{height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden}
+.challenge-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--blue-light));border-radius:3px;transition:width .3s ease}
+.challenge-item.completed .challenge-progress-fill{background:linear-gradient(90deg,var(--green),var(--green-light))}
+.challenge-status{min-width:50px;text-align:right}
+.challenge-count{font-size:12px;font-weight:600;color:var(--gray-600)}
+.challenges-complete-bonus{text-align:center;padding:10px;margin-top:8px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;color:#92400e;font-weight:600;font-size:13px}
+[data-theme="dark"] .daily-challenges-card{background:#16213e;border-color:#374151}
+[data-theme="dark"] .daily-challenges-card h3{color:#93c5fd}
+[data-theme="dark"] .challenge-item{background:#1f2937;border-color:#374151}
+[data-theme="dark"] .challenge-item:hover{background:#1e3a5f;border-color:#60a5fa}
+[data-theme="dark"] .challenge-item.completed{background:linear-gradient(135deg,#064e3b,#065f46);border-color:#34d399}
+[data-theme="dark"] .challenge-name{color:#e5e7eb}
+[data-theme="dark"] .challenge-desc{color:#9ca3af}
+[data-theme="dark"] .challenge-progress-bar{background:#374151}
+[data-theme="dark"] .challenge-count{color:#9ca3af}
+[data-theme="dark"] .challenges-complete-bonus{background:linear-gradient(135deg,#78350f,#92400e);color:#fde68a}
+
 #bankList{display:grid;grid-template-columns:1fr;gap:16px;width:100%}
 .bank-card{background:var(--white);border:1px solid var(--gray-200);border-radius:8px;padding:20px;box-shadow:var(--shadow);transition:box-shadow .2s ease;height:100%;display:flex;flex-direction:column}
 .bank-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.15)}
@@ -1741,6 +1770,7 @@ button:focus-visible {
                 </summary>
                 <div id="streakBanner"></div>
                 <div id="dailyGoalCard"></div>
+                <div id="dailyChallengesCard"></div>
                 <div id="xpBarContainer"></div>
             </div>
 
@@ -7899,6 +7929,7 @@ const Garden = {
         }
 
         state.garden.totalHarvests = (state.garden.totalHarvests || 0) + 1;
+        DailyChallenges.trackHarvest();
 
         // Rare seed drop chance on harvest
         const dropChance = this.getRareSeedDropChance(state, plot.seedType);
@@ -8024,6 +8055,7 @@ const Garden = {
         }
         state.garden.lastGrowthTick = Date.now();
         Gamification.saveState(state);
+        DailyChallenges.trackWater();
         this.render();
         this.flashWaterMeter();
     },
@@ -8568,6 +8600,7 @@ const PetModal = {
         Gamification.saveState(state);
         SoundFX.play('petFeed');
         Gamification.updateBuddyWidget();
+        DailyChallenges.trackFeed();
 
         // Check achievements
         if (state.studyBuddy.totalMealsEaten >= 50) Gamification.unlockAchievement('happy_tummy');
@@ -9024,6 +9057,214 @@ const Session = {
 };
 
 // =====================================================================
+// DAILY CHALLENGES SYSTEM
+// =====================================================================
+const DailyChallenges = {
+    CHALLENGE_TYPES: [
+        { id: 'speed_demon', name: 'Speed Demon', desc: 'Answer 5 questions in under 30 seconds each', icon: '⚡', target: 5, reward: { coins: 50, xp: 100 } },
+        { id: 'perfect_run', name: 'Perfect Run', desc: 'Get 10 questions correct in a row', icon: '🎯', target: 10, reward: { coins: 75, xp: 150 } },
+        { id: 'marathon', name: 'Marathon', desc: 'Complete 25 questions today', icon: '🏃', target: 25, reward: { coins: 100, xp: 200 } },
+        { id: 'drill_master', name: 'Drill Master', desc: 'Complete 15 drill questions', icon: '🔨', target: 15, reward: { coins: 60, xp: 120 } },
+        { id: 'garden_tender', name: 'Garden Tender', desc: 'Water plants 5 times', icon: '💧', target: 5, reward: { coins: 40, xp: 80 } },
+        { id: 'harvest_fest', name: 'Harvest Festival', desc: 'Harvest 3 crops', icon: '🌾', target: 3, reward: { coins: 80, xp: 160 } },
+        { id: 'pet_lover', name: 'Pet Lover', desc: 'Feed your pet 3 times', icon: '🐾', target: 3, reward: { coins: 30, xp: 60 } },
+        { id: 'combo_king', name: 'Combo King', desc: 'Reach a 5x combo', icon: '🔥', target: 5, reward: { coins: 60, xp: 120 } },
+        { id: 'night_owl', name: 'Night Owl', desc: 'Study after 9 PM', icon: '🦉', target: 1, reward: { coins: 40, xp: 80 } },
+        { id: 'early_bird', name: 'Early Bird', desc: 'Study before 8 AM', icon: '🐦', target: 1, reward: { coins: 40, xp: 80 } },
+        { id: 'explorer', name: 'Explorer', desc: 'Try 3 different question banks', icon: '🗺️', target: 3, reward: { coins: 50, xp: 100 } },
+        { id: 'ai_chat', name: 'AI Scholar', desc: 'Ask the AI tutor 3 questions', icon: '🤖', target: 3, reward: { coins: 45, xp: 90 } }
+    ],
+    
+    getTodayStr() { 
+        const d = new Date(); 
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); 
+    },
+    
+    getState() {
+        return Store.get('dailyChallenges', { 
+            date: null, 
+            challenges: [], 
+            completed: [] 
+        });
+    },
+    
+    saveState(state) {
+        Store.set('dailyChallenges', state);
+    },
+    
+    generateDailyChallenges() {
+        const today = this.getTodayStr();
+        let state = this.getState();
+        
+        if (state.date === today && state.challenges.length > 0) {
+            return state.challenges;
+        }
+        
+        // Generate 3 random challenges for today using date as seed
+        const seed = parseInt(today.replace(/-/g, ''));
+        const shuffled = [...this.CHALLENGE_TYPES].sort((a, b) => {
+            const hashA = (seed * 31 + a.id.charCodeAt(0)) % 1000;
+            const hashB = (seed * 31 + b.id.charCodeAt(0)) % 1000;
+            return hashA - hashB;
+        });
+        
+        const selected = shuffled.slice(0, 3).map(c => ({
+            ...c,
+            progress: 0,
+            completed: false
+        }));
+        
+        state = { date: today, challenges: selected, completed: [] };
+        this.saveState(state);
+        return selected;
+    },
+    
+    updateProgress(challengeId, amount = 1) {
+        let state = this.getState();
+        const today = this.getTodayStr();
+        
+        if (state.date !== today) {
+            this.generateDailyChallenges();
+            state = this.getState();
+        }
+        
+        const challenge = state.challenges.find(c => c.id === challengeId);
+        if (!challenge || challenge.completed) return false;
+        
+        challenge.progress = Math.min(challenge.progress + amount, challenge.target);
+        
+        if (challenge.progress >= challenge.target && !challenge.completed) {
+            challenge.completed = true;
+            state.completed.push(challengeId);
+            
+            // Award rewards
+            const template = this.CHALLENGE_TYPES.find(t => t.id === challengeId);
+            if (template) {
+                Gamification.awardCoins(template.reward.coins, 'challenge');
+                Gamification.awardXp('challenge', { multiplier: template.reward.xp / 25 });
+                Gamification.triggerConfetti();
+                
+                // Show toast
+                const toast = document.createElement('div');
+                toast.className = 'achievement-toast';
+                toast.innerHTML = `<span style="font-size:28px">${template.icon}</span><div><strong>Challenge Complete!</strong><br><small>${template.name} - +${template.reward.coins} coins</small></div>`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 4000);
+            }
+            
+            this.saveState(state);
+            this.render();
+            return true;
+        }
+        
+        this.saveState(state);
+        return false;
+    },
+    
+    // Track various actions
+    trackQuestion(isCorrect, timeMs) {
+        if (isCorrect && timeMs < 30000) {
+            this.updateProgress('speed_demon');
+        }
+        this.updateProgress('marathon');
+        
+        const hour = new Date().getHours();
+        if (hour >= 21) this.updateProgress('night_owl');
+        if (hour < 8) this.updateProgress('early_bird');
+    },
+    
+    trackDrill() {
+        this.updateProgress('drill_master');
+    },
+    
+    trackCombo(combo) {
+        let state = this.getState();
+        const challenge = state.challenges.find(c => c.id === 'combo_king');
+        if (challenge && !challenge.completed && combo >= challenge.target) {
+            challenge.progress = challenge.target;
+            this.updateProgress('combo_king', 0);
+        }
+    },
+    
+    trackStreak(streak) {
+        let state = this.getState();
+        const challenge = state.challenges.find(c => c.id === 'perfect_run');
+        if (challenge && !challenge.completed) {
+            challenge.progress = Math.max(challenge.progress, streak);
+            if (streak >= challenge.target) {
+                this.updateProgress('perfect_run', 0);
+            } else {
+                this.saveState(state);
+            }
+        }
+    },
+    
+    trackWater() { this.updateProgress('garden_tender'); },
+    trackHarvest() { this.updateProgress('harvest_fest'); },
+    trackFeed() { this.updateProgress('pet_lover'); },
+    trackBank(bankId) {
+        let state = this.getState();
+        if (!state.banksUsed) state.banksUsed = [];
+        if (!state.banksUsed.includes(bankId)) {
+            state.banksUsed.push(bankId);
+            this.saveState(state);
+            this.updateProgress('explorer');
+        }
+    },
+    trackAIChat() { this.updateProgress('ai_chat'); },
+    
+    render() {
+        const container = document.getElementById('dailyChallengesCard');
+        if (!container) return;
+        
+        const challenges = this.generateDailyChallenges();
+        const allComplete = challenges.every(c => c.completed);
+        
+        let html = `
+            <div class="daily-challenges-card">
+                <h3>🎮 Daily Challenges <span class="challenges-reset">Resets at midnight</span></h3>
+                <div class="challenges-list">
+        `;
+        
+        challenges.forEach(c => {
+            const pct = Math.round((c.progress / c.target) * 100);
+            html += `
+                <div class="challenge-item ${c.completed ? 'completed' : ''}">
+                    <span class="challenge-icon">${c.icon}</span>
+                    <div class="challenge-info">
+                        <div class="challenge-name">${c.name}</div>
+                        <div class="challenge-desc">${c.desc}</div>
+                        <div class="challenge-progress-bar">
+                            <div class="challenge-progress-fill" style="width:${pct}%"></div>
+                        </div>
+                    </div>
+                    <div class="challenge-status">
+                        ${c.completed ? '✅' : `<span class="challenge-count">${c.progress}/${c.target}</span>`}
+                    </div>
+                </div>
+            `;
+        });
+        
+        if (allComplete) {
+            html += `<div class="challenges-complete-bonus">🎉 All challenges complete! +50 bonus coins</div>`;
+        }
+        
+        html += `</div></div>`;
+        container.innerHTML = html;
+        
+        // Award bonus for completing all
+        if (allComplete) {
+            let state = this.getState();
+            if (!state.bonusAwarded) {
+                state.bonusAwarded = true;
+                this.saveState(state);
+                Gamification.awardCoins(50, 'allChallenges');
+            }
+        }
+    }
+};
+
+// =====================================================================
 // STREAK & DAILY GOAL SYSTEM
 // =====================================================================
 const DailyGoal = {
@@ -9145,6 +9386,7 @@ const Home = {
     render() {
         DailyGoal.renderStreakBanner();
         DailyGoal.renderDailyGoalCard();
+        DailyChallenges.render();
         this.updateMetaSummary();
         this.renderStats();
         this.renderBanks();
@@ -9481,6 +9723,7 @@ const App = {
         if (!this.bank) return;
         this._reviewFilter = null;
         Session.start(); // Start session timer
+        DailyChallenges.trackBank(bankId);
 
         this.sessionMeta = this._getDefaultSessionMeta();
 
@@ -9807,6 +10050,8 @@ const App = {
         if (isCorrect) Garden.grow(1);
 
         DailyGoal.recordQuestion();
+        DailyChallenges.trackQuestion(isCorrect, timeSpent);
+        if (isCorrect) DailyChallenges.trackStreak(Gamification.getState().combo || 0);
         QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeSpent);
         this.renderQuestion();
         SessionState.save();
@@ -10308,6 +10553,7 @@ const Drill = {
         if (!this.bank) return;
         this._focusQIds = focusQIds || null;
         Session.start(); // Start session timer
+        DailyChallenges.trackBank(bankId);
         this.sessionCount = 0;
         this.sessionCorrect = 0;
         this.buildQueue();
@@ -10502,6 +10748,9 @@ const Drill = {
 
         // Record question for daily goal
         DailyGoal.recordQuestion();
+        DailyChallenges.trackQuestion(isCorrect, timeSpent);
+        DailyChallenges.trackDrill();
+        if (isCorrect) DailyChallenges.trackStreak(stats.drillStreak || 0);
 
         // Track per-question performance (AFTER firstTry check above)
         QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeSpent);
@@ -11177,6 +11426,8 @@ const SpeedMode = {
         QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeUsed * 1000);
         Gamification.updateCategoryMastery(q.category || 'General', isCorrect);
         DailyGoal.recordQuestion();
+        DailyChallenges.trackQuestion(isCorrect, timeUsed * 1000);
+        if (isCorrect) DailyChallenges.trackStreak(Gamification.getState().combo || 0);
 
         this.updateDisplay();
 
@@ -11953,6 +12204,8 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
 
         // Record question for daily goal
         DailyGoal.recordQuestion();
+        DailyChallenges.trackQuestion(isCorrect, timeSpent);
+        if (isCorrect) DailyChallenges.trackStreak(Gamification.getState().combo || 0);
 
         // Track per-question performance
         QuestionTracker.recordSingle(
@@ -13933,6 +14186,7 @@ const Chat = {
         const text = input.value.trim();
         if (!text) return;
         input.value = '';
+        DailyChallenges.trackAIChat();
 
         if (!navigator.onLine) {
             this.addMessage('system', 'You are offline. Chat requires an internet connection.');
@@ -15888,7 +16142,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.57</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.58</div>
 
 </body>
 </html>
