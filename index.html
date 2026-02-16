@@ -2819,7 +2819,8 @@ const Gamification = {
     },
 
     // Multiplier to make pet decay more visible during short sessions (1 = real time)
-    PET_DECAY_TIMESCALE: 3,
+    // Lowered from 3 to 1 for more realistic survival times
+    PET_DECAY_TIMESCALE: 1,
 
     getDefaultState() {
         return {
@@ -3530,7 +3531,8 @@ const Gamification = {
         const el = document.getElementById('studyBuddy');
         if (!el) return;
 
-        if (!state.settings.pet) {
+        // Hide if pet setting disabled, pet is dead, or no pets exist
+        if (!state.settings.pet || state.studyBuddy.dead || (state.pets || []).length === 0) {
             el.classList.remove('active');
             return;
         }
@@ -7662,8 +7664,10 @@ const Garden = {
             const hungerReduction = 1 - allDecayReduction;
             const happyReduction = 1 - Math.max(comfortReduction, allDecayReduction);
 
-            let hungerDecay = scaledHours * 12 * decayRate * hungerReduction;
-            let happyDecay = scaledHours * 8 * decayRate * happyReduction;
+            // Base decay: ~4% per hour = ~24h to starve for easy pets, faster for harder species
+            // With decayRate multiplier, harder species decay faster
+            let hungerDecay = scaledHours * 4 * decayRate * hungerReduction;
+            let happyDecay = scaledHours * 2.5 * decayRate * happyReduction;
             
             // Auto-feed from food bowl while away
             if (petCare.foodBowl.level > 0 && pet.hunger < 50) {
@@ -7772,9 +7776,16 @@ const Garden = {
                 });
             });
             
-            // Adjust active pet index
+            // Adjust active pet index and update studyBuddy
             if (state.activePetIdx >= pets.length) {
                 state.activePetIdx = Math.max(0, pets.length - 1);
+            }
+            // Update studyBuddy to point to new active pet (or clear if no pets)
+            if (pets.length > 0) {
+                state.studyBuddy = pets[state.activePetIdx];
+            } else {
+                // No pets left - hide the buddy widget
+                state.studyBuddy = { ...Gamification.getDefaultState().studyBuddy, dead: true };
             }
             anyChanged = true;
         }
@@ -14926,7 +14937,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.44</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.53</div>
 
 </body>
 </html>
