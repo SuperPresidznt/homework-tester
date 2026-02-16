@@ -11040,16 +11040,69 @@ const Drill = {
         const scored = questions.map(q => {
             const p = this.getProgress(q.id);
             let priority = 0;
-            if (this._focusQIds) priority = 3; // forced focus mode — all high priority
-            else if (p.nextReview && p.nextReview <= now) priority = 3;
-            else if (p.reps === 0) priority = 2;
-            else if (p.ef < 2.0) priority = 1;
-            else priority = 0;
-            return { question: q, progress: p, priority };
+            if (this._focusQIds) {
+                priority = 3; // forced focus mode — all high priority
+            } else if (p.nextReview && p.nextReview > now) {
+                // Not due yet - skip unless it's struggling
+                priority = p.ef < 1.8 ? 1 : 0;
+            } else if (p.reps >= 5 && p.ef >= 2.5) {
+                // Well-mastered (5+ correct reviews, good ease) - very low priority
+                priority = 0;
+            } else if (p.nextReview && p.nextReview <= now) {
+                // Due for review
+                priority = 3;
+            } else if (p.reps === 0) {
+                // Never seen
+                priority = 2;
+            } else if (p.ef < 2.0) {
+                // Struggling
+                priority = 2;
+            } else {
+                // Seen but not mastered
+                priority = 1;
+            }
+            // Add random factor for variety within same priority
+            const randomFactor = Math.random();
+            return { question: q, progress: p, priority, randomFactor };
         }).filter(s => s.priority > 0)
-          .sort((a, b) => b.priority - a.priority || a.progress.ef - b.progress.ef);
+          .sort((a, b) => {
+              // Sort by priority first, then by ease (lower = harder), then random
+              if (b.priority !== a.priority) return b.priority - a.priority;
+              if (a.progress.ef !== b.progress.ef) return a.progress.ef - b.progress.ef;
+              return a.randomFactor - b.randomFactor;
+          });
 
-        this.queue = scored.slice(0, this.SESSION_LIMIT);
+        // Shuffle within each priority group for variety
+        const shuffled = [];
+        let currentPriority = null;
+        let currentGroup = [];
+        for (const item of scored) {
+            if (currentPriority !== item.priority) {
+                if (currentGroup.length > 0) {
+                    // Shuffle the group before adding
+                    for (let i = currentGroup.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [currentGroup[i], currentGroup[j]] = [currentGroup[j], currentGroup[i]];
+                    }
+                    shuffled.push(...currentGroup);
+                }
+                currentGroup = [item];
+                currentPriority = item.priority;
+            } else {
+                currentGroup.push(item);
+            }
+        }
+        // Don't forget the last group
+        if (currentGroup.length > 0) {
+            for (let i = currentGroup.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [currentGroup[i], currentGroup[j]] = [currentGroup[j], currentGroup[i]];
+            }
+            shuffled.push(...currentGroup);
+        }
+
+        this.queue = shuffled.slice(0, this.SESSION_LIMIT);
+        console.log('[Drill] Queue built:', this.queue.length, 'questions. Priorities:', this.queue.map(q => q.priority).join(','));
     },
 
     nextCard() {
@@ -16896,7 +16949,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.75</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.76</div>
 
 </body>
 </html>
