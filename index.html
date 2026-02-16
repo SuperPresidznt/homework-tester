@@ -3152,6 +3152,28 @@ const Gamification = {
                     st.pets = [st.studyBuddy];
                     st.activePetIdx = 0;
                 } else {
+                    // Clean up duplicate pets by name
+                    const seenNames = new Set();
+                    st.pets = st.pets.filter(p => {
+                        if (!p || !p.name) return false;
+                        const key = p.name.toLowerCase();
+                        if (seenNames.has(key)) return false;
+                        seenNames.add(key);
+                        return true;
+                    });
+                    // Clean up graveyard duplicates too
+                    if (st.graveyard && st.graveyard.length > 0) {
+                        const graveSeen = new Set();
+                        st.graveyard = st.graveyard.filter(g => {
+                            if (!g || !g.name) return false;
+                            const key = g.name.toLowerCase();
+                            if (graveSeen.has(key)) return false;
+                            graveSeen.add(key);
+                            return true;
+                        });
+                    }
+                    // Ensure activePetIdx is valid
+                    if (st.activePetIdx >= st.pets.length) st.activePetIdx = 0;
                     // Load active pet into studyBuddy
                     const idx = st.activePetIdx || 0;
                     if (st.pets[idx]) st.studyBuddy = st.pets[idx];
@@ -16707,7 +16729,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.64</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.65</div>
 
 </body>
 </html>
