@@ -1099,6 +1099,41 @@ button:focus-visible {
 .garden-scene.water-low{filter:saturate(.6) brightness(.92)}
 .garden-scene.water-critical{filter:saturate(.35) brightness(.82)}
 
+/* Garden Stats Bar */
+.garden-stats-bar{position:relative;z-index:3;display:flex;justify-content:center;gap:12px;padding:6px 12px;background:rgba(0,0,0,.25);backdrop-filter:blur(4px);border-radius:8px;margin:8px 12px 0;font-size:12px}
+.garden-stat{display:flex;align-items:center;gap:4px;padding:4px 10px;background:rgba(255,255,255,.15);border-radius:6px;color:#fff;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.garden-stat.bonus-active{background:rgba(74,222,128,.3);color:#4ade80}
+
+/* Weather animations */
+.garden-weather{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none;z-index:0}
+.garden-weather.rainy::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(transparent 0%,rgba(100,149,237,.15) 100%);animation:rainFall 0.5s linear infinite}
+.garden-weather.stormy::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(transparent 0%,rgba(50,50,80,.25) 100%);animation:stormFlash 3s ease-in-out infinite}
+.garden-weather.sunny::after{content:'';position:absolute;top:10px;right:10px;width:60px;height:60px;background:radial-gradient(circle,rgba(255,200,0,.3) 0%,transparent 70%);border-radius:50%;animation:sunGlow 3s ease-in-out infinite}
+@keyframes rainFall{0%{background-position:0 0}100%{background-position:0 20px}}
+@keyframes stormFlash{0%,90%,100%{opacity:1}92%,94%{opacity:.7}}
+@keyframes sunGlow{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.1);opacity:1}}
+
+/* Garden Info Panel */
+.garden-info-panel{display:flex;justify-content:space-around;padding:12px 16px;background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(59,130,246,.1));border-radius:12px;margin:12px 0;border:1px solid rgba(74,222,128,.2)}
+.garden-info-row{display:flex;flex-direction:column;align-items:center;gap:2px}
+.garden-info-label{font-size:11px;color:var(--gray-500);font-weight:500}
+.garden-info-value{font-size:16px;font-weight:700;color:var(--green)}
+
+/* Companion planting glow */
+.garden-plot.companion-bonus{box-shadow:inset 0 2px 6px rgba(0,0,0,.3),0 0 12px rgba(74,222,128,.4)}
+.garden-plot.companion-bonus::after{content:'🌿';position:absolute;top:-8px;right:-8px;font-size:14px;animation:pulse 2s infinite}
+
+/* In-season glow */
+.garden-plot.in-season{border-color:#fbbf24;box-shadow:inset 0 2px 6px rgba(0,0,0,.3),0 0 8px rgba(251,191,36,.5)}
+.plot-season-badge{position:absolute;top:-6px;left:-6px;font-size:16px;animation:pulse 1.5s infinite}
+.plot-bonus-tag{position:absolute;bottom:4px;right:4px;background:linear-gradient(135deg,#22c55e,#16a34a);color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+
+/* Season themes */
+.garden-scene.spring{background:linear-gradient(to bottom,#87CEEB 0%,#a8d8ea 28%,#7CCD7C 28%,#6ab84a 40%,#5a9e3a 100%)}
+.garden-scene.summer{background:linear-gradient(to bottom,#5BA8E8 0%,#87CEEB 28%,#8BC34A 28%,#7CB342 40%,#689F38 100%)}
+.garden-scene.autumn{background:linear-gradient(to bottom,#B8860B 0%,#DAA520 28%,#CD853F 28%,#A0522D 40%,#8B4513 100%)}
+.garden-scene.winter{background:linear-gradient(to bottom,#B0C4DE 0%,#E0E8F0 28%,#F5F5F5 28%,#E8E8E8 40%,#D3D3D3 100%)}
+
 /* Seed Picker & Plot Info Modals */
 .garden-modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;z-index:5000;animation:fadeIn .2s}
 .garden-modal{background:var(--white);border-radius:16px;padding:24px;max-width:380px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.3);position:relative;max-height:80vh;overflow-y:auto}
@@ -1784,6 +1819,12 @@ button:focus-visible {
         <div class="garden-sky">
             <span class="garden-sky-sun" id="gardenSun">&#9728;&#65039;</span>
             <span class="garden-sky-stars">&#10024; &#11088; &#10024;</span>
+            <span class="garden-weather" id="gardenWeather"></span>
+        </div>
+        <div class="garden-stats-bar" id="gardenStatsBar">
+            <span class="garden-stat" id="gardenSeason" title="Current Season">🌸 Spring</span>
+            <span class="garden-stat" id="gardenWeatherStat" title="Weather Effect">☀️ Sunny</span>
+            <span class="garden-stat" id="gardenBonus" title="Growth Bonus">+0%</span>
         </div>
         <div class="garden-fence">&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;&#9596;</div>
         <div class="garden-ground">
@@ -1794,6 +1835,20 @@ button:focus-visible {
         <div class="garden-water-btn" id="gardenWaterBtn" onclick="Garden.useWater()" title="Use Watering Can">
             <span>&#x1FAA3;</span>
             <span class="water-count" id="gardenWaterCount">0</span>
+        </div>
+    </div>
+    <div class="garden-info-panel" id="gardenInfoPanel">
+        <div class="garden-info-row">
+            <span class="garden-info-label">🌱 Total Harvests:</span>
+            <span class="garden-info-value" id="gardenTotalHarvests">0</span>
+        </div>
+        <div class="garden-info-row">
+            <span class="garden-info-label">💰 Coin Bonus:</span>
+            <span class="garden-info-value" id="gardenCoinBonusDisplay">+0%</span>
+        </div>
+        <div class="garden-info-row">
+            <span class="garden-info-label">🌿 Companion Bonus:</span>
+            <span class="garden-info-value" id="gardenCompanionBonus">+0%</span>
         </div>
     </div>
 </div>
@@ -2538,7 +2593,7 @@ const Gamification = {
         food:        { kibble: 1, treat: 3, feast: 7, goldfish: 12 },
         seeds:       { sunflower: 1, cactus: 3, bonsai: 7, crystal: 12, rainbow: 18, moneyTree: 20, starfruit: 15, dragonFruit: 18, moonflower: 12, goldenApple: 22, ancientOak: 25 },
         gardenItems: { water: 1, fertilizer: 5, magicDust: 10, evoStone: 5, healthPotion: 1, shieldCharm: 5, powerBerry: 3 },
-        decorations: { fountain: 5, gnome: 1, lantern: 3, bench: 1 },
+        decorations: { fountain: 5, gnome: 1, lantern: 3, bench: 1, statue: 10, windmill: 8, pond: 12, clover: 10, weatherVane: 6, scarecrow: 4 },
         cosmetics:   { hat: 3, crown: 10, scarf: 1, sunglasses: 3, cape: 7 }
     },
 
@@ -2764,7 +2819,10 @@ const Gamification = {
             bench:    { name: 'Garden Bench',  price: 40,  icon: '🪑', desc: 'Decorative' },
             statue:   { name: 'Scholar Statue', price: 200, icon: '🗿', desc: '+2% XP bonus', xpBonus: 0.02 },
             windmill: { name: 'Windmill',      price: 150, icon: '🎡', desc: 'Decorative, animated' },
-            pond:     { name: 'Koi Pond',      price: 250, icon: '🐠', desc: '+1 coin per correct answer', coinBonus: 1 }
+            pond:     { name: 'Koi Pond',      price: 250, icon: '🐠', desc: '+1 coin per correct answer', coinBonus: 1 },
+            clover:   { name: 'Lucky Clover',  price: 175, icon: '🍀', desc: '+25% rare seed drop chance', effect: 'luckyDrop' },
+            weatherVane: { name: 'Weather Vane', price: 120, icon: '🐓', desc: 'Shows weather forecast', effect: 'weatherInfo' },
+            scarecrow: { name: 'Scarecrow',   price: 90,  icon: '🎃', desc: 'Protects crops from disasters', effect: 'protection' }
         },
         cosmetics: {
             hat:        { name: 'Hat',        price: 50,  icon: '🎩' },
@@ -7285,6 +7343,121 @@ const Battle = {
 const Garden = {
     _meterPulseTimer: null,
     _waterPromptEl: null,
+    
+    // Weather system
+    WEATHER_TYPES: {
+        sunny:  { name: 'Sunny',  icon: '☀️', growthMod: 1.0, waterDecay: 1.2, desc: 'Normal growth' },
+        cloudy: { name: 'Cloudy', icon: '☁️', growthMod: 0.9, waterDecay: 0.8, desc: 'Slower growth, less water loss' },
+        rainy:  { name: 'Rainy',  icon: '🌧️', growthMod: 1.2, waterDecay: 0.3, desc: '+20% growth, minimal water loss' },
+        stormy: { name: 'Stormy', icon: '⛈️', growthMod: 0.7, waterDecay: 0.2, desc: 'Slower growth, but free water!' },
+        windy:  { name: 'Windy',  icon: '💨', growthMod: 1.1, waterDecay: 1.5, desc: '+10% growth, faster water loss' },
+        hot:    { name: 'Hot',    icon: '🔥', growthMod: 1.3, waterDecay: 2.0, desc: '+30% growth, 2x water loss' }
+    },
+    
+    // Seasons affect which seeds grow better
+    SEASONS: {
+        spring: { name: 'Spring', icon: '🌸', bonusSeeds: ['sunflower', 'rainbow', 'moonflower'], growthMod: 1.1 },
+        summer: { name: 'Summer', icon: '☀️', bonusSeeds: ['cactus', 'dragonFruit', 'starfruit'], growthMod: 1.2 },
+        autumn: { name: 'Autumn', icon: '🍂', bonusSeeds: ['bonsai', 'goldenApple', 'moneyTree'], growthMod: 1.0 },
+        winter: { name: 'Winter', icon: '❄️', bonusSeeds: ['crystal', 'ancientOak'], growthMod: 0.8 }
+    },
+    
+    // Companion planting bonuses (adjacent seeds boost each other)
+    COMPANIONS: {
+        sunflower: ['cactus', 'rainbow'],      // Sunflower helps cactus and rainbow
+        cactus: ['sunflower', 'dragonFruit'],
+        bonsai: ['crystal', 'ancientOak'],
+        crystal: ['bonsai', 'moonflower'],
+        rainbow: ['sunflower', 'starfruit'],
+        moneyTree: ['goldenApple', 'ancientOak'],
+        starfruit: ['rainbow', 'moonflower'],
+        dragonFruit: ['cactus', 'goldenApple'],
+        moonflower: ['crystal', 'starfruit'],
+        goldenApple: ['moneyTree', 'dragonFruit'],
+        ancientOak: ['bonsai', 'moneyTree']
+    },
+    
+    getCurrentSeason() {
+        const month = new Date().getMonth();
+        if (month >= 2 && month <= 4) return 'spring';
+        if (month >= 5 && month <= 7) return 'summer';
+        if (month >= 8 && month <= 10) return 'autumn';
+        return 'winter';
+    },
+    
+    getCurrentWeather(state) {
+        // Weather changes every 2 hours based on a seed
+        const now = Date.now();
+        const weatherSeed = Math.floor(now / (2 * 60 * 60 * 1000));
+        const weatherKeys = Object.keys(this.WEATHER_TYPES);
+        const idx = weatherSeed % weatherKeys.length;
+        return weatherKeys[idx];
+    },
+    
+    getCompanionBonus(state, plotIdx) {
+        const plots = state.garden.plots || [];
+        const plot = plots[plotIdx];
+        if (!plot || !plot.seedType) return 0;
+        
+        const companions = this.COMPANIONS[plot.seedType] || [];
+        if (companions.length === 0) return 0;
+        
+        // Check adjacent plots (3x3 grid)
+        const adjacentIdxs = this.getAdjacentPlots(plotIdx);
+        let bonus = 0;
+        
+        adjacentIdxs.forEach(adjIdx => {
+            const adjPlot = plots[adjIdx];
+            if (adjPlot && adjPlot.seedType && companions.includes(adjPlot.seedType)) {
+                bonus += 0.15; // +15% per companion
+            }
+        });
+        
+        return Math.min(bonus, 0.45); // Cap at 45%
+    },
+    
+    getAdjacentPlots(idx) {
+        // 3x3 grid adjacency
+        const row = Math.floor(idx / 3);
+        const col = idx % 3;
+        const adjacent = [];
+        
+        for (let r = row - 1; r <= row + 1; r++) {
+            for (let c = col - 1; c <= col + 1; c++) {
+                if (r >= 0 && r < 3 && c >= 0 && c < 3 && !(r === row && c === col)) {
+                    adjacent.push(r * 3 + c);
+                }
+            }
+        }
+        return adjacent;
+    },
+    
+    getTotalGrowthBonus(state, plotIdx) {
+        const season = this.getCurrentSeason();
+        const weather = this.getCurrentWeather(state);
+        const seasonData = this.SEASONS[season];
+        const weatherData = this.WEATHER_TYPES[weather];
+        const plot = (state.garden.plots || [])[plotIdx];
+        
+        let bonus = 1.0;
+        
+        // Season modifier
+        bonus *= seasonData.growthMod;
+        
+        // Weather modifier
+        bonus *= weatherData.growthMod;
+        
+        // Season bonus for specific seeds
+        if (plot && plot.seedType && seasonData.bonusSeeds.includes(plot.seedType)) {
+            bonus *= 1.25; // +25% for in-season seeds
+        }
+        
+        // Companion bonus
+        bonus *= (1 + this.getCompanionBonus(state, plotIdx));
+        
+        return bonus;
+    },
+    
     show() {
         this.render();
         showScreen('garden');
@@ -7303,7 +7476,22 @@ const Garden = {
         if (scene) {
             scene.classList.toggle('water-low', water > 0 && water < 25);
             scene.classList.toggle('water-critical', water <= 0);
+            
+            // Apply season theme
+            const season = this.getCurrentSeason();
+            scene.classList.remove('spring', 'summer', 'autumn', 'winter');
+            scene.classList.add(season);
+            
+            // Apply weather effect
+            const weather = this.getCurrentWeather(state);
+            const weatherEl = document.getElementById('gardenWeather');
+            if (weatherEl) {
+                weatherEl.className = 'garden-weather ' + weather;
+            }
         }
+        
+        // Update stats bar
+        this.updateStatsBar(state);
 
         this.updateWaterMeter(state);
 
@@ -7319,6 +7507,130 @@ const Garden = {
         this.renderGrid(state);
         this.renderDecos(state);
         this.renderPet(state);
+        this.renderInfoPanel(state);
+    },
+    
+    updateStatsBar(state) {
+        const season = this.getCurrentSeason();
+        const weather = this.getCurrentWeather(state);
+        const seasonData = this.SEASONS[season];
+        const weatherData = this.WEATHER_TYPES[weather];
+        
+        // Calculate average growth bonus across all planted plots
+        const plots = state.garden.plots || [];
+        let totalBonus = 0;
+        let plantedCount = 0;
+        plots.forEach((plot, idx) => {
+            if (plot && plot.seedType) {
+                totalBonus += this.getTotalGrowthBonus(state, idx);
+                plantedCount++;
+            }
+        });
+        const avgBonus = plantedCount > 0 ? totalBonus / plantedCount : 1;
+        
+        const seasonEl = document.getElementById('gardenSeason');
+        const weatherEl = document.getElementById('gardenWeatherStat');
+        const bonusEl = document.getElementById('gardenBonus');
+        
+        if (seasonEl) seasonEl.innerHTML = `${seasonData.icon} ${seasonData.name}`;
+        if (weatherEl) {
+            weatherEl.innerHTML = `${weatherData.icon} ${weatherData.name}`;
+            weatherEl.title = weatherData.desc;
+        }
+        if (bonusEl) {
+            const bonusPct = Math.round((avgBonus - 1) * 100);
+            bonusEl.textContent = bonusPct >= 0 ? `+${bonusPct}%` : `${bonusPct}%`;
+            bonusEl.classList.toggle('bonus-active', bonusPct > 0);
+        }
+    },
+    
+    renderInfoPanel(state) {
+        const harvestsEl = document.getElementById('gardenTotalHarvests');
+        const coinBonusEl = document.getElementById('gardenCoinBonusDisplay');
+        const companionEl = document.getElementById('gardenCompanionBonus');
+        
+        if (harvestsEl) harvestsEl.textContent = state.garden.totalHarvests || 0;
+        if (coinBonusEl) {
+            const bonus = Math.round((state.gardenCoinBonus || 0) * 100);
+            coinBonusEl.textContent = `+${bonus}%`;
+        }
+        
+        // Calculate total companion bonus
+        if (companionEl) {
+            const plots = state.garden.plots || [];
+            let totalCompanion = 0;
+            plots.forEach((plot, idx) => {
+                if (plot && plot.seedType) {
+                    totalCompanion += this.getCompanionBonus(state, idx);
+                }
+            });
+            const avgCompanion = plots.filter(p => p && p.seedType).length > 0 
+                ? Math.round((totalCompanion / plots.filter(p => p && p.seedType).length) * 100) 
+                : 0;
+            companionEl.textContent = `+${avgCompanion}%`;
+        }
+    },
+    
+    // Rare seed drop system
+    RARE_SEED_TIERS: {
+        common: ['sunflower', 'cactus'],
+        uncommon: ['bonsai', 'moonflower'],
+        rare: ['crystal', 'starfruit', 'dragonFruit'],
+        epic: ['rainbow', 'goldenApple'],
+        legendary: ['moneyTree', 'ancientOak']
+    },
+    
+    getRareSeedDropChance(state, harvestedSeed) {
+        // Base drop chance depends on what you harvested
+        const seedData = Gamification.SHOP.seeds[harvestedSeed];
+        let baseChance = 0.05; // 5% base
+        
+        // Higher tier seeds have better drop chances
+        if (this.RARE_SEED_TIERS.uncommon.includes(harvestedSeed)) baseChance = 0.08;
+        if (this.RARE_SEED_TIERS.rare.includes(harvestedSeed)) baseChance = 0.12;
+        if (this.RARE_SEED_TIERS.epic.includes(harvestedSeed)) baseChance = 0.15;
+        if (this.RARE_SEED_TIERS.legendary.includes(harvestedSeed)) baseChance = 0.20;
+        
+        // Season bonus
+        const season = this.getCurrentSeason();
+        const seasonData = this.SEASONS[season];
+        if (seasonData.bonusSeeds.includes(harvestedSeed)) {
+            baseChance *= 1.5; // +50% in season
+        }
+        
+        // Lucky clover decoration bonus
+        if ((state.garden.decorations || []).includes('clover')) {
+            baseChance *= 1.25;
+        }
+        
+        return Math.min(baseChance, 0.35); // Cap at 35%
+    },
+    
+    rollRareSeedDrop(state) {
+        const level = state.level || 1;
+        const roll = Math.random();
+        
+        // Weighted roll based on player level
+        let tier;
+        if (roll < 0.50) tier = 'common';
+        else if (roll < 0.75) tier = 'uncommon';
+        else if (roll < 0.90) tier = 'rare';
+        else if (roll < 0.97) tier = 'epic';
+        else tier = 'legendary';
+        
+        // Can only get seeds you've unlocked or are close to unlocking
+        const tierSeeds = this.RARE_SEED_TIERS[tier];
+        const availableSeeds = tierSeeds.filter(seedId => {
+            const req = Gamification.LEVEL_REQS.seeds[seedId] || 1;
+            return level >= req - 3; // Can get seeds up to 3 levels ahead
+        });
+        
+        if (availableSeeds.length === 0) {
+            // Fall back to common
+            return this.RARE_SEED_TIERS.common[Math.floor(Math.random() * this.RARE_SEED_TIERS.common.length)];
+        }
+        
+        return availableSeeds[Math.floor(Math.random() * availableSeeds.length)];
     },
 
     renderGrid(state) {
@@ -7326,6 +7638,8 @@ const Garden = {
         const plots = state.garden.plots || [];
         const unlocked = state.garden.unlockedPlots || 3;
         const outOfWater = (state.inventory.gardenItems.water || 0) <= 0;
+        const season = this.getCurrentSeason();
+        const seasonData = this.SEASONS[season];
         let html = '';
 
         for (let i = 0; i < 9; i++) {
@@ -7341,12 +7655,20 @@ const Garden = {
                 if (!seed) { html += `<div class="garden-plot empty"></div>`; continue; }
                 const stageIdx = Math.min(plot.currentStage || 0, seed.emojis.length - 1);
                 const isReady = plot.currentStage >= seed.stages - 1;
-                html += `<div class="garden-plot planted${isReady ? ' harvestable' : ''}" onclick="${isReady ? `Garden.harvest(${i})` : `Garden.showPlotInfoModal(${i})`}">
+                const companionBonus = this.getCompanionBonus(state, i);
+                const hasCompanion = companionBonus > 0;
+                const inSeason = seasonData.bonusSeeds.includes(plot.seedType);
+                const growthBonus = this.getTotalGrowthBonus(state, i);
+                const bonusPct = Math.round((growthBonus - 1) * 100);
+                
+                html += `<div class="garden-plot planted${isReady ? ' harvestable' : ''}${hasCompanion ? ' companion-bonus' : ''}${inSeason ? ' in-season' : ''}" onclick="${isReady ? `Garden.harvest(${i})` : `Garden.showPlotInfoModal(${i})`}">
                     <span class="plot-plant${isReady ? ' glow-bounce' : ''}">${Sprites.plantSprite(plot.seedType, stageIdx, seed.emojis[stageIdx], 40)}</span>
                     ${!isReady ? `<div class="plot-progress-bar"><div class="plot-progress-fill" style="width:${Math.floor(((plot.growthPoints || 0) / seed.gpNeeded) * 100)}%"></div></div>` : '<div class="plot-ready">\u2728 Harvest!</div>'}
                     <div class="plot-label">${seed.name}</div>
+                    ${bonusPct > 0 && !isReady ? `<div class="plot-bonus-tag">+${bonusPct}%</div>` : ''}
                     ${!isReady ? `<button class="plot-water-btn" ${outOfWater ? 'disabled' : ''} onclick="event.stopPropagation();Garden.waterPlot(${i})">\u{1F4A7} Water</button>` : ''}
                     ${plot.fertilized ? '<span class="plot-fertilized" title="Fertilized">\u{1F9EA}</span>' : ''}
+                    ${inSeason ? '<span class="plot-season-badge" title="In Season!">🌟</span>' : ''}
                 </div>`;
             }
         }
@@ -7575,6 +7897,22 @@ const Garden = {
 
         state.garden.totalHarvests = (state.garden.totalHarvests || 0) + 1;
 
+        // Rare seed drop chance on harvest
+        const dropChance = this.getRareSeedDropChance(state, plot.seedType);
+        if (Math.random() < dropChance) {
+            const droppedSeed = this.rollRareSeedDrop(state);
+            if (droppedSeed) {
+                state.inventory.seeds[droppedSeed] = (state.inventory.seeds[droppedSeed] || 0) + 1;
+                const seedData = Gamification.SHOP.seeds[droppedSeed];
+                Gamification.showAchievementToast({ 
+                    icon: seedData?.icon || '🌱', 
+                    name: 'Rare Seed Found!', 
+                    desc: `You found a ${seedData?.name || droppedSeed} seed!`, 
+                    xp: 0 
+                });
+            }
+        }
+
         // Clear the plot
         state.garden.plots[plotIdx] = null;
         Gamification.saveState(state);
@@ -7603,8 +7941,16 @@ const Garden = {
             state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 5);
         }
 
-        // Decay water slightly per question
-        state.garden.waterLevel = Math.max(0, (state.garden.waterLevel || 100) - 1);
+        // Decay water slightly per question (affected by weather)
+        const weather = this.getCurrentWeather(state);
+        const weatherData = this.WEATHER_TYPES[weather];
+        const waterDecay = Math.ceil(1 * (weatherData?.waterDecay || 1));
+        state.garden.waterLevel = Math.max(0, (state.garden.waterLevel || 100) - waterDecay);
+        
+        // Stormy weather adds free water
+        if (weather === 'stormy') {
+            state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 3);
+        }
 
         const plots = state.garden.plots || [];
         const now = Date.now();
@@ -7615,7 +7961,10 @@ const Garden = {
             if (!seed) continue;
             if ((plot.currentStage || 0) >= seed.stages - 1) continue; // Already ready
 
-            let gp = points;
+            // Apply growth bonus from weather, season, and companions
+            const growthBonus = this.getTotalGrowthBonus(state, i);
+            let gp = Math.ceil(points * growthBonus);
+            
             if (plot.fertilized && plot.fertilizedRemaining > 0) {
                 gp *= 2;
                 plot.fertilizedRemaining--;
@@ -7728,13 +8077,16 @@ const Garden = {
 
         let changed = false;
         const plots = state.garden.plots || [];
-        plots.forEach(plot => {
+        plots.forEach((plot, idx) => {
             if (!plot || !plot.seedType) return;
             const seed = Gamification.SHOP.seeds[plot.seedType];
             if (!seed) return;
             if ((plot.currentStage || 0) >= seed.stages - 1) return;
 
-            let gp = gpBonus;
+            // Apply growth bonus from weather, season, and companions
+            const growthBonus = this.getTotalGrowthBonus(state, idx);
+            let gp = gpBonus * growthBonus;
+            
             if (plot.fertilized && plot.fertilizedRemaining > 0) {
                 gp *= 2;
                 const fertDrain = Math.max(1, Math.round(gpBonus));
@@ -15072,7 +15424,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.54</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.55</div>
 
 </body>
 </html>
