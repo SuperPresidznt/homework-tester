@@ -12533,6 +12533,10 @@ CRITICAL RULES:
 - The question text must be neutral and not give away the answer
 - Only provide exactly 4 options (A, B, C, D) - never 5 options
 - Do NOT add any commentary, hints, or explanations outside the JSON
+- If the question references a table, chart, or data set, you MUST include the ACTUAL DATA in the question text
+- NEVER say "the table below shows" or "see the graph" without including the actual values
+- Format tables as plain text with clear labels, e.g.: "Month 1: R=$5000, E=$3000 | Month 2: R=$6000, E=$3500 | ..."
+- All information needed to solve the problem MUST be in the question text itself
 
 You MUST respond with ONLY valid JSON in this EXACT format (no markdown, no extra text, no commentary before or after):
 {
@@ -16866,7 +16870,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.72</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.73</div>
 
 </body>
 </html>
