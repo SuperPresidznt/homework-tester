@@ -13182,6 +13182,11 @@ const Progress = {
         const trackerData = Store.get('questionTracker', {});
         const gamState = Gamification.getState();
         
+        // Safety check for BankManager
+        if (!BankManager || !BankManager.banks || BankManager.banks.length === 0) {
+            return insights;
+        }
+        
         let allHistory = [];
         for (const bank of BankManager.banks) {
             const history = Store.get('testHistory_' + bank.bankId, []);
@@ -13378,6 +13383,7 @@ const Progress = {
 
     _getStudyTimeScoreCorrelation() {
         const studyByDay = Store.get('studyByDay', {});
+        if (!BankManager || !BankManager.banks) return { data: [], correlation: 0 };
         let allHistory = [];
         for (const bank of BankManager.banks) {
             const history = Store.get('testHistory_' + bank.bankId, []);
@@ -13515,6 +13521,7 @@ const Progress = {
     _renderOverallTrend() {
         const el = document.getElementById('overallTrend');
         if (!el) return;
+        if (!BankManager || !BankManager.banks) return;
         
         // Calculate overall trend from recent tests
         let allHistory = [];
@@ -13686,13 +13693,14 @@ const Progress = {
     },
 
     renderGamificationStats() {
-        const gamState = Gamification.getState();
-        const globalStats = DailyGoal.getStats();
-        const aiTotal = globalStats.aiPracticeTotal || 0;
-        const aiCorrect = globalStats.aiPracticeCorrect || 0;
-        const aiPct = aiTotal > 0 ? Math.round((aiCorrect / aiTotal) * 100) : 0;
-        
-        return `<div class="progress-section">
+        try {
+            const gamState = Gamification.getState() || { level: 1, xp: 0, coins: 0, stats: {}, achievements: {} };
+            const globalStats = DailyGoal.getStats() || {};
+            const aiTotal = globalStats.aiPracticeTotal || 0;
+            const aiCorrect = globalStats.aiPracticeCorrect || 0;
+            const aiPct = aiTotal > 0 ? Math.round((aiCorrect / aiTotal) * 100) : 0;
+            
+            return `<div class="progress-section">
             <h3>🎮 Player Stats</h3>
             <div class="mastery-grid" style="grid-template-columns:repeat(auto-fit,minmax(100px,1fr))">
                 <div class="mastery-item mastered"><div class="value">Lv ${gamState.level}</div><div class="label">${gamState.currentTitle || 'Student'}</div></div>
@@ -13719,9 +13727,14 @@ const Progress = {
                     '<span style="font-size:12px;color:var(--gray-500)">No achievements yet</span>'}
             </div>
         </div>`;
+        } catch (err) {
+            console.error('[Progress] renderGamificationStats error:', err);
+            return '<div class="progress-section"><h3>🎮 Player Stats</h3><p style="color:var(--gray-500)">Error loading stats</p></div>';
+        }
     },
 
     renderScoreTrend() {
+        if (!BankManager || !BankManager.banks) return '';
         let allHistory = [];
         for (const bank of BankManager.banks) {
             const history = Store.get('testHistory_' + bank.bankId, []);
@@ -13738,6 +13751,7 @@ const Progress = {
     _drawTrendChart() {
         const canvas = document.getElementById('trendChart');
         if (!canvas) return;
+        if (!BankManager || !BankManager.banks) return;
         let allHistory = [];
         for (const bank of BankManager.banks) {
             const history = Store.get('testHistory_' + bank.bankId, []);
@@ -13889,6 +13903,7 @@ const Progress = {
     },
 
     renderTestHistory() {
+        if (!BankManager || !BankManager.banks) return '';
         let allHistory = [];
         for (const bank of BankManager.banks) {
             const history = Store.get('testHistory_' + bank.bankId, []);
@@ -13971,6 +13986,7 @@ const Progress = {
     },
 
     renderCategoryPerformance() {
+        if (!BankManager || !BankManager.banks) return '';
         const catStats = {};
         const drillData = Store.get('drillProgress', {});
         for (const bank of BankManager.banks) {
@@ -14000,6 +14016,7 @@ const Progress = {
     },
 
     renderMasteryProgress() {
+        if (!BankManager || !BankManager.banks) return '';
         const drillData = Store.get('drillProgress', {});
         let totalQ = 0;
         for (const bank of BankManager.banks) {
@@ -16870,7 +16887,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.73</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.74</div>
 
 </body>
 </html>
