@@ -159,6 +159,20 @@ button:active:not(:disabled){transform:scale(0.97)}
 .streak-mult{display:inline-block;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:6px;animation:streakGlow 2s ease-in-out infinite}
 .streak-next{font-size:10px;color:var(--gray-500);font-weight:normal}
 @keyframes streakGlow{0%,100%{box-shadow:0 0 4px rgba(251,191,36,.4)}50%{box-shadow:0 0 12px rgba(251,191,36,.8)}}
+
+/* === KEYBOARD SHORTCUTS HELP === */
+.shortcuts-help{padding:12px;background:var(--gray-50);border-radius:8px;margin-top:12px}
+.shortcuts-help h4{margin:0 0 10px;font-size:14px;color:var(--navy)}
+.shortcuts-section{margin-bottom:12px}
+.shortcuts-section strong{font-size:12px;color:var(--gray-600);display:block;margin-bottom:6px}
+.shortcuts-section ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px}
+.shortcuts-section li{font-size:12px;color:var(--gray-700);display:flex;align-items:center;gap:6px}
+.shortcuts-section kbd{display:inline-block;background:var(--white);border:1px solid var(--gray-300);border-radius:4px;padding:2px 6px;font-family:monospace;font-size:11px;color:var(--navy);box-shadow:0 1px 2px rgba(0,0,0,.1)}
+[data-theme="dark"] .shortcuts-help{background:#1f2937}
+[data-theme="dark"] .shortcuts-help h4{color:#93c5fd}
+[data-theme="dark"] .shortcuts-section strong{color:#9ca3af}
+[data-theme="dark"] .shortcuts-section li{color:#d1d5db}
+[data-theme="dark"] .shortcuts-section kbd{background:#374151;border-color:#4b5563;color:#e5e7eb}
 [data-theme="dark"] .daily-challenges-card h3{color:#93c5fd}
 [data-theme="dark"] .challenge-item{background:#1f2937;border-color:#374151}
 [data-theme="dark"] .challenge-item:hover{background:#1e3a5f;border-color:#60a5fa}
@@ -16002,45 +16016,160 @@ const QuestionTracker = {
 // =====================================================================
 // KEYBOARD SHORTCUTS
 // =====================================================================
-document.addEventListener('keydown', (e) => {
-    // Help modal shortcut (? key) works globally
-    if ((e.key === '?' || (e.shiftKey && e.key === '/')) && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-        document.getElementById('helpModal').classList.toggle('active');
-        return;
-    }
-    // Escape closes help modal
-    if (e.key === 'Escape' && document.getElementById('helpModal').classList.contains('active')) {
+const KeyboardShortcuts = {
+    enabled: true,
+    
+    SHORTCUTS: {
+        global: [
+            { key: '?', desc: 'Toggle help modal', action: () => document.getElementById('helpModal').classList.toggle('active') },
+            { key: 'c', desc: 'Toggle calculator', action: () => Calc.toggle() },
+            { key: 'Escape', desc: 'Close modals', action: () => KeyboardShortcuts.closeModals() },
+            { key: 'h', desc: 'Go to home screen', action: () => { showScreen('home'); Home.render(); } },
+            { key: 's', desc: 'Open settings', action: () => Settings.openModal() },
+            { key: 'g', desc: 'Open garden', action: () => showScreen('garden') },
+        ],
+        exam: [
+            { key: 'ArrowRight', alt: 'n', desc: 'Next question', action: () => App.next() },
+            { key: 'ArrowLeft', alt: 'p', desc: 'Previous question', action: () => App.prev() },
+            { key: 'b', desc: 'Toggle bookmark', action: () => App.toggleBookmark() },
+            { key: 't', desc: 'Toggle notes', action: () => Notes.toggle() },
+            { key: '1-4', desc: 'Select answer option', action: null },
+            { key: 'Enter', desc: 'Check answer (practice)', action: () => { if (App.mode === 'practice' && !App.practiceChecked[App.currentQ]) App.checkAnswer(); } },
+            { key: 'Space', desc: 'Pause/resume timer', action: () => App.toggleTimer() },
+            { key: 'f', desc: 'Toggle flag/bookmark', action: () => App.toggleBookmark() },
+            { key: 'q', desc: 'Toggle question palette', action: () => App.togglePalette() },
+        ],
+        drill: [
+            { key: 'Space', desc: 'Show answer', action: () => { if (!Drill.showingAnswer) Drill.showAnswer(); } },
+            { key: '1', desc: 'Rate: Again', action: () => { if (Drill.showingAnswer) Drill.rate(1); } },
+            { key: '2', desc: 'Rate: Hard', action: () => { if (Drill.showingAnswer) Drill.rate(2); } },
+            { key: '3', desc: 'Rate: Good', action: () => { if (Drill.showingAnswer) Drill.rate(3); } },
+            { key: '4', desc: 'Rate: Easy', action: () => { if (Drill.showingAnswer) Drill.rate(5); } },
+        ]
+    },
+
+    closeModals() {
         document.getElementById('helpModal').classList.remove('active');
-        return;
-    }
-    // Calculator shortcut works globally
-    if (e.key === 'c' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-        Calc.toggle();
-        return;
-    }
-    // Escape closes calculator
-    if (e.key === 'Escape' && Calc.isOpen) {
-        Calc.toggle();
-        return;
-    }
+        if (Calc.isOpen) Calc.toggle();
+        document.getElementById('settingsModal').style.display = 'none';
+        document.getElementById('qCountModal').style.display = 'none';
+    },
 
-    // Only in exam screen
-    if (!document.getElementById('screen-exam').classList.contains('active')) return;
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    getActiveScreen() {
+        if (document.getElementById('screen-exam').classList.contains('active')) return 'exam';
+        if (document.getElementById('screen-drill').classList.contains('active')) return 'drill';
+        if (document.getElementById('screen-home').classList.contains('active')) return 'home';
+        return 'other';
+    },
 
-    if (e.key === 'ArrowRight' || e.key === 'n') App.next();
-    if (e.key === 'ArrowLeft' || e.key === 'p') App.prev();
-    if (e.key === 'b') App.toggleBookmark();
-    if (e.key === 't') Notes.toggle();
-    if (e.key >= '1' && e.key <= '4' && !App.submitted && !App.practiceChecked[App.currentQ]) {
-        const optIdx = parseInt(e.key) - 1;
-        const q = App.questions[App.currentQ];
-        if (q && q.options && optIdx < q.options.length) App.selectOption(optIdx);
+    handle(e) {
+        if (!this.enabled) return;
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        const screen = this.getActiveScreen();
+        
+        // Global shortcuts
+        if (e.key === '?' || (e.shiftKey && e.key === '/')) {
+            document.getElementById('helpModal').classList.toggle('active');
+            e.preventDefault();
+            return;
+        }
+        
+        // Escape always closes modals
+        if (e.key === 'Escape') {
+            this.closeModals();
+            return;
+        }
+
+        // Calculator
+        if (e.key === 'c' && !e.ctrlKey && !e.metaKey) {
+            Calc.toggle();
+            return;
+        }
+
+        // Home navigation
+        if (e.key === 'h' && !e.ctrlKey && !e.metaKey) {
+            showScreen('home');
+            Home.render();
+            return;
+        }
+
+        // Settings
+        if (e.key === 's' && !e.ctrlKey && !e.metaKey && screen === 'home') {
+            Settings.openModal();
+            return;
+        }
+
+        // Garden
+        if (e.key === 'g' && !e.ctrlKey && !e.metaKey && screen === 'home') {
+            showScreen('garden');
+            return;
+        }
+
+        // Exam-specific shortcuts
+        if (screen === 'exam') {
+            if (e.key === 'ArrowRight' || e.key === 'n') { App.next(); return; }
+            if (e.key === 'ArrowLeft' || e.key === 'p') { App.prev(); return; }
+            if (e.key === 'b' || e.key === 'f') { App.toggleBookmark(); return; }
+            if (e.key === 't') { Notes.toggle(); return; }
+            if (e.key === 'q') { App.togglePalette(); return; }
+            if (e.key === ' ') { e.preventDefault(); App.toggleTimer(); return; }
+            if (e.key >= '1' && e.key <= '4' && !App.submitted && !App.practiceChecked[App.currentQ]) {
+                const optIdx = parseInt(e.key) - 1;
+                const q = App.questions[App.currentQ];
+                if (q && q.options && optIdx < q.options.length) App.selectOption(optIdx);
+                return;
+            }
+            if (e.key === 'Enter' && App.mode === 'practice' && !App.practiceChecked[App.currentQ]) {
+                App.checkAnswer();
+                return;
+            }
+        }
+
+        // Drill-specific shortcuts
+        if (screen === 'drill') {
+            if (e.key === ' ' && !Drill.showingAnswer) { e.preventDefault(); Drill.showAnswer(); return; }
+            if (Drill.showingAnswer) {
+                if (e.key === '1') { Drill.rate(1); return; }
+                if (e.key === '2') { Drill.rate(2); return; }
+                if (e.key === '3') { Drill.rate(3); return; }
+                if (e.key === '4') { Drill.rate(5); return; }
+            }
+        }
+    },
+
+    renderHelpSection() {
+        const screen = this.getActiveScreen();
+        let html = '<div class="shortcuts-help"><h4>⌨️ Keyboard Shortcuts</h4>';
+        html += '<div class="shortcuts-section"><strong>Global</strong><ul>';
+        this.SHORTCUTS.global.forEach(s => {
+            html += `<li><kbd>${s.key}</kbd> ${s.desc}</li>`;
+        });
+        html += '</ul></div>';
+        
+        if (screen === 'exam' || screen === 'home') {
+            html += '<div class="shortcuts-section"><strong>Exam/Practice</strong><ul>';
+            this.SHORTCUTS.exam.forEach(s => {
+                const keyText = s.alt ? `${s.key}/${s.alt}` : s.key;
+                html += `<li><kbd>${keyText}</kbd> ${s.desc}</li>`;
+            });
+            html += '</ul></div>';
+        }
+        
+        if (screen === 'drill' || screen === 'home') {
+            html += '<div class="shortcuts-section"><strong>Drill Mode</strong><ul>';
+            this.SHORTCUTS.drill.forEach(s => {
+                html += `<li><kbd>${s.key}</kbd> ${s.desc}</li>`;
+            });
+            html += '</ul></div>';
+        }
+        
+        html += '</div>';
+        return html;
     }
-    if (e.key === 'Enter' && App.mode === 'practice' && !App.practiceChecked[App.currentQ]) {
-        App.checkAnswer();
-    }
-});
+};
+
+document.addEventListener('keydown', (e) => KeyboardShortcuts.handle(e));
 
 // =====================================================================
 // INIT
@@ -16185,7 +16314,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.59</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.60</div>
 
 </body>
 </html>
