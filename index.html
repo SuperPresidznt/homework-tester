@@ -154,6 +154,11 @@ button:active:not(:disabled){transform:scale(0.97)}
 .challenge-count{font-size:12px;font-weight:600;color:var(--gray-600)}
 .challenges-complete-bonus{text-align:center;padding:10px;margin-top:8px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:8px;color:#92400e;font-weight:600;font-size:13px}
 [data-theme="dark"] .daily-challenges-card{background:#16213e;border-color:#374151}
+
+/* === STREAK MULTIPLIER === */
+.streak-mult{display:inline-block;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:6px;animation:streakGlow 2s ease-in-out infinite}
+.streak-next{font-size:10px;color:var(--gray-500);font-weight:normal}
+@keyframes streakGlow{0%,100%{box-shadow:0 0 4px rgba(251,191,36,.4)}50%{box-shadow:0 0 12px rgba(251,191,36,.8)}}
 [data-theme="dark"] .daily-challenges-card h3{color:#93c5fd}
 [data-theme="dark"] .challenge-item{background:#1f2937;border-color:#374151}
 [data-theme="dark"] .challenge-item:hover{background:#1e3a5f;border-color:#60a5fa}
@@ -2504,6 +2509,30 @@ const Gamification = {
         return src.momentum && src.momentum.active ? src.momentum : null;
     },
 
+    // Daily streak multiplier: rewards consecutive days of studying
+    // 3 days = 1.1x, 7 days = 1.25x, 14 days = 1.5x, 30 days = 2x
+    getStreakMultiplier() {
+        const stats = DailyGoal ? DailyGoal.getStats() : { streak: 0 };
+        const streak = stats.streak || 0;
+        if (streak >= 30) return 2.0;
+        if (streak >= 14) return 1.5;
+        if (streak >= 7) return 1.25;
+        if (streak >= 3) return 1.1;
+        return 1.0;
+    },
+
+    getStreakBonusInfo() {
+        const stats = DailyGoal ? DailyGoal.getStats() : { streak: 0 };
+        const streak = stats.streak || 0;
+        const mult = this.getStreakMultiplier();
+        let nextMilestone = null, daysToNext = 0;
+        if (streak < 3) { nextMilestone = 3; daysToNext = 3 - streak; }
+        else if (streak < 7) { nextMilestone = 7; daysToNext = 7 - streak; }
+        else if (streak < 14) { nextMilestone = 14; daysToNext = 14 - streak; }
+        else if (streak < 30) { nextMilestone = 30; daysToNext = 30 - streak; }
+        return { streak, multiplier: mult, nextMilestone, daysToNext };
+    },
+
     showMomentumToast(message, icon = '⚠️') {
         const toast = document.getElementById('momentumToast');
         if (!toast) return;
@@ -3144,6 +3173,10 @@ const Gamification = {
             appliedMomentum = momentum;
         }
         if (state.combo.multiplier > 1) xpAmount = Math.floor(xpAmount * state.combo.multiplier);
+        
+        // Apply daily streak multiplier bonus
+        const streakMultiplier = this.getStreakMultiplier();
+        if (streakMultiplier > 1) xpAmount = Math.floor(xpAmount * streakMultiplier);
         if (state.doubleXpRemaining > 0) {
             xpAmount *= 2;
             state.doubleXpRemaining--;
@@ -9278,7 +9311,17 @@ const DailyGoal = {
     recordQuestions(count) { let stats = this.getStats(); stats = this.checkDateReset(stats); const wasGoalMet = stats.questionsToday >= stats.dailyGoal; stats.questionsToday += count; const isGoalMet = stats.questionsToday >= stats.dailyGoal; if (!wasGoalMet && isGoalMet) { stats = this.updateStreak(stats); Gamification.awardXp('dailyGoalReached'); Gamification.triggerConfetti(); Gamification.checkStreakAchievements(stats.streak); if (stats.streak > 0 && stats.streak % 7 === 0) { Gamification.awardXp('weeklyGoalReached'); } } this.saveStats(stats); return !wasGoalMet && isGoalMet; },
     setGoal(goal) { let stats = this.getStats(); stats.dailyGoal = goal; this.saveStats(stats); },
     checkStreakOnLoad() { let stats = this.getStats(); stats = this.checkDateReset(stats); const today = this.getTodayStr(); const lastDate = stats.lastStudyDate; if (lastDate && lastDate !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); const yesterdayStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0'); if (lastDate !== yesterdayStr) { stats.streak = 0; this.saveStats(stats); } } return stats; },
-    renderStreakBanner() { const stats = this.checkStreakOnLoad(); const el = document.getElementById('streakBanner'); if (!el) return; const streak = stats.streak || 0; const hasStreak = streak > 0; el.innerHTML = '<div class="streak-banner ' + (hasStreak ? '' : 'no-streak') + '"><span class="streak-flame">\uD83D\uDD25</span><div class="streak-info"><div class="streak-count">' + streak + ' day' + (streak !== 1 ? 's' : '') + '</div><div class="streak-label">' + (hasStreak ? 'Study Streak' : 'Start your streak today!') + '</div></div></div>'; },
+    renderStreakBanner() { 
+        const stats = this.checkStreakOnLoad(); 
+        const el = document.getElementById('streakBanner'); 
+        if (!el) return; 
+        const streak = stats.streak || 0; 
+        const hasStreak = streak > 0;
+        const bonusInfo = Gamification.getStreakBonusInfo();
+        const multText = bonusInfo.multiplier > 1 ? `<span class="streak-mult">${bonusInfo.multiplier}x XP</span>` : '';
+        const nextText = bonusInfo.nextMilestone ? `<span class="streak-next">${bonusInfo.daysToNext} day${bonusInfo.daysToNext !== 1 ? 's' : ''} to ${bonusInfo.nextMilestone}-day bonus</span>` : '';
+        el.innerHTML = '<div class="streak-banner ' + (hasStreak ? '' : 'no-streak') + '"><span class="streak-flame">\uD83D\uDD25</span><div class="streak-info"><div class="streak-count">' + streak + ' day' + (streak !== 1 ? 's' : '') + ' ' + multText + '</div><div class="streak-label">' + (hasStreak ? 'Study Streak' + (nextText ? ' • ' + nextText : '') : 'Start your streak today!') + '</div></div></div>'; 
+    },
     renderDailyGoalCard() { const stats = this.getStats(); const el = document.getElementById('dailyGoalCard'); if (!el) return; const today = this.getTodayStr(); let questionsToday = stats.questionsToday || 0; if (stats.todayDate !== today) { questionsToday = 0; } const goal = stats.dailyGoal || 10; const pct = Math.round((Math.min(questionsToday, goal) / goal) * 100); const isComplete = questionsToday >= goal; el.innerHTML = '<div class="daily-goal-card"><h3>\uD83C\uDFAF Daily Goal</h3><div class="goal-progress"><div class="goal-bar"><div class="goal-bar-fill ' + (isComplete ? 'complete' : '') + '" style="width:' + pct + '%"></div></div><div class="goal-text ' + (isComplete ? 'complete' : '') + '">' + questionsToday + '/' + goal + ' questions</div></div>' + (isComplete ? '<div class="goal-celebration">Goal reached! Great job today!</div>' : '') + '</div>'; }
 };
 
@@ -16142,7 +16185,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.58</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.59</div>
 
 </body>
 </html>
