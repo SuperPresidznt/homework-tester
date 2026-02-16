@@ -13108,25 +13108,40 @@ const Progress = {
 
     render() {
         const content = document.getElementById('progressContent');
-        const allContent = this.renderInsights() + this.renderGamificationStats() + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderStudyTimeVsScore() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
-        
-        if (!allContent.trim()) {
-            content.innerHTML = `
-                <div style="text-align:center;padding:60px 20px;color:var(--gray-600)">
-                    <div style="font-size:48px;margin-bottom:16px">📊</div>
-                    <h3 style="color:var(--navy);margin-bottom:8px">No Data Yet</h3>
-                    <p style="margin-bottom:20px">Complete some practice questions, drills, or tests to see your metrics here.</p>
-                    <p style="font-size:13px;color:var(--gray-500)">Your performance data from all modes (Exam, Drill, AI Practice, Speed Mode) will appear here.</p>
-                </div>
-            `;
+        if (!content) {
+            console.error('[Progress] progressContent element not found!');
             return;
         }
         
-        content.innerHTML = allContent;
-        this._drawTrendChart();
-        this._drawAccuracyChart();
-        this._drawStudyVsScoreChart();
-        this._renderOverallTrend();
+        try {
+            const gamStats = this.renderGamificationStats();
+            console.log('[Progress] renderGamificationStats returned:', gamStats ? gamStats.length + ' chars' : 'empty');
+            
+            const allContent = this.renderInsights() + gamStats + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderStudyTimeVsScore() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
+            
+            console.log('[Progress] Total content length:', allContent.length);
+            
+            if (!allContent.trim()) {
+                content.innerHTML = `
+                    <div style="text-align:center;padding:60px 20px;color:var(--gray-600)">
+                        <div style="font-size:48px;margin-bottom:16px">📊</div>
+                        <h3 style="color:var(--navy);margin-bottom:8px">No Data Yet</h3>
+                        <p style="margin-bottom:20px">Complete some practice questions, drills, or tests to see your metrics here.</p>
+                        <p style="font-size:13px;color:var(--gray-500)">Your performance data from all modes (Exam, Drill, AI Practice, Speed Mode) will appear here.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            content.innerHTML = allContent;
+            this._drawTrendChart();
+            this._drawAccuracyChart();
+            this._drawStudyVsScoreChart();
+            this._renderOverallTrend();
+        } catch (err) {
+            console.error('[Progress] Error rendering:', err);
+            content.innerHTML = `<div style="padding:20px;color:red">Error loading metrics: ${err.message}</div>`;
+        }
     },
 
     // Intelligent correlation detection - only shows strong correlations
@@ -16851,7 +16866,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.71</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.72</div>
 
 </body>
 </html>
