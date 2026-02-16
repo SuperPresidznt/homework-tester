@@ -12181,7 +12181,7 @@ const AIPractice = {
     selectedOption: null,
     isChecked: false,
     isGenerating: false,
-    sessionStats: { total: 0, correct: 0, byCategory: {} },
+    sessionStats: { total: 0, correct: 0, byCategory: {}, byType: {} },
     weakCategories: [],
     currentCategory: null,
     currentDifficulty: 2,
@@ -12189,6 +12189,8 @@ const AIPractice = {
     BUFFER_SIZE: 3,
     _questionBuffer: [],
     _prefetchInFlight: 0,
+    _recentQuestionTypes: [], // Track recent question types to avoid repetition
+    _masteredTypes: [], // Types answered correctly multiple times
 
     async start(bankId) {
         if (this.isGenerating) return; // Prevent double-start while generating
@@ -12204,13 +12206,15 @@ const AIPractice = {
         }
 
         Session.start();
-        this.sessionStats = { total: 0, correct: 0, byCategory: {} };
+        this.sessionStats = { total: 0, correct: 0, byCategory: {}, byType: {} };
         this.currentQuestion = null;
         this.selectedOption = null;
         this.isChecked = false;
         this.currentDifficulty = 2;
         this._questionBuffer = [];
         this._prefetchInFlight = 0;
+        this._recentQuestionTypes = [];
+        this._masteredTypes = [];
 
         this.analyzeWeakAreas();
         this.startingWeakness = {};
@@ -12495,6 +12499,10 @@ const AIPractice = {
         const difficultyLabel = difficulty === 1 ? 'Easy' : difficulty === 2 ? 'Medium' : 'Hard';
         const bankCategories = this.bank.categories || [];
 
+        // Build avoid list from recent question types
+        const avoidTypes = this._recentQuestionTypes.slice(-5).join(', ');
+        const masteredTypes = this._masteredTypes.slice(0, 10).join(', ');
+
         const systemPrompt = `You are generating practice questions for WGU Applied Algebra assessments.
 
 CATEGORY: ${category}
@@ -12503,6 +12511,9 @@ BANK CATEGORIES: ${bankCategories.join(', ')}
 
 ${sampleQuestions.length > 0 ? `SAMPLE QUESTIONS FROM THIS CATEGORY (use similar style):
 ${sampleQuestions.join('\n')}` : ''}
+
+${avoidTypes ? `AVOID THESE QUESTION TYPES (recently asked): ${avoidTypes}` : ''}
+${masteredTypes ? `STUDENT HAS MASTERED: ${masteredTypes} - focus on other concepts` : ''}
 
 INSTRUCTIONS:
 1. Generate ONE multiple choice question about "${category}"
@@ -12514,13 +12525,15 @@ INSTRUCTIONS:
    ${difficulty === 3 ? '- Complex scenarios with multiple concepts\n   - Requires deep understanding and careful analysis' : ''}
 5. Make distractors (wrong answers) plausible but clearly incorrect
 6. Provide a thorough explanation of why the correct answer is right
+7. IMPORTANT: Generate a DIFFERENT type of problem than recent questions - vary the concept/formula/scenario
 
 You MUST respond with ONLY valid JSON in this EXACT format (no markdown, no extra text):
 {
     "question": "The full question text here",
     "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
     "correctAnswer": 0,
-    "explanation": "Detailed explanation of why the correct answer is right and why others are wrong..."
+    "explanation": "Detailed explanation of why the correct answer is right and why others are wrong...",
+    "questionType": "Brief label for this question type (e.g., 'compound interest', 'slope calculation', 'linear equation')"
 }
 
 IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, etc.)`;
@@ -12673,6 +12686,26 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         }
         this.sessionStats.byCategory[cat].total++;
         if (isCorrect) this.sessionStats.byCategory[cat].correct++;
+
+        // Track question type for variety
+        const qType = this.currentQuestion.questionType;
+        if (qType) {
+            this._recentQuestionTypes.push(qType);
+            if (this._recentQuestionTypes.length > 10) this._recentQuestionTypes.shift();
+            
+            // Track by type stats
+            if (!this.sessionStats.byType[qType]) {
+                this.sessionStats.byType[qType] = { correct: 0, total: 0 };
+            }
+            this.sessionStats.byType[qType].total++;
+            if (isCorrect) this.sessionStats.byType[qType].correct++;
+            
+            // If answered correctly 2+ times, mark as mastered for this session
+            const typeStats = this.sessionStats.byType[qType];
+            if (typeStats.correct >= 2 && !this._masteredTypes.includes(qType)) {
+                this._masteredTypes.push(qType);
+            }
+        }
 
         // Record question for daily goal
         DailyGoal.recordQuestion();
@@ -16744,7 +16777,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.66</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.67</div>
 
 </body>
 </html>
