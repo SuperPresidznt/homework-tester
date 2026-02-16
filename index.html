@@ -13105,6 +13105,15 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
 // PROGRESS DASHBOARD
 // =====================================================================
 const Progress = {
+    // Helper to safely extract day string from various date formats
+    _parseDay(dateVal) {
+        if (!dateVal) return null;
+        if (typeof dateVal === 'string') return dateVal.split('T')[0];
+        if (dateVal instanceof Date) return dateVal.toISOString().split('T')[0];
+        if (typeof dateVal === 'number') return new Date(dateVal).toISOString().split('T')[0];
+        return null;
+    },
+
     show() {
         showScreen('progress');
         this.render();
@@ -13198,7 +13207,7 @@ const Progress = {
         
         // 1. Study Time vs Test Scores
         const studyScoreData = allHistory.map(test => {
-            const day = test.date.split('T')[0];
+            const day = this._parseDay(test.date);
             return { x: studyByDay[day] || 0, y: test.pct };
         });
         const studyScoreR = this._pearsonCorrelation(studyScoreData);
@@ -13289,7 +13298,7 @@ const Progress = {
         let currentStreak = 0;
         let lastDate = null;
         allHistory.forEach(test => {
-            const day = test.date.split('T')[0];
+            const day = this._parseDay(test.date);
             if (lastDate) {
                 const diff = (new Date(day) - new Date(lastDate)) / (1000 * 60 * 60 * 24);
                 if (diff <= 1) currentStreak++;
@@ -13393,7 +13402,7 @@ const Progress = {
         // Group tests by day and match with study time
         const data = [];
         allHistory.forEach(test => {
-            const day = test.date.split('T')[0];
+            const day = this._parseDay(test.date);
             const studyMins = studyByDay[day] || 0;
             data.push({ day, studyMins, score: test.pct });
         });
@@ -13575,8 +13584,8 @@ const Progress = {
         const byDay = {};
         Object.values(trackerData).forEach(qData => {
             (qData.history || []).forEach(attempt => {
-                if (!attempt.date) return;
-                const day = attempt.date.split('T')[0];
+                const day = this._parseDay(attempt.date);
+                if (!day) return;
                 if (!byDay[day]) byDay[day] = { correct: 0, total: 0 };
                 byDay[day].total++;
                 if (attempt.correct) byDay[day].correct++;
@@ -16887,7 +16896,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.74</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.75</div>
 
 </body>
 </html>
