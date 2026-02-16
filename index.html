@@ -2536,7 +2536,7 @@ const Gamification = {
     // Level unlock requirements for shop items
     LEVEL_REQS: {
         food:        { kibble: 1, treat: 3, feast: 7, goldfish: 12 },
-        seeds:       { sunflower: 1, cactus: 3, bonsai: 7, crystal: 12, rainbow: 18 },
+        seeds:       { sunflower: 1, cactus: 3, bonsai: 7, crystal: 12, rainbow: 18, moneyTree: 20, starfruit: 15, dragonFruit: 18, moonflower: 12, goldenApple: 22, ancientOak: 25 },
         gardenItems: { water: 1, fertilizer: 5, magicDust: 10, evoStone: 5, healthPotion: 1, shieldCharm: 5, powerBerry: 3 },
         decorations: { fountain: 5, gnome: 1, lantern: 3, bench: 1 },
         cosmetics:   { hat: 3, crown: 10, scarf: 1, sunglasses: 3, cape: 7 }
@@ -2719,7 +2719,18 @@ const Gamification = {
             rainbow:   { name: 'Rainbow Rose',  price: 120, icon: '🌈', gpNeeded: 60, stages: 6, coinReward: 100, xpReward: 250,
                          emojis: ['🫘','🌱','🌿','🪻','🌹','🌈'] },
             moneyTree: { name: 'Money Tree',    price: 300, icon: '💰', gpNeeded: 100, stages: 7, coinReward: 250, xpReward: 500,
-                         emojis: ['🫘','🌱','🌿','🪴','🌳','💵','💰'] }
+                         emojis: ['🫘','🌱','🌿','🪴','🌳','💵','💰'] },
+            // Premium/rare seeds
+            starfruit:  { name: 'Starfruit',     price: 200, icon: '⭐', gpNeeded: 80, stages: 6, coinReward: 150, xpReward: 350, gemReward: 1,
+                         emojis: ['🫘','🌱','🌿','🪴','🌟','⭐'], desc: 'Rare! Yields gems on harvest' },
+            dragonFruit:{ name: 'Dragon Fruit',  price: 250, icon: '🐉', gpNeeded: 90, stages: 6, coinReward: 180, xpReward: 400, petBonus: true,
+                         emojis: ['🫘','🌱','🌿','🪴','🔥','🐉'], desc: '+10 pet happiness on harvest' },
+            moonflower: { name: 'Moonflower',    price: 180, icon: '🌙', gpNeeded: 70, stages: 5, coinReward: 120, xpReward: 300, nightBonus: true,
+                         emojis: ['🫘','🌱','🌿','🌸','🌙'], desc: '2x rewards if harvested at night' },
+            goldenApple:{ name: 'Golden Apple',  price: 400, icon: '🍎', gpNeeded: 120, stages: 7, coinReward: 300, xpReward: 600, healPet: true,
+                         emojis: ['🫘','🌱','🌿','🪴','🌳','🍏','🍎'], desc: 'Fully heals pet on harvest' },
+            ancientOak: { name: 'Ancient Oak',   price: 500, icon: '🌲', gpNeeded: 150, stages: 8, coinReward: 400, xpReward: 800, permBonus: 0.05,
+                         emojis: ['🫘','🌱','🌿','🪴','🌳','🌲','🎄','🌲'], desc: 'Permanent +5% coin bonus after harvest' }
         },
         gardenItems: {
             water:      { name: 'Watering Can', price: 5,   icon: '💧', desc: '+25 water level' },
@@ -2729,6 +2740,7 @@ const Gamification = {
             healthPotion: { name: 'Health Potion', price: 30, icon: '🧃', desc: 'Heal pet 40 HP mid-battle' },
             shieldCharm:  { name: 'Shield Charm',  price: 50, icon: '🛡️', desc: 'Block next enemy attack 100%' },
             powerBerry:   { name: 'Power Berry',   price: 40, icon: '🫐', desc: '+50% ATK for 3 questions' },
+            resStone:     { name: 'Resurrection Stone', price: 50, icon: '💎', desc: 'Revive a pet from the graveyard' },
             superFertilizer: { name: 'Super Fertilizer', price: 75, icon: '💊', desc: '3x growth for 1 plant' },
             rainCloud:    { name: 'Rain Cloud',   price: 100, icon: '🌧️', desc: 'Auto-water all plants for 1 hour' }
         },
@@ -2854,9 +2866,9 @@ const Gamification = {
             },
             inventory: {
                 petFood: { kibble: 3, treat: 1, feast: 0, goldfish: 0 },
-                seeds: { sunflower: 2, cactus: 0, bonsai: 0, crystal: 0, rainbow: 0 },
+                seeds: { sunflower: 2, cactus: 0, bonsai: 0, crystal: 0, rainbow: 0, moneyTree: 0, starfruit: 0, dragonFruit: 0, moonflower: 0, goldenApple: 0, ancientOak: 0 },
                 gardenItems: { water: 5, fertilizer: 0, magicDust: 0, evoStone: 0 },
-                battleItems: { healthPotion: 0, shieldCharm: 0, powerBerry: 0 },
+                battleItems: { healthPotion: 0, shieldCharm: 0, powerBerry: 0, resStone: 5 },
                 decorations: [],
                 petAccessories: [],
                 petHousing: {},
@@ -3122,6 +3134,12 @@ const Gamification = {
 
         const state = this.getState();
         let coinsToAdd = amount;
+        
+        // Apply garden permanent coin bonus (from Ancient Oak harvests)
+        if (state.gardenCoinBonus && state.gardenCoinBonus > 0) {
+            coinsToAdd = Math.floor(coinsToAdd * (1 + state.gardenCoinBonus));
+        }
+        
         if (momentum && momentum.coinMultiplier && momentum.coinMultiplier !== 1) {
             coinsToAdd = Math.floor(coinsToAdd * momentum.coinMultiplier);
         }
@@ -6027,6 +6045,85 @@ const Shop = {
         this.render();
     },
 
+    resurrectPet(graveIdx) {
+        const state = Gamification.getState();
+        const graveyard = state.graveyard || [];
+        const resStones = state.inventory?.battleItems?.resStone || 0;
+        const pets = state.pets || [];
+        const maxPets = 6;
+        
+        if (graveIdx < 0 || graveIdx >= graveyard.length) return;
+        if (resStones <= 0) {
+            alert('You need a Resurrection Stone! Buy one from the shop.');
+            return;
+        }
+        if (pets.length >= maxPets) {
+            alert('Pet roster is full! Release a pet first.');
+            return;
+        }
+        
+        const grave = graveyard[graveIdx];
+        const sp = Gamification.PET_SPECIES[grave.species] || Gamification.PET_SPECIES.bird;
+        
+        // Confirm resurrection
+        if (!confirm(`Resurrect ${grave.name} the ${sp.name}? This will use 1 Resurrection Stone.`)) return;
+        
+        // Use resurrection stone
+        state.inventory.battleItems.resStone--;
+        
+        // Remove from graveyard
+        graveyard.splice(graveIdx, 1);
+        
+        // Remove name from retired names so it can be used again
+        const retiredIdx = (state.retiredNames || []).indexOf(grave.name);
+        if (retiredIdx >= 0) state.retiredNames.splice(retiredIdx, 1);
+        
+        // Create resurrected pet with fresh stats but keep some progress
+        const now = Date.now();
+        const newPet = {
+            name: grave.name,
+            species: grave.species,
+            stage: Math.max(1, grave.stage - 1), // Lose 1 evolution stage on resurrection
+            totalXpFed: Math.floor((grave.totalXpFed || 0) * 0.5), // Keep 50% XP
+            mood: 'content',
+            lastFed: now,
+            hunger: 80,
+            happiness: 80,
+            lastDecayCheck: now,
+            careMinutes: Math.floor((grave.careMinutes || 0) * 0.5), // Keep 50% care time
+            studyMinutes: 0,
+            sick: false,
+            lastInteraction: now,
+            accessories: [],
+            totalMealsEaten: 0,
+            birthDate: now, // Fresh lifespan
+            lifespan: 30 + Math.floor(Math.random() * 15), // 30-45 days
+            resurrected: true,
+            timesResurrected: (grave.timesResurrected || 0) + 1
+        };
+        
+        // Add to pets array
+        pets.push(newPet);
+        state.pets = pets;
+        
+        // Make it the active pet
+        state.activePetIdx = pets.length - 1;
+        state.studyBuddy = newPet;
+        
+        Gamification.saveState(state);
+        Gamification.updateBuddyWidget();
+        
+        Gamification.showAchievementToast({
+            icon: '✨',
+            name: `${grave.name} has returned!`,
+            desc: 'Your pet has been resurrected',
+            xp: 0
+        });
+        
+        SoundFX.play('levelUp');
+        this.render();
+    },
+
     renderAdoptTab(el, state, coins) {
         const pets = state.pets || [];
         const ownedSpecies = pets.map(p => p.species);
@@ -6077,20 +6174,28 @@ const Shop = {
         
         // Show graveyard if any pets have died
         const graveyard = state.graveyard || [];
+        const resStones = state.inventory?.battleItems?.resStone || 0;
+        const maxPetsForRes = 6;
+        const petsForRes = (state.pets || []).length;
+        const canResurrect = resStones > 0 && petsForRes < maxPetsForRes;
+        
         if (graveyard.length > 0) {
-            html += '<h3>🪦 Pet Graveyard</h3><div class="shop-grid">';
-            graveyard.forEach(grave => {
+            html += `<h3>🪦 Pet Graveyard <span style="font-size:12px;color:var(--gray-500)">(💎 ${resStones} Resurrection Stones)</span></h3><div class="shop-grid">`;
+            graveyard.forEach((grave, idx) => {
                 const sp = Gamification.PET_SPECIES[grave.species] || Gamification.PET_SPECIES.bird;
                 const diedDate = new Date(grave.diedAt).toLocaleDateString();
                 const ageLabel = grave.ageAtDeath ? `Age: ${grave.ageAtDeath} days` : '';
                 const causeLabel = grave.diedOfAge ? '🕊️ Natural causes' : '💔 Neglect';
-                html += `<div class="shop-item" style="opacity:0.7;background:linear-gradient(135deg,#2d2d3a,#1a1a2e)">
-                    <div class="shop-item-icon" style="filter:grayscale(1)">${Gamification.getSpeciesEmoji(grave.species, grave.stage)}</div>
+                html += `<div class="shop-item" style="background:linear-gradient(135deg,#2d2d3a,#1a1a2e)">
+                    <div class="shop-item-icon" style="filter:grayscale(0.5)">${Gamification.getSpeciesEmoji(grave.species, grave.stage)}</div>
                     <div class="shop-item-name">${grave.name}</div>
                     <div class="shop-item-desc">${sp.name} Stage ${grave.stage}</div>
                     ${ageLabel ? `<div class="shop-item-desc" style="color:#9ca3af">${ageLabel}</div>` : ''}
                     <div class="shop-item-desc" style="color:#888">${causeLabel} • ${diedDate}</div>
                     <div class="shop-item-desc" style="color:#666">XP Fed: ${grave.totalXpFed || 0}</div>
+                    ${canResurrect ? `<button class="shop-buy-btn" style="background:linear-gradient(135deg,#8b5cf6,#6366f1)" onclick="Shop.resurrectPet(${idx})">💎 Resurrect</button>` : ''}
+                    ${!canResurrect && resStones <= 0 ? `<div class="shop-item-desc" style="color:#f59e0b">Need Resurrection Stone</div>` : ''}
+                    ${!canResurrect && petsForRes >= maxPetsForRes ? `<div class="shop-item-desc" style="color:#ef4444">Pet roster full</div>` : ''}
                 </div>`;
             });
             html += '</div>';
@@ -7431,13 +7536,42 @@ const Garden = {
         const seed = Gamification.SHOP.seeds[plot.seedType];
         if (!seed) return;
 
+        // Check for night bonus (moonflower)
+        const hour = new Date().getHours();
+        const isNight = hour >= 20 || hour < 6;
+        const nightMultiplier = (seed.nightBonus && isNight) ? 2 : 1;
+
         // Award coins and XP
-        Gamification.awardCoins(seed.coinReward, 'harvest');
-        Gamification.awardXp('correctAnswer', { multiplier: seed.xpReward / 25 });
+        Gamification.awardCoins(seed.coinReward * nightMultiplier, 'harvest');
+        Gamification.awardXp('correctAnswer', { multiplier: (seed.xpReward / 25) * nightMultiplier });
+
+        // Award gems if seed has gemReward (starfruit)
+        if (seed.gemReward) {
+            Gamification.awardGems(seed.gemReward * nightMultiplier, 'harvest');
+        }
 
         // Pet happiness boost from harvest
         state.studyBuddy.hunger = Math.min(100, (state.studyBuddy.hunger || 0) + 10);
         state.studyBuddy.happiness = Math.min(100, (state.studyBuddy.happiness || 0) + 10);
+
+        // Dragon Fruit bonus: extra pet happiness
+        if (seed.petBonus) {
+            state.studyBuddy.happiness = Math.min(100, (state.studyBuddy.happiness || 0) + 10);
+        }
+
+        // Golden Apple: fully heal pet
+        if (seed.healPet) {
+            state.studyBuddy.hunger = 100;
+            state.studyBuddy.happiness = 100;
+            state.studyBuddy.sick = false;
+            Gamification.showAchievementToast({ icon: '🍎', name: 'Golden Apple!', desc: 'Pet fully healed', xp: 0 });
+        }
+
+        // Ancient Oak: permanent coin bonus
+        if (seed.permBonus) {
+            state.gardenCoinBonus = (state.gardenCoinBonus || 0) + seed.permBonus;
+            Gamification.showAchievementToast({ icon: '🌲', name: 'Ancient Oak Blessing', desc: `+${Math.round(seed.permBonus * 100)}% permanent coin bonus!`, xp: 0 });
+        }
 
         state.garden.totalHarvests = (state.garden.totalHarvests || 0) + 1;
 
@@ -7452,6 +7586,7 @@ const Garden = {
         if (state.garden.totalHarvests === 1) Gamification.unlockAchievement('green_thumb');
         if (state.garden.totalHarvests >= 10) Gamification.unlockAchievement('master_gardener');
         if (plot.seedType === 'rainbow') Gamification.unlockAchievement('rainbow_bloom');
+        if (plot.seedType === 'ancientOak') Gamification.unlockAchievement('ancient_gardener');
 
         this.render();
     },
@@ -14937,7 +15072,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.53</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.54</div>
 
 </body>
 </html>
