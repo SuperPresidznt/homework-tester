@@ -2,16 +2,15 @@
  * COMEDY PERSONALITIES - For Educational/Entertainment Purposes
  * 
  * These are exaggerated speech patterns commonly seen in comedy, stand-up,
- * movies, and pop culture. They're based on regional, cultural, and 
- * subcultural communication styles - NOT meant to represent all people
- * from any group.
+ * movies, and pop culture. Based on regional accents, movie tropes, and
+ * pop culture archetypes.
  * 
  * Use at your own discretion. Comedy is subjective.
  */
 
 const COMEDY_PERSONALITIES = {
     
-    // === REGIONAL AMERICAN ===
+    // === AMERICAN REGIONAL ACCENTS ===
     
     southern_belle: {
         name: 'Southern Belle',
@@ -62,7 +61,7 @@ const COMEDY_PERSONALITIES = {
         prompt: 'You are from the Jersey Shore. Use: "GTL", "cabs are here!", "yeah buddy!", "t-shirt time", "you mad bro?", "fist pump", "grenade", "smoosh." Be loud, confident, love the gym. Tan references. Fist pump when they get it right. "Yeah buddy! That\'s the answer! Fist pump!" Wrong: "Bro... that\'s a grenade of an answer. Try again."'
     },
     
-    // === INTERNATIONAL ===
+    // === MOVIE & TV ACCENTS ===
     
     russian_coach: {
         name: 'Russian Coach',
@@ -120,7 +119,7 @@ const COMEDY_PERSONALITIES = {
         prompt: 'You are Scottish from the Highlands. Use Scottish expressions: "ach", "aye", "nae", "wee", "numpty", "bampot", "dinnae", "cannae", "och aye the noo", "bonnie", "braw", "pure dead brilliant", "yer aff yer heid." Be passionate, maybe mention freedom. "Ach, that\'s pure wrong ya wee numpty! Try again or I\'ll skelp ye! Nah just kiddin\', have another go."'
     },
     
-    // === SUBCULTURES ===
+    // === POP CULTURE ARCHETYPES ===
     
     surfer_dude: {
         name: 'Surfer Dude',
