@@ -12713,10 +12713,9 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         if (isCorrect) DailyChallenges.trackStreak(Gamification.getState().combo || 0);
 
         // Track per-question performance
-        QuestionTracker.recordSingle(
-            this.currentQuestion.id || ('ai_' + this.sessionStats.total),
-            this.currentCategory || 'General', isCorrect, timeSpent
-        );
+        const qId = this.currentQuestion.id || ('ai_' + Date.now() + '_' + this.sessionStats.total);
+        console.log('[AI Practice] Recording question:', qId, 'Category:', this.currentCategory, 'Correct:', isCorrect);
+        QuestionTracker.recordSingle(qId, this.currentCategory || 'General', isCorrect, timeSpent);
 
         // Update global stats
         const globalStats = Store.get('globalStats', {});
@@ -16392,6 +16391,7 @@ const QuestionTracker = {
 
     // Record a single question attempt (for drill and AI practice)
     recordSingle(qId, category, isCorrect, timeSpent, meta = {}) {
+        console.log('[QuestionTracker] recordSingle called:', { qId, category, isCorrect, timeSpent });
         this.recordResults([{
             qId,
             category,
@@ -16403,6 +16403,7 @@ const QuestionTracker = {
             confidence: meta.confidence ?? null,
             mode: meta.mode || 'practice'
         }]);
+        console.log('[QuestionTracker] Data after save:', this._getData());
     },
 
     _updateScheduling(entry, isCorrect, confidence) {
@@ -16803,7 +16804,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.68</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.69</div>
 
 </body>
 </html>
