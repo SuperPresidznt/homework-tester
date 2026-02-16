@@ -12286,7 +12286,7 @@ const AIPractice = {
     },
 
     pickNextCategory() {
-        // Prioritize weak categories but occasionally mix in stronger ones
+        // Prioritize weak categories with randomization to avoid repetition
         const sessionCatStats = this.sessionStats.byCategory;
 
         // Re-analyze weak areas periodically based on session performance
@@ -12294,25 +12294,53 @@ const AIPractice = {
             this._updateWeakAreasFromSession();
         }
 
-        // Check if any weak categories are still below 80% in this session
+        // Collect all weak categories that need practice (below 80% or < 3 attempts)
+        const needsPractice = [];
         for (const wc of this.weakCategories) {
             const sessionData = sessionCatStats[wc.category];
-            if (!sessionData) return wc.category; // Not attempted yet
-
-            const sessionPct = sessionData.total > 0 ?
-                (sessionData.correct / sessionData.total) * 100 : 0;
-            if (sessionPct < 80 || sessionData.total < 3) {
-                return wc.category;
+            if (!sessionData) {
+                needsPractice.push({ ...wc, priority: 3 }); // Not attempted = high priority
+            } else {
+                const sessionPct = sessionData.total > 0 ?
+                    (sessionData.correct / sessionData.total) * 100 : 0;
+                if (sessionPct < 80 || sessionData.total < 3) {
+                    // Lower accuracy = higher priority, fewer attempts = higher priority
+                    const priority = (100 - sessionPct) / 100 + (3 - Math.min(sessionData.total, 3)) / 3;
+                    needsPractice.push({ ...wc, priority });
+                }
             }
         }
 
-        // If all are at 80%+, pick the weakest with fewest attempts
+        if (needsPractice.length > 0) {
+            // Weighted random selection - higher priority = more likely to be picked
+            // But avoid picking the same category twice in a row
+            const lastCategory = this.currentCategory;
+            let candidates = needsPractice.filter(c => c.category !== lastCategory);
+            if (candidates.length === 0) candidates = needsPractice; // Only one category left
+            
+            // Weight by priority (higher priority = more weight)
+            const totalWeight = candidates.reduce((sum, c) => sum + c.priority, 0);
+            let random = Math.random() * totalWeight;
+            for (const c of candidates) {
+                random -= c.priority;
+                if (random <= 0) return c.category;
+            }
+            return candidates[0].category;
+        }
+
+        // If all are at 80%+, randomly pick from categories with fewest attempts
         const byAttempts = [...this.weakCategories].sort((a, b) => {
             const aAttempts = sessionCatStats[a.category]?.total || 0;
             const bAttempts = sessionCatStats[b.category]?.total || 0;
             return aAttempts - bAttempts;
         });
-        return byAttempts[0]?.category || this.weakCategories[0]?.category || 'General';
+        // Get all with same low attempt count and pick randomly
+        const minAttempts = sessionCatStats[byAttempts[0]?.category]?.total || 0;
+        const lowAttemptCats = byAttempts.filter(c => 
+            (sessionCatStats[c.category]?.total || 0) <= minAttempts + 1
+        );
+        const randomIdx = Math.floor(Math.random() * lowAttemptCats.length);
+        return lowAttemptCats[randomIdx]?.category || this.weakCategories[0]?.category || 'General';
     },
 
     // Dynamically update weak areas based on session performance
@@ -16679,7 +16707,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.63</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.64</div>
 
 </body>
 </html>
