@@ -12539,7 +12539,8 @@ const AIPractice = {
         }
     },
 
-    async generateQuestion(category, difficulty) {
+    async generateQuestion(category, difficulty, retryCount = 0) {
+        const MAX_RETRIES = 2;
         const provider = Store.get('provider', 'anthropic');
         const apiKey = provider === 'openai' ? Store.get('openaiKey', '') : Store.get('anthropicKey', '');
 
@@ -12586,10 +12587,14 @@ CRITICAL RULES:
 - The question text must be neutral and not give away the answer
 - Only provide exactly 4 options (A, B, C, D) - never 5 options
 - Do NOT add any commentary, hints, or explanations outside the JSON
-- If the question references a table, chart, or data set, you MUST include the ACTUAL DATA in the question text
-- NEVER say "the table below shows" or "see the graph" without including the actual values
-- Format tables as plain text with clear labels, e.g.: "Month 1: R=$5000, E=$3000 | Month 2: R=$6000, E=$3500 | ..."
-- All information needed to solve the problem MUST be in the question text itself
+
+DATA INCLUSION RULES (VERY IMPORTANT):
+- NEVER reference external data that isn't shown. If you mention a table, chart, graph, or data set, the ACTUAL VALUES must be in the question text.
+- FORBIDDEN PHRASES: "the table below", "see the graph", "the function table shows", "as shown in", "refer to the data"
+- INSTEAD: Embed all data directly. Example: "A car depreciates as follows: Year 2006: $22,800 | Year 2007: $19,380 | Year 2008: $16,473 | Year 2009: $14,002 | Year 2010: $11,902. Based on this data..."
+- For depreciation/growth problems: List at least 4-5 actual data points with specific values
+- For function tables: Write out each row explicitly (x=1, y=5 | x=2, y=8 | x=3, y=11...)
+- The student CANNOT see any external images, tables, or graphs - everything must be TEXT in the question
 
 You MUST respond with ONLY valid JSON in this EXACT format (no markdown, no extra text, no commentary before or after):
 {
@@ -12659,6 +12664,27 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
                 cleanQuestion = cleanQuestion.replace(pattern, '').trim();
             }
 
+            // Check for missing data references - if question mentions table/graph but has no actual data
+            const missingDataPatterns = [
+                /\b(the\s+)?(table|graph|chart|data|function\s+table)\s+(below|above|shown|provided)\b/i,
+                /\bbelow\s+is\s+a\s+(table|graph|chart|function)/i,
+                /\brefer\s+to\s+the\s+(table|graph|chart|data)/i,
+                /\bas\s+shown\s+in\s+the\s+(table|graph|chart)/i
+            ];
+            const hasDataReference = missingDataPatterns.some(p => p.test(cleanQuestion));
+            // Check if question actually contains numeric data (at least 3 numbers with context)
+            const dataPointPattern = /(\$?\d+[,.]?\d*)/g;
+            const dataPoints = cleanQuestion.match(dataPointPattern) || [];
+            const hasActualData = dataPoints.length >= 4; // At least 4 numbers suggests real data
+            
+            if (hasDataReference && !hasActualData) {
+                console.warn('[AI Practice] Question references missing data, retry:', retryCount);
+                if (retryCount < MAX_RETRIES) {
+                    return this.generateQuestion(category, difficulty, retryCount + 1);
+                }
+                throw new Error('Question references data that is not included after retries.');
+            }
+
             return {
                 question: cleanQuestion,
                 options: parsed.options,
@@ -12668,7 +12694,10 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
                 difficulty: difficulty
             };
         } catch (err) {
-            // Question generation error handled in UI
+            // Retry on validation errors
+            if (retryCount < MAX_RETRIES && err.message?.includes('Regenerating')) {
+                return this.generateQuestion(category, difficulty, retryCount + 1);
+            }
             throw err;
         }
     },
@@ -16949,7 +16978,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.76</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.77</div>
 
 </body>
 </html>
