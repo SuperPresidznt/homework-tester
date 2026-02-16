@@ -6262,12 +6262,24 @@ const Shop = {
 
     resurrectPet(graveIdx) {
         const state = Gamification.getState();
-        const graveyard = state.graveyard || [];
+        let graveyard = state.graveyard || [];
         const resStones = state.inventory?.battleItems?.resStone || 0;
         const pets = state.pets || [];
         const maxPets = 6;
         
-        if (graveIdx < 0 || graveIdx >= graveyard.length) return;
+        // Clean up duplicate graveyard entries first
+        const seenNames = new Set();
+        graveyard = graveyard.filter(g => {
+            if (seenNames.has(g.name)) return false;
+            seenNames.add(g.name);
+            return true;
+        });
+        state.graveyard = graveyard;
+        
+        if (graveIdx < 0 || graveIdx >= graveyard.length) {
+            alert('Pet not found in graveyard.');
+            return;
+        }
         if (resStones <= 0) {
             alert('You need a Resurrection Stone! Buy one from the shop.');
             return;
@@ -6288,28 +6300,30 @@ const Shop = {
         
         // Remove from graveyard
         graveyard.splice(graveIdx, 1);
+        state.graveyard = graveyard;
         
         // Remove name from retired names so it can be used again
         const retiredIdx = (state.retiredNames || []).indexOf(grave.name);
         if (retiredIdx >= 0) state.retiredNames.splice(retiredIdx, 1);
         
-        // Create resurrected pet with fresh stats but keep some progress
+        // Create resurrected pet - keep at least stage 2 (baby, not egg)
         const now = Date.now();
+        const revivedStage = Math.max(2, (grave.stage || 2)); // At least baby stage, keep original if higher
         const newPet = {
             name: grave.name,
             species: grave.species,
-            stage: Math.max(1, grave.stage - 1), // Lose 1 evolution stage on resurrection
-            totalXpFed: Math.floor((grave.totalXpFed || 0) * 0.5), // Keep 50% XP
+            stage: revivedStage,
+            totalXpFed: Math.floor((grave.totalXpFed || 0) * 0.75), // Keep 75% XP
             mood: 'content',
             lastFed: now,
             hunger: 80,
             happiness: 80,
             lastDecayCheck: now,
-            careMinutes: Math.floor((grave.careMinutes || 0) * 0.5), // Keep 50% care time
+            careMinutes: Math.floor((grave.careMinutes || 0) * 0.75), // Keep 75% care time
             studyMinutes: 0,
             sick: false,
             lastInteraction: now,
-            accessories: [],
+            accessories: grave.accessories || [],
             totalMealsEaten: 0,
             birthDate: now, // Fresh lifespan
             lifespan: 30 + Math.floor(Math.random() * 15), // 30-45 days
@@ -6321,9 +6335,10 @@ const Shop = {
         pets.push(newPet);
         state.pets = pets;
         
-        // Make it the active pet
+        // Make it the active pet and clear dead flag
         state.activePetIdx = pets.length - 1;
         state.studyBuddy = newPet;
+        state.studyBuddy.dead = false;
         
         Gamification.saveState(state);
         Gamification.updateBuddyWidget();
@@ -6336,6 +6351,7 @@ const Shop = {
         });
         
         SoundFX.play('levelUp');
+        Garden.render();
         this.render();
     },
 
@@ -7859,13 +7875,22 @@ const Garden = {
             // Show graveyard if there are dead pets
             if (graveyard.length > 0) {
                 const resStones = state.inventory?.battleItems?.resStone || 0;
+                // Dedupe graveyard by name for display
+                const uniqueGraves = [];
+                const seenNames = new Set();
+                graveyard.forEach((g, idx) => {
+                    if (!seenNames.has(g.name)) {
+                        seenNames.add(g.name);
+                        uniqueGraves.push({ ...g, originalIdx: idx });
+                    }
+                });
                 el.innerHTML = `
                     <div class="garden-graveyard">
                         <div class="graveyard-header">🪦 Pet Graveyard</div>
                         <div class="graveyard-list">
-                            ${graveyard.slice(0, 3).map((grave, idx) => {
+                            ${uniqueGraves.slice(0, 3).map((grave) => {
                                 const sp = Gamification.PET_SPECIES[grave.species] || Gamification.PET_SPECIES.bird;
-                                return `<div class="graveyard-pet" onclick="Pets.resurrectPet(${idx})" title="Click to resurrect (needs 💎)">
+                                return `<div class="graveyard-pet" onclick="Shop.resurrectPet(${grave.originalIdx})" title="Click to resurrect (needs 💎)">
                                     <span class="graveyard-icon">🪦</span>
                                     <span class="graveyard-name">${grave.name}</span>
                                 </div>`;
@@ -7873,9 +7898,9 @@ const Garden = {
                         </div>
                         <div class="graveyard-footer">
                             💎 ${resStones} Resurrection Stone${resStones !== 1 ? 's' : ''}
-                            ${graveyard.length > 3 ? `<br><small>+${graveyard.length - 3} more</small>` : ''}
+                            ${uniqueGraves.length > 3 ? `<br><small>+${uniqueGraves.length - 3} more</small>` : ''}
                         </div>
-                        <button class="btn-sm" onclick="Pets.show()" style="margin-top:8px">View All Pets</button>
+                        <button class="btn-sm" onclick="Shop.show();Shop.switchTab('adoptPet')" style="margin-top:8px">View All Pets</button>
                     </div>
                 `;
             } else {
@@ -16654,7 +16679,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.62</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.63</div>
 
 </body>
 </html>
