@@ -12527,7 +12527,14 @@ INSTRUCTIONS:
 6. Provide a thorough explanation of why the correct answer is right
 7. IMPORTANT: Generate a DIFFERENT type of problem than recent questions - vary the concept/formula/scenario
 
-You MUST respond with ONLY valid JSON in this EXACT format (no markdown, no extra text):
+CRITICAL RULES:
+- NEVER reveal or hint at the correct answer in the question text
+- NEVER include phrases like "the answer is", "correct answer", "option A is right", etc.
+- The question text must be neutral and not give away the answer
+- Only provide exactly 4 options (A, B, C, D) - never 5 options
+- Do NOT add any commentary, hints, or explanations outside the JSON
+
+You MUST respond with ONLY valid JSON in this EXACT format (no markdown, no extra text, no commentary before or after):
 {
     "question": "The full question text here",
     "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
@@ -12572,8 +12579,31 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
                 throw new Error('Invalid correct answer index from AI');
             }
 
+            // Ensure exactly 4 options
+            if (parsed.options.length !== 4) {
+                console.warn('[AI Practice] Got', parsed.options.length, 'options, expected 4');
+                // Trim to 4 or pad if needed
+                while (parsed.options.length > 4) parsed.options.pop();
+                while (parsed.options.length < 4) parsed.options.push('N/A');
+                if (parsed.correctAnswer >= parsed.options.length) parsed.correctAnswer = 0;
+            }
+
+            // Sanitize question text - remove any answer hints that AI might have added
+            let cleanQuestion = parsed.question;
+            const hintPatterns = [
+                /\b(the\s+)?(correct\s+)?answer\s+is\s+[A-D]/gi,
+                /\boption\s+[A-D]\s+is\s+(correct|right)/gi,
+                /\b[A-D]\s+is\s+(the\s+)?(correct|right)\s+answer/gi,
+                /looking\s+at\s+the\s+choices.*?correct/gi,
+                /need\s+help\s+working\s+through/gi,
+                /just\s+a\s+quick\s+check/gi
+            ];
+            for (const pattern of hintPatterns) {
+                cleanQuestion = cleanQuestion.replace(pattern, '').trim();
+            }
+
             return {
-                question: parsed.question,
+                question: cleanQuestion,
                 options: parsed.options,
                 correctAnswer: parsed.correctAnswer,
                 explanation: parsed.explanation,
@@ -16804,7 +16834,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.69</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.70</div>
 
 </body>
 </html>
