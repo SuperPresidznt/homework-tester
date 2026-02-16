@@ -13010,15 +13010,18 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
     getQuestionContext() {
         if (!this.currentQuestion) return null;
         const q = this.currentQuestion;
+        // Don't reveal answer if user hasn't checked yet
+        const hideAnswer = !this.isChecked;
         return {
             number: 'AI-' + this.sessionStats.total,
             text: q.question,
             options: q.options,
-            correctAnswer: q.correctAnswer,
-            correctText: q.options[q.correctAnswer],
-            explanation: q.explanation,
+            correctAnswer: hideAnswer ? null : q.correctAnswer,
+            correctText: hideAnswer ? null : q.options[q.correctAnswer],
+            explanation: hideAnswer ? null : q.explanation,
             userAnswer: this.selectedOption,
-            userAnswerText: this.selectedOption !== null ? q.options[this.selectedOption] : null
+            userAnswerText: this.selectedOption !== null ? q.options[this.selectedOption] : null,
+            isAnswered: this.isChecked
         };
     },
 
@@ -14837,8 +14840,22 @@ If the student asks for a summary, analysis, or graph, use this data. For graphs
         }
 
         if (ctx) {
-            systemPrompt += `\n\nCurrent question (#${ctx.number}):\n"${ctx.text}"\n\nOptions:\n${ctx.options.map((o, i) => `${String.fromCharCode(65+i)}. ${o}`).join('\n')}\n\nCorrect answer: ${String.fromCharCode(65+ctx.correctAnswer)}. ${ctx.correctText}`;
-            if (ctx.explanation) systemPrompt += `\n\nExplanation: ${ctx.explanation}`;
+            systemPrompt += `\n\nCurrent question (#${ctx.number}):\n"${ctx.text}"\n\nOptions:\n${ctx.options.map((o, i) => `${String.fromCharCode(65+i)}. ${o}`).join('\n')}`;
+            
+            // Only reveal answer if user has already answered (isAnswered flag or correctAnswer is not null)
+            if (ctx.correctAnswer !== null && ctx.correctAnswer !== undefined) {
+                systemPrompt += `\n\nCorrect answer: ${String.fromCharCode(65+ctx.correctAnswer)}. ${ctx.correctText}`;
+                if (ctx.explanation) systemPrompt += `\n\nExplanation: ${ctx.explanation}`;
+            } else {
+                // User hasn't answered yet - DO NOT reveal the answer
+                systemPrompt += `\n\n⚠️ IMPORTANT: The student has NOT answered this question yet. DO NOT reveal the correct answer. Instead:
+- Help them understand the concepts needed to solve it
+- Guide them through the problem-solving process
+- Ask clarifying questions to help them think
+- Explain relevant formulas or methods WITHOUT giving away the answer
+- If they directly ask "what is the answer", say "Try working through it first - I can help guide you!"`;
+            }
+            
             if (ctx.userAnswer !== undefined && ctx.userAnswer !== null) {
                 systemPrompt += `\n\nStudent selected: ${String.fromCharCode(65+ctx.userAnswer)}. ${ctx.userAnswerText}`;
             }
@@ -16834,7 +16851,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.70</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.71</div>
 
 </body>
 </html>
