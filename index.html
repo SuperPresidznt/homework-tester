@@ -14120,57 +14120,62 @@ If the student asks for a summary, analysis, or graph, use this data. For graphs
         
         const settings = Audio.getSettings();
         if (btn) btn.classList.add('speaking');
+        Audio.speaking = true;
         
-        if (settings.provider === 'elevenlabs' && settings.elevenLabsKey) {
-            // Use ElevenLabs
-            Audio.speaking = true;
-            const voiceId = Audio.ELEVENLABS_VOICES[settings.voice]?.id || Audio.ELEVENLABS_VOICES.rachel.id;
-            try {
+        const onComplete = () => { Audio.speaking = false; if (btn) btn.classList.remove('speaking'); };
+        
+        try {
+            if (settings.provider === 'elevenlabs' && settings.elevenLabsKey) {
+                const voiceId = Audio.ELEVENLABS_VOICES[settings.voice]?.id || Audio.ELEVENLABS_VOICES.rachel.id;
                 const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`, {
                     method: 'POST',
-                    headers: {
-                        'Accept': 'audio/mpeg',
-                        'Content-Type': 'application/json',
-                        'xi-api-key': settings.elevenLabsKey
-                    },
-                    body: JSON.stringify({
-                        text: text,
-                        model_id: 'eleven_monolingual_v1',
-                        voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-                    })
+                    headers: { 'Accept': 'audio/mpeg', 'Content-Type': 'application/json', 'xi-api-key': settings.elevenLabsKey },
+                    body: JSON.stringify({ text, model_id: 'eleven_monolingual_v1', voice_settings: { stability: 0.5, similarity_boost: 0.75 } })
                 });
                 if (response.ok) {
-                    const audioBlob = await response.blob();
-                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audioUrl = URL.createObjectURL(await response.blob());
                     Audio.currentAudio = new window.Audio(audioUrl);
                     Audio.currentAudio.playbackRate = settings.speed || 1.0;
-                    Audio.currentAudio.onended = () => { 
-                        Audio.speaking = false; 
-                        if (btn) btn.classList.remove('speaking'); 
-                        URL.revokeObjectURL(audioUrl);
-                    };
-                    Audio.currentAudio.onerror = () => { 
-                        Audio.speaking = false; 
-                        if (btn) btn.classList.remove('speaking'); 
-                    };
+                    Audio.currentAudio.onended = () => { onComplete(); URL.revokeObjectURL(audioUrl); };
+                    Audio.currentAudio.onerror = onComplete;
                     Audio.currentAudio.play();
                     return;
                 }
-            } catch (e) { console.error('ElevenLabs chat TTS error:', e); }
-            Audio.speaking = false;
-        }
+            } else if (settings.provider === 'openai' && settings.openaiKey) {
+                const response = await fetch('https://api.openai.com/v1/audio/speech', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${settings.openaiKey}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model: 'tts-1', input: text, voice: settings.openaiVoice || 'nova', speed: settings.speed || 1.0 })
+                });
+                if (response.ok) {
+                    const audioUrl = URL.createObjectURL(await response.blob());
+                    Audio.currentAudio = new window.Audio(audioUrl);
+                    Audio.currentAudio.onended = () => { onComplete(); URL.revokeObjectURL(audioUrl); };
+                    Audio.currentAudio.onerror = onComplete;
+                    Audio.currentAudio.play();
+                    return;
+                }
+            } else if (settings.provider === 'speechify') {
+                if (window.speechify?.speak) {
+                    window.speechify.speak(text, { rate: settings.speed || 1.0 });
+                    setTimeout(onComplete, text.length * 60);
+                } else {
+                    window.open(`https://speechify.com/text-to-speech-online/?text=${encodeURIComponent(text.substring(0, 500))}`, '_blank', 'width=500,height=400');
+                    onComplete();
+                }
+                return;
+            }
+        } catch (e) { console.error('TTS error:', e); }
         
         // Fallback to browser TTS
-        if (!('speechSynthesis' in window)) { if (btn) btn.classList.remove('speaking'); return; }
+        if (!('speechSynthesis' in window)) { onComplete(); return; }
         const utterance = new SpeechSynthesisUtterance(text);
         const voices = speechSynthesis.getVoices();
         const preferred = voices.find(v => v.name.includes('Google') || v.name.includes('Microsoft') || v.name.includes('Samantha') || v.name.includes('Alex'));
         if (preferred) utterance.voice = preferred;
         utterance.rate = settings.speed || 1.0;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        utterance.onend = () => { if (btn) btn.classList.remove('speaking'); };
-        utterance.onerror = () => { if (btn) btn.classList.remove('speaking'); };
+        utterance.onend = onComplete;
+        utterance.onerror = onComplete;
         speechSynthesis.speak(utterance);
     },
 
@@ -14776,12 +14781,24 @@ const Audio = {
         mimi: { id: 'zrHiDhphv9ZnVXBqCLjz', name: 'Mimi', desc: 'Swedish childish female' }
     },
     
+    // OpenAI TTS voices
+    OPENAI_VOICES: {
+        alloy: { name: 'Alloy', desc: 'Neutral, balanced' },
+        echo: { name: 'Echo', desc: 'Warm, conversational' },
+        fable: { name: 'Fable', desc: 'Expressive, British' },
+        onyx: { name: 'Onyx', desc: 'Deep, authoritative' },
+        nova: { name: 'Nova', desc: 'Friendly, upbeat female' },
+        shimmer: { name: 'Shimmer', desc: 'Clear, pleasant female' }
+    },
+    
     getSettings() {
         const state = Gamification.getState();
         return state.ttsSettings || { 
             provider: 'browser', 
             elevenLabsKey: '', 
+            openaiKey: '',
             voice: 'rachel',
+            openaiVoice: 'nova',
             speed: 1.0 
         };
     },
@@ -14835,8 +14852,80 @@ const Audio = {
         
         if (settings.provider === 'elevenlabs' && settings.elevenLabsKey) {
             await this._speakElevenLabs(text, settings);
+        } else if (settings.provider === 'openai' && settings.openaiKey) {
+            await this._speakOpenAI(text, settings);
+        } else if (settings.provider === 'speechify') {
+            this._speakSpeechify(text, settings);
         } else {
             this._speakBrowser(text, settings);
+        }
+    },
+    
+    async _speakOpenAI(text, settings) {
+        try {
+            const response = await fetch('https://api.openai.com/v1/audio/speech', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${settings.openaiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'tts-1',
+                    input: text,
+                    voice: settings.openaiVoice || 'nova',
+                    speed: settings.speed || 1.0
+                })
+            });
+            
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                console.error('OpenAI TTS error:', error);
+                this._speakBrowser(text, settings);
+                return;
+            }
+            
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            this.currentAudio = new window.Audio(audioUrl);
+            
+            this.currentAudio.onended = () => {
+                this.speaking = false;
+                document.getElementById('btnAudio')?.classList.remove('active');
+                URL.revokeObjectURL(audioUrl);
+                this.currentAudio = null;
+            };
+            
+            this.currentAudio.onerror = () => {
+                this.speaking = false;
+                document.getElementById('btnAudio')?.classList.remove('active');
+                URL.revokeObjectURL(audioUrl);
+                this.currentAudio = null;
+            };
+            
+            this.currentAudio.play();
+        } catch (err) {
+            console.error('OpenAI TTS error:', err);
+            this._speakBrowser(text, settings);
+        }
+    },
+    
+    _speakSpeechify(text, settings) {
+        // Speechify uses their Chrome extension or embedded widget
+        // Check if Speechify API is available (from extension)
+        if (window.speechify && window.speechify.speak) {
+            window.speechify.speak(text, { rate: settings.speed || 1.0 });
+            // Speechify handles its own UI, we just track state
+            this.speaking = true;
+            setTimeout(() => {
+                this.speaking = false;
+                document.getElementById('btnAudio')?.classList.remove('active');
+            }, text.length * 60); // Rough estimate
+        } else {
+            // Fallback: Open Speechify web reader with text
+            const speechifyUrl = `https://speechify.com/text-to-speech-online/?text=${encodeURIComponent(text.substring(0, 500))}`;
+            window.open(speechifyUrl, '_blank', 'width=500,height=400');
+            this.speaking = false;
+            document.getElementById('btnAudio')?.classList.remove('active');
         }
     },
     
@@ -14964,43 +15053,97 @@ const Audio = {
     
     showSettingsModal() {
         const settings = this.getSettings();
-        const voices = Object.entries(this.ELEVENLABS_VOICES);
+        const elevenVoices = Object.entries(this.ELEVENLABS_VOICES);
+        const openaiVoices = Object.entries(this.OPENAI_VOICES);
         
-        let voiceOptions = voices.map(([key, v]) => 
+        let elevenVoiceOptions = elevenVoices.map(([key, v]) => 
             `<option value="${key}" ${settings.voice === key ? 'selected' : ''}>${v.name} - ${v.desc}</option>`
+        ).join('');
+        
+        let openaiVoiceOptions = openaiVoices.map(([key, v]) => 
+            `<option value="${key}" ${settings.openaiVoice === key ? 'selected' : ''}>${v.name} - ${v.desc}</option>`
         ).join('');
         
         const html = `
             <div class="modal-overlay" id="ttsSettingsModal" onclick="if(event.target===this)this.remove()">
-                <div class="modal-content" style="max-width:450px">
+                <div class="modal-content" style="max-width:480px;max-height:90vh;overflow-y:auto">
                     <h3 style="margin:0 0 16px;display:flex;align-items:center;gap:8px">
                         <span style="font-size:24px">🔊</span> Voice Settings
                     </h3>
                     
                     <div style="margin-bottom:16px">
                         <label style="display:block;font-weight:600;margin-bottom:6px">TTS Provider</label>
-                        <select id="ttsProvider" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);font-size:14px" onchange="Audio._toggleApiKeyField()">
-                            <option value="browser" ${settings.provider === 'browser' ? 'selected' : ''}>Browser (Free, basic quality)</option>
-                            <option value="elevenlabs" ${settings.provider === 'elevenlabs' ? 'selected' : ''}>ElevenLabs (Premium AI voices)</option>
+                        <select id="ttsProvider" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);font-size:14px" onchange="Audio._toggleProviderSettings()">
+                            <option value="browser" ${settings.provider === 'browser' ? 'selected' : ''}>🌐 Browser (Free, basic quality)</option>
+                            <option value="elevenlabs" ${settings.provider === 'elevenlabs' ? 'selected' : ''}>🎙️ ElevenLabs (Premium AI, 10k free/mo)</option>
+                            <option value="openai" ${settings.provider === 'openai' ? 'selected' : ''}>🤖 OpenAI TTS (~$0.015/1k chars)</option>
+                            <option value="speechify" ${settings.provider === 'speechify' ? 'selected' : ''}>📖 Speechify (Extension/Web)</option>
                         </select>
                     </div>
                     
-                    <div id="elevenLabsSettings" style="display:${settings.provider === 'elevenlabs' ? 'block' : 'none'}">
-                        <div style="margin-bottom:16px">
-                            <label style="display:block;font-weight:600;margin-bottom:6px">ElevenLabs API Key</label>
-                            <input type="password" id="elevenLabsKey" value="${settings.elevenLabsKey || ''}" 
-                                   placeholder="Enter your API key" 
-                                   style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);font-size:14px;box-sizing:border-box">
-                            <p style="font-size:11px;color:var(--gray-500);margin:4px 0 0">
-                                Get free API key at <a href="https://elevenlabs.io" target="_blank" style="color:var(--blue)">elevenlabs.io</a> (10k chars/month free)
+                    <!-- ElevenLabs Settings -->
+                    <div id="elevenLabsSettings" class="provider-settings" style="display:${settings.provider === 'elevenlabs' ? 'block' : 'none'}">
+                        <div style="padding:12px;background:rgba(139,92,246,.1);border-radius:8px;margin-bottom:12px">
+                            <div style="margin-bottom:12px">
+                                <label style="display:block;font-weight:600;margin-bottom:6px">ElevenLabs API Key</label>
+                                <input type="password" id="elevenLabsKey" value="${settings.elevenLabsKey || ''}" 
+                                       placeholder="Enter your API key" 
+                                       style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);font-size:14px;box-sizing:border-box">
+                                <p style="font-size:11px;color:var(--gray-500);margin:4px 0 0">
+                                    Get free key at <a href="https://elevenlabs.io" target="_blank" style="color:var(--blue)">elevenlabs.io</a> • 10k chars/month free
+                                </p>
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:600;margin-bottom:6px">Voice (40+ options)</label>
+                                <select id="ttsVoice" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);font-size:14px">
+                                    ${elevenVoiceOptions}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- OpenAI Settings -->
+                    <div id="openaiSettings" class="provider-settings" style="display:${settings.provider === 'openai' ? 'block' : 'none'}">
+                        <div style="padding:12px;background:rgba(16,185,129,.1);border-radius:8px;margin-bottom:12px">
+                            <div style="margin-bottom:12px">
+                                <label style="display:block;font-weight:600;margin-bottom:6px">OpenAI API Key</label>
+                                <input type="password" id="openaiKey" value="${settings.openaiKey || ''}" 
+                                       placeholder="sk-..." 
+                                       style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);font-size:14px;box-sizing:border-box">
+                                <p style="font-size:11px;color:var(--gray-500);margin:4px 0 0">
+                                    Uses your existing OpenAI key • ~$0.015 per 1,000 characters
+                                </p>
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:600;margin-bottom:6px">Voice</label>
+                                <select id="openaiVoice" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);font-size:14px">
+                                    ${openaiVoiceOptions}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Speechify Settings -->
+                    <div id="speechifySettings" class="provider-settings" style="display:${settings.provider === 'speechify' ? 'block' : 'none'}">
+                        <div style="padding:12px;background:rgba(59,130,246,.1);border-radius:8px;margin-bottom:12px">
+                            <p style="margin:0 0 8px;font-size:13px">
+                                <strong>Option 1:</strong> Install the <a href="https://speechify.com/chrome-extension/" target="_blank" style="color:var(--blue)">Speechify Chrome Extension</a> for seamless integration.
+                            </p>
+                            <p style="margin:0;font-size:13px">
+                                <strong>Option 2:</strong> Opens Speechify's web reader with the question text.
+                            </p>
+                            <p style="margin:8px 0 0;font-size:11px;color:var(--gray-500)">
+                                Speechify offers natural voices with their subscription plans.
                             </p>
                         </div>
-                        
-                        <div style="margin-bottom:16px">
-                            <label style="display:block;font-weight:600;margin-bottom:6px">Voice</label>
-                            <select id="ttsVoice" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--gray-300);font-size:14px">
-                                ${voiceOptions}
-                            </select>
+                    </div>
+                    
+                    <!-- Browser Settings -->
+                    <div id="browserSettings" class="provider-settings" style="display:${settings.provider === 'browser' ? 'block' : 'none'}">
+                        <div style="padding:12px;background:rgba(107,114,128,.1);border-radius:8px;margin-bottom:12px">
+                            <p style="margin:0;font-size:13px">
+                                Uses your browser's built-in text-to-speech. Quality varies by browser and OS.
+                            </p>
                         </div>
                     </div>
                     
@@ -15025,9 +15168,16 @@ const Audio = {
         document.body.insertAdjacentHTML('beforeend', html);
     },
     
-    _toggleApiKeyField() {
+    _toggleProviderSettings() {
         const provider = document.getElementById('ttsProvider').value;
-        document.getElementById('elevenLabsSettings').style.display = provider === 'elevenlabs' ? 'block' : 'none';
+        document.querySelectorAll('.provider-settings').forEach(el => el.style.display = 'none');
+        const settingsId = {
+            'elevenlabs': 'elevenLabsSettings',
+            'openai': 'openaiSettings', 
+            'speechify': 'speechifySettings',
+            'browser': 'browserSettings'
+        }[provider];
+        if (settingsId) document.getElementById(settingsId).style.display = 'block';
     },
     
     async _testVoice() {
@@ -15035,7 +15185,9 @@ const Audio = {
         const testSettings = {
             provider: provider,
             elevenLabsKey: document.getElementById('elevenLabsKey')?.value || '',
+            openaiKey: document.getElementById('openaiKey')?.value || '',
             voice: document.getElementById('ttsVoice')?.value || 'rachel',
+            openaiVoice: document.getElementById('openaiVoice')?.value || 'nova',
             speed: parseFloat(document.getElementById('ttsSpeed').value) || 1.0
         };
         
@@ -15046,6 +15198,10 @@ const Audio = {
         
         if (testSettings.provider === 'elevenlabs' && testSettings.elevenLabsKey) {
             await this._speakElevenLabs(testText, testSettings);
+        } else if (testSettings.provider === 'openai' && testSettings.openaiKey) {
+            await this._speakOpenAI(testText, testSettings);
+        } else if (testSettings.provider === 'speechify') {
+            this._speakSpeechify(testText, testSettings);
         } else {
             this._speakBrowser(testText, testSettings);
         }
@@ -15055,7 +15211,9 @@ const Audio = {
         const settings = {
             provider: document.getElementById('ttsProvider').value,
             elevenLabsKey: document.getElementById('elevenLabsKey')?.value || '',
+            openaiKey: document.getElementById('openaiKey')?.value || '',
             voice: document.getElementById('ttsVoice')?.value || 'rachel',
+            openaiVoice: document.getElementById('openaiVoice')?.value || 'nova',
             speed: parseFloat(document.getElementById('ttsSpeed').value) || 1.0
         };
         
@@ -15065,7 +15223,8 @@ const Audio = {
         // Show confirmation
         const toast = document.createElement('div');
         toast.className = 'achievement-toast';
-        toast.innerHTML = `<span style="font-size:24px">🔊</span><div><strong>Voice Settings Saved</strong><br><small>${settings.provider === 'elevenlabs' ? 'ElevenLabs' : 'Browser'} voice active</small></div>`;
+        const providerNames = { browser: 'Browser', elevenlabs: 'ElevenLabs', openai: 'OpenAI', speechify: 'Speechify' };
+        toast.innerHTML = `<span style="font-size:24px">🔊</span><div><strong>Voice Settings Saved</strong><br><small>${providerNames[settings.provider] || 'Browser'} voice active</small></div>`;
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 3000);
     }
@@ -15729,7 +15888,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.56</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.57</div>
 
 </body>
 </html>
