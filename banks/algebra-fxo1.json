@@ -2975,57 +2975,22 @@
     },
     {
       "id": 55,
-      "text": "A technology firm in Erie, Pennsylvania, receives a contract to develop a computer program controlling the angle of a solar array on a daily basis. The firm first needs to model the hours of sunlight for every day of the year.\n From December to March, the hours of daylight are increasing faster and faster, and from March to June, they are increasing slower and slower.\n [Graph: Four Graph Options]\n Which graph would be an appropriate model for this firm to use?",
+      "text": "A technology firm in Erie, Pennsylvania, receives a contract to develop a computer program controlling the angle of a solar array on a daily basis. The firm first needs to model the hours of sunlight for every day of the year.\n\nFrom December to March, the hours of daylight are increasing faster and faster, and from March to June, they are increasing slower and slower.\n\n**Graph Descriptions (each shows hours of daylight from Dec to Jun):**\n- **Graph A**: S-curve shape - starts flat, curves upward steeply in middle, then flattens at top (concave up → inflection → concave down)\n- **Graph B**: Steep rise at start that gradually levels off (concave down throughout)\n- **Graph C**: Slow rise at start that gets steeper toward the end (concave up throughout)\n- **Graph D**: Straight diagonal line from bottom-left to top-right (linear increase)\n\nWhich graph would be an appropriate model for this firm to use?",
       "options": [
-        "Graph A (S-curve: concave up then concave down, always increasing)",
-        "Graph B (Concave down throughout, always increasing)",
-        "Graph C (Concave up throughout, always increasing)",
-        "Graph D (Linear increase)"
+        "Graph A",
+        "Graph B",
+        "Graph C",
+        "Graph D"
       ],
       "correctAnswer": 0,
-      "explanation": "The description requires: increasing faster and faster (concave up) from December to March, then increasing slower and slower (concave down) from March to June, with an inflection point around March. Graph A shows this S-shaped pattern of concave up transitioning to concave down while continuously increasing.",
+      "explanation": "The description requires: increasing faster and faster (concave up) from December to March, then increasing slower and slower (concave down) from March to June. This means the graph must have an inflection point around March where it transitions from concave up to concave down. Only Graph A (S-curve) shows this pattern - it curves upward increasingly fast until March, then continues increasing but at a slowing rate until June.",
       "category": "Concavity & Curvature",
       "tags": [
         "concavity",
         "inflection",
         "model-selection"
       ],
-      "difficulty": 3,
-      "graphData": {
-        "type": "line",
-        "title": "Graph Options A-D (Hours of Daylight Dec-Jun)",
-        "xLabel": "Month (0=Dec, 6=Jun)",
-        "yLabel": "Hours",
-        "xMin": 0,
-        "xMax": 6,
-        "yMin": 7,
-        "yMax": 18,
-        "noFill": true,
-        "series": [
-          {
-            "label": "A: S-curve (correct)",
-            "data": [{"x":0,"y":8},{"x":1,"y":8.5},{"x":2,"y":9.5},{"x":3,"y":11},{"x":4,"y":13},{"x":5,"y":14.5},{"x":6,"y":15}],
-            "type": "line"
-          },
-          {
-            "label": "B: Concave down",
-            "data": [{"x":0,"y":9},{"x":1,"y":12},{"x":2,"y":14},{"x":3,"y":15},{"x":4,"y":15.5},{"x":5,"y":15.8},{"x":6,"y":16}],
-            "type": "line",
-            "dashed": true
-          },
-          {
-            "label": "C: Concave up",
-            "data": [{"x":0,"y":10},{"x":1,"y":10.2},{"x":2,"y":10.8},{"x":3,"y":12},{"x":4,"y":14},{"x":5,"y":16},{"x":6,"y":17}],
-            "type": "line"
-          },
-          {
-            "label": "D: Linear",
-            "data": [{"x":0,"y":11},{"x":1,"y":12.2},{"x":2,"y":13.4},{"x":3,"y":14.6},{"x":4,"y":15.8},{"x":5,"y":17},{"x":6,"y":18}],
-            "type": "line",
-            "dashed": true
-          }
-        ]
-      }
+      "difficulty": 3
     },
     {
       "id": 56,
