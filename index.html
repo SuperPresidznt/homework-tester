@@ -14312,7 +14312,7 @@ const Progress = {
     },
 
     renderCategoryAccuracy() {
-        const cats = QuestionTracker.getCategoryAccuracy();
+        const cats = QuestionTracker.getCategoryAccuracyWithTrend();
         const entries = Object.entries(cats).filter(([_, d]) => d.total > 0);
         if (entries.length === 0) return '';
         entries.sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total));
@@ -14326,9 +14326,18 @@ const Progress = {
                 const lvl = gamState.categoryMastery[cat].level;
                 badge = ' <span style="display:inline-block;background:' + badgeColors[lvl] + ';color:#333;padding:1px 6px;border-radius:8px;font-size:10px;font-weight:bold">' + lvl.charAt(0).toUpperCase() + lvl.slice(1) + '</span>';
             }
-            return '<div class="chart-row"><span class="chart-label">' + escapeHtml(cat) + badge + '</span><div class="chart-bar-bg"><div class="chart-bar-fill ' + colorClass + '" style="width:' + pct + '%"></div></div><span class="chart-value">' + d.correct + '/' + d.total + ' (' + pct + '%)</span></div>';
+            // Trend indicator (+/- %)
+            let trendHtml = '';
+            if (d.trend !== null && d.trend !== 0) {
+                const trendColor = d.trend > 0 ? 'var(--green)' : 'var(--red)';
+                const trendIcon = d.trend > 0 ? '↑' : '↓';
+                trendHtml = ' <span style="color:' + trendColor + ';font-size:11px;font-weight:bold">' + trendIcon + Math.abs(d.trend) + '%</span>';
+            } else if (d.trend === 0 && d.recentTotal > 0 && d.olderTotal > 0) {
+                trendHtml = ' <span style="color:var(--gray-500);font-size:11px">→0%</span>';
+            }
+            return '<div class="chart-row"><span class="chart-label">' + escapeHtml(cat) + badge + '</span><div class="chart-bar-bg"><div class="chart-bar-fill ' + colorClass + '" style="width:' + pct + '%"></div></div><span class="chart-value">' + d.correct + '/' + d.total + ' (' + pct + '%)' + trendHtml + '</span></div>';
         }).join('');
-        return '<div class="progress-section"><h3>Category Accuracy (All Modes)</h3><p style="font-size:12px;color:var(--gray-600);margin-bottom:8px">Combined from tests, drills, and AI practice</p><div class="progress-chart">' + bars + '</div></div>';
+        return '<div class="progress-section"><h3>Category Accuracy (All Modes)</h3><p style="font-size:12px;color:var(--gray-600);margin-bottom:8px">Combined from tests, drills, and AI practice. Trend shows last 7 days vs previous 7 days.</p><div class="progress-chart">' + bars + '</div></div>';
     },
 
     renderTestHistory() {
@@ -17000,6 +17009,59 @@ const QuestionTracker = {
         return cats;
     },
 
+    // Get category accuracy with trend (compare last 7 days vs previous 7 days)
+    getCategoryAccuracyWithTrend() {
+        const data = this._getData();
+        const now = Date.now();
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        const twoWeeks = 14 * 24 * 60 * 60 * 1000;
+        
+        const cats = {};
+        for (const qId in data) {
+            const d = data[qId];
+            const cat = d.category || 'General';
+            if (!cats[cat]) cats[cat] = { 
+                correct: 0, total: 0, 
+                recentCorrect: 0, recentTotal: 0,
+                olderCorrect: 0, olderTotal: 0
+            };
+            
+            // Overall totals
+            cats[cat].correct += d.correct;
+            cats[cat].total += d.attempts;
+            
+            // Split by time period using history
+            if (d.history && d.history.length > 0) {
+                d.history.forEach(h => {
+                    const ts = new Date(h.date).getTime();
+                    const age = now - ts;
+                    if (age <= oneWeek) {
+                        cats[cat].recentTotal++;
+                        if (h.correct) cats[cat].recentCorrect++;
+                    } else if (age <= twoWeeks) {
+                        cats[cat].olderTotal++;
+                        if (h.correct) cats[cat].olderCorrect++;
+                    }
+                });
+            }
+        }
+        
+        // Calculate trends
+        for (const cat in cats) {
+            const c = cats[cat];
+            const recentPct = c.recentTotal > 0 ? (c.recentCorrect / c.recentTotal) * 100 : null;
+            const olderPct = c.olderTotal > 0 ? (c.olderCorrect / c.olderTotal) * 100 : null;
+            
+            if (recentPct !== null && olderPct !== null) {
+                c.trend = Math.round(recentPct - olderPct);
+            } else {
+                c.trend = null; // Not enough data
+            }
+        }
+        
+        return cats;
+    },
+
     // Get improvement trend (compare last N attempts vs previous N)
     getTrend(qId, lookback) {
         lookback = lookback || 5;
@@ -17342,7 +17404,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.88</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.89</div>
 
 </body>
 </html>
