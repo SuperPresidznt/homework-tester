@@ -3001,32 +3001,39 @@
       ],
       "difficulty": 3,
       "graphData": {
-        "type": "multi",
-        "title": "Graph Options A-D",
-        "graphs": [
+        "type": "line",
+        "title": "Graph Options A-D (Hours of Daylight Dec-Jun)",
+        "xLabel": "Month (0=Dec, 6=Jun)",
+        "yLabel": "Hours",
+        "xMin": 0,
+        "xMax": 6,
+        "yMin": 7,
+        "yMax": 18,
+        "noFill": true,
+        "series": [
           {
-            "label": "A",
-            "description": "S-curve (concave up → concave down)",
-            "data": [{"x":0,"y":8},{"x":1,"y":8.5},{"x":2,"y":9.5},{"x":3,"y":11},{"x":4,"y":13},{"x":5,"y":14.5},{"x":6,"y":15}]
+            "label": "A: S-curve (correct)",
+            "data": [{"x":0,"y":8},{"x":1,"y":8.5},{"x":2,"y":9.5},{"x":3,"y":11},{"x":4,"y":13},{"x":5,"y":14.5},{"x":6,"y":15}],
+            "type": "line"
           },
           {
-            "label": "B", 
-            "description": "Concave down throughout",
-            "data": [{"x":0,"y":8},{"x":1,"y":11},{"x":2,"y":13},{"x":3,"y":14},{"x":4,"y":14.5},{"x":5,"y":14.8},{"x":6,"y":15}]
+            "label": "B: Concave down",
+            "data": [{"x":0,"y":9},{"x":1,"y":12},{"x":2,"y":14},{"x":3,"y":15},{"x":4,"y":15.5},{"x":5,"y":15.8},{"x":6,"y":16}],
+            "type": "line",
+            "dashed": true
           },
           {
-            "label": "C",
-            "description": "Concave up throughout", 
-            "data": [{"x":0,"y":8},{"x":1,"y":8.2},{"x":2,"y":8.8},{"x":3,"y":10},{"x":4,"y":12},{"x":5,"y":14},{"x":6,"y":17}]
+            "label": "C: Concave up",
+            "data": [{"x":0,"y":10},{"x":1,"y":10.2},{"x":2,"y":10.8},{"x":3,"y":12},{"x":4,"y":14},{"x":5,"y":16},{"x":6,"y":17}],
+            "type": "line"
           },
           {
-            "label": "D",
-            "description": "Linear increase",
-            "data": [{"x":0,"y":8},{"x":1,"y":9.2},{"x":2,"y":10.4},{"x":3,"y":11.6},{"x":4,"y":12.8},{"x":5,"y":14},{"x":6,"y":15.2}]
+            "label": "D: Linear",
+            "data": [{"x":0,"y":11},{"x":1,"y":12.2},{"x":2,"y":13.4},{"x":3,"y":14.6},{"x":4,"y":15.8},{"x":5,"y":17},{"x":6,"y":18}],
+            "type": "line",
+            "dashed": true
           }
-        ],
-        "xLabel": "Month (Dec-Jun)",
-        "yLabel": "Hours of Daylight"
+        ]
       }
     },
     {
