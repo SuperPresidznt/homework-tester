@@ -7275,7 +7275,7 @@ const Battle = {
         document.getElementById('battleContent').innerHTML = html;
         // Render math in question text
         if (window.renderMathInElement) {
-            try { renderMathInElement(document.getElementById('battleContent'), { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '$', right: '$', display: false }, { left: '\\(', right: '\\)', display: false }, { left: '\\[', right: '\\]', display: true }] }); } catch {}
+            try { renderMathInElement(document.getElementById('battleContent'), { delimiters: [{ left: '\\(', right: '\\)', display: false }, { left: '\\[', right: '\\]', display: true }] }); } catch {}
         }
     },
 
@@ -10937,8 +10937,6 @@ const App = {
                     delimiters: [
                         { left: "\\[", right: "\\]", display: true },
                         { left: "\\(", right: "\\)", display: false },
-                        { left: "$$", right: "$$", display: true },
-                        { left: "$", right: "$", display: false },
                     ]
                 });
             } catch {}
@@ -11290,8 +11288,6 @@ const Drill = {
                     delimiters: [
                         { left: "\\[", right: "\\]", display: true },
                         { left: "\\(", right: "\\)", display: false },
-                        { left: "$$", right: "$$", display: true },
-                        { left: "$", right: "$", display: false },
                     ]
                 });
             } catch {}
@@ -12048,8 +12044,6 @@ const SpeedMode = {
                     delimiters: [
                         { left: "\\[", right: "\\]", display: true },
                         { left: "\\(", right: "\\)", display: false },
-                        { left: "$$", right: "$$", display: true },
-                        { left: "$", right: "$", display: false },
                     ]
                 });
             } catch {}
@@ -12152,8 +12146,6 @@ const Review = {
                     delimiters: [
                         { left: "\\[", right: "\\]", display: true },
                         { left: "\\(", right: "\\)", display: false },
-                        { left: "$$", right: "$$", display: true },
-                        { left: "$", right: "$", display: false },
                     ]
                 });
             } catch {}
@@ -13029,8 +13021,6 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
                     delimiters: [
                         { left: "\\[", right: "\\]", display: true },
                         { left: "\\(", right: "\\)", display: false },
-                        { left: "$$", right: "$$", display: true },
-                        { left: "$", right: "$", display: false },
                     ]
                 });
             } catch {}
@@ -16989,7 +16979,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.78</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.79</div>
 
 </body>
 </html>
