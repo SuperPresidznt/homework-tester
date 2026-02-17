@@ -13790,7 +13790,7 @@ const Progress = {
         return `<div class="progress-section">
             <h3>📚 Study Time vs Test Scores</h3>
             <p style="font-size:12px;color:var(--gray-600);margin-bottom:8px">${insight}</p>
-            <canvas id="studyVsScoreChart" width="600" height="200" style="width:100%;max-height:200px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
+            <canvas id="studyVsScoreChart" width="600" height="200" style="width:100%;height:200px;max-height:200px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
             <p style="font-size:12px;color:var(--gray-600);text-align:center;margin-top:6px">Each dot = one test day (study mins that day vs score)</p>
         </div>`;
     },
@@ -13976,7 +13976,7 @@ const Progress = {
         
         return `<div class="progress-section">
             <h3>📈 Daily Accuracy Trend</h3>
-            <canvas id="accuracyChart" width="600" height="200" style="width:100%;max-height:200px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
+            <canvas id="accuracyChart" width="600" height="200" style="width:100%;height:200px;max-height:200px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
             <p style="font-size:12px;color:var(--gray-600);text-align:center;margin-top:6px">Last ${dailyData.length} days with activity</p>
         </div>`;
     },
@@ -14167,7 +14167,7 @@ const Progress = {
         allHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
         const recent = allHistory.slice(-20);
         return '<div class="progress-section"><h3>📊 Score Trend</h3>' +
-            '<canvas id="trendChart" width="600" height="220" style="width:100%;max-height:220px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>' +
+            '<canvas id="trendChart" width="600" height="220" style="width:100%;height:220px;max-height:220px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>' +
             '<p style="font-size:12px;color:var(--gray-600);text-align:center;margin-top:6px">Last ' + recent.length + ' tests</p></div>';
     },
 
@@ -17341,7 +17341,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.86</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.87</div>
 
 </body>
 </html>
