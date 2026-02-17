@@ -13400,15 +13400,15 @@ const Progress = {
         
         return `<div class="progress-section">
             <h3>💡 Insights</h3>
-            <p style="font-size:12px;color:var(--gray-600);margin-bottom:12px">Strong patterns detected in your data:</p>
+            <p style="font-size:12px;color:var(--gray-600);margin-bottom:12px">Statistically significant patterns (based on ${insights.length > 0 ? '8+' : ''} data points):</p>
             ${insightItems}
         </div>`;
     },
 
     _detectCorrelations() {
         const insights = [];
-        const MIN_CORRELATION = 0.4; // Only show strong correlations
-        const MIN_DATA_POINTS = 5;
+        const MIN_CORRELATION = 0.55; // Only show meaningful correlations (was 0.4)
+        const MIN_DATA_POINTS = 8; // Need more data for statistical validity (was 5)
         
         // Gather all the data we need
         const studyByDay = Store.get('studyByDay', {});
@@ -13443,7 +13443,7 @@ const Progress = {
                     ? 'The more time you study each day, the higher your test scores tend to be.'
                     : 'More study time isn\'t improving scores. Try focusing on weak areas instead.',
                 r: studyScoreR,
-                strength: Math.abs(studyScoreR) > 0.7 ? 'Strong' : 'Moderate',
+                strength: this._getCorrelationStrength(studyScoreR),
                 positive: studyScoreR > 0
             });
         }
@@ -13483,7 +13483,7 @@ const Progress = {
             }
         });
         
-        if (drillVsScoreData.length >= 4) {
+        if (drillVsScoreData.length >= 6) { // Need at least 6 categories for meaningful correlation
             const drillR = this._pearsonCorrelation(drillVsScoreData);
             if (Math.abs(drillR) >= MIN_CORRELATION) {
                 insights.push({
@@ -13492,7 +13492,7 @@ const Progress = {
                         ? 'Categories you drill more have higher test scores. Keep it up!'
                         : 'More drilling isn\'t translating to better scores. Try AI Practice for weak areas.',
                     r: drillR,
-                    strength: Math.abs(drillR) > 0.7 ? 'Strong' : 'Moderate',
+                    strength: this._getCorrelationStrength(drillR),
                     positive: drillR > 0
                 });
             }
@@ -13507,12 +13507,12 @@ const Progress = {
             const secondAvg = secondHalf.reduce((s, h) => s + h.pct, 0) / secondHalf.length;
             const improvement = secondAvg - firstAvg;
             
-            if (improvement > 5) {
+            if (improvement > 8) { // Require 8%+ improvement for statistical significance
                 insights.push({
                     title: 'AI Practice Is Boosting Scores!',
                     description: `Your recent test average is ${Math.round(improvement)}% higher than earlier. AI-targeted practice is helping!`,
-                    r: 0.5,
-                    strength: 'Moderate',
+                    r: Math.min(0.9, 0.5 + improvement / 30), // Scale r based on improvement magnitude
+                    strength: improvement > 15 ? 'Strong' : 'Moderate',
                     positive: true
                 });
             }
@@ -13544,7 +13544,7 @@ const Progress = {
                         ? 'Longer study streaks correlate with better scores. Keep your streak going!'
                         : 'Long streaks might be causing burnout. Quality rest can help.',
                     r: streakR,
-                    strength: Math.abs(streakR) > 0.7 ? 'Strong' : 'Moderate',
+                    strength: this._getCorrelationStrength(streakR),
                     positive: streakR > 0
                 });
             }
@@ -13565,22 +13565,30 @@ const Progress = {
             }
         });
         
-        if (timeAccuracyData.length >= 20) {
+        if (timeAccuracyData.length >= 50) { // Need many data points for time-accuracy correlation
             const timeR = this._pearsonCorrelation(timeAccuracyData);
-            if (Math.abs(timeR) >= 0.2) { // Lower threshold for this one
+            if (Math.abs(timeR) >= 0.3) { // Raised threshold
                 insights.push({
                     title: timeR > 0 ? 'Take Your Time' : 'Trust Your Instincts',
                     description: timeR > 0
                         ? 'Spending more time on questions tends to improve accuracy. Don\'t rush!'
                         : 'Your quick answers are often correct. Trust your first instinct.',
                     r: timeR,
-                    strength: Math.abs(timeR) > 0.4 ? 'Moderate' : 'Weak',
+                    strength: this._getCorrelationStrength(timeR),
                     positive: timeR > 0
                 });
             }
         }
         
         return insights;
+    },
+
+    _getCorrelationStrength(r) {
+        const absR = Math.abs(r);
+        if (absR >= 0.8) return 'Very Strong';
+        if (absR >= 0.65) return 'Strong';
+        if (absR >= 0.5) return 'Moderate';
+        return 'Weak';
     },
 
     _pearsonCorrelation(data) {
@@ -17147,7 +17155,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.83</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.84</div>
 
 </body>
 </html>
