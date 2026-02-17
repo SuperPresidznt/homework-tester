@@ -1999,6 +1999,11 @@ button:focus-visible {
             <div class="garden-decos-row" id="gardenDecos"></div>
         </div>
         <div class="garden-pet" id="gardenPet" onclick="PetModal.show()"></div>
+        <div class="garden-water-meter" id="gardenWaterMeter">
+            <div class="water-meter-label">Water Level</div>
+            <div class="water-meter-bar"><div class="water-meter-fill" style="width:100%"></div></div>
+            <div class="water-meter-text">100% - Hydrated</div>
+        </div>
         <div class="garden-water-btn" id="gardenWaterBtn" onclick="Garden.useWater()" title="Use Watering Can">
             <span>&#x1FAA3;</span>
             <span class="water-count" id="gardenWaterCount">0</span>
@@ -17612,7 +17617,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.99</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.00</div>
 
 </body>
 </html>
