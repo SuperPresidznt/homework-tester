@@ -666,7 +666,7 @@
     },
     {
       "id": 13,
-      "text": "The following table compares the number of employees hired and the number of employees dismissed over an 11-year period for a certain business.\n [Table: Employees Hired vs Dismissed 2007-2017]\n What can be concluded from this table?",
+      "text": "The following table compares the number of employees hired and the number of employees dismissed over an 11-year period for a certain business.\n\n| Year | Hired | Dismissed |\n|------|-------|----------|\n| 2007 | 50 | 10 |\n| 2008 | 20 | 10 |\n| 2009 | 30 | 5 |\n| 2010 | 21 | 17 |\n| 2011 | 60 | 30 |\n| 2012 | 70 | 15 |\n| 2013 | 40 | 20 |\n| 2014 | 15 | 5 |\n| 2015 | 20 | 6 |\n| 2016 | 10 | 2 |\n| 2017 | 10 | 7 |\n\nWhat can be concluded from this table?",
       "options": [
         "Fewer employees were hired than dismissed each year.",
         "More employees were hired in 2007 and 2008 than in 2010 and 2011.",
@@ -742,7 +742,7 @@
     },
     {
       "id": 17,
-      "text": "The function table below shows a company's revenue function (R) and expense function (E) for each month.\n Monthly Revenues and Expenses for months 1-12 provided.\n Which conclusion can be made about this function table?",
+      "text": "The function table below shows a company's revenue function (R) and expense function (E) for each month.\n\n| Month | R(m) | E(m) |\n|-------|--------|--------|\n| 1 (Jan) | $4,500 | $2,100 |\n| 2 (Feb) | $3,220 | $3,957 |\n| 3 (Mar) | $5,800 | $2,400 |\n| 4 (Apr) | $6,100 | $1,800 |\n| 5 (May) | $4,200 | $3,900 |\n| 6 (Jun) | $7,500 | $2,200 |\n| 7 (Jul) | $8,900 | $1,500 |\n| 8 (Aug) | $9,200 | $1,800 |\n| 9 (Sep) | $10,100 | $1,200 |\n| 10 (Oct) | $12,337 | $927 |\n| 11 (Nov) | $10,234 | $3,786 |\n| 12 (Dec) | $11,000 | $2,500 |\n\nWhich conclusion can be made about this function table?",
       "options": [
         "Since R(11) is $10,234 and E(11) is $3,786, there was not a profit in November.",
         "The lowest profit occurred during May.",
@@ -761,7 +761,7 @@
     },
     {
       "id": 18,
-      "text": "The original value of a company car bought in January of 2006 was $22,800. Below is a function table that tracks the value of the car V(y) as it depreciates from 2006 to 2015.\n Which other conclusion can be reached from this table?",
+      "text": "The original value of a company car bought in January of 2006 was $22,800. Below is a function table that tracks the value of the car V(y) as it depreciates from 2006 to 2015.\n\n| Year | V(y) |\n|------|------|\n| 2006 | $22,800 |\n| 2007 | $18,240 |\n| 2008 | $15,504 |\n| 2009 | $13,178 |\n| 2010 | $11,202 |\n| 2011 | $9,522 |\n| 2012 | $8,094 |\n| 2013 | $6,879 |\n| 2014 | $5,847 |\n| 2015 | $4,970 |\n\nWhich other conclusion can be reached from this table?",
       "options": [
         "V(y) decreases the most from 2006 to 2007.",
         "V(y) decreases by the same amount each year.",
