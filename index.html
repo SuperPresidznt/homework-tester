@@ -9789,6 +9789,8 @@ function showScreen(name, showSubheader, showFooter) {
         Session.end();
         // Reset combo when returning home so it doesn't persist
         Gamification.resetCombo();
+        // Clean up any Speed Mode feedback overlays
+        document.querySelectorAll('.speed-feedback-overlay').forEach(el => el.remove());
     }
 
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -11945,7 +11947,11 @@ const SpeedMode = {
     },
 
     showFeedback(text, color, multiplier) {
+        // Remove any existing feedback first
+        document.querySelectorAll('.speed-feedback-overlay').forEach(el => el.remove());
+        
         const feedback = document.createElement('div');
+        feedback.className = 'speed-feedback-overlay';
         feedback.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:bold;color:${color};text-shadow:2px 2px 4px rgba(0,0,0,.3);z-index:9999;animation:speedFeedback 0.8s ease-out forwards;pointer-events:none`;
         feedback.textContent = text;
         if (multiplier > 1) {
@@ -12025,6 +12031,9 @@ const SpeedMode = {
     end() {
         this.stopTimer();
         Session.end();
+        
+        // Clean up any lingering feedback overlays
+        document.querySelectorAll('.speed-feedback-overlay').forEach(el => el.remove());
 
         document.getElementById('speedCard').innerHTML = `
             <div class="drill-session-done" style="text-align:center;padding:30px">
@@ -17010,7 +17019,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.80</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.81</div>
 
 </body>
 </html>
