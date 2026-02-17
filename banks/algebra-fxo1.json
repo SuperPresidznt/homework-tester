@@ -2978,12 +2978,12 @@
     },
     {
       "id": 55,
-      "text": "A technology firm in Erie, Pennsylvania, receives a contract to develop a computer program controlling the angle of a solar array on a daily basis. The firm first needs to model the hours of sunlight for every day of the year.\n From December to March, the hours of daylight are increasing faster and faster, and from March to June, they are increasing slower and slower.\n Which graph would be an appropriate model for this firm to use?",
+      "text": "A technology firm in Erie, Pennsylvania, receives a contract to develop a computer program controlling the angle of a solar array on a daily basis. The firm first needs to model the hours of sunlight for every day of the year.\n From December to March, the hours of daylight are increasing faster and faster, and from March to June, they are increasing slower and slower.\n [Graph: Four Graph Options]\n Which graph would be an appropriate model for this firm to use?",
       "options": [
-        "Graph A",
-        "Graph B",
-        "Graph C",
-        "Graph D"
+        "Graph A (S-curve: concave up then concave down, always increasing)",
+        "Graph B (Concave down throughout, always increasing)",
+        "Graph C (Concave up throughout, always increasing)",
+        "Graph D (Linear increase)"
       ],
       "correctAnswer": 0,
       "explanation": "The description requires: increasing faster and faster (concave up) from December to March, then increasing slower and slower (concave down) from March to June, with an inflection point around March. Graph A shows this S-shaped pattern of concave up transitioning to concave down while continuously increasing.",
@@ -2993,7 +2993,35 @@
         "inflection",
         "model-selection"
       ],
-      "difficulty": 3
+      "difficulty": 3,
+      "graphData": {
+        "type": "multi",
+        "title": "Graph Options A-D",
+        "graphs": [
+          {
+            "label": "A",
+            "description": "S-curve (concave up → concave down)",
+            "data": [{"x":0,"y":8},{"x":1,"y":8.5},{"x":2,"y":9.5},{"x":3,"y":11},{"x":4,"y":13},{"x":5,"y":14.5},{"x":6,"y":15}]
+          },
+          {
+            "label": "B", 
+            "description": "Concave down throughout",
+            "data": [{"x":0,"y":8},{"x":1,"y":11},{"x":2,"y":13},{"x":3,"y":14},{"x":4,"y":14.5},{"x":5,"y":14.8},{"x":6,"y":15}]
+          },
+          {
+            "label": "C",
+            "description": "Concave up throughout", 
+            "data": [{"x":0,"y":8},{"x":1,"y":8.2},{"x":2,"y":8.8},{"x":3,"y":10},{"x":4,"y":12},{"x":5,"y":14},{"x":6,"y":17}]
+          },
+          {
+            "label": "D",
+            "description": "Linear increase",
+            "data": [{"x":0,"y":8},{"x":1,"y":9.2},{"x":2,"y":10.4},{"x":3,"y":11.6},{"x":4,"y":12.8},{"x":5,"y":14},{"x":6,"y":15.2}]
+          }
+        ],
+        "xLabel": "Month (Dec-Jun)",
+        "yLabel": "Hours of Daylight"
+      }
     },
     {
       "id": 56,
