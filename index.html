@@ -3708,8 +3708,9 @@ const Gamification = {
         state.categoryMastery[category].total++;
         if (isCorrect) state.categoryMastery[category].correct++;
         
-        // Track time spent per category
-        const timeSpent = this.getQuestionTime() || 0;
+        // Track time spent per category (cap at 5 min to filter outliers)
+        const rawTime = this.getQuestionTime() || 0;
+        const timeSpent = Math.min(rawTime, 5 * 60 * 1000);
         state.categoryMastery[category].totalTimeMs = (state.categoryMastery[category].totalTimeMs || 0) + timeSpent;
 
         const cm = state.categoryMastery[category];
@@ -16915,7 +16916,9 @@ const QuestionTracker = {
             if (!r.answered) { entry.skipped++; }
             else if (r.correct) { entry.correct++; }
             else { entry.incorrect++; }
-            entry.totalTime += r.timeSpent || 0;
+            // Cap time to filter outliers (5 min max per question)
+            const cappedTime = Math.min(r.timeSpent || 0, 5 * 60 * 1000);
+            entry.totalTime += cappedTime;
             if (r.category) entry.category = r.category;
             if (r.confidence != null) {
                 entry.confidenceSum = (entry.confidenceSum || 0) + r.confidence;
@@ -16927,13 +16930,19 @@ const QuestionTracker = {
             // Keep last 20 attempts
             entry.history.push({
                 date: now, correct: r.correct, answered: r.answered,
-                chosen: r.chosen, timeMs: r.timeSpent || 0,
+                chosen: r.chosen, timeMs: cappedTime,
                 confidence: r.confidence == null ? undefined : r.confidence,
                 category: r.category || entry.category || 'General'
             });
             if (entry.history.length > 20) entry.history = entry.history.slice(-20);
         }
         this._save(data);
+    },
+
+    // Cap time to filter outliers (5 min max per question - longer = interruption)
+    _capTime(timeMs) {
+        const MAX_TIME = 5 * 60 * 1000; // 5 minutes
+        return Math.min(timeMs || 0, MAX_TIME);
     },
 
     // Record a single question attempt (for drill and AI practice)
@@ -16946,7 +16955,7 @@ const QuestionTracker = {
             answered: true,
             chosen: null,
             correctAnswer: null,
-            timeSpent: timeSpent || 0,
+            timeSpent: this._capTime(timeSpent),
             confidence: meta.confidence ?? null,
             mode: meta.mode || 'practice'
         }]);
@@ -17404,7 +17413,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.89</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.90</div>
 
 </body>
 </html>
