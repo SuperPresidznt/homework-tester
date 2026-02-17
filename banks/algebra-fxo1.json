@@ -2614,19 +2614,10 @@
             "type": "line"
           }
         ],
-        "annotations": [
-          {
-            "x": 9,
-            "y": 18,
-            "text": "Sep 2015: $18",
-            "dx": 0,
-            "dy": -12
-          }
-        ],
         "asymptotes": [
           {
             "y": 20,
-            "label": "$20 threshold"
+            "label": "$20 buy threshold"
           }
         ]
       }
