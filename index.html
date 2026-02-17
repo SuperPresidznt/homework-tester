@@ -998,6 +998,16 @@ button:focus-visible {
 [data-theme="dark"] .inline-chart-wrap{background:#16213e;border-color:#374151}
 @media(prefers-color-scheme:dark){body:not([data-theme="light"]) .inline-chart-wrap{background:#16213e;border-color:#374151}}
 
+/* Grid layout for multiple graph panels (2x2) */
+.inline-chart-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:12px 0;padding:12px;background:var(--gray-100);border-radius:8px}
+.inline-chart-grid-item{background:#fff;border:1px solid var(--gray-200);border-radius:6px;overflow:hidden}
+.chart-grid-label{padding:8px 12px;font-weight:600;font-size:14px;background:var(--gray-100);border-bottom:1px solid var(--gray-200);text-align:center}
+.inline-chart-grid-item canvas{display:block;width:100%;height:160px}
+[data-theme="dark"] .inline-chart-grid{background:#1e293b}
+[data-theme="dark"] .inline-chart-grid-item{background:#16213e;border-color:#374151}
+[data-theme="dark"] .chart-grid-label{background:#1e293b;border-color:#374151;color:#93c5fd}
+@media(max-width:500px){.inline-chart-grid{grid-template-columns:1fr}.inline-chart-grid-item canvas{height:140px}}
+
 /* Graph/image placeholder styling for dark mode */
 @media (prefers-color-scheme: dark) {
     body:not([data-theme="light"]) .question-text em[data-graph],
@@ -15759,6 +15769,41 @@ const InlineChart = {
         const html = el.innerHTML;
         if (!html.includes('[Graph:')) return;
 
+        // Handle grid type (2x2 panel of separate graphs)
+        if (graphData.type === 'grid' && graphData.panels) {
+            el.innerHTML = html.replace(/\[Graph:[^\]]*\]/g, () => {
+                const gridHtml = graphData.panels.map((panel, i) => {
+                    const id = 'chart-grid-' + Math.random().toString(36).substr(2, 9);
+                    return `<div class="inline-chart-grid-item">
+                        <div class="chart-grid-label">${panel.label || ('Graph ' + String.fromCharCode(65 + i))}</div>
+                        <canvas id="${id}" data-panel-idx="${i}" width="260" height="200"></canvas>
+                    </div>`;
+                }).join('');
+                return `<div class="inline-chart-grid">${gridHtml}</div>`;
+            });
+
+            requestAnimationFrame(() => {
+                const canvases = el.querySelectorAll('canvas[data-panel-idx]');
+                canvases.forEach(canvas => {
+                    const idx = parseInt(canvas.dataset.panelIdx);
+                    const panel = graphData.panels[idx];
+                    if (panel) {
+                        const panelGd = {
+                            type: panel.type || 'line',
+                            series: [{ data: panel.data, label: panel.label }],
+                            xMin: graphData.xMin,
+                            xMax: graphData.xMax,
+                            yMin: graphData.yMin,
+                            yMax: graphData.yMax,
+                            noFill: true
+                        };
+                        this.draw(canvas, panelGd);
+                    }
+                });
+            });
+            return;
+        }
+
         // Build legend HTML for multi-series graphs
         const series = graphData.series || [{ data: graphData.data || [] }];
         const seriesColors = ['#2980b9', '#e67e22', '#2ecc71', '#9b59b6'];
@@ -17430,7 +17475,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.93</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.94</div>
 
 </body>
 </html>

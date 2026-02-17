@@ -2975,7 +2975,7 @@
     },
     {
       "id": 55,
-      "text": "A technology firm in Erie, Pennsylvania, receives a contract to develop a computer program controlling the angle of a solar array on a daily basis. The firm first needs to model the hours of sunlight for every day of the year.\n\nFrom December to March, the hours of daylight are increasing faster and faster, and from March to June, they are increasing slower and slower.\n\n**Graph Descriptions (each shows hours of daylight from Dec to Jun):**\n- **Graph A**: S-curve shape - starts flat, curves upward steeply in middle, then flattens at top (concave up → inflection → concave down)\n- **Graph B**: Steep rise at start that gradually levels off (concave down throughout)\n- **Graph C**: Slow rise at start that gets steeper toward the end (concave up throughout)\n- **Graph D**: Straight diagonal line from bottom-left to top-right (linear increase)\n\nWhich graph would be an appropriate model for this firm to use?",
+      "text": "A technology firm in Erie, Pennsylvania, receives a contract to develop a computer program controlling the angle of a solar array on a daily basis. The firm first needs to model the hours of sunlight for every day of the year.\n\nFrom December to March, the hours of daylight are increasing faster and faster, and from March to June, they are increasing slower and slower.\n\n[Graph: Four Graph Options]\n\nWhich graph would be an appropriate model for this firm to use?",
       "options": [
         "Graph A",
         "Graph B",
@@ -2990,7 +2990,32 @@
         "inflection",
         "model-selection"
       ],
-      "difficulty": 3
+      "difficulty": 3,
+      "graphData": {
+        "type": "grid",
+        "xMin": 0,
+        "xMax": 6,
+        "yMin": 8,
+        "yMax": 16,
+        "panels": [
+          {
+            "label": "Graph A",
+            "data": [{"x":0,"y":9},{"x":1,"y":9.3},{"x":2,"y":10},{"x":3,"y":12},{"x":4,"y":14},{"x":5,"y":15},{"x":6,"y":15.3}]
+          },
+          {
+            "label": "Graph B",
+            "data": [{"x":0,"y":9},{"x":1,"y":12},{"x":2,"y":13.5},{"x":3,"y":14.3},{"x":4,"y":14.8},{"x":5,"y":15.1},{"x":6,"y":15.3}]
+          },
+          {
+            "label": "Graph C",
+            "data": [{"x":0,"y":9},{"x":1,"y":9.2},{"x":2,"y":9.7},{"x":3,"y":10.5},{"x":4,"y":12},{"x":5,"y":14},{"x":6,"y":15.3}]
+          },
+          {
+            "label": "Graph D",
+            "data": [{"x":0,"y":9},{"x":1,"y":10.05},{"x":2,"y":11.1},{"x":3,"y":12.15},{"x":4,"y":13.2},{"x":5,"y":14.25},{"x":6,"y":15.3}]
+          }
+        ]
+      }
     },
     {
       "id": 56,
