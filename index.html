@@ -2274,7 +2274,11 @@ button:focus-visible {
             </div>
             <div class="setting-row">
                 <button class="btn-nav" style="background:var(--gray-600);border-color:var(--gray-600)" onclick="Settings.clearTimeData()">Clear Study Time</button>
-                <div class="hint">Clears all study time tracking data (today and total). Useful if time seems inaccurate.</div>
+                <div class="hint">Clears daily study time totals only.</div>
+            </div>
+            <div class="setting-row">
+                <button class="btn-nav" style="background:#7c3aed;border-color:#7c3aed" onclick="Settings.resetTimeStats()">Reset All Time Stats</button>
+                <div class="hint">Clears ALL time data: study time, session history, and per-question time tracking. Keeps your correct/incorrect counts. Use this if time stats seem inflated.</div>
             </div>
             <div class="setting-row">
                 <button class="btn-nav" style="background:var(--red);border-color:var(--red)" onclick="Settings.resetAllMetrics()">Reset All Metrics</button>
@@ -9454,6 +9458,40 @@ const Session = {
         const stats = Store.get('globalStats', {});
         stats.totalStudyMins = 0;
         Store.set('globalStats', stats);
+    },
+
+    // Reset all time stats including question tracker time data
+    resetAllTimeStats() {
+        // Clear study time
+        Store.set('studyByDay', {});
+        const stats = Store.get('globalStats', {});
+        stats.totalStudyMins = 0;
+        Store.set('globalStats', stats);
+
+        // Clear session history time data
+        Store.set('sessionHistory', []);
+
+        // Clean up question tracker - reset time data but keep correct/incorrect counts
+        const tracker = Store.get('questionTracker', {});
+        Object.keys(tracker).forEach(qKey => {
+            const q = tracker[qKey];
+            q.totalTime = 0;
+            if (q.history) {
+                q.history.forEach(h => {
+                    h.timeMs = 0;
+                });
+            }
+        });
+        Store.set('questionTracker', tracker);
+
+        // Clear category mastery time data
+        const state = Store.get('state', {});
+        if (state.categoryMastery) {
+            Object.keys(state.categoryMastery).forEach(cat => {
+                state.categoryMastery[cat].totalTimeMs = 0;
+            });
+            Store.set('state', state);
+        }
     }
 };
 
@@ -14673,6 +14711,13 @@ const Settings = {
         Session.clearAllTimeData();
         alert('Study time data cleared.');
         Home.render();
+    },
+
+    resetTimeStats() {
+        if (!confirm('Reset ALL time stats?\n\nThis will clear:\n• Study time totals\n• Session history\n• Per-question time tracking\n\nYour correct/incorrect counts will be preserved.\n\nContinue?')) return;
+        Session.resetAllTimeStats();
+        alert('All time stats have been reset. Your question accuracy data is preserved.');
+        Home.render();
     }
 };
 
@@ -17475,7 +17520,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.94</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.95</div>
 
 </body>
 </html>
