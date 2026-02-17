@@ -12241,21 +12241,22 @@ const SpeedMode = {
     },
 
     // Update drill progress (SM-2) based on speed + correctness
-    // Fast correct = big boost, slow correct = small boost, wrong = gentle penalty
+    // Speed Mode is the ONLY mode with gentle penalty for wrong answers
+    // because time pressure means you might know it but couldn't answer fast enough
     updateDrillProgress(qId, isCorrect, timeRatio) {
         const all = Store.get('drillProgress', {});
         const p = all[qId] || { ef: 2.5, interval: 0, reps: 0, nextReview: 0 };
         
         // Calculate quality based on speed + correctness
         // Correct: 5 (fast), 4 (medium), 3 (slow)
-        // Wrong: 2 (gentle penalty - doesn't reset reps like quality 1)
+        // Wrong: 2 (GENTLE penalty - Speed Mode only! Time pressure = forgiving)
         let quality;
         if (isCorrect) {
             if (timeRatio >= 0.6) quality = 5;      // Fast (60%+ time left)
             else if (timeRatio >= 0.3) quality = 4; // Medium
             else quality = 3;                        // Slow but correct
         } else {
-            quality = 2; // Wrong - gentle penalty (doesn't fully reset progress)
+            quality = 2; // Wrong - gentle penalty (Speed Mode only - time pressure)
         }
         
         // SM-2 algorithm
@@ -13455,9 +13456,9 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         const all = Store.get('drillProgress', {});
         const p = all[qId] || { ef: 2.5, interval: 0, reps: 0, nextReview: 0 };
         
-        // Quality based on correctness (AI questions don't have speed pressure like Speed Mode)
-        // Correct = 4 (good), Wrong = 2 (gentle penalty)
-        const quality = isCorrect ? 4 : 2;
+        // Quality based on correctness - no time pressure so use standard penalty
+        // Correct = 5 (got it), Wrong = 1 (full reset - you had time to think)
+        const quality = isCorrect ? 5 : 1;
         
         // SM-2 algorithm
         let ef = p.ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
@@ -13466,7 +13467,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         
         let interval, reps;
         if (quality < 3) {
-            reps = Math.max(0, p.reps - 1);
+            reps = 0; // Full reset - no time pressure means you should know it
             interval = 1;
         } else {
             reps = p.reps + 1;
@@ -17341,7 +17342,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.87</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.88</div>
 
 </body>
 </html>
