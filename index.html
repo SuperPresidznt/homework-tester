@@ -11449,6 +11449,10 @@ const Drill = {
     showSessionDone() {
         Session.end();
         SessionState.clear();
+        
+        // Record drill session for analytics
+        StudyAnalytics.recordDrillSession(this.sessionCount, this.sessionCount > 0 ? Math.round(this.sessionCorrect/this.sessionCount*100) : 0);
+        
         document.getElementById('drillProgress').textContent = '';
         document.getElementById('drillCard').innerHTML = `
             <div class="drill-session-done">
@@ -12209,6 +12213,11 @@ const SpeedMode = {
     end() {
         this.stopTimer();
         Session.end();
+        
+        // Record speed session for analytics (treat as test with score as accuracy proxy)
+        if (this.questionsAnswered > 0) {
+            StudyAnalytics.recordTestCompletion('speed', this.bank?.bankId, this.questionsAnswered, this.questionsAnswered, 0);
+        }
         
         // Clean up any lingering feedback overlays
         document.querySelectorAll('.speed-feedback-overlay').forEach(el => el.remove());
@@ -13123,6 +13132,12 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         Session.end();
         this.saveSessionStats();
         SessionState.clear();
+        
+        // Record AI practice session for analytics
+        if (this.sessionStats.total > 0) {
+            StudyAnalytics.recordTestCompletion('ai', 'ai-practice', this.sessionStats.correct, this.sessionStats.total, 0);
+        }
+        
         this.renderSummary();
     },
 
@@ -17415,7 +17430,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.92</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.93</div>
 
 </body>
 </html>
