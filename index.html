@@ -987,8 +987,13 @@ button:focus-visible {
 [data-theme="dark"] .progress-section h3 { color: #93c5fd; }
 
 /* Inline chart container */
-.inline-chart-wrap{margin:12px 0;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:#fff;max-width:100%}
-.inline-chart-wrap canvas{display:block;width:100%;height:clamp(180px,35vw,320px);max-height:320px}
+.inline-chart-wrap{margin:12px 0;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:#fff;max-width:100%;position:relative}
+.inline-chart-wrap canvas{display:block;width:100%;height:clamp(220px,45vw,360px);max-height:360px}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px 16px;padding:8px 12px;background:rgba(0,0,0,0.03);border-top:1px solid var(--gray-200);font-size:12px}
+.chart-legend-item{display:flex;align-items:center;gap:6px}
+.chart-legend-color{width:16px;height:3px;border-radius:2px}
+.chart-legend-color.dashed{background:repeating-linear-gradient(90deg,currentColor 0,currentColor 4px,transparent 4px,transparent 8px)}
+[data-theme="dark"] .chart-legend{background:rgba(255,255,255,0.05);border-color:#374151}
 [data-theme="dark"] .inline-chart-wrap{background:#16213e;border-color:#374151}
 @media(prefers-color-scheme:dark){body:not([data-theme="light"]) .inline-chart-wrap{background:#16213e;border-color:#374151}}
 
@@ -15395,10 +15400,23 @@ const InlineChart = {
         const html = el.innerHTML;
         if (!html.includes('[Graph:')) return;
 
-        // Replace placeholder with canvas container
+        // Build legend HTML for multi-series graphs
+        const series = graphData.series || [{ data: graphData.data || [] }];
+        const seriesColors = ['#2980b9', '#e67e22', '#2ecc71', '#9b59b6'];
+        let legendHtml = '';
+        if (series.length > 1 && series.some(s => s.label)) {
+            legendHtml = '<div class="chart-legend">' + series.map((s, i) => {
+                if (!s.label) return '';
+                const col = seriesColors[i % seriesColors.length];
+                const dashedClass = s.dashed ? ' dashed' : '';
+                return `<div class="chart-legend-item"><span class="chart-legend-color${dashedClass}" style="background-color:${col}"></span><span>${s.label}</span></div>`;
+            }).join('') + '</div>';
+        }
+
+        // Replace placeholder with canvas container + legend
         el.innerHTML = html.replace(/\[Graph:[^\]]*\]/g, () => {
             const id = 'chart-' + Math.random().toString(36).substr(2, 9);
-            return `<div class="inline-chart-wrap"><canvas id="${id}" width="560" height="320"></canvas></div>`;
+            return `<div class="inline-chart-wrap"><canvas id="${id}" width="560" height="360"></canvas>${legendHtml}</div>`;
         });
 
         // Render after DOM update
@@ -15423,8 +15441,9 @@ const InlineChart = {
             ? { bg: '#16213e', axes: '#9ca3af', grid: '#374151', text: '#d1d5db', title: '#93c5fd', line1: '#60a5fa', line2: '#f59e0b', dot: '#60a5fa', dot2: '#f59e0b', fill: 'rgba(96,165,250,0.15)', regLine: '#ef4444' }
             : { bg: '#ffffff', axes: '#555', grid: '#e5e5e5', text: '#555', title: '#1a3a5c', line1: '#2980b9', line2: '#e67e22', dot: '#2980b9', dot2: '#e67e22', fill: 'rgba(41,128,185,0.1)', regLine: '#c0392b' };
 
-        // Margins
-        const m = { top: 36, right: 20, bottom: 44, left: 56 };
+        // Margins - responsive based on width
+        const isSmall = w < 400;
+        const m = { top: 40, right: isSmall ? 12 : 20, bottom: 48, left: isSmall ? 48 : 56 };
         const pw = w - m.left - m.right;
         const ph = h - m.top - m.bottom;
 
@@ -15487,22 +15506,32 @@ const InlineChart = {
             ctx.fillText(label, m.left - 6, sy(v) + 4);
         });
 
-        // Axis labels
+        // Axis labels - responsive font size
+        const labelFont = isSmall ? '10px Arial' : '12px Arial';
         ctx.fillStyle = colors.text;
-        ctx.font = '12px Arial';
+        ctx.font = labelFont;
         ctx.textAlign = 'center';
-        if (gd.xLabel) ctx.fillText(gd.xLabel, m.left + pw / 2, h - 4);
+        if (gd.xLabel) {
+            const xLabelTrunc = this._truncateText(ctx, gd.xLabel, pw);
+            ctx.fillText(xLabelTrunc, m.left + pw / 2, h - 4);
+        }
         ctx.save();
-        ctx.translate(14, m.top + ph / 2);
+        ctx.translate(12, m.top + ph / 2);
         ctx.rotate(-Math.PI / 2);
-        if (gd.yLabel) ctx.fillText(gd.yLabel, 0, 0);
+        if (gd.yLabel) {
+            const yLabelTrunc = this._truncateText(ctx, gd.yLabel, ph);
+            ctx.fillText(yLabelTrunc, 0, 0);
+        }
         ctx.restore();
 
-        // Title
+        // Title - responsive and truncated if needed
         ctx.fillStyle = colors.title;
-        ctx.font = 'bold 13px Arial';
+        ctx.font = isSmall ? 'bold 12px Arial' : 'bold 14px Arial';
         ctx.textAlign = 'center';
-        if (gd.title) ctx.fillText(gd.title, w / 2, 18);
+        if (gd.title) {
+            const titleTrunc = this._truncateText(ctx, gd.title, w - 20);
+            ctx.fillText(titleTrunc, w / 2, 22);
+        }
 
         // Horizontal asymptotes
         if (gd.asymptotes) {
@@ -15600,14 +15629,7 @@ const InlineChart = {
                 });
             }
 
-            // Series label
-            if (s.label) {
-                ctx.fillStyle = col;
-                ctx.font = '11px Arial';
-                ctx.textAlign = 'left';
-                const lastP = sorted[sorted.length - 1];
-                ctx.fillText(s.label, sx(lastP.x) + 6, sy(lastP.y) + 4);
-            }
+            // Series labels are now shown in the HTML legend below the chart
         });
 
         // Regression line
@@ -15700,6 +15722,15 @@ const InlineChart = {
         if (Math.abs(v) >= 1e3) return (v / 1e3).toFixed(v % 1000 === 0 ? 0 : 1) + 'K';
         if (Number.isInteger(v)) return v.toString();
         return v.toFixed(1);
+    },
+
+    _truncateText(ctx, text, maxWidth) {
+        if (ctx.measureText(text).width <= maxWidth) return text;
+        let truncated = text;
+        while (truncated.length > 0 && ctx.measureText(truncated + '…').width > maxWidth) {
+            truncated = truncated.slice(0, -1);
+        }
+        return truncated + '…';
     }
 };
 
@@ -16979,7 +17010,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.79</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.80</div>
 
 </body>
 </html>
