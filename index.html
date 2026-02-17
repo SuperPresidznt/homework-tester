@@ -358,6 +358,13 @@ button:active:not(:disabled){transform:scale(0.97)}
 .btn-bookmark.flagged{background:#fff3cd;border-color:var(--orange);color:#856404}
 .question-text{font-size:15px;line-height:1.7;margin-bottom:18px;color:var(--gray-900);overflow-wrap:break-word}
 .question-text strong{color:var(--navy)}
+.md-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px}
+.md-table th,.md-table td{border:1px solid var(--gray-300);padding:8px 12px;text-align:left}
+.md-table th{background:var(--gray-100);font-weight:600;color:var(--navy)}
+.md-table tr:nth-child(even){background:var(--gray-50)}
+[data-theme="dark"] .md-table th,[data-theme="dark"] .md-table td{border-color:#374151}
+[data-theme="dark"] .md-table th{background:#1e293b;color:#93c5fd}
+[data-theme="dark"] .md-table tr:nth-child(even){background:rgba(255,255,255,0.03)}
 .question-text img,.question-text canvas{max-width:100%;height:auto}
 .question-text [data-graph]{display:block;width:100%;max-width:100%}
 .question-text,.option-label,.explanation-panel,.explanation-panel p{word-break:normal;overflow-wrap:break-word;white-space:normal}
@@ -2489,6 +2496,77 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
+}
+
+// Format question text with markdown table support and bold
+function formatQuestionText(str) {
+    if (typeof str !== 'string') return '';
+    
+    // Check if text contains a markdown table
+    const lines = str.split('\n');
+    const result = [];
+    let inTable = false;
+    let tableRows = [];
+    
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // Detect table row (starts and ends with |, or is separator row)
+        const isTableRow = /^\|.*\|$/.test(line);
+        const isSeparator = /^\|[-:\s|]+\|$/.test(line);
+        
+        if (isTableRow || isSeparator) {
+            if (!inTable) {
+                inTable = true;
+                tableRows = [];
+            }
+            if (!isSeparator) {
+                // Parse cells
+                const cells = line.split('|').filter((c, idx, arr) => idx > 0 && idx < arr.length - 1).map(c => c.trim());
+                tableRows.push(cells);
+            }
+        } else {
+            // End of table
+            if (inTable && tableRows.length > 0) {
+                result.push(renderMarkdownTable(tableRows));
+                tableRows = [];
+                inTable = false;
+            }
+            // Regular line - escape and handle bold
+            let escaped = escapeHtml(line);
+            // Convert **text** to <strong>text</strong>
+            escaped = escaped.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            result.push(escaped);
+        }
+    }
+    
+    // Handle table at end of text
+    if (inTable && tableRows.length > 0) {
+        result.push(renderMarkdownTable(tableRows));
+    }
+    
+    return result.join('<br>');
+}
+
+function renderMarkdownTable(rows) {
+    if (!rows || rows.length === 0) return '';
+    const header = rows[0];
+    const body = rows.slice(1);
+    
+    let html = '<table class="md-table"><thead><tr>';
+    header.forEach(cell => {
+        html += `<th>${escapeHtml(cell)}</th>`;
+    });
+    html += '</tr></thead><tbody>';
+    body.forEach(row => {
+        html += '<tr>';
+        row.forEach(cell => {
+            html += `<td>${escapeHtml(cell)}</td>`;
+        });
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+    return html;
 }
 
 // =====================================================================
@@ -9263,7 +9341,7 @@ const SessionState = {
 
                 const q = Drill.current.question;
                 document.getElementById('drillCard').innerHTML = `
-                    <div class="question-text">${escapeHtml(q.text).replace(/\n/g, '<br>')}</div>
+                    <div class="question-text">${formatQuestionText(q.text)}</div>
                     <ul class="options-list" id="drillOptions">
                         ${q.options.map((opt, i) => `
                             <li class="option-item${Drill.selectedOption === i ? ' selected' : ''}${Drill.showingAnswer && i === q.correctAnswer ? ' correct-answer' : ''}${Drill.showingAnswer && Drill.selectedOption === i && i !== q.correctAnswer ? ' wrong-answer' : ''}" onclick="Drill.selectOption(${i})" id="dropt-${i}">
@@ -10544,7 +10622,7 @@ const App = {
     renderQuestion() {
         const q = this.questions[this.currentQ];
         document.getElementById('questionNumber').textContent = `Question ${this.currentQ + 1} of ${this.questions.length}`;
-        document.getElementById('questionText').innerHTML = escapeHtml(q.text).replace(/\n/g, '<br>');
+        document.getElementById('questionText').innerHTML = formatQuestionText(q.text);
         // Render inline chart if question has graphData or [Graph:...] placeholder
         if (q.graphData || q.text.includes('[Graph:')) {
             const graphData = q.graphData || InlineChart.generatePlaceholderGraph(q.text);
@@ -11350,7 +11428,7 @@ const Drill = {
 
         const q = this.current.question;
         document.getElementById('drillCard').innerHTML = `
-            <div class="question-text">${escapeHtml(q.text).replace(/\n/g, '<br>')}</div>
+            <div class="question-text">${formatQuestionText(q.text)}</div>
             <ul class="options-list" id="drillOptions">
                 ${q.options.map((opt, i) => `
                     <li class="option-item" onclick="Drill.selectOption(${i})" id="dropt-${i}">
@@ -12402,7 +12480,7 @@ const Review = {
                 const masteryLabel = mastery ? (mastery.ef >= 2.5 && mastery.reps >= 3 ? 'Mastered' : mastery.reps > 0 ? 'Learning' : 'New') : 'New';
                 const note = notesData[q.id] || '';
                 html += `<div class="review-q">
-                    <div class="rq-text" data-qid="${q.id}"><strong>Q${q.id}.</strong> ${escapeHtml(q.text).replace(/\n/g, '<br>')}</div>
+                    <div class="rq-text" data-qid="${q.id}"><strong>Q${q.id}.</strong> ${formatQuestionText(q.text)}</div>
                     <ul class="rq-options">
                         ${q.options.map((opt, i) => `<li class="rq-opt ${i === q.correctAnswer ? 'rq-correct' : ''}">${String.fromCharCode(65+i)}. ${escapeHtml(opt)}</li>`).join('')}
                     </ul>
@@ -17520,7 +17598,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.95</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.96</div>
 
 </body>
 </html>
