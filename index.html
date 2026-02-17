@@ -11136,13 +11136,11 @@ const Drill = {
                 <div class="correct-label" id="drillResultLabel"></div>
                 <div class="explanation">${escapeHtml(q.explanation || '')}</div>
                 <div class="drill-buttons">
-                    <button class="drill-btn btn-missed" onclick="Drill.rate(1)">Missed it (1)</button>
-                    <button class="drill-btn btn-struggled" onclick="Drill.rate(3)">Struggled (3)</button>
-                    <button class="drill-btn btn-got-it" onclick="Drill.rate(5)">Got it! (5)</button>
+                    <button class="drill-btn btn-got-it" onclick="Drill.nextAfterCheck()">Next Question →</button>
                 </div>
             </div>
             <div style="text-align:center;margin-top:16px">
-                <button class="drill-btn btn-show" id="drillShowBtn" onclick="Drill.showAnswer()">Show Answer</button>
+                <button class="drill-btn btn-show" id="drillShowBtn" onclick="Drill.checkAnswer()">Check Answer</button>
             </div>
         `;
 
@@ -11170,8 +11168,19 @@ const Drill = {
         SessionState.save();
     },
 
-    showAnswer() {
-        if (!this.current) return;
+    checkAnswer() {
+        if (!this.current || this.showingAnswer) return;
+        if (this.selectedOption === null) {
+            // Must select an answer first
+            document.getElementById('drillResultLabel').textContent = 'Please select an answer first';
+            document.getElementById('drillResultLabel').style.color = 'var(--yellow)';
+            document.getElementById('drillAnswer').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('drillAnswer').classList.remove('show');
+            }, 1500);
+            return;
+        }
+        
         this.showingAnswer = true;
         const q = this.current.question;
 
@@ -11183,16 +11192,25 @@ const Drill = {
         });
 
         const isCorrect = this.selectedOption === q.correctAnswer;
-        document.getElementById('drillResultLabel').textContent = isCorrect ? 'Correct!' : (this.selectedOption !== null ? 'Incorrect' : 'Not answered');
+        this._lastWasCorrect = isCorrect;
+        document.getElementById('drillResultLabel').textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
         document.getElementById('drillResultLabel').style.color = isCorrect ? 'var(--green)' : 'var(--red)';
         document.getElementById('drillAnswer').classList.add('show');
         document.getElementById('drillShowBtn').style.display = 'none';
+        
+        // Play sound
+        SoundFX.play(isCorrect ? 'correct' : 'incorrect');
     },
 
-    rate(quality) {
+    nextAfterCheck() {
         if (!this.current) return;
         const q = this.current.question;
         const p = this.current.progress;
+        const isCorrect = this._lastWasCorrect;
+        
+        // Auto-calculate quality based on correctness
+        // Correct = 5 (got it), Wrong = 1 (missed)
+        const quality = isCorrect ? 5 : 1;
 
         // SM-2 algorithm
         let ef = p.ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
@@ -11213,33 +11231,26 @@ const Drill = {
         this.saveProgress(q.id, { ef, interval, reps, nextReview });
 
         this.sessionCount++;
-        const isCorrect = this.selectedOption === q.correctAnswer;
         if (isCorrect) this.sessionCorrect++;
 
-        // Gamification hooks — gate XP on actual correctness, not self-rating
+        // Gamification hooks — gate XP on actual correctness
         const timeSpent = Gamification.getQuestionTime();
         if (isCorrect) {
             Gamification.incrementCombo();
-            if (quality >= 5) {
-                const trackerData = QuestionTracker._getData();
-                const isFirstTry = !trackerData[q.id] || trackerData[q.id].attempts === 0;
-                Gamification.awardXp(isFirstTry ? 'firstTryCorrect' : 'drillGotIt', { withCombo: true });
-            } else {
-                Gamification.awardXp('drillStruggled');
-            }
-            SoundFX.play('correct');
+            const trackerData = QuestionTracker._getData();
+            const isFirstTry = !trackerData[q.id] || trackerData[q.id].attempts === 0;
+            Gamification.awardXp(isFirstTry ? 'firstTryCorrect' : 'drillGotIt', { withCombo: true });
         } else {
             Gamification.resetCombo();
-            SoundFX.play('incorrect');
         }
         Gamification.checkAchievements(isCorrect, timeSpent);
         Gamification.updateCategoryMastery(q.category || 'General', isCorrect);
         Gamification.startQuestionTimer();
         if (isCorrect) Garden.grow(1);
 
-        // Update drill streak (require actual correctness, not just self-rating)
+        // Update drill streak
         const stats = DailyGoal.getStats();
-        if (isCorrect && quality >= 3) stats.drillStreak++;
+        if (isCorrect) stats.drillStreak++;
         else stats.drillStreak = 0;
         DailyGoal.saveStats(stats);
 
@@ -16978,7 +16989,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.77</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.78</div>
 
 </body>
 </html>
