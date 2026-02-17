@@ -970,9 +970,10 @@ button:focus-visible {
 .mastery-item.learning .value{color:var(--orange)}
 .mastery-item.new .value{color:var(--blue)}
 
-.study-bars{display:flex;align-items:flex-end;gap:4px;height:80px;margin-top:12px}
+.study-bars{display:flex;align-items:flex-end;gap:4px;height:100px;margin-top:12px}
 .study-day{flex:1;display:flex;flex-direction:column;align-items:center}
-.study-day .bar{width:100%;background:var(--blue);border-radius:4px 4px 0 0;transition:height .3s}
+.study-day .bar-value{font-size:10px;font-weight:600;color:var(--blue);margin-bottom:2px}
+.study-day .bar{width:100%;background:var(--blue);border-radius:4px 4px 0 0;transition:height .3s;min-height:2px}
 .study-day .day-label{font-size:10px;color:var(--gray-600);margin-top:4px}
 
 @media (prefers-color-scheme: dark) {
@@ -14493,7 +14494,8 @@ const Progress = {
 
         const bars = days.map(d => {
             const height = Math.round((d.mins / maxMins) * 70);
-            return '<div class="study-day"><div class="bar" style="height:' + height + 'px" title="' + d.mins + ' min"></div><span class="day-label">' + d.dayName + '</span></div>';
+            const minsLabel = d.mins > 0 ? '<span class="bar-value">' + d.mins + 'm</span>' : '';
+            return '<div class="study-day">' + minsLabel + '<div class="bar" style="height:' + height + 'px" title="' + d.mins + ' min"></div><span class="day-label">' + d.dayName + '</span></div>';
         }).join('');
 
         return '<div class="progress-section"><h3>Study Time (Last 7 Days)</h3><div class="study-bars">' + bars + '</div><p style="text-align:center;font-size:12px;color:var(--gray-600);margin-top:8px">Total: ' + Session.formatTime(stats.totalStudyMins || 0) + '</p></div>';
@@ -17413,7 +17415,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.90</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.91</div>
 
 </body>
 </html>
