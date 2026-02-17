@@ -12305,7 +12305,8 @@ const AIPractice = {
     _questionBuffer: [],
     _prefetchInFlight: 0,
     _recentQuestionTypes: [], // Track recent question types to avoid repetition
-    _masteredTypes: [], // Types answered correctly multiple times
+    _masteredTypes: [], // Types answered correctly multiple times (session)
+    _globalMasteredTypes: {}, // Persistent mastery tracking {type: {correct: n, total: n, lastSeen: timestamp}}
 
     async start(bankId) {
         if (this.isGenerating) return; // Prevent double-start while generating
@@ -12330,6 +12331,9 @@ const AIPractice = {
         this._prefetchInFlight = 0;
         this._recentQuestionTypes = [];
         this._masteredTypes = [];
+        
+        // Load persistent mastery data
+        this._globalMasteredTypes = Store.get('aiMasteredTypes_' + bankId, {});
 
         this.analyzeWeakAreas();
         this.startingWeakness = {};
@@ -12615,9 +12619,13 @@ const AIPractice = {
         const difficultyLabel = difficulty === 1 ? 'Easy' : difficulty === 2 ? 'Medium' : 'Hard';
         const bankCategories = this.bank.categories || [];
 
-        // Build avoid list from recent question types
+        // Build avoid list from recent question types and truly mastered types
         const avoidTypes = this._recentQuestionTypes.slice(-5).join(', ');
-        const masteredTypes = this._masteredTypes.slice(0, 10).join(', ');
+        const sessionMastered = this._masteredTypes.slice(0, 10);
+        const globalMastered = this._getTrulyMasteredTypes();
+        // Combine session and global mastered, dedupe
+        const allMastered = [...new Set([...sessionMastered, ...globalMastered])];
+        const masteredTypes = allMastered.slice(0, 15).join(', ');
 
         const systemPrompt = `You are generating practice questions for WGU Applied Algebra assessments.
 
@@ -12883,6 +12891,9 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
             if (typeStats.correct >= 2 && !this._masteredTypes.includes(qType)) {
                 this._masteredTypes.push(qType);
             }
+            
+            // Update persistent mastery tracking
+            this._updateGlobalMastery(qType, isCorrect);
         }
 
         // Record question for daily goal
@@ -12890,10 +12901,13 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         DailyChallenges.trackQuestion(isCorrect, timeSpent);
         if (isCorrect) DailyChallenges.trackStreak(Gamification.getState().combo || 0);
 
-        // Track per-question performance
+        // Track per-question performance and update drill progress
         const qId = this.currentQuestion.id || ('ai_' + Date.now() + '_' + this.sessionStats.total);
         console.log('[AI Practice] Recording question:', qId, 'Category:', this.currentCategory, 'Correct:', isCorrect);
         QuestionTracker.recordSingle(qId, this.currentCategory || 'General', isCorrect, timeSpent);
+        
+        // Update drill progress (SM-2) for AI questions - helps integrate with overall mastery
+        this._updateDrillProgress(qId, isCorrect, timeSpent);
 
         // Update global stats
         const globalStats = Store.get('globalStats', {});
@@ -13239,6 +13253,75 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
             totalAttempts: questionTracker.totalAttempts,
             questionsTracked: questionTracker.questionsTracked
         };
+    },
+
+    // Update persistent mastery tracking for question types
+    _updateGlobalMastery(qType, isCorrect) {
+        if (!qType || !this.bank) return;
+        
+        const key = 'aiMasteredTypes_' + this.bank.bankId;
+        const mastery = Store.get(key, {});
+        
+        if (!mastery[qType]) {
+            mastery[qType] = { correct: 0, total: 0, lastSeen: Date.now() };
+        }
+        
+        mastery[qType].total++;
+        if (isCorrect) mastery[qType].correct++;
+        mastery[qType].lastSeen = Date.now();
+        
+        // Calculate mastery level (0-100)
+        const stats = mastery[qType];
+        stats.masteryLevel = stats.total >= 3 ? Math.round((stats.correct / stats.total) * 100) : 0;
+        
+        Store.set(key, mastery);
+        this._globalMasteredTypes = mastery;
+    },
+
+    // Update drill progress (SM-2) for AI-generated questions
+    _updateDrillProgress(qId, isCorrect, timeSpent) {
+        const all = Store.get('drillProgress', {});
+        const p = all[qId] || { ef: 2.5, interval: 0, reps: 0, nextReview: 0 };
+        
+        // Quality based on correctness (AI questions don't have speed pressure like Speed Mode)
+        // Correct = 4 (good), Wrong = 2 (gentle penalty)
+        const quality = isCorrect ? 4 : 2;
+        
+        // SM-2 algorithm
+        let ef = p.ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
+        if (ef < 1.3) ef = 1.3;
+        if (ef > 3.0) ef = 3.0;
+        
+        let interval, reps;
+        if (quality < 3) {
+            reps = Math.max(0, p.reps - 1);
+            interval = 1;
+        } else {
+            reps = p.reps + 1;
+            if (reps === 1) interval = 1;
+            else if (reps === 2) interval = 3;
+            else interval = Math.round(p.interval * ef);
+        }
+        
+        const nextReview = Date.now() + interval * 86400000;
+        all[qId] = { ef, interval, reps, nextReview };
+        Store.set('drillProgress', all);
+    },
+
+    // Get list of truly mastered question types (80%+ accuracy with 3+ attempts)
+    _getTrulyMasteredTypes() {
+        const mastered = [];
+        const now = Date.now();
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        
+        Object.entries(this._globalMasteredTypes).forEach(([qType, stats]) => {
+            // Mastered if: 80%+ accuracy, 3+ attempts, seen in last week
+            if (stats.total >= 3 && stats.masteryLevel >= 80 && (now - stats.lastSeen) < oneWeek) {
+                mastered.push(qType);
+            }
+        });
+        
+        return mastered;
     }
 };
 
@@ -17064,7 +17147,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.82</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.83</div>
 
 </body>
 </html>
