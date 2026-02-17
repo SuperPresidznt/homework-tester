@@ -988,10 +988,10 @@ button:focus-visible {
 
 /* Inline chart container */
 .inline-chart-wrap{margin:12px 0;border:1px solid var(--gray-200);border-radius:8px;overflow:hidden;background:#fff;max-width:100%;position:relative}
-.inline-chart-wrap canvas{display:block;width:100%;height:clamp(220px,45vw,360px);max-height:360px}
-.chart-legend{display:flex;flex-wrap:wrap;gap:8px 16px;padding:8px 12px;background:rgba(0,0,0,0.03);border-top:1px solid var(--gray-200);font-size:12px}
-.chart-legend-item{display:flex;align-items:center;gap:6px}
-.chart-legend-color{width:16px;height:3px;border-radius:2px}
+.inline-chart-wrap canvas{display:block;width:100%;height:clamp(260px,50vw,400px);max-height:400px}
+.chart-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 20px;padding:10px 16px;background:rgba(0,0,0,0.03);border-top:1px solid var(--gray-200);font-size:13px;font-weight:500}
+.chart-legend-item{display:flex;align-items:center;gap:8px}
+.chart-legend-color{width:20px;height:4px;border-radius:2px}
 .chart-legend-color.dashed{background:repeating-linear-gradient(90deg,currentColor 0,currentColor 4px,transparent 4px,transparent 8px)}
 [data-theme="dark"] .chart-legend{background:rgba(255,255,255,0.05);border-color:#374151}
 [data-theme="dark"] .inline-chart-wrap{background:#16213e;border-color:#374151}
@@ -1116,6 +1116,43 @@ button:focus-visible {
 .pet-sel-btn.active{border-color:var(--blue);background:#eff6ff}
 .pet-sel-btn:hover{transform:scale(1.1)}
 .shop-item.sold-out{opacity:.5}
+
+/* === HOUSE INTERIOR === */
+.house-interior{position:relative;border-radius:16px;overflow:hidden;min-height:320px;margin-bottom:20px}
+.house-interior.tent{background:linear-gradient(180deg,#4a3728 0%,#3d2d1f 100%)}
+.house-interior.cabin{background:linear-gradient(180deg,#5d4037 0%,#4e342e 100%)}
+.house-interior.house{background:linear-gradient(180deg,#f5f0e6 0%,#e8e0d0 100%)}
+.house-interior.mansion{background:linear-gradient(180deg,#faf8f5 0%,#f0ebe0 100%)}
+.house-interior.penthouse{background:linear-gradient(180deg,#1a1a2e 0%,#16213e 100%)}
+.house-interior.castle{background:linear-gradient(180deg,#2d2d44 0%,#1f1f30 100%)}
+.house-window{position:absolute;top:0;left:0;right:0;height:35%;overflow:hidden}
+.house-window-view{width:100%;height:100%;object-fit:cover}
+.house-window.penthouse{background:linear-gradient(180deg,#0f0c29 0%,#302b63 50%,#24243e 100%)}
+.house-window.penthouse::before{content:'🌃';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;opacity:0.3}
+.house-skyline{position:absolute;bottom:0;left:0;right:0;height:60%;display:flex;align-items:flex-end;justify-content:center;gap:4px;padding:0 10px}
+.house-building{background:linear-gradient(180deg,#1a1a2e,#0d0d1a);border-radius:4px 4px 0 0;position:relative}
+.house-building::before{content:'';position:absolute;inset:4px;background:repeating-linear-gradient(0deg,transparent 0,transparent 8px,rgba(255,200,50,0.3) 8px,rgba(255,200,50,0.3) 10px),repeating-linear-gradient(90deg,transparent 0,transparent 6px,rgba(255,200,50,0.2) 6px,rgba(255,200,50,0.2) 8px)}
+.house-floor{position:absolute;bottom:0;left:0;right:0;height:65%;display:flex;flex-direction:column}
+.house-room-tabs{display:flex;gap:4px;padding:8px 12px;background:rgba(0,0,0,0.2);overflow-x:auto;scrollbar-width:thin}
+.house-room-tab{padding:6px 12px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap;border:none}
+.house-room-tab:hover{background:rgba(255,255,255,0.2)}
+.house-room-tab.active{background:var(--blue);color:#fff}
+.house-room-content{flex:1;padding:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.house-room-name{font-size:14px;font-weight:600;color:rgba(255,255,255,0.9);margin-bottom:12px;text-transform:capitalize}
+.house-room-furniture{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:16px}
+.house-furniture-item{font-size:32px;padding:8px;background:rgba(255,255,255,0.1);border-radius:10px;cursor:default;transition:transform 0.2s}
+.house-furniture-item:hover{transform:scale(1.1)}
+.house-pet{position:absolute;bottom:20px;left:20px;cursor:pointer;transition:transform 0.2s}
+.house-pet:hover{transform:scale(1.1)}
+.house-pet-sprite{font-size:48px;animation:petIdle 2s ease-in-out infinite}
+.house-pet-name{font-size:11px;color:rgba(255,255,255,0.8);text-align:center;margin-top:4px}
+.house-pet-mood{position:absolute;top:-20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.9);padding:2px 8px;border-radius:8px;font-size:10px;white-space:nowrap}
+[data-theme="light"] .house-interior.house,.house-interior.house{background:linear-gradient(180deg,#f5f0e6 0%,#e8e0d0 100%)}
+[data-theme="light"] .house-interior.house .house-room-name{color:#333}
+[data-theme="light"] .house-interior.house .house-room-tab{background:rgba(0,0,0,0.05);color:#555}
+[data-theme="light"] .house-interior.house .house-room-tab.active{background:var(--blue);color:#fff}
+[data-theme="light"] .house-interior.mansion .house-room-name{color:#333}
+
 .shop-item-icon{font-size:36px;margin-bottom:8px}
 .shop-item-name{font-weight:bold;font-size:14px;color:var(--navy);margin-bottom:4px}
 .shop-item-desc{font-size:11px;color:var(--gray-600);margin-bottom:6px;line-height:1.3}
@@ -2963,11 +3000,12 @@ const Gamification = {
             halo:       { name: 'Halo',       price: 150, icon: '😇' }
         },
         housing: {
-            tent:       { name: 'Tent',         price: 100,   icon: '⛺', desc: 'Basic shelter', tier: 1, decayRate: 0.5, repairCost: 10 },
-            cabin:      { name: 'Cabin',        price: 500,   icon: '🛖', desc: 'Cozy wooden cabin', tier: 2, decayRate: 0.4, repairCost: 25 },
-            house:      { name: 'House',        price: 1500,  icon: '🏠', desc: 'Comfortable home', tier: 3, decayRate: 0.3, repairCost: 75 },
-            mansion:    { name: 'Mansion',      price: 5000,  icon: '🏛️', desc: 'Luxurious estate', tier: 4, decayRate: 0.25, repairCost: 200 },
-            castle:     { name: 'Castle',       price: 15000, icon: '🏰', desc: 'Royal residence', tier: 5, decayRate: 0.2, repairCost: 500 }
+            tent:       { name: 'Tent',         price: 100,   icon: '⛺', desc: 'Basic shelter', tier: 1, decayRate: 0.5, repairCost: 10, rooms: ['sleeping'] },
+            cabin:      { name: 'Cabin',        price: 500,   icon: '🛖', desc: 'Cozy wooden cabin', tier: 2, decayRate: 0.4, repairCost: 25, rooms: ['living', 'sleeping'] },
+            house:      { name: 'House',        price: 1500,  icon: '🏠', desc: 'Comfortable home', tier: 3, decayRate: 0.3, repairCost: 75, rooms: ['living', 'kitchen', 'bedroom', 'bathroom'] },
+            mansion:    { name: 'Mansion',      price: 5000,  icon: '🏛️', desc: 'Luxurious estate', tier: 4, decayRate: 0.25, repairCost: 200, rooms: ['foyer', 'living', 'kitchen', 'dining', 'bedroom', 'bathroom', 'study'] },
+            penthouse:  { name: 'Penthouse',    price: 25000, icon: '🏙️', desc: 'Luxury city living with skyline views', tier: 5, decayRate: 0.15, repairCost: 800, rooms: ['foyer', 'living', 'kitchen', 'dining', 'master', 'guest', 'bathroom', 'office', 'terrace'] },
+            castle:     { name: 'Castle',       price: 50000, icon: '🏰', desc: 'Royal residence', tier: 6, decayRate: 0.1, repairCost: 1500, rooms: ['throne', 'great_hall', 'kitchen', 'dining', 'master', 'guest', 'tower', 'library', 'courtyard'] }
         },
         services: {
             laborer:    { name: 'Laborer (1 day)', price: 50,  icon: '👷', desc: 'Repairs 10% condition/day', duration: 1 },
@@ -6553,6 +6591,8 @@ const House = {
         showScreen('house');
     },
 
+    currentRoom: 0,
+
     render() {
         const state = Gamification.getState();
         const housing = state.housing || { current: null, owned: [] };
@@ -6564,22 +6604,31 @@ const House = {
         
         let html = '';
         
-        // Current house display
+        // Current house display with interior view
         const conditions = housing.conditions || {};
         if (housing.current) {
             const houseData = Gamification.SHOP.housing[housing.current];
             const condition = conditions[housing.current] ?? 100;
             const condColor = this.getConditionColor(condition);
             const condLabel = this.getConditionLabel(condition);
-            html += `<div class="house-display" style="text-align:center;padding:20px;background:linear-gradient(135deg,var(--navy),#1a1a2e);border-radius:16px;margin-bottom:20px">
-                <div style="font-size:64px">${houseData?.icon || '🏠'}</div>
-                <h2 style="color:var(--white);margin:8px 0">${houseData?.name || 'My Home'}</h2>
-                <p style="color:var(--gray-400)">${houseData?.desc || ''}</p>
-                <div style="margin-top:12px">
-                    <div style="background:rgba(255,255,255,0.1);border-radius:8px;height:20px;overflow:hidden;margin:8px auto;max-width:200px">
-                        <div style="background:${condColor};height:100%;width:${condition}%;transition:width 0.3s"></div>
+            const rooms = houseData?.rooms || ['living'];
+            const currentRoom = Math.min(this.currentRoom, rooms.length - 1);
+            
+            // Interior view
+            html += this.renderInterior(housing.current, houseData, rooms, currentRoom, state);
+            
+            // Condition bar below interior
+            html += `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--gray-100);border-radius:10px;margin-bottom:16px">
+                <span style="font-size:24px">${houseData?.icon || '🏠'}</span>
+                <div style="flex:1">
+                    <div style="font-weight:600;color:var(--navy)">${houseData?.name || 'My Home'}</div>
+                    <div style="font-size:11px;color:var(--gray-500)">${houseData?.desc || ''}</div>
+                </div>
+                <div style="text-align:right">
+                    <div style="background:var(--gray-200);border-radius:6px;height:12px;width:100px;overflow:hidden">
+                        <div style="background:${condColor};height:100%;width:${condition}%"></div>
                     </div>
-                    <span style="color:${condColor};font-weight:bold">${condLabel} (${Math.round(condition)}%)</span>
+                    <div style="font-size:11px;color:${condColor};margin-top:2px">${condLabel} (${Math.round(condition)}%)</div>
                 </div>
             </div>`;
         } else {
@@ -6702,8 +6751,131 @@ const House = {
         if (state.housing.owned.includes(houseId)) {
             state.housing.current = houseId;
             Gamification.saveState(state);
+            this.currentRoom = 0;
             this.render();
         }
+    },
+
+    switchRoom(roomIdx) {
+        this.currentRoom = roomIdx;
+        this.render();
+    },
+
+    renderInterior(houseId, houseData, rooms, currentRoomIdx, state) {
+        const roomName = rooms[currentRoomIdx] || 'living';
+        const furniture = state.inventory?.furniture || {};
+        const pet = state.pet || {};
+        
+        // Room display names
+        const roomNames = {
+            sleeping: '🛏️ Sleeping Area', living: '🛋️ Living Room', kitchen: '🍳 Kitchen',
+            bedroom: '🛏️ Bedroom', bathroom: '🚿 Bathroom', foyer: '🚪 Foyer',
+            dining: '🍽️ Dining Room', study: '📚 Study', master: '👑 Master Suite',
+            guest: '🛏️ Guest Room', office: '💼 Home Office', terrace: '🌆 Terrace',
+            throne: '👑 Throne Room', great_hall: '🏰 Great Hall', tower: '🗼 Tower',
+            library: '📖 Library', courtyard: '🌳 Courtyard'
+        };
+        
+        // Room-specific furniture mapping
+        const roomFurniture = {
+            sleeping: ['bed'], living: ['couch', 'tv', 'rug', 'plant'], kitchen: ['lamp'],
+            bedroom: ['bed', 'lamp', 'rug'], bathroom: [], foyer: ['plant', 'painting'],
+            dining: ['lamp', 'rug'], study: ['desk', 'bookshelf', 'lamp', 'computer'],
+            master: ['bed', 'lamp', 'rug', 'painting'], guest: ['bed', 'lamp'],
+            office: ['desk', 'computer', 'bookshelf'], terrace: ['plant'],
+            throne: ['rug', 'painting'], great_hall: ['fireplace', 'rug', 'painting'],
+            tower: ['bookshelf', 'lamp'], library: ['bookshelf', 'desk', 'lamp'],
+            courtyard: ['plant', 'aquarium']
+        };
+        
+        // Get furniture for current room
+        const roomFurn = roomFurniture[roomName] || [];
+        const displayFurniture = roomFurn.filter(f => furniture[f] > 0);
+        
+        // Build interior HTML
+        let html = `<div class="house-interior ${houseId}">`;
+        
+        // Window/view area based on house type
+        if (houseId === 'penthouse') {
+            html += `<div class="house-window penthouse">
+                <div class="house-skyline">
+                    ${this._renderSkyline()}
+                </div>
+            </div>`;
+        } else if (houseId === 'castle') {
+            html += `<div class="house-window" style="background:linear-gradient(180deg,#1a1a3e 0%,#2d2d5a 100%)">
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:60px;opacity:0.2">🏰</div>
+            </div>`;
+        } else if (houseId === 'mansion') {
+            html += `<div class="house-window" style="background:linear-gradient(180deg,#87CEEB 0%,#98d4e8 100%)">
+                <div style="position:absolute;bottom:0;left:0;right:0;height:40%;background:linear-gradient(180deg,#228B22,#2d8f2d)"></div>
+            </div>`;
+        } else if (houseId === 'tent' || houseId === 'cabin') {
+            html += `<div class="house-window" style="background:linear-gradient(180deg,#2d4a3e 0%,#1a2f26 100%)">
+                <div style="position:absolute;top:20px;right:30px;font-size:24px">🌙</div>
+                <div style="position:absolute;top:15px;left:20px;font-size:12px;letter-spacing:8px">✨⭐✨</div>
+            </div>`;
+        } else {
+            html += `<div class="house-window" style="background:linear-gradient(180deg,#87CEEB 0%,#b8e0f0 100%)">
+                <div style="position:absolute;top:20px;right:30px;font-size:28px">☀️</div>
+            </div>`;
+        }
+        
+        // Floor area with room tabs and content
+        html += `<div class="house-floor">
+            <div class="house-room-tabs">
+                ${rooms.map((r, i) => `<button class="house-room-tab${i === currentRoomIdx ? ' active' : ''}" onclick="House.switchRoom(${i})">${roomNames[r] || r}</button>`).join('')}
+            </div>
+            <div class="house-room-content">
+                <div class="house-room-name">${roomNames[roomName] || roomName}</div>
+                <div class="house-room-furniture">
+                    ${displayFurniture.length > 0 ? displayFurniture.map(f => {
+                        const fData = Gamification.SHOP.furniture[f];
+                        return `<div class="house-furniture-item" title="${fData?.name || f}">${fData?.icon || '📦'}</div>`;
+                    }).join('') : '<div style="color:rgba(255,255,255,0.5);font-size:12px">No furniture placed</div>'}
+                </div>
+                ${this._renderPetInRoom(pet, state)}
+            </div>
+        </div>`;
+        
+        html += '</div>';
+        return html;
+    },
+
+    _renderSkyline() {
+        const buildings = [];
+        for (let i = 0; i < 12; i++) {
+            const h = 40 + Math.random() * 50;
+            const w = 15 + Math.random() * 20;
+            buildings.push(`<div class="house-building" style="width:${w}px;height:${h}%"></div>`);
+        }
+        return buildings.join('');
+    },
+
+    _renderPetInRoom(pet, state) {
+        if (!pet.type) return '';
+        const petData = Gamification.SHOP.pets?.[pet.type] || {};
+        const emoji = petData.stages?.[pet.stage || 0] || petData.icon || '🐣';
+        const accessory = pet.accessory ? (Gamification.SHOP.petAccessories?.[pet.accessory]?.icon || '') : '';
+        const mood = this._getPetMood(pet);
+        
+        return `<div class="house-pet" onclick="PetModal.show()">
+            <div class="house-pet-mood">${mood}</div>
+            <div class="house-pet-sprite">${emoji}${accessory ? `<span style="position:absolute;top:-8px;right:-8px;font-size:16px">${accessory}</span>` : ''}</div>
+            <div class="house-pet-name">${pet.name || 'Pet'}</div>
+        </div>`;
+    },
+
+    _getPetMood(pet) {
+        const hunger = pet.hunger ?? 100;
+        const happiness = pet.happiness ?? 100;
+        if (pet.sick) return '🤒 Sick';
+        if (hunger < 30) return '😫 Starving';
+        if (happiness < 30) return '😢 Sad';
+        if (hunger < 60) return '😋 Hungry';
+        if (happiness < 60) return '😐 Bored';
+        if (happiness > 80 && hunger > 80) return '😊 Happy';
+        return '😌 Content';
     },
 
     calculateXpBonus(state) {
@@ -13618,8 +13790,8 @@ const Progress = {
         return `<div class="progress-section">
             <h3>📚 Study Time vs Test Scores</h3>
             <p style="font-size:12px;color:var(--gray-600);margin-bottom:8px">${insight}</p>
-            <canvas id="studyVsScoreChart" width="600" height="180" style="width:100%;max-height:180px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
-            <p style="font-size:11px;color:var(--gray-600);text-align:center;margin-top:4px">Each dot = one test day (study mins that day vs score)</p>
+            <canvas id="studyVsScoreChart" width="600" height="200" style="width:100%;max-height:200px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
+            <p style="font-size:12px;color:var(--gray-600);text-align:center;margin-top:6px">Each dot = one test day (study mins that day vs score)</p>
         </div>`;
     },
 
@@ -13670,7 +13842,7 @@ const Progress = {
         canvas.height = canvas.offsetHeight * dpr;
         ctx.scale(dpr, dpr);
         const w = canvas.offsetWidth, h = canvas.offsetHeight;
-        const pad = { top: 15, right: 15, bottom: 30, left: 40 };
+        const pad = { top: 25, right: 20, bottom: 40, left: 50 };
         const plotW = w - pad.left - pad.right;
         const plotH = h - pad.top - pad.bottom;
         
@@ -13692,10 +13864,10 @@ const Progress = {
             ctx.moveTo(pad.left, y);
             ctx.lineTo(w - pad.right, y);
             ctx.stroke();
-            ctx.fillStyle = isDark ? '#9ca3af' : '#999';
-            ctx.font = '9px Arial';
+            ctx.fillStyle = isDark ? '#9ca3af' : '#666';
+            ctx.font = '11px Arial';
             ctx.textAlign = 'right';
-            ctx.fillText(pct + '%', pad.left - 3, y + 3);
+            ctx.fillText(pct + '%', pad.left - 5, y + 4);
         }
         
         // Pass line
@@ -13709,14 +13881,14 @@ const Progress = {
         ctx.setLineDash([]);
         
         // X axis labels
-        ctx.fillStyle = isDark ? '#9ca3af' : '#999';
-        ctx.font = '9px Arial';
+        ctx.fillStyle = isDark ? '#9ca3af' : '#666';
+        ctx.font = '10px Arial';
         ctx.textAlign = 'center';
         for (let mins of [0, Math.round(maxMins / 2), maxMins]) {
             const x = pad.left + (mins / maxMins) * plotW;
-            ctx.fillText(mins + 'm', x, h - 5);
+            ctx.fillText(mins + ' min', x, h - 8);
         }
-        ctx.fillText('Study Time →', pad.left + plotW / 2, h - 15);
+        ctx.fillText('Study Time →', pad.left + plotW / 2, h - 22);
         
         // Scatter points
         data.forEach(d => {
@@ -13725,11 +13897,11 @@ const Progress = {
             const color = d.score >= 70 ? (isDark ? '#4ade80' : '#27ae60') : (isDark ? '#ef4444' : '#c0392b');
             
             ctx.beginPath();
-            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.arc(x, y, 7, 0, Math.PI * 2);
             ctx.fillStyle = color;
             ctx.fill();
             ctx.strokeStyle = isDark ? '#16213e' : '#fff';
-            ctx.lineWidth = 1.5;
+            ctx.lineWidth = 2;
             ctx.stroke();
         });
         
@@ -13804,8 +13976,8 @@ const Progress = {
         
         return `<div class="progress-section">
             <h3>📈 Daily Accuracy Trend</h3>
-            <canvas id="accuracyChart" width="600" height="160" style="width:100%;max-height:160px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
-            <p style="font-size:11px;color:var(--gray-600);text-align:center;margin-top:4px">Last ${dailyData.length} days with activity</p>
+            <canvas id="accuracyChart" width="600" height="200" style="width:100%;max-height:200px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>
+            <p style="font-size:12px;color:var(--gray-600);text-align:center;margin-top:6px">Last ${dailyData.length} days with activity</p>
         </div>`;
     },
 
@@ -13852,7 +14024,7 @@ const Progress = {
         canvas.height = canvas.offsetHeight * dpr;
         ctx.scale(dpr, dpr);
         const w = canvas.offsetWidth, h = canvas.offsetHeight;
-        const pad = { top: 15, right: 15, bottom: 25, left: 35 };
+        const pad = { top: 25, right: 20, bottom: 35, left: 45 };
         const plotW = w - pad.left - pad.right;
         const plotH = h - pad.top - pad.bottom;
         
@@ -13871,10 +14043,10 @@ const Progress = {
             ctx.moveTo(pad.left, y);
             ctx.lineTo(w - pad.right, y);
             ctx.stroke();
-            ctx.fillStyle = isDark ? '#9ca3af' : '#999';
-            ctx.font = '9px Arial';
+            ctx.fillStyle = isDark ? '#9ca3af' : '#666';
+            ctx.font = '11px Arial';
             ctx.textAlign = 'right';
-            ctx.fillText(pct + '%', pad.left - 3, y + 3);
+            ctx.fillText(pct + '%', pad.left - 5, y + 4);
         }
         
         // Pass line at 70%
@@ -13914,23 +14086,32 @@ const Progress = {
         points.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
         ctx.stroke();
         
-        // Dots
+        // Dots with white border for better visibility
         points.forEach(p => {
             const color = p.accuracy >= 70 ? (isDark ? '#4ade80' : '#27ae60') : (isDark ? '#ef4444' : '#c0392b');
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
             ctx.fillStyle = color;
             ctx.fill();
+            ctx.strokeStyle = isDark ? '#16213e' : '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
         });
         
         // X axis labels (dates)
-        ctx.fillStyle = isDark ? '#9ca3af' : '#999';
-        ctx.font = '8px Arial';
+        ctx.fillStyle = isDark ? '#9ca3af' : '#666';
+        ctx.font = '10px Arial';
         ctx.textAlign = 'center';
-        const step = Math.max(1, Math.floor(dailyData.length / 5));
+        const labelCount = Math.min(5, dailyData.length);
+        const step = Math.max(1, Math.floor((dailyData.length - 1) / (labelCount - 1)));
         for (let i = 0; i < dailyData.length; i += step) {
             const dateStr = dailyData[i].day.slice(5); // MM-DD
-            ctx.fillText(dateStr, points[i].x, h - 5);
+            ctx.fillText(dateStr, points[i].x, h - 10);
+        }
+        // Always show last date
+        if ((dailyData.length - 1) % step !== 0) {
+            const lastDate = dailyData[dailyData.length - 1].day.slice(5);
+            ctx.fillText(lastDate, points[points.length - 1].x, h - 10);
         }
     },
 
@@ -13985,9 +14166,9 @@ const Progress = {
         if (allHistory.length < 2) return '';
         allHistory.sort((a, b) => new Date(a.date) - new Date(b.date));
         const recent = allHistory.slice(-20);
-        return '<div class="progress-section"><h3>Score Trend</h3>' +
-            '<canvas id="trendChart" width="600" height="180" style="width:100%;max-height:180px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>' +
-            '<p style="font-size:11px;color:var(--gray-600);text-align:center;margin-top:4px">Last ' + recent.length + ' tests</p></div>';
+        return '<div class="progress-section"><h3>📊 Score Trend</h3>' +
+            '<canvas id="trendChart" width="600" height="220" style="width:100%;max-height:220px;border-radius:8px;background:var(--white);border:1px solid var(--gray-200)"></canvas>' +
+            '<p style="font-size:12px;color:var(--gray-600);text-align:center;margin-top:6px">Last ' + recent.length + ' tests</p></div>';
     },
 
     _drawTrendChart() {
@@ -14009,7 +14190,7 @@ const Progress = {
         canvas.height = canvas.offsetHeight * dpr;
         ctx.scale(dpr, dpr);
         const w = canvas.offsetWidth, h = canvas.offsetHeight;
-        const pad = { top: 20, right: 20, bottom: 30, left: 40 };
+        const pad = { top: 25, right: 25, bottom: 40, left: 50 };
         const plotW = w - pad.left - pad.right;
         const plotH = h - pad.top - pad.bottom;
 
@@ -14022,16 +14203,16 @@ const Progress = {
         // Grid lines
         ctx.strokeStyle = isDark ? '#374151' : '#eee';
         ctx.lineWidth = 1;
-        for (let pct of [0, 25, 50, 70, 100]) {
+        for (let pct of [0, 50, 70, 100]) {
             const y = pad.top + plotH - (pct / 100) * plotH;
             ctx.beginPath();
             ctx.moveTo(pad.left, y);
             ctx.lineTo(w - pad.right, y);
             ctx.stroke();
-            ctx.fillStyle = isDark ? '#9ca3af' : '#999';
-            ctx.font = '10px Arial';
+            ctx.fillStyle = isDark ? '#9ca3af' : '#666';
+            ctx.font = '11px Arial';
             ctx.textAlign = 'right';
-            ctx.fillText(pct + '%', pad.left - 4, y + 3);
+            ctx.fillText(pct + '%', pad.left - 6, y + 4);
         }
 
         // Pass line at 70%
@@ -14074,7 +14255,7 @@ const Progress = {
         points.forEach((p, i) => {
             const color = data[i] >= 70 ? (isDark ? '#4ade80' : '#27ae60') : (isDark ? '#ef4444' : '#c0392b');
             ctx.beginPath();
-            ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+            ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
             ctx.fillStyle = color;
             ctx.fill();
             ctx.strokeStyle = isDark ? '#16213e' : '#fff';
@@ -14082,15 +14263,20 @@ const Progress = {
             ctx.stroke();
         });
 
-        // X axis labels
-        ctx.fillStyle = isDark ? '#9ca3af' : '#999';
-        ctx.font = '9px Arial';
+        // X axis labels - show test numbers
+        ctx.fillStyle = isDark ? '#9ca3af' : '#666';
+        ctx.font = '10px Arial';
         ctx.textAlign = 'center';
-        const step = Math.max(1, Math.floor(data.length / 6));
+        // Only show a few labels to avoid crowding
+        const labelCount = Math.min(6, data.length);
+        const step = Math.max(1, Math.floor((data.length - 1) / (labelCount - 1)));
         for (let i = 0; i < data.length; i += step) {
-            ctx.fillText('#' + (i + 1), points[i].x, h - 6);
+            ctx.fillText('Test ' + (i + 1), points[i].x, h - 10);
         }
-        ctx.fillText('#' + data.length, points[points.length - 1].x, h - 6);
+        // Always show last test
+        if ((data.length - 1) % step !== 0) {
+            ctx.fillText('Test ' + data.length, points[points.length - 1].x, h - 10);
+        }
     },
 
     renderOverallStats() {
@@ -15575,7 +15761,7 @@ const InlineChart = {
         const ctx = canvas.getContext('2d');
         const dpr = window.devicePixelRatio || 1;
         const w = canvas.clientWidth || 560;
-        const h = canvas.clientHeight || 320;
+        const h = canvas.clientHeight || 360;
         canvas.width = w * dpr;
         canvas.height = h * dpr;
         ctx.scale(dpr, dpr);
@@ -15588,7 +15774,7 @@ const InlineChart = {
 
         // Margins - responsive based on width
         const isSmall = w < 400;
-        const m = { top: 40, right: isSmall ? 12 : 20, bottom: 48, left: isSmall ? 48 : 56 };
+        const m = { top: 50, right: isSmall ? 15 : 25, bottom: 55, left: isSmall ? 52 : 62 };
         const pw = w - m.left - m.right;
         const ph = h - m.top - m.bottom;
 
@@ -15639,11 +15825,11 @@ const InlineChart = {
 
         // Tick labels
         ctx.fillStyle = colors.text;
-        ctx.font = '11px Arial';
+        ctx.font = isSmall ? '11px Arial' : '12px Arial';
         ctx.textAlign = 'center';
         xTicks.forEach(v => {
             const label = gd.xTickFormat ? gd.xTickFormat(v) : this._fmtNum(v);
-            ctx.fillText(label, sx(v), m.top + ph + 16);
+            ctx.fillText(label, sx(v), m.top + ph + 18);
         });
         ctx.textAlign = 'right';
         yTicks.forEach(v => {
@@ -15652,16 +15838,16 @@ const InlineChart = {
         });
 
         // Axis labels - responsive font size
-        const labelFont = isSmall ? '10px Arial' : '12px Arial';
+        const labelFont = isSmall ? '11px Arial' : '13px Arial';
         ctx.fillStyle = colors.text;
         ctx.font = labelFont;
         ctx.textAlign = 'center';
         if (gd.xLabel) {
             const xLabelTrunc = this._truncateText(ctx, gd.xLabel, pw);
-            ctx.fillText(xLabelTrunc, m.left + pw / 2, h - 4);
+            ctx.fillText(xLabelTrunc, m.left + pw / 2, h - 8);
         }
         ctx.save();
-        ctx.translate(12, m.top + ph / 2);
+        ctx.translate(14, m.top + ph / 2);
         ctx.rotate(-Math.PI / 2);
         if (gd.yLabel) {
             const yLabelTrunc = this._truncateText(ctx, gd.yLabel, ph);
@@ -15671,11 +15857,11 @@ const InlineChart = {
 
         // Title - responsive and truncated if needed
         ctx.fillStyle = colors.title;
-        ctx.font = isSmall ? 'bold 12px Arial' : 'bold 14px Arial';
+        ctx.font = isSmall ? 'bold 13px Arial' : 'bold 16px Arial';
         ctx.textAlign = 'center';
         if (gd.title) {
-            const titleTrunc = this._truncateText(ctx, gd.title, w - 20);
-            ctx.fillText(titleTrunc, w / 2, 22);
+            const titleTrunc = this._truncateText(ctx, gd.title, w - 30);
+            ctx.fillText(titleTrunc, w / 2, 28);
         }
 
         // Horizontal asymptotes
@@ -17155,7 +17341,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.84</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v2.86</div>
 
 </body>
 </html>
