@@ -11458,6 +11458,12 @@ const Drill = {
             let priority = 0;
             if (this._focusQIds) {
                 priority = 3; // forced focus mode — all high priority
+            } else if (p.speedMastered) {
+                // Speed mastered (answered fast twice) - almost never show
+                priority = 0;
+            } else if (p.avgSpeed && p.avgSpeed < 8 && (p.fastCorrect || 0) >= 1) {
+                // Fast answers (avg <8s with 1+ fast) - very low priority
+                priority = 0;
             } else if (p.nextReview && p.nextReview > now) {
                 // Not due yet - skip unless it's struggling
                 priority = p.ef < 1.8 ? 1 : 0;
@@ -11623,6 +11629,7 @@ const Drill = {
         const q = this.current.question;
         const p = this.current.progress;
         const isCorrect = this._lastWasCorrect;
+        const timeSpent = Gamification.getQuestionTime(); // Get time early for speed tracking
         
         // Auto-calculate quality based on correctness
         // Correct = 5 (got it), Wrong = 1 (missed)
@@ -11644,13 +11651,29 @@ const Drill = {
         }
 
         const nextReview = Date.now() + interval * 86400000;
-        this.saveProgress(q.id, { ef, interval, reps, nextReview });
+        
+        // Track answer speed for filtering (same as SpeedMode)
+        const timeSpentSec = timeSpent / 1000; // convert ms to seconds
+        let fastCorrect = p.fastCorrect || 0;
+        let avgSpeed = p.avgSpeed;
+        if (isCorrect) {
+            // Track fast correct answers (under 10 seconds)
+            if (timeSpentSec < 10) fastCorrect++;
+            avgSpeed = avgSpeed ? (avgSpeed * 0.7 + timeSpentSec * 0.3) : timeSpentSec;
+        } else {
+            // Reset fast correct count on wrong answer
+            fastCorrect = 0;
+        }
+        
+        // Mark as speed mastered if 2+ fast correct answers
+        const speedMastered = fastCorrect >= 2 || (reps >= 5 && ef >= 2.5 && avgSpeed && avgSpeed < 10);
+        
+        this.saveProgress(q.id, { ef, interval, reps, nextReview, fastCorrect, avgSpeed, speedMastered });
 
         this.sessionCount++;
         if (isCorrect) this.sessionCorrect++;
 
         // Gamification hooks — gate XP on actual correctness
-        const timeSpent = Gamification.getQuestionTime();
         if (isCorrect) {
             Gamification.incrementCombo();
             const trackerData = QuestionTracker._getData();
@@ -17745,7 +17768,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.11</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.12</div>
 
 </body>
 </html>
