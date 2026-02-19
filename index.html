@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    <script src="config.local.js" onerror="window.CONFIG={}"></script>
     <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&display=swap');
 /* === RESET & VARIABLES === */
@@ -11168,6 +11169,69 @@ const Home = {
                 <button class="btn-nav" style="background:var(--red);font-size:12px;padding:6px 14px" onclick="Drill.start('${escapeHtml(bank.bankId)}', [${weakQIds.join(',')}])">Drill Weak Areas</button>
             </div>
         </div>`;
+    }
+};
+
+// =====================================================================
+// IMAGE GENERATOR - DALL-E 3 Integration
+// =====================================================================
+const ImageGenerator = {
+    getApiKey() {
+        // Priority: CONFIG file > localStorage settings
+        return (window.CONFIG && CONFIG.OPENAI_API_KEY) || Store.get('openaiKey', '');
+    },
+    
+    async generate(prompt, size = '1024x1024') {
+        const apiKey = this.getApiKey();
+        if (!apiKey) {
+            throw new Error('No OpenAI API key found. Set it in Settings or config.local.js');
+        }
+        
+        const resp = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: 'dall-e-3',
+                prompt: prompt,
+                n: 1,
+                size: size,
+                quality: 'standard',
+                response_format: 'url'
+            })
+        });
+        
+        if (!resp.ok) {
+            const err = await resp.json().catch(() => ({}));
+            throw new Error(err.error?.message || `API error: ${resp.status}`);
+        }
+        
+        const data = await resp.json();
+        return {
+            url: data.data[0].url,
+            revisedPrompt: data.data[0].revised_prompt
+        };
+    },
+    
+    async generateAndShow(prompt, targetElementId) {
+        const target = document.getElementById(targetElementId);
+        if (target) target.innerHTML = '<div style="text-align:center;padding:20px">🎨 Generating image...</div>';
+        
+        try {
+            const result = await this.generate(prompt);
+            if (target) {
+                target.innerHTML = `
+                    <img src="${result.url}" style="max-width:100%;border-radius:8px" alt="${prompt}">
+                    <div style="font-size:11px;color:var(--gray-500);margin-top:8px">${result.revisedPrompt}</div>
+                `;
+            }
+            return result;
+        } catch (err) {
+            if (target) target.innerHTML = `<div style="color:var(--red);padding:20px">❌ ${err.message}</div>`;
+            throw err;
+        }
     }
 };
 
