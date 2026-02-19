@@ -13218,7 +13218,8 @@ const SpeedMode = {
     isActive: false, // Track if speed mode is currently running
 
     // Fallback time limits by difficulty (seconds) - used when no baseline exists
-    TIME_LIMITS: { easy: 30, medium: 20, hard: 15 },
+    // Hard questions get MORE time because they're harder!
+    TIME_LIMITS: { easy: 20, medium: 25, hard: 35 },
     
     // Difficulty modifiers (reduce baseline time by this percentage)
     DIFFICULTY_MODIFIERS: { easy: 0.10, medium: 0.20, hard: 0.35 },
@@ -13271,11 +13272,11 @@ const SpeedMode = {
         }
         
         // You've answered this before - give you your average time + buffer
-        // Easy: +20% buffer, Medium: +10% buffer, Hard: no buffer (you know it)
+        // Hard questions get MORE buffer because they're harder!
         let buffer;
-        if (difficulty === 1) buffer = 1.2;      // Easy: generous
-        else if (difficulty === 3) buffer = 1.0; // Hard: tight
-        else buffer = 1.1;                        // Medium: slight buffer
+        if (difficulty === 1) buffer = 1.0;      // Easy: no buffer needed
+        else if (difficulty === 3) buffer = 1.3; // Hard: +30% extra time
+        else buffer = 1.15;                       // Medium: +15% buffer
         
         const adjustedTime = Math.round(baseline * buffer);
         
