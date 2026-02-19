@@ -1117,6 +1117,9 @@ button:focus-visible {
 .shop-item{background:var(--white);border:2px solid var(--gray-200);border-radius:12px;padding:16px;text-align:center;transition:all .2s}
 .shop-item:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.1)}
 .shop-item.cant-afford{opacity:.6}
+.shop-item.already-owned{border-color:var(--green);background:linear-gradient(135deg,#f0fdf4,#dcfce7)}
+.shop-item.already-owned .shop-item-icon{opacity:.7}
+.shop-owned-badge{background:var(--green);color:white;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;margin-top:8px}
 .shop-item.locked-item{opacity:.5;position:relative}
 .shop-item.locked-item .shop-item-icon{filter:grayscale(1)}
 .shop-item-lock{font-size:11px;color:#ef4444;font-weight:600;margin:4px 0}
@@ -2875,33 +2878,60 @@ const Gamification = {
         { id: 'first_correct', name: 'First Steps', desc: 'Get your first correct answer', icon: '🎯', xp: 50 },
         { id: 'ten_streak', name: 'On Fire', desc: '10 correct answers in a row', icon: '🔥', xp: 100 },
         { id: 'twenty_streak', name: 'Unstoppable', desc: '20 correct answers in a row', icon: '💥', xp: 200 },
+        { id: 'fifty_streak', name: 'Legendary', desc: '50 correct answers in a row', icon: '👑', xp: 500 },
         { id: 'perfect_test', name: 'Perfectionist', desc: 'Score 100% on a test', icon: '💯', xp: 500 },
         { id: 'category_master', name: 'Category Master', desc: 'Master a category (30+ correct, 90%+)', icon: '🏆', xp: 200 },
+        { id: 'multi_master', name: 'Multi-Master', desc: 'Master 5 different categories', icon: '🎖️', xp: 400 },
         { id: 'week_streak', name: 'Weekly Warrior', desc: '7-day study streak', icon: '📅', xp: 300 },
         { id: 'month_streak', name: 'Dedicated Learner', desc: '30-day study streak', icon: '🗓️', xp: 1000 },
         { id: 'early_bird', name: 'Early Bird', desc: 'Study before 7am', icon: '🌅', xp: 50 },
         { id: 'night_owl', name: 'Night Owl', desc: 'Study after 11pm', icon: '🦉', xp: 50 },
         { id: 'speed_demon', name: 'Speed Demon', desc: 'Answer correctly in under 10 seconds', icon: '⚡', xp: 75 },
+        { id: 'lightning_fast', name: 'Lightning Fast', desc: 'Answer correctly in under 5 seconds', icon: '⚡', xp: 150 },
         { id: 'century', name: 'Century', desc: 'Answer 100 questions', icon: '💪', xp: 200 },
+        { id: 'five_hundred', name: 'Halfway There', desc: 'Answer 500 questions', icon: '🎯', xp: 400 },
         { id: 'thousand', name: 'Grind Master', desc: 'Answer 1000 questions', icon: '🏋️', xp: 1000 },
+        { id: 'five_thousand', name: 'Unstoppable Force', desc: 'Answer 5000 questions', icon: '💎', xp: 2500 },
         { id: 'comeback', name: 'Comeback Kid', desc: 'Return after 3+ days away', icon: '👋', xp: 100 },
         { id: 'level_5', name: 'Rising Star', desc: 'Reach level 5', icon: '⭐', xp: 100 },
         { id: 'level_10', name: 'Dedicated Student', desc: 'Reach level 10', icon: '🌟', xp: 200 },
         { id: 'level_20', name: 'True Expert', desc: 'Reach level 20', icon: '✨', xp: 500 },
+        { id: 'level_30', name: 'Grand Master', desc: 'Reach level 30', icon: '🏅', xp: 1000 },
+        // Daily mastery achievements
+        { id: 'daily_10', name: 'Daily Dozen', desc: 'Answer 10 questions correctly in one day', icon: '📝', xp: 50, daily: true },
+        { id: 'daily_25', name: 'Quarter Century', desc: 'Answer 25 questions correctly in one day', icon: '📚', xp: 100, daily: true },
+        { id: 'daily_50', name: 'Half Century', desc: 'Answer 50 questions correctly in one day', icon: '🎓', xp: 200, daily: true },
+        { id: 'daily_100', name: 'Century Day', desc: 'Answer 100 questions correctly in one day', icon: '🏆', xp: 500, daily: true },
+        { id: 'daily_perfect_10', name: 'Perfect Ten', desc: 'Get 10 correct in a row today', icon: '🎯', xp: 75, daily: true },
+        { id: 'daily_speed_5', name: 'Quick Study', desc: 'Answer 5 questions under 15 seconds today', icon: '⏱️', xp: 60, daily: true },
+        { id: 'daily_all_modes', name: 'Well Rounded', desc: 'Use Test, Practice, Drill, and Speed mode today', icon: '🔄', xp: 100, daily: true },
+        { id: 'daily_3_banks', name: 'Explorer', desc: 'Study from 3 different banks today', icon: '🗺️', xp: 75, daily: true },
         // Garden & Pet achievements
         { id: 'green_thumb', name: 'Green Thumb', desc: 'Harvest your first plant', icon: '🌱', xp: 75 },
         { id: 'master_gardener', name: 'Master Gardener', desc: 'Harvest 10 plants', icon: '🧑‍🌾', xp: 200 },
+        { id: 'legendary_gardener', name: 'Legendary Gardener', desc: 'Harvest 50 plants', icon: '🌳', xp: 500 },
         { id: 'garden_paradise', name: 'Garden Paradise', desc: 'Fill all 9 garden plots', icon: '🏡', xp: 300 },
         { id: 'best_friends', name: 'Best Friends', desc: 'Reach max pet evolution', icon: '🦅', xp: 250 },
         { id: 'happy_tummy', name: 'Happy Tummy', desc: 'Feed your pet 50 meals', icon: '🍖', xp: 150 },
+        { id: 'pet_collector', name: 'Pet Collector', desc: 'Own 3 different pets', icon: '🐾', xp: 300 },
         { id: 'window_shopper', name: 'Window Shopper', desc: 'Make your first purchase', icon: '🛒', xp: 50 },
         { id: 'big_spender', name: 'Big Spender', desc: 'Earn 1000 total coins', icon: '💰', xp: 200 },
+        { id: 'coin_hoarder', name: 'Coin Hoarder', desc: 'Earn 10000 total coins', icon: '🏦', xp: 500 },
         { id: 'rainbow_bloom', name: 'Rainbow Bloom', desc: 'Grow a Rainbow Rose', icon: '🌈', xp: 500 },
+        { id: 'rare_collector', name: 'Rare Collector', desc: 'Grow all premium seed types', icon: '💎', xp: 750 },
         // Battle achievements
         { id: 'first_victory', name: 'First Blood', desc: 'Win your first battle', icon: '⚔️', xp: 75 },
         { id: 'chapter_clear', name: 'Chapter Master', desc: 'Complete a full chapter', icon: '🏰', xp: 200 },
         { id: 'boss_slayer', name: 'Boss Slayer', desc: 'Defeat all 5 bosses', icon: '💀', xp: 500 },
-        { id: 'flawless', name: 'Flawless Victory', desc: 'Win a battle taking no damage', icon: '✨', xp: 150 }
+        { id: 'flawless', name: 'Flawless Victory', desc: 'Win a battle taking no damage', icon: '✨', xp: 150 },
+        // Business achievements
+        { id: 'entrepreneur', name: 'Entrepreneur', desc: 'Start your first business', icon: '🏪', xp: 100 },
+        { id: 'business_mogul', name: 'Business Mogul', desc: 'Own 3 different businesses', icon: '🏢', xp: 300 },
+        { id: 'millionaire', name: 'Millionaire', desc: 'Earn 1,000,000 from businesses', icon: '💵', xp: 1000 },
+        // Housing achievements
+        { id: 'homeowner', name: 'Homeowner', desc: 'Buy your first house', icon: '🏠', xp: 150 },
+        { id: 'interior_designer', name: 'Interior Designer', desc: 'Own 10 pieces of furniture', icon: '🛋️', xp: 200 },
+        { id: 'real_estate', name: 'Real Estate Mogul', desc: 'Own 3 different houses', icon: '🏘️', xp: 500 }
     ],
 
     // Power-ups
@@ -3088,29 +3118,30 @@ const Gamification = {
             magicBerry:   { name: 'Magic Berry',   price: 150, icon: '🫐', hunger: 30, happiness: 60, careBonus: 20, healthy: true, decayMod: 0.6 }
         },
         seeds: {
-            sunflower: { name: 'Sunflower',     price: 15,  icon: '🌻', gpNeeded: 10, stages: 4, coinReward: 10, xpReward: 25,
-                         emojis: ['🫘','🌱','🌿','🌻'] },
-            cactus:    { name: 'Cactus',        price: 20,  icon: '🌵', gpNeeded: 15, stages: 4, coinReward: 15, xpReward: 40,
-                         emojis: ['🫘','🌱','🪴','🌵'] },
-            bonsai:    { name: 'Bonsai',        price: 40,  icon: '🌳', gpNeeded: 25, stages: 5, coinReward: 30, xpReward: 75,
-                         emojis: ['🫘','🌱','🪴','🌿','🌳'] },
-            crystal:   { name: 'Crystal Bloom', price: 75,  icon: '💎', gpNeeded: 40, stages: 5, coinReward: 50, xpReward: 120,
-                         emojis: ['🫘','🌱','🪴','💠','💎'] },
-            rainbow:   { name: 'Rainbow Rose',  price: 120, icon: '🌈', gpNeeded: 60, stages: 6, coinReward: 100, xpReward: 250,
-                         emojis: ['🫘','🌱','🌿','🪻','🌹','🌈'] },
-            moneyTree: { name: 'Money Tree',    price: 300, icon: '💰', gpNeeded: 100, stages: 7, coinReward: 250, xpReward: 500,
-                         emojis: ['🫘','🌱','🌿','🪴','🌳','💵','💰'] },
-            // Premium/rare seeds
-            starfruit:  { name: 'Starfruit',     price: 200, icon: '⭐', gpNeeded: 80, stages: 6, coinReward: 150, xpReward: 350, gemReward: 1,
-                         emojis: ['🫘','🌱','🌿','🪴','🌟','⭐'], desc: 'Rare! Yields gems on harvest' },
-            dragonFruit:{ name: 'Dragon Fruit',  price: 250, icon: '🐉', gpNeeded: 90, stages: 6, coinReward: 180, xpReward: 400, petBonus: true,
-                         emojis: ['🫘','🌱','🌿','🪴','🔥','🐉'], desc: '+10 pet happiness on harvest' },
-            moonflower: { name: 'Moonflower',    price: 180, icon: '🌙', gpNeeded: 70, stages: 5, coinReward: 120, xpReward: 300, nightBonus: true,
-                         emojis: ['🫘','🌱','🌿','🌸','🌙'], desc: '2x rewards if harvested at night' },
-            goldenApple:{ name: 'Golden Apple',  price: 400, icon: '🍎', gpNeeded: 120, stages: 7, coinReward: 300, xpReward: 600, healPet: true,
-                         emojis: ['🫘','🌱','🌿','🪴','🌳','🍏','🍎'], desc: 'Fully heals pet on harvest' },
-            ancientOak: { name: 'Ancient Oak',   price: 500, icon: '🌲', gpNeeded: 150, stages: 8, coinReward: 400, xpReward: 800, permBonus: 0.05,
-                         emojis: ['🫘','🌱','🌿','🪴','🌳','🌲','🎄','🌲'], desc: 'Permanent +5% coin bonus after harvest' }
+            // Growth times at 1.4 GP/hour: sunflower ~24h, cactus ~36h, bonsai ~2d, etc.
+            sunflower: { name: 'Sunflower',     price: 15,  icon: '🌻', gpNeeded: 35, stages: 4, coinReward: 15, xpReward: 35,
+                         emojis: ['🫘','🌱','🌿','🌻'], growthHours: 24 },
+            cactus:    { name: 'Cactus',        price: 20,  icon: '🌵', gpNeeded: 50, stages: 4, coinReward: 25, xpReward: 50,
+                         emojis: ['🫘','🌱','🪴','🌵'], growthHours: 36 },
+            bonsai:    { name: 'Bonsai',        price: 40,  icon: '🌳', gpNeeded: 70, stages: 5, coinReward: 45, xpReward: 100,
+                         emojis: ['🫘','🌱','🪴','🌿','🌳'], growthHours: 48 },
+            crystal:   { name: 'Crystal Bloom', price: 75,  icon: '💎', gpNeeded: 100, stages: 5, coinReward: 75, xpReward: 175,
+                         emojis: ['🫘','🌱','🪴','💠','💎'], growthHours: 72 },
+            rainbow:   { name: 'Rainbow Rose',  price: 120, icon: '🌈', gpNeeded: 140, stages: 6, coinReward: 150, xpReward: 350,
+                         emojis: ['🫘','🌱','🌿','🪻','🌹','🌈'], growthHours: 96 },
+            moneyTree: { name: 'Money Tree',    price: 300, icon: '💰', gpNeeded: 200, stages: 7, coinReward: 400, xpReward: 750,
+                         emojis: ['🫘','🌱','🌿','🪴','🌳','💵','💰'], growthHours: 144 },
+            // Premium/rare seeds - take even longer but better rewards
+            starfruit:  { name: 'Starfruit',     price: 200, icon: '⭐', gpNeeded: 170, stages: 6, coinReward: 250, xpReward: 500, gemReward: 1,
+                         emojis: ['🫘','🌱','🌿','🪴','🌟','⭐'], desc: 'Rare! Yields gems on harvest', growthHours: 120 },
+            dragonFruit:{ name: 'Dragon Fruit',  price: 250, icon: '🐉', gpNeeded: 190, stages: 6, coinReward: 300, xpReward: 600, petBonus: true,
+                         emojis: ['🫘','🌱','🌿','🪴','🔥','🐉'], desc: '+10 pet happiness on harvest', growthHours: 132 },
+            moonflower: { name: 'Moonflower',    price: 180, icon: '🌙', gpNeeded: 150, stages: 5, coinReward: 200, xpReward: 450, nightBonus: true,
+                         emojis: ['🫘','🌱','🌿','🌸','🌙'], desc: '2x rewards if harvested at night', growthHours: 108 },
+            goldenApple:{ name: 'Golden Apple',  price: 400, icon: '🍎', gpNeeded: 250, stages: 7, coinReward: 500, xpReward: 900, healPet: true,
+                         emojis: ['🫘','🌱','🌿','🪴','🌳','🍏','🍎'], desc: 'Fully heals pet on harvest', growthHours: 180 },
+            ancientOak: { name: 'Ancient Oak',   price: 500, icon: '🌲', gpNeeded: 350, stages: 8, coinReward: 700, xpReward: 1200, permBonus: 0.05,
+                         emojis: ['🫘','🌱','🌿','🪴','🌳','🌲','🎄','🌲'], desc: 'Permanent +5% coin bonus after harvest', growthHours: 240 }
         },
         gardenItems: {
             water:      { name: 'Watering Can', price: 5,   icon: '💧', desc: '+25 water level' },
@@ -6502,15 +6533,19 @@ const Shop = {
             const unlocked = Gamification.isItemUnlocked(this.currentTab, id);
             const reqLevel = (Gamification.LEVEL_REQS[this.currentTab] || {})[id] || 1;
             const onSale = discount > 0;
+            // Unique items (housing, cosmetics) can only be bought once
+            const isUniqueItem = this.currentTab === 'housing' || this.currentTab === 'cosmetics';
+            const alreadyOwned = isUniqueItem && owned === 'Yes';
             html += `
-                <div class="shop-item${!unlocked ? ' locked-item' : ''}${!canAfford && unlocked ? ' cant-afford' : ''}${onSale ? ' on-sale' : ''}">
-                    ${onSale ? `<div class="shop-sale-tag">-${Math.round(discount * 100)}%</div>` : ''}
+                <div class="shop-item${!unlocked ? ' locked-item' : ''}${!canAfford && unlocked && !alreadyOwned ? ' cant-afford' : ''}${onSale ? ' on-sale' : ''}${alreadyOwned ? ' already-owned' : ''}">
+                    ${onSale && !alreadyOwned ? `<div class="shop-sale-tag">-${Math.round(discount * 100)}%</div>` : ''}
                     <div class="shop-item-icon">${this.currentTab === 'seeds' ? Sprites.plantSprite(id, (item.stages || 4) - 1, item.icon, 36) : item.icon}</div>
                     <div class="shop-item-name">${item.name}</div>
                     ${item.desc ? `<div class="shop-item-desc">${item.desc}</div>` : ''}
                     ${!unlocked ? `<div class="shop-item-lock">Unlocks at Lv. ${reqLevel}</div>` : ''}
-                    ${owned !== null && unlocked ? `<div class="shop-item-owned">Owned: ${owned}</div>` : ''}
-                    ${unlocked ? `<button class="shop-buy-btn${onSale ? ' sale-btn' : ''}" onclick="Shop.buy('${this.currentTab}','${id}')" ${!canAfford ? 'disabled' : ''}>${onSale ? `<s style="opacity:0.5;font-size:10px">&#x1FA99;${originalPrice}</s> ` : ''}&#x1FA99; ${salePrice}</button>` : ''}
+                    ${owned !== null && unlocked ? `<div class="shop-item-owned">${alreadyOwned ? '✓ Owned' : 'Owned: ' + owned}</div>` : ''}
+                    ${unlocked && !alreadyOwned ? `<button class="shop-buy-btn${onSale ? ' sale-btn' : ''}" onclick="Shop.buy('${this.currentTab}','${id}')" ${!canAfford ? 'disabled' : ''}>${onSale ? `<s style="opacity:0.5;font-size:10px">&#x1FA99;${originalPrice}</s> ` : ''}&#x1FA99; ${salePrice}</button>` : ''}
+                    ${alreadyOwned ? `<div class="shop-owned-badge">✓ Purchased</div>` : ''}
                 </div>`;
         }
         html += '</div>';
@@ -7115,7 +7150,7 @@ const House = {
     renderInterior(houseId, houseData, rooms, currentRoomIdx, state) {
         const roomName = rooms[currentRoomIdx] || 'living';
         const furniture = state.inventory?.furniture || {};
-        const pet = state.pet || {};
+        const pet = state.studyBuddy || {};
         
         // Room display names
         const roomNames = {
@@ -7127,21 +7162,25 @@ const House = {
             library: '📖 Library', courtyard: '🌳 Courtyard'
         };
         
-        // Room-specific furniture mapping
+        // Room-specific furniture mapping (which furniture fits best in each room)
         const roomFurniture = {
-            sleeping: ['bed'], living: ['couch', 'tv', 'rug', 'plant'], kitchen: ['lamp'],
-            bedroom: ['bed', 'lamp', 'rug'], bathroom: [], foyer: ['plant', 'painting'],
-            dining: ['lamp', 'rug'], study: ['desk', 'bookshelf', 'lamp', 'computer'],
-            master: ['bed', 'lamp', 'rug', 'painting'], guest: ['bed', 'lamp'],
-            office: ['desk', 'computer', 'bookshelf'], terrace: ['plant'],
-            throne: ['rug', 'painting'], great_hall: ['fireplace', 'rug', 'painting'],
-            tower: ['bookshelf', 'lamp'], library: ['bookshelf', 'desk', 'lamp'],
+            sleeping: ['bed', 'lamp', 'rug'], living: ['couch', 'tv', 'rug', 'plant', 'painting', 'lamp'], kitchen: ['lamp', 'plant'],
+            bedroom: ['bed', 'lamp', 'rug', 'painting'], bathroom: ['plant'], foyer: ['plant', 'painting', 'rug'],
+            dining: ['lamp', 'rug', 'painting'], study: ['desk', 'bookshelf', 'lamp', 'computer', 'rug'],
+            master: ['bed', 'lamp', 'rug', 'painting', 'tv'], guest: ['bed', 'lamp', 'rug'],
+            office: ['desk', 'computer', 'bookshelf', 'lamp'], terrace: ['plant', 'lamp'],
+            throne: ['rug', 'painting', 'fireplace'], great_hall: ['fireplace', 'rug', 'painting', 'couch'],
+            tower: ['bookshelf', 'lamp', 'desk'], library: ['bookshelf', 'desk', 'lamp', 'rug'],
             courtyard: ['plant', 'aquarium']
         };
         
-        // Get furniture for current room
-        const roomFurn = roomFurniture[roomName] || [];
+        // Get furniture for current room - show all owned furniture that fits this room
+        const roomFurn = roomFurniture[roomName] || Object.keys(Gamification.SHOP.furniture || {});
         const displayFurniture = roomFurn.filter(f => furniture[f] > 0);
+        
+        // Also show any other owned furniture not in the room mapping (fallback)
+        const otherFurniture = Object.keys(furniture).filter(f => furniture[f] > 0 && !roomFurn.includes(f));
+        const allDisplayFurniture = [...displayFurniture, ...otherFurniture];
         
         // Build interior HTML
         let html = `<div class="house-interior ${houseId}">`;
@@ -7180,7 +7219,7 @@ const House = {
             <div class="house-room-content">
                 <div class="house-room-name">${roomNames[roomName] || roomName}</div>
                 <div class="house-room-furniture">
-                    ${displayFurniture.length > 0 ? displayFurniture.map(f => {
+                    ${allDisplayFurniture.length > 0 ? allDisplayFurniture.map(f => {
                         const fData = Gamification.SHOP.furniture[f];
                         return `<div class="house-furniture-item" title="${fData?.name || f}">${fData?.icon || '📦'}</div>`;
                     }).join('') : '<div style="color:rgba(255,255,255,0.5);font-size:12px">No furniture placed</div>'}
@@ -7442,13 +7481,18 @@ const Business = {
             
             const hasIngredients = this.hasIngredientsFor(data, bizData);
             
+            // Batch production: produce multiple items at once based on level/machines
+            const batchSize = this.getBatchSize(data);
+            const batchEfficiency = this.getBatchEfficiency(data);
+            
             if (data.hasManager && hasIngredients) {
                 const cycles = Math.floor(elapsed / cycleTime);
                 if (cycles > 0) {
                     const actualCycles = this.consumeIngredients(data, bizData, cycles);
                     if (actualCycles > 0) {
                         const ingredientCost = this.getIngredientCost(bizData, actualCycles);
-                        const profit = Math.max(0, actualCycles * baseIncome - ingredientCost);
+                        // Profit scales with batch size and efficiency
+                        const profit = Math.max(0, actualCycles * baseIncome * batchSize * batchEfficiency - ingredientCost);
                         // Profit goes to business balance, not player coins
                         data.balance = (data.balance || 0) + Math.floor(profit);
                         biz.totalEarned = (biz.totalEarned || 0) + Math.floor(profit);
@@ -7527,9 +7571,33 @@ const Business = {
         }
         return total;
     },
+    
+    // Batch size starts at 1 and scales with level and machines
+    // Level 1 = 1 item, Level 2 = 2 items, etc.
+    // Each machine adds +1 to batch size
+    getBatchSize(data) {
+        const level = data.level || 1;
+        const machines = data.machines || 0;
+        // Base batch = level, machines add +1 each, cap at 20
+        return Math.min(20, level + machines);
+    },
+    
+    // Get batch multiplier for display (how much more efficient batches are)
+    getBatchEfficiency(data) {
+        const batchSize = this.getBatchSize(data);
+        // Larger batches are slightly more efficient (5% per item over 1)
+        return 1 + (batchSize - 1) * 0.05;
+    },
 
-    // Manual work - click to progress without manager
-    work(businessId) {
+    // Work timer state
+    _workTimer: null,
+    _workProgress: 0,
+    _workBusinessId: null,
+    _workStartTime: null,
+    
+    // Manual work - starts a timer-based work session (like idle games)
+    // Each work cycle takes time based on business type
+    startWork(businessId) {
         const state = Gamification.getState();
         const biz = state.businesses || { owned: {} };
         const data = biz.owned[businessId];
@@ -7541,17 +7609,91 @@ const Business = {
             return;
         }
         
-        // Each click = 10% progress
+        // Already working on this business
+        if (this._workTimer && this._workBusinessId === businessId) {
+            return;
+        }
+        
+        // Cancel any existing work
+        this.cancelWork();
+        
+        // Work time scales with business tier (lemonade = 15s, higher tiers = longer)
+        // But upgrades and machines reduce this
+        const baseWorkTime = Math.max(10, bizData.cycleTime * 0.5); // Half of cycle time, min 10s
+        const machineSpeed = 1 + (data.machines || 0) * 0.2;
+        const workTime = baseWorkTime / machineSpeed;
+        
+        this._workBusinessId = businessId;
+        this._workStartTime = Date.now();
+        this._workDuration = workTime * 1000; // Convert to ms
+        this._workProgress = 0;
+        
+        // Update progress every 100ms
+        this._workTimer = setInterval(() => {
+            const elapsed = Date.now() - this._workStartTime;
+            this._workProgress = Math.min(100, (elapsed / this._workDuration) * 100);
+            
+            // Update the work button UI
+            this._updateWorkUI(businessId);
+            
+            if (this._workProgress >= 100) {
+                this.completeWork(businessId);
+            }
+        }, 100);
+        
+        SoundFX.play('click');
+        this._updateWorkUI(businessId);
+    },
+    
+    cancelWork() {
+        if (this._workTimer) {
+            clearInterval(this._workTimer);
+            this._workTimer = null;
+        }
+        this._workBusinessId = null;
+        this._workProgress = 0;
+    },
+    
+    completeWork(businessId) {
+        this.cancelWork();
+        
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        // Add 10% to production progress (need 10 work cycles to complete)
         data.progress = Math.min(100, (data.progress || 0) + 10);
         state.businesses = biz;
         Gamification.saveState(state);
-        SoundFX.play('click');
+        SoundFX.play('coin');
         
         if (this._currentBusiness === businessId) {
             this.renderBusinessDetail(businessId);
-        } else {
-            this.render();
         }
+    },
+    
+    _updateWorkUI(businessId) {
+        const btn = document.getElementById('workBtn-' + businessId);
+        if (!btn) return;
+        
+        if (this._workTimer && this._workBusinessId === businessId) {
+            const timeLeft = Math.ceil((this._workDuration - (Date.now() - this._workStartTime)) / 1000);
+            btn.innerHTML = `⏳ Working... ${Math.floor(this._workProgress)}% (${timeLeft}s)`;
+            btn.disabled = true;
+            btn.style.background = `linear-gradient(90deg, var(--green) ${this._workProgress}%, var(--gray-600) ${this._workProgress}%)`;
+        } else {
+            const bizData = Gamification.SHOP.businesses[businessId];
+            const theme = bizData?.theme || { accent: '#f59e0b' };
+            btn.innerHTML = '👆 Work (+10%)';
+            btn.disabled = false;
+            btn.style.background = theme.accent;
+        }
+    },
+    
+    // Legacy work function for backwards compatibility
+    work(businessId) {
+        this.startWork(businessId);
     },
 
     collect(businessId) {
@@ -7564,9 +7706,13 @@ const Business = {
         const now = Date.now();
         const studyMult = this.getStudyMultiplier(state);
         const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
-        const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
         
-        // Consume ingredients for 1 cycle
+        // Batch production: produce multiple items at once based on level/machines
+        const batchSize = this.getBatchSize(data);
+        const batchEfficiency = this.getBatchEfficiency(data);
+        const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult * batchEfficiency;
+        
+        // Consume ingredients for batch (1 cycle = 1 batch of batchSize items)
         if (!this.hasIngredientsFor(data, bizData)) {
             alert('Not enough ingredients!');
             return;
@@ -7574,7 +7720,8 @@ const Business = {
         this.consumeIngredients(data, bizData, 1);
         
         const ingredientCost = this.getIngredientCost(bizData, 1);
-        const profit = Math.max(1, Math.floor(baseIncome - ingredientCost));
+        // Profit scales with batch size
+        const profit = Math.max(1, Math.floor((baseIncome * batchSize) - ingredientCost));
         
         // Manual collect goes to business balance (you can withdraw later)
         data.balance = (data.balance || 0) + profit;
@@ -7844,9 +7991,12 @@ const Business = {
         const machineSpeed = 1 + (data.machines || 0) * 0.2;
         const totalSpeedMult = machineSpeed * (1 + speedBonus);
         const cycleTime = bizData.cycleTime / totalSpeedMult;
+        const batchSize = this.getBatchSize(data);
+        const batchEfficiency = this.getBatchEfficiency(data);
         const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult * (1 + incomeBonus) + flatBonus;
         const ingredientCost = this.getIngredientCost(bizData, 1);
-        const profit = Math.max(0, baseIncome - ingredientCost);
+        // Profit per batch (scales with batch size and efficiency)
+        const profit = Math.max(0, (baseIncome * batchSize * batchEfficiency) - ingredientCost);
         
         const balance = data.balance || 0;
         const lowFunds = data.hasManager && balance < 50;
@@ -7862,7 +8012,8 @@ const Business = {
                     <span style="font-size:48px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3))">${bizData.icon}</span>
                     <div style="flex:1">
                         <h2 style="margin:0;color:${theme.accent};text-shadow:0 2px 4px rgba(0,0,0,0.3)">${bizData.name}</h2>
-                        <div style="color:rgba(255,255,255,0.7);font-size:12px">Level ${data.level} • ${bizData.flavorText || bizData.desc}</div>
+                        <div style="color:rgba(255,255,255,0.7);font-size:12px">Level ${data.level} • Batch: ${batchSize} items${batchSize > 1 ? ` (+${Math.round((batchEfficiency - 1) * 100)}% efficiency)` : ''}</div>
+                        <div style="color:rgba(255,255,255,0.5);font-size:11px">${bizData.flavorText || bizData.desc}</div>
                     </div>
                     <div style="text-align:right">
                         <div style="font-size:11px;color:rgba(255,255,255,0.6)">Your Wallet</div>
@@ -7917,7 +8068,7 @@ const Business = {
                 </div>
                 <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
                     ${!data.hasManager ? `
-                        <button class="shop-buy-btn" onclick="Business.work('${businessId}')" style="background:${theme.accent}">
+                        <button id="workBtn-${businessId}" class="shop-buy-btn" onclick="Business.work('${businessId}')" style="background:${theme.accent}">
                             👆 Work (+10%)
                         </button>
                     ` : '<span style="color:var(--gray-500);font-size:12px">👔 Manager running automatically</span>'}
@@ -10031,8 +10182,20 @@ const PetModal = {
             acc.push(id);
         }
         state.studyBuddy.accessories = acc;
+        
+        // Also update in pets array if using multi-pet system
+        if (state.pets && state.activePetIdx !== undefined && state.pets[state.activePetIdx]) {
+            state.pets[state.activePetIdx].accessories = acc;
+        }
+        
         Gamification.saveState(state);
         Gamification.updateBuddyWidget();
+        
+        // Re-render Garden if it's visible to show accessory on pet
+        if (typeof Garden !== 'undefined' && Garden && document.getElementById('gardenPet')) {
+            Garden.renderPet(state);
+        }
+        
         this.show();
     }
 };
@@ -10054,6 +10217,7 @@ const SessionState = {
                     mode: App.mode,
                     bankId: App.bank ? App.bank.bankId : null,
                     questionIndices: App._questionIndices || null,
+                    optionMaps: App._optionMaps || null,
                     currentQ: App.currentQ,
                     answers: App.answers,
                     bookmarked: App.bookmarked,
@@ -10080,7 +10244,9 @@ const SessionState = {
                     showingAnswer: Drill.showingAnswer,
                     selectedOption: Drill.selectedOption,
                     currentQuestionId: Drill.current ? Drill.current.question.id : null,
-                    queueIds: (Drill.queue || []).map(item => item.question.id)
+                    queueIds: (Drill.queue || []).map(item => item.question.id),
+                    currentShuffleMap: Drill.currentShuffleMap,
+                    currentShuffledCorrect: Drill.currentShuffledCorrect
                 },
                 // AI Practice state
                 aiPractice: {
@@ -10092,7 +10258,9 @@ const SessionState = {
                     weakCategories: AIPractice.weakCategories,
                     currentCategory: AIPractice.currentCategory,
                     currentDifficulty: AIPractice.currentDifficulty,
-                    startingWeakness: AIPractice.startingWeakness
+                    startingWeakness: AIPractice.startingWeakness,
+                    currentShuffleMap: AIPractice.currentShuffleMap,
+                    currentShuffledCorrect: AIPractice.currentShuffledCorrect
                 },
                 // Metrics state
                 metrics: {
@@ -10160,6 +10328,19 @@ const SessionState = {
             } else {
                 App.questions = [...bank.questions];
                 App._questionIndices = null;
+            }
+            
+            // Restore option shuffle maps
+            App._optionMaps = state.app.optionMaps || {};
+            if (state.app.optionMaps) {
+                // Rebuild _shuffledOptions and _shuffledCorrect for each question
+                App.questions.forEach((q, qi) => {
+                    const optIndices = state.app.optionMaps[qi];
+                    if (optIndices && Array.isArray(optIndices)) {
+                        q._shuffledOptions = optIndices.map(i => q.options[i]);
+                        q._shuffledCorrect = optIndices.indexOf(q.correctAnswer);
+                    }
+                });
             }
             App.mode = state.app.mode || 'test';
             App.currentQ = state.app.currentQ || 0;
@@ -10261,6 +10442,10 @@ const SessionState = {
             document.getElementById('chatFab').style.display = '';
             Chat.clearHistory();
 
+            // Restore shuffle state
+            Drill.currentShuffleMap = state.drill.currentShuffleMap || null;
+            Drill.currentShuffledCorrect = state.drill.currentShuffledCorrect !== undefined ? state.drill.currentShuffledCorrect : null;
+
             // Re-render current card or show session done
             if (Drill.current) {
                 Gamification.startQuestionTimer();
@@ -10269,27 +10454,40 @@ const SessionState = {
                     `<span class="due-count">${dueCount}</span> questions remaining | ${Drill.sessionCount} completed (${Drill.sessionCorrect} correct)`;
 
                 const q = Drill.current.question;
+                
+                // Use saved shuffle map or create new one if not available
+                if (!Drill.currentShuffleMap) {
+                    const optIndices = q.options.map((_, i) => i);
+                    for (let i = optIndices.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [optIndices[i], optIndices[j]] = [optIndices[j], optIndices[i]];
+                    }
+                    Drill.currentShuffleMap = optIndices;
+                    Drill.currentShuffledCorrect = optIndices.indexOf(q.correctAnswer);
+                }
+                
+                const shuffleMap = Drill.currentShuffleMap;
+                const shuffledCorrect = Drill.currentShuffledCorrect;
+                
                 document.getElementById('drillCard').innerHTML = `
                     <div class="question-text">${formatQuestionText(q.text)}</div>
                     <ul class="options-list" id="drillOptions">
-                        ${q.options.map((opt, i) => `
-                            <li class="option-item${Drill.selectedOption === i ? ' selected' : ''}${Drill.showingAnswer && i === q.correctAnswer ? ' correct-answer' : ''}${Drill.showingAnswer && Drill.selectedOption === i && i !== q.correctAnswer ? ' wrong-answer' : ''}" onclick="Drill.selectOption(${i})" id="dropt-${i}">
-                                <input type="radio" name="drill" value="${i}"${Drill.selectedOption === i ? ' checked' : ''}>
-                                <span class="option-label">${escapeHtml(opt)}</span>
+                        ${shuffleMap.map((origIdx, displayIdx) => `
+                            <li class="option-item${Drill.selectedOption === displayIdx ? ' selected' : ''}${Drill.showingAnswer && displayIdx === shuffledCorrect ? ' correct-answer' : ''}${Drill.showingAnswer && Drill.selectedOption === displayIdx && displayIdx !== shuffledCorrect ? ' wrong-answer' : ''}" onclick="Drill.selectOption(${displayIdx})" id="dropt-${displayIdx}">
+                                <input type="radio" name="drill" value="${displayIdx}"${Drill.selectedOption === displayIdx ? ' checked' : ''}>
+                                <span class="option-label">${escapeHtml(q.options[origIdx])}</span>
                             </li>
                         `).join('')}
                     </ul>
                     <div class="drill-answer${Drill.showingAnswer ? ' show' : ''}" id="drillAnswer">
-                        <div class="correct-label" id="drillResultLabel"${Drill.showingAnswer ? ` style="color:${Drill.selectedOption === q.correctAnswer ? 'var(--green)' : 'var(--red)'}">` + (Drill.selectedOption === q.correctAnswer ? 'Correct!' : (Drill.selectedOption !== null ? 'Incorrect' : 'Not answered')) + '</div>' : '>'}
+                        <div class="correct-label" id="drillResultLabel"${Drill.showingAnswer ? ` style="color:${Drill.selectedOption === shuffledCorrect ? 'var(--green)' : 'var(--red)'}">` + (Drill.selectedOption === shuffledCorrect ? 'Correct!' : (Drill.selectedOption !== null ? 'Incorrect' : 'Not answered')) + '</div>' : '>'}
                         <div class="explanation">${escapeHtml(q.explanation || '')}</div>
                         <div class="drill-buttons">
-                            <button class="drill-btn btn-missed" onclick="Drill.rate(1)">Missed it (1)</button>
-                            <button class="drill-btn btn-struggled" onclick="Drill.rate(3)">Struggled (3)</button>
-                            <button class="drill-btn btn-got-it" onclick="Drill.rate(5)">Got it! (5)</button>
+                            <button class="drill-btn btn-got-it" onclick="Drill.nextAfterCheck()">Next Question →</button>
                         </div>
                     </div>
                     <div style="text-align:center;margin-top:16px">
-                        <button class="drill-btn btn-show" id="drillShowBtn" onclick="Drill.showAnswer()"${Drill.showingAnswer ? ' style="display:none"' : ''}>Show Answer</button>
+                        <button class="drill-btn btn-show" id="drillShowBtn" onclick="Drill.checkAnswer()"${Drill.showingAnswer ? ' style="display:none"' : ''}>Check Answer</button>
                     </div>
                 `;
 
@@ -10338,6 +10536,8 @@ const SessionState = {
             AIPractice.currentCategory = state.aiPractice.currentCategory || null;
             AIPractice.currentDifficulty = state.aiPractice.currentDifficulty || 2;
             AIPractice.startingWeakness = state.aiPractice.startingWeakness || {};
+            AIPractice.currentShuffleMap = state.aiPractice.currentShuffleMap || null;
+            AIPractice.currentShuffledCorrect = state.aiPractice.currentShuffledCorrect !== undefined ? state.aiPractice.currentShuffledCorrect : null;
 
             showScreen('ai-practice', false, false);
             document.getElementById('chatFab').style.display = '';
@@ -10932,10 +11132,10 @@ const DailyChallenges = {
 // =====================================================================
 const DailyGoal = {
     getTodayStr() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); },
-    getDefaultStats() { return { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0, streak: 0, lastStudyDate: null, dailyGoal: 10, questionsToday: 0, todayDate: null }; },
+    getDefaultStats() { return { testsCompleted: 0, avgScore: 0, drillStreak: 0, totalStudyMins: 0, streak: 0, lastStudyDate: null, dailyGoal: 10, questionsToday: 0, todayDate: null, correctToday: 0, streakToday: 0, bestStreakToday: 0, fastAnswersToday: 0, modesUsedToday: [], banksUsedToday: [] }; },
     getStats() { const defaults = this.getDefaultStats(); const stats = Store.get('globalStats', defaults); return { ...defaults, ...stats }; },
     saveStats(stats) { Store.set('globalStats', stats); },
-    checkDateReset(stats) { const today = this.getTodayStr(); if (stats.todayDate !== today) { stats.questionsToday = 0; stats.todayDate = today; } return stats; },
+    checkDateReset(stats) { const today = this.getTodayStr(); if (stats.todayDate !== today) { stats.questionsToday = 0; stats.correctToday = 0; stats.streakToday = 0; stats.bestStreakToday = 0; stats.fastAnswersToday = 0; stats.modesUsedToday = []; stats.banksUsedToday = []; stats.todayDate = today; } return stats; },
     updateStreak(stats) { const today = this.getTodayStr(); const lastDate = stats.lastStudyDate; if (!lastDate) { stats.streak = 1; } else if (lastDate !== today) { const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); const yesterdayStr = yesterday.getFullYear() + '-' + String(yesterday.getMonth() + 1).padStart(2, '0') + '-' + String(yesterday.getDate()).padStart(2, '0'); stats.streak = (lastDate === yesterdayStr) ? stats.streak + 1 : 1; } stats.lastStudyDate = today; return stats; },
     recordQuestion() { return this.recordQuestions(1); },
     recordQuestions(count) { let stats = this.getStats(); stats = this.checkDateReset(stats); const wasGoalMet = stats.questionsToday >= stats.dailyGoal; stats.questionsToday += count; const isGoalMet = stats.questionsToday >= stats.dailyGoal; if (!wasGoalMet && isGoalMet) { stats = this.updateStreak(stats); Gamification.awardXp('dailyGoalReached'); Gamification.triggerConfetti(); Gamification.checkStreakAchievements(stats.streak); if (stats.streak > 0 && stats.streak % 7 === 0) { Gamification.awardXp('weeklyGoalReached'); } } this.saveStats(stats); return !wasGoalMet && isGoalMet; },
@@ -10952,7 +11152,105 @@ const DailyGoal = {
         const nextText = bonusInfo.nextMilestone ? `<span class="streak-next">${bonusInfo.daysToNext} day${bonusInfo.daysToNext !== 1 ? 's' : ''} to ${bonusInfo.nextMilestone}-day bonus</span>` : '';
         el.innerHTML = '<div class="streak-banner ' + (hasStreak ? '' : 'no-streak') + '"><span class="streak-flame">\uD83D\uDD25</span><div class="streak-info"><div class="streak-count">' + streak + ' day' + (streak !== 1 ? 's' : '') + ' ' + multText + '</div><div class="streak-label">' + (hasStreak ? 'Study Streak' + (nextText ? ' • ' + nextText : '') : 'Start your streak today!') + '</div></div></div>'; 
     },
-    renderDailyGoalCard() { const stats = this.getStats(); const el = document.getElementById('dailyGoalCard'); if (!el) return; const today = this.getTodayStr(); let questionsToday = stats.questionsToday || 0; if (stats.todayDate !== today) { questionsToday = 0; } const goal = stats.dailyGoal || 10; const pct = Math.round((Math.min(questionsToday, goal) / goal) * 100); const isComplete = questionsToday >= goal; el.innerHTML = '<div class="daily-goal-card"><h3>\uD83C\uDFAF Daily Goal</h3><div class="goal-progress"><div class="goal-bar"><div class="goal-bar-fill ' + (isComplete ? 'complete' : '') + '" style="width:' + pct + '%"></div></div><div class="goal-text ' + (isComplete ? 'complete' : '') + '">' + questionsToday + '/' + goal + ' questions</div></div>' + (isComplete ? '<div class="goal-celebration">Goal reached! Great job today!</div>' : '') + '</div>'; }
+    renderDailyGoalCard() { const stats = this.getStats(); const el = document.getElementById('dailyGoalCard'); if (!el) return; const today = this.getTodayStr(); let questionsToday = stats.questionsToday || 0; if (stats.todayDate !== today) { questionsToday = 0; } const goal = stats.dailyGoal || 10; const pct = Math.round((Math.min(questionsToday, goal) / goal) * 100); const isComplete = questionsToday >= goal; el.innerHTML = '<div class="daily-goal-card"><h3>\uD83C\uDFAF Daily Goal</h3><div class="goal-progress"><div class="goal-bar"><div class="goal-bar-fill ' + (isComplete ? 'complete' : '') + '" style="width:' + pct + '%"></div></div><div class="goal-text ' + (isComplete ? 'complete' : '') + '">' + questionsToday + '/' + goal + ' questions</div></div>' + (isComplete ? '<div class="goal-celebration">Goal reached! Great job today!</div>' : '') + '</div>'; },
+    
+    // Track correct answer for daily achievements
+    recordCorrect(isCorrect, timeSpent) {
+        let stats = this.getStats();
+        stats = this.checkDateReset(stats);
+        if (isCorrect) {
+            stats.correctToday = (stats.correctToday || 0) + 1;
+            stats.streakToday = (stats.streakToday || 0) + 1;
+            if (stats.streakToday > (stats.bestStreakToday || 0)) {
+                stats.bestStreakToday = stats.streakToday;
+            }
+            // Track fast answers (under 15 seconds)
+            if (timeSpent && timeSpent < 15000) {
+                stats.fastAnswersToday = (stats.fastAnswersToday || 0) + 1;
+            }
+        } else {
+            stats.streakToday = 0;
+        }
+        this.saveStats(stats);
+        this.checkDailyAchievements(stats);
+    },
+    
+    // Track mode usage for daily achievements
+    recordMode(mode) {
+        let stats = this.getStats();
+        stats = this.checkDateReset(stats);
+        if (!stats.modesUsedToday) stats.modesUsedToday = [];
+        if (!stats.modesUsedToday.includes(mode)) {
+            stats.modesUsedToday.push(mode);
+        }
+        this.saveStats(stats);
+        this.checkDailyAchievements(stats);
+    },
+    
+    // Track bank usage for daily achievements
+    recordBank(bankId) {
+        let stats = this.getStats();
+        stats = this.checkDateReset(stats);
+        if (!stats.banksUsedToday) stats.banksUsedToday = [];
+        if (!stats.banksUsedToday.includes(bankId)) {
+            stats.banksUsedToday.push(bankId);
+        }
+        this.saveStats(stats);
+        this.checkDailyAchievements(stats);
+    },
+    
+    // Check and award daily achievements
+    checkDailyAchievements(stats) {
+        const today = this.getTodayStr();
+        const dailyKey = 'dailyAchievements_' + today;
+        const awarded = Store.get(dailyKey, []);
+        
+        // Daily correct answer milestones
+        if (stats.correctToday >= 10 && !awarded.includes('daily_10')) {
+            Gamification.unlockAchievement('daily_10');
+            awarded.push('daily_10');
+        }
+        if (stats.correctToday >= 25 && !awarded.includes('daily_25')) {
+            Gamification.unlockAchievement('daily_25');
+            awarded.push('daily_25');
+        }
+        if (stats.correctToday >= 50 && !awarded.includes('daily_50')) {
+            Gamification.unlockAchievement('daily_50');
+            awarded.push('daily_50');
+        }
+        if (stats.correctToday >= 100 && !awarded.includes('daily_100')) {
+            Gamification.unlockAchievement('daily_100');
+            awarded.push('daily_100');
+        }
+        
+        // Daily streak achievement
+        if (stats.bestStreakToday >= 10 && !awarded.includes('daily_perfect_10')) {
+            Gamification.unlockAchievement('daily_perfect_10');
+            awarded.push('daily_perfect_10');
+        }
+        
+        // Daily fast answers achievement
+        if (stats.fastAnswersToday >= 5 && !awarded.includes('daily_speed_5')) {
+            Gamification.unlockAchievement('daily_speed_5');
+            awarded.push('daily_speed_5');
+        }
+        
+        // Daily all modes achievement (test, practice, drill, speed)
+        const requiredModes = ['test', 'practice', 'drill', 'speed'];
+        const hasAllModes = requiredModes.every(m => (stats.modesUsedToday || []).includes(m));
+        if (hasAllModes && !awarded.includes('daily_all_modes')) {
+            Gamification.unlockAchievement('daily_all_modes');
+            awarded.push('daily_all_modes');
+        }
+        
+        // Daily 3 banks achievement
+        if ((stats.banksUsedToday || []).length >= 3 && !awarded.includes('daily_3_banks')) {
+            Gamification.unlockAchievement('daily_3_banks');
+            awarded.push('daily_3_banks');
+        }
+        
+        Store.set(dailyKey, awarded);
+    }
 };
 
 // =====================================================================
@@ -11032,6 +11330,9 @@ function showScreen(name, showSubheader, showFooter) {
     if (el) el.classList.add('active');
     document.getElementById('subheader').style.display = showSubheader ? '' : 'none';
     document.getElementById('footerNav').style.display = showFooter ? '' : 'none';
+    
+    // Scroll to top when switching screens
+    window.scrollTo(0, 0);
 
     const chatFab = document.getElementById('chatFab');
     if (name === 'exam' || name === 'drill' || name === 'ai-practice' || name === 'speed') {
@@ -12110,6 +12411,10 @@ const App = {
         this.confidence = {};
         this._eliminatedOptions = {};
 
+        // Track mode and bank for daily achievements
+        DailyGoal.recordMode(mode);
+        DailyGoal.recordBank(this.bank.bankId);
+
         // Timer setup - scale time proportionally if subset
         if (mode === 'test') {
             this.countdown = true;
@@ -12396,6 +12701,7 @@ const App = {
         if (isCorrect) Garden.grow(1);
 
         DailyGoal.recordQuestion();
+        DailyGoal.recordCorrect(isCorrect, timeSpent);
         DailyChallenges.trackQuestion(isCorrect, timeSpent);
         if (isCorrect) DailyChallenges.trackStreak(Gamification.getState().combo || 0);
         QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeSpent);
@@ -12902,6 +13208,8 @@ const Drill = {
         this._focusQIds = focusQIds || null;
         Session.start(); // Start session timer
         DailyChallenges.trackBank(bankId);
+        DailyGoal.recordMode('drill');
+        DailyGoal.recordBank(bankId);
         this.sessionCount = 0;
         this.sessionCorrect = 0;
         this.buildQueue();
@@ -13032,13 +13340,23 @@ const Drill = {
             `<span class="due-count">${dueCount}</span> questions remaining | ${this.sessionCount} completed (${this.sessionCorrect} correct)`;
 
         const q = this.current.question;
+        
+        // Shuffle answer options to prevent position memorization
+        const optIndices = q.options.map((_, i) => i);
+        for (let i = optIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [optIndices[i], optIndices[j]] = [optIndices[j], optIndices[i]];
+        }
+        this.currentShuffleMap = optIndices;
+        this.currentShuffledCorrect = optIndices.indexOf(q.correctAnswer);
+        
         document.getElementById('drillCard').innerHTML = `
             <div class="question-text">${formatQuestionText(q.text)}</div>
             <ul class="options-list" id="drillOptions">
-                ${q.options.map((opt, i) => `
-                    <li class="option-item" onclick="Drill.selectOption(${i})" id="dropt-${i}">
-                        <input type="radio" name="drill" value="${i}">
-                        <span class="option-label">${escapeHtml(opt)}</span>
+                ${optIndices.map((origIdx, displayIdx) => `
+                    <li class="option-item" onclick="Drill.selectOption(${displayIdx})" id="dropt-${displayIdx}">
+                        <input type="radio" name="drill" value="${displayIdx}">
+                        <span class="option-label">${escapeHtml(q.options[origIdx])}</span>
                     </li>
                 `).join('')}
             </ul>
@@ -13093,15 +13411,16 @@ const Drill = {
         
         this.showingAnswer = true;
         const q = this.current.question;
+        const shuffledCorrect = this.currentShuffledCorrect;
 
-        // Highlight correct/wrong
-        q.options.forEach((_, i) => {
-            const el = document.getElementById('dropt-' + i);
-            if (i === q.correctAnswer) el.classList.add('correct-answer');
-            if (this.selectedOption === i && i !== q.correctAnswer) el.classList.add('wrong-answer');
+        // Highlight correct/wrong using shuffled positions
+        q.options.forEach((_, displayIdx) => {
+            const el = document.getElementById('dropt-' + displayIdx);
+            if (displayIdx === shuffledCorrect) el.classList.add('correct-answer');
+            if (this.selectedOption === displayIdx && displayIdx !== shuffledCorrect) el.classList.add('wrong-answer');
         });
 
-        const isCorrect = this.selectedOption === q.correctAnswer;
+        const isCorrect = this.selectedOption === shuffledCorrect;
         this._lastWasCorrect = isCorrect;
         document.getElementById('drillResultLabel').textContent = isCorrect ? '✓ Correct!' : '✗ Incorrect';
         document.getElementById('drillResultLabel').style.color = isCorrect ? 'var(--green)' : 'var(--red)';
@@ -13118,40 +13437,49 @@ const Drill = {
         const p = this.current.progress;
         const isCorrect = this._lastWasCorrect;
         const timeSpent = Gamification.getQuestionTime(); // Get time early for speed tracking
+        const timeSpentSec = timeSpent / 1000; // convert ms to seconds
         
-        // Auto-calculate quality based on correctness
-        // Correct = 5 (got it), Wrong = 1 (missed)
-        const quality = isCorrect ? 5 : 1;
-
-        // SM-2 algorithm
-        let ef = p.ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-        if (ef < 1.3) ef = 1.3;
-
-        let interval, reps;
-        if (quality < 3) {
-            reps = 0;
-            interval = 1;
-        } else {
-            reps = p.reps + 1;
+        // Modified SM-2: Never lower mastery (ef), but speed heavily influences gains
+        // Fast answers = big boost, slow answers = small boost, wrong = no change
+        let ef = p.ef;
+        let interval = p.interval || 1;
+        let reps = p.reps || 0;
+        
+        if (isCorrect) {
+            // Speed bonus: faster = bigger ef increase
+            // Under 5s = +0.3, 5-10s = +0.2, 10-20s = +0.1, 20-30s = +0.05, 30s+ = +0.02
+            let speedBonus;
+            if (timeSpentSec < 5) speedBonus = 0.3;
+            else if (timeSpentSec < 10) speedBonus = 0.2;
+            else if (timeSpentSec < 20) speedBonus = 0.1;
+            else if (timeSpentSec < 30) speedBonus = 0.05;
+            else speedBonus = 0.02;
+            
+            ef = Math.min(3.0, ef + speedBonus); // Cap at 3.0
+            reps++;
+            
+            // Interval progression based on reps and ef
             if (reps === 1) interval = 1;
-            else if (reps === 2) interval = 6;
-            else interval = Math.round(p.interval * ef);
+            else if (reps === 2) interval = 3;
+            else interval = Math.round(interval * ef);
+        }
+        // Wrong answers: don't lower ef, just reset interval for review sooner
+        // Keep reps so they don't lose all progress
+        if (!isCorrect) {
+            interval = 1; // Review again soon
         }
 
         const nextReview = Date.now() + interval * 86400000;
         
         // Track answer speed for filtering (same as SpeedMode)
-        const timeSpentSec = timeSpent / 1000; // convert ms to seconds
         let fastCorrect = p.fastCorrect || 0;
         let avgSpeed = p.avgSpeed;
         if (isCorrect) {
             // Track fast correct answers (under 10 seconds)
             if (timeSpentSec < 10) fastCorrect++;
             avgSpeed = avgSpeed ? (avgSpeed * 0.7 + timeSpentSec * 0.3) : timeSpentSec;
-        } else {
-            // Reset fast correct count on wrong answer
-            fastCorrect = 0;
         }
+        // Don't reset fastCorrect on wrong - preserve their speed achievements
         
         // Mark as speed mastered if 2+ fast correct answers
         const speedMastered = fastCorrect >= 2 || (reps >= 5 && ef >= 2.5 && avgSpeed && avgSpeed < 10);
@@ -13183,6 +13511,7 @@ const Drill = {
 
         // Record question for daily goal
         DailyGoal.recordQuestion();
+        DailyGoal.recordCorrect(isCorrect, timeSpent);
         DailyChallenges.trackQuestion(isCorrect, timeSpent);
         DailyChallenges.trackDrill();
         if (isCorrect) DailyChallenges.trackStreak(stats.drillStreak || 0);
@@ -13673,6 +14002,8 @@ const SpeedMode = {
         if (!this.bank) return;
 
         Session.start();
+        DailyGoal.recordMode('speed');
+        DailyGoal.recordBank(bankId);
         this.score = 0;
         this.coins = 0;
         this.streak = 0;
@@ -13695,33 +14026,36 @@ const SpeedMode = {
         const drillProgress = Store.get('drillProgress', {});
         const now = Date.now();
 
-        // Filter and weight questions - speed mastered questions show up much less
+        // Filter and weight questions - speed mastered questions are EXCLUDED
         const weighted = this.bank.questions.map(q => {
             const prog = drillProgress[q.id] || { ef: 2.5, reps: 0 };
             
-            // Speed mastered questions (2+ fast correct OR 3+ regular correct) - almost never show
+            // Speed mastered questions - SKIP entirely (weight 0)
+            // You've proven you know this, no need to see it again in speed mode
             if (prog.speedMastered) {
-                // 5% chance to appear - you've proven you know this
-                return { question: q, weight: 0.05, ef: prog.ef, mastered: true };
+                return { question: q, weight: 0, ef: prog.ef, mastered: true };
             }
             
-            // Questions answered fast (avg under 8s) but not yet mastered - reduce weight
+            // Questions answered fast (avg under 8s) with at least 1 fast correct - very low weight
             if (prog.avgSpeed && prog.avgSpeed < 8 && (prog.fastCorrect || 0) >= 1) {
-                // You're fast at this - 20% weight
-                return { question: q, weight: 0.2, ef: prog.ef, mastered: false };
+                return { question: q, weight: 0.1, ef: prog.ef, mastered: false };
+            }
+            
+            // High EF (2.6+) with 2+ reps = you know this well, low weight
+            if (prog.ef >= 2.6 && prog.reps >= 2) {
+                return { question: q, weight: 0.15, ef: prog.ef, mastered: false };
             }
             
             // Weight: new questions = 3, weak (low EF) = 2-3, learning = 1.5, strong = 0.5
             let weight = 1;
-            if (prog.reps === 0) weight = 3;           // Never seen
-            else if (prog.ef < 1.8) weight = 3;        // Very weak
+            if (prog.reps === 0) weight = 3;           // Never seen - prioritize
+            else if (prog.ef < 1.8) weight = 3;        // Very weak - need practice
             else if (prog.ef < 2.2) weight = 2;        // Weak
             else if (prog.ef < 2.5) weight = 1.5;      // Learning
-            else if (prog.reps >= 3) weight = 0.3;     // Strong - rarely show
-            else weight = 1;
+            else weight = 0.5;                          // Strong
 
             return { question: q, weight, ef: prog.ef, mastered: false };
-        });
+        }).filter(item => item.weight > 0); // Remove mastered questions entirely
 
         // Shuffle with weighting - prioritizes weak questions
         this.queue = [];
@@ -13785,10 +14119,19 @@ const SpeedMode = {
         const timingLabel = timing.isAdaptive ? `⚡${this.maxTime}s` : `${this.maxTime}s`;
         const timingTitle = timing.isAdaptive ? `Based on your avg ${timing.baseline}s on this question` : 'First time seeing this question';
 
-        const optionsHtml = q.options.map((opt, i) => `
-            <button class="speed-option drill-option" onclick="SpeedMode.selectOption(${i})" data-idx="${i}">
-                <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-                <span class="option-text">${escapeHtml(opt)}</span>
+        // Shuffle answer options to prevent position memorization
+        const optIndices = q.options.map((_, i) => i);
+        for (let i = optIndices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [optIndices[i], optIndices[j]] = [optIndices[j], optIndices[i]];
+        }
+        this.currentShuffleMap = optIndices;
+        this.currentShuffledCorrect = optIndices.indexOf(q.correctAnswer);
+
+        const optionsHtml = optIndices.map((origIdx, displayIdx) => `
+            <button class="speed-option drill-option" onclick="SpeedMode.selectOption(${displayIdx})" data-idx="${displayIdx}">
+                <span class="option-letter">${String.fromCharCode(65 + displayIdx)}</span>
+                <span class="option-text">${escapeHtml(q.options[origIdx])}</span>
             </button>
         `).join('');
 
@@ -13819,15 +14162,16 @@ const SpeedMode = {
         this.stopTimer();
 
         const q = this.current.question;
-        const isCorrect = idx === q.correctAnswer;
+        const shuffledCorrect = this.currentShuffledCorrect;
+        const isCorrect = idx === shuffledCorrect;
         const timeUsed = this.maxTime - this.timeRemaining;
         const timeRatio = this.timeRemaining / this.maxTime;
 
-        // Highlight answer
+        // Highlight answer using shuffled positions
         const options = document.querySelectorAll('.speed-option');
         options.forEach((opt, i) => {
             opt.disabled = true;
-            if (i === q.correctAnswer) opt.classList.add('correct');
+            if (i === shuffledCorrect) opt.classList.add('correct');
             else if (i === idx && !isCorrect) opt.classList.add('incorrect');
         });
 
@@ -13880,6 +14224,7 @@ const SpeedMode = {
         QuestionTracker.recordSingle(q.id, q.category || 'General', isCorrect, timeUsed * 1000);
         Gamification.updateCategoryMastery(q.category || 'General', isCorrect);
         DailyGoal.recordQuestion();
+        DailyGoal.recordCorrect(isCorrect, timeUsed * 1000);
         DailyChallenges.trackQuestion(isCorrect, timeUsed * 1000);
         if (isCorrect) DailyChallenges.trackStreak(Gamification.getState().combo || 0);
         
@@ -14057,22 +14402,17 @@ const SpeedMode = {
             const fastCorrect = (p.fastCorrect || 0) + (actualTimeUsed < 10 ? 1 : 0);
             const avgSpeed = p.avgSpeed ? (p.avgSpeed * 0.7 + actualTimeUsed * 0.3) : actualTimeUsed;
             
-            // Mark as "speed mastered" after 3 correct in speed mode
+            // Mark as "speed mastered" after 2 correct in speed mode (was 3)
             // OR 2 fast correct answers (under 10s) = you know this cold
-            if ((reps >= 3 && ef >= 2.5) || fastCorrect >= 2) {
-                all[qId].speedMastered = true;
-            }
+            const speedMastered = (reps >= 2 && ef >= 2.4) || fastCorrect >= 2;
             
-            all[qId] = { ...all[qId], fastCorrect, avgSpeed };
+            all[qId] = { ...all[qId], fastCorrect, avgSpeed, speedMastered };
         } else {
-            // WRONG: Minimal penalty - time pressure is forgiving
-            // Don't reduce EF much, just schedule for sooner review
-            ef = Math.max(1.3, p.ef - 0.05); // Tiny EF reduction
+            // WRONG: Never lower mastery - just schedule for sooner review
+            ef = p.ef; // Keep EF unchanged
             reps = p.reps; // Keep reps - don't punish for speed mode mistakes
-            interval = Math.max(1, Math.floor(p.interval / 2)); // Review sooner but not immediately
-            
-            // Reset fast correct count on wrong answer
-            all[qId] = { ...all[qId], fastCorrect: 0 };
+            interval = 1; // Review soon
+            // Don't reset fastCorrect - preserve speed achievements
         }
         
         const nextReview = Date.now() + interval * 86400000;
@@ -14278,6 +14618,8 @@ const AIPractice = {
     _recentQuestionTypes: [], // Track recent question types to avoid repetition
     _masteredTypes: [], // Types answered correctly multiple times (session)
     _globalMasteredTypes: {}, // Persistent mastery tracking {type: {correct: n, total: n, lastSeen: timestamp}}
+    currentShuffleMap: null, // Shuffled option indices for current question
+    currentShuffledCorrect: null, // Correct answer index in shuffled order
 
     async start(bankId) {
         if (this.isGenerating) return; // Prevent double-start while generating
@@ -14293,6 +14635,8 @@ const AIPractice = {
         }
 
         Session.start();
+        DailyGoal.recordMode('ai');
+        DailyGoal.recordBank(bankId);
         this.sessionStats = { total: 0, correct: 0, byCategory: {}, byType: {} };
         this.currentQuestion = null;
         this.selectedOption = null;
@@ -14300,6 +14644,8 @@ const AIPractice = {
         this.currentDifficulty = 2;
         this._questionBuffer = [];
         this._prefetchInFlight = 0;
+        this.currentShuffleMap = null;
+        this.currentShuffledCorrect = null;
         this._recentQuestionTypes = [];
         this._masteredTypes = [];
         
@@ -14524,6 +14870,9 @@ const AIPractice = {
             this.currentQuestion = payload.question;
             this.currentCategory = payload.category;
             this.currentDifficulty = payload.difficulty;
+            // Reset shuffle state for new question
+            this.currentShuffleMap = null;
+            this.currentShuffledCorrect = null;
             this.renderQuestion();
             Gamification.startQuestionTimer();
             SessionState.save();
@@ -14816,7 +15165,8 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         if (this.selectedOption === null || this.isChecked) return;
 
         this.isChecked = true;
-        const isCorrect = this.selectedOption === this.currentQuestion.correctAnswer;
+        const shuffledCorrect = this.currentShuffledCorrect !== null ? this.currentShuffledCorrect : this.currentQuestion.correctAnswer;
+        const isCorrect = this.selectedOption === shuffledCorrect;
 
         // Gamification hooks
         const timeSpent = Gamification.getQuestionTime();
@@ -14869,6 +15219,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
 
         // Record question for daily goal
         DailyGoal.recordQuestion();
+        DailyGoal.recordCorrect(isCorrect, timeSpent);
         DailyChallenges.trackQuestion(isCorrect, timeSpent);
         if (isCorrect) DailyChallenges.trackStreak(Gamification.getState().combo || 0);
 
@@ -15001,20 +15352,34 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         }
         diffHtml += '</div><span>' + (q.difficulty === 1 ? 'Easy' : q.difficulty === 2 ? 'Medium' : 'Hard') + '</span></div>';
 
+        // Shuffle answer options on first render (not when re-rendering after check)
+        if (!this.isChecked && this.currentShuffleMap === null) {
+            const optIndices = q.options.map((_, i) => i);
+            for (let i = optIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [optIndices[i], optIndices[j]] = [optIndices[j], optIndices[i]];
+            }
+            this.currentShuffleMap = optIndices;
+            this.currentShuffledCorrect = optIndices.indexOf(q.correctAnswer);
+        }
+        
+        const shuffleMap = this.currentShuffleMap || q.options.map((_, i) => i);
+        const shuffledCorrect = this.currentShuffledCorrect !== null ? this.currentShuffledCorrect : q.correctAnswer;
+
         // Options
         let optionsHtml = '<ul class="options-list">';
-        q.options.forEach((opt, i) => {
+        shuffleMap.forEach((origIdx, displayIdx) => {
             let cls = 'option-item';
-            if (this.selectedOption === i) cls += ' selected';
+            if (this.selectedOption === displayIdx) cls += ' selected';
             if (this.isChecked) {
                 cls += ' disabled';
-                if (i === q.correctAnswer) cls += ' correct-answer';
-                if (this.selectedOption === i && i !== q.correctAnswer) cls += ' wrong-answer';
+                if (displayIdx === shuffledCorrect) cls += ' correct-answer';
+                if (this.selectedOption === displayIdx && displayIdx !== shuffledCorrect) cls += ' wrong-answer';
             }
             optionsHtml += `
-                <li class="${cls}" onclick="AIPractice.selectOption(${i})">
-                    <input type="radio" name="aiopt" value="${i}" ${this.selectedOption === i ? 'checked' : ''} ${this.isChecked ? 'disabled' : ''}>
-                    <span class="option-label">${escapeHtml(opt)}</span>
+                <li class="${cls}" onclick="AIPractice.selectOption(${displayIdx})">
+                    <input type="radio" name="aiopt" value="${displayIdx}" ${this.selectedOption === displayIdx ? 'checked' : ''} ${this.isChecked ? 'disabled' : ''}>
+                    <span class="option-label">${escapeHtml(q.options[origIdx])}</span>
                 </li>
             `;
         });
@@ -15023,7 +15388,7 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         // Explanation
         let explanationHtml = '';
         if (this.isChecked) {
-            const isCorrect = this.selectedOption === q.correctAnswer;
+            const isCorrect = this.selectedOption === shuffledCorrect;
             explanationHtml = `
                 <div class="ai-explanation${isCorrect ? '' : ' incorrect'}">
                     <h4>${isCorrect ? 'Correct!' : 'Incorrect'}</h4>
@@ -15259,25 +15624,31 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
     _updateDrillProgress(qId, isCorrect, timeSpent) {
         const all = Store.get('drillProgress', {});
         const p = all[qId] || { ef: 2.5, interval: 0, reps: 0, nextReview: 0 };
+        const timeSpentSec = timeSpent / 1000;
         
-        // Quality based on correctness - no time pressure so use standard penalty
-        // Correct = 5 (got it), Wrong = 1 (full reset - you had time to think)
-        const quality = isCorrect ? 5 : 1;
+        // Never lower mastery - speed heavily influences gains
+        let ef = p.ef;
+        let interval = p.interval || 1;
+        let reps = p.reps || 0;
         
-        // SM-2 algorithm
-        let ef = p.ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-        if (ef < 1.3) ef = 1.3;
-        if (ef > 3.0) ef = 3.0;
-        
-        let interval, reps;
-        if (quality < 3) {
-            reps = 0; // Full reset - no time pressure means you should know it
-            interval = 1;
-        } else {
-            reps = p.reps + 1;
+        if (isCorrect) {
+            // Speed bonus: faster = bigger ef increase
+            let speedBonus;
+            if (timeSpentSec < 5) speedBonus = 0.3;
+            else if (timeSpentSec < 10) speedBonus = 0.2;
+            else if (timeSpentSec < 20) speedBonus = 0.1;
+            else if (timeSpentSec < 30) speedBonus = 0.05;
+            else speedBonus = 0.02;
+            
+            ef = Math.min(3.0, ef + speedBonus);
+            reps++;
+            
             if (reps === 1) interval = 1;
             else if (reps === 2) interval = 3;
-            else interval = Math.round(p.interval * ef);
+            else interval = Math.round(interval * ef);
+        } else {
+            // Wrong: don't lower ef, just review sooner
+            interval = 1;
         }
         
         const nextReview = Date.now() + interval * 86400000;
@@ -15360,31 +15731,52 @@ const Progress = {
     },
 
     // Big weighted predicted grade - quick snapshot of likely test performance
+    // Uses time-decay weighting: newer attempts count more than older ones
     renderPredictedGrade() {
         const drillProgress = Store.get('drillProgress', {});
         const trackerData = Store.get('questionTracker', {});
         const catAccuracy = QuestionTracker.getCategoryAccuracy();
         
-        // Get all question data for weighting
+        // Get all question data for time-weighted scoring
         let totalQuestions = 0;
         let weightedCorrect = 0;
         let weightedTotal = 0;
         let categoryBreakdown = [];
+        let recentWeightedCorrect = 0; // Last 7 days
+        let recentWeightedTotal = 0;
         
-        // Calculate weighted score from question tracker (most accurate source)
+        const now = Date.now();
+        const dayMs = 24 * 60 * 60 * 1000;
+        const weekAgo = now - (7 * dayMs);
+        const monthAgo = now - (30 * dayMs);
+        
+        // Calculate time-weighted score from question tracker
+        // Newer data weighs more: last 7 days = 3x, last 30 days = 2x, older = 1x
         Object.entries(trackerData).forEach(([qId, data]) => {
             if (data.history && data.history.length > 0) {
                 totalQuestions++;
-                // Weight recent attempts more heavily
-                const recentAttempts = data.history.slice(-5);
-                const correctCount = recentAttempts.filter(a => a.correct).length;
-                const weight = recentAttempts.length;
-                weightedCorrect += correctCount;
-                weightedTotal += weight;
+                
+                // Process each attempt with time-decay weighting
+                data.history.forEach(attempt => {
+                    const ts = attempt.timestamp || 0;
+                    let weight = 1; // Base weight for old data
+                    
+                    if (ts > weekAgo) {
+                        weight = 3; // Recent (last 7 days) = 3x weight
+                        recentWeightedTotal += weight;
+                        if (attempt.correct) recentWeightedCorrect += weight;
+                    } else if (ts > monthAgo) {
+                        weight = 2; // Last 30 days = 2x weight
+                    }
+                    // Older than 30 days = 1x weight
+                    
+                    weightedTotal += weight;
+                    if (attempt.correct) weightedCorrect += weight;
+                });
             }
         });
         
-        // Also factor in category accuracy with question counts as weights
+        // Build category breakdown with time-weighted accuracy
         Object.entries(catAccuracy).forEach(([cat, data]) => {
             if (data.total >= 2) {
                 const pct = Math.round((data.correct / data.total) * 100);
@@ -15398,8 +15790,18 @@ const Progress = {
         const masteryBonus = totalQuestions > 0 ? (mastered / totalQuestions) * 5 : 0; // Up to +5%
         const strugglePenalty = totalQuestions > 0 ? (struggling / totalQuestions) * 5 : 0; // Up to -5%
         
-        // Base predicted score from weighted accuracy
+        // Base predicted score from time-weighted accuracy
         let predictedScore = weightedTotal > 0 ? Math.round((weightedCorrect / weightedTotal) * 100) : 0;
+        
+        // Calculate recent trend (last 7 days vs overall)
+        let recentScore = recentWeightedTotal > 0 ? Math.round((recentWeightedCorrect / recentWeightedTotal) * 100) : null;
+        let trendDirection = null;
+        let trendAmount = 0;
+        if (recentScore !== null && recentWeightedTotal >= 10) { // Need at least 10 weighted attempts for trend
+            trendAmount = recentScore - predictedScore;
+            if (trendAmount > 3) trendDirection = 'up';
+            else if (trendAmount < -3) trendDirection = 'down';
+        }
         
         // Apply mastery adjustments
         predictedScore = Math.round(predictedScore + masteryBonus - strugglePenalty);
@@ -15443,8 +15845,15 @@ const Progress = {
                     
                     <!-- Score & Details -->
                     <div style="flex:1;min-width:200px">
-                        <div style="font-size:48px;font-weight:bold;color:var(--navy)">${predictedScore}%</div>
-                        <div style="font-size:14px;color:var(--gray-600)">Weighted Score ${gradeEmoji}</div>
+                        <div style="display:flex;align-items:center;gap:12px">
+                            <div style="font-size:48px;font-weight:bold;color:var(--navy)">${predictedScore}%</div>
+                            ${trendDirection ? `<div style="font-size:24px;color:${trendDirection === 'up' ? 'var(--green)' : 'var(--red)'}">
+                                ${trendDirection === 'up' ? '📈' : '📉'}
+                                <span style="font-size:14px;font-weight:bold">${trendAmount > 0 ? '+' : ''}${trendAmount}%</span>
+                            </div>` : ''}
+                        </div>
+                        <div style="font-size:14px;color:var(--gray-600)">Time-Weighted Score ${gradeEmoji}</div>
+                        <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Recent data weighs 3x more</div>
                         <div style="margin-top:12px;padding:10px;background:${passStatus ? '#dcfce7' : '#fef2f2'};border-radius:8px;display:inline-block">
                             <span style="font-weight:bold;color:${passStatus ? '#16a34a' : '#dc2626'}">
                                 ${passStatus ? '✅ PASSING' : '❌ NOT PASSING'}
@@ -15459,7 +15868,7 @@ const Progress = {
                     <div style="text-align:center;min-width:120px">
                         <div style="font-size:13px;color:var(--gray-500);margin-bottom:4px">Confidence</div>
                         <div style="font-size:18px;font-weight:bold;color:var(--navy)">${confidence}</div>
-                        <div style="font-size:11px;color:var(--gray-500)">${weightedTotal} attempts</div>
+                        <div style="font-size:11px;color:var(--gray-500)">${Math.round(weightedTotal / 3)} raw attempts</div>
                     </div>
                 </div>
                 
@@ -19403,7 +19812,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.16</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.19</div>
 
 </body>
 </html>
