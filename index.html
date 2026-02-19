@@ -13628,9 +13628,15 @@ const SpeedMode = {
         const drillProgress = Store.get('drillProgress', {});
         const now = Date.now();
 
-        // Filter and weight questions - speed mastered questions are EXCLUDED
+        // Filter and weight questions - speed mastered and unsuitable questions are EXCLUDED
         const weighted = this.bank.questions.map(q => {
             const prog = drillProgress[q.id] || { ef: 2.5, reps: 0 };
+            
+            // Questions answered wrong 5+ times in speed mode - NOT SUITABLE for speed mode
+            // These need more thought/time, better for drill mode
+            if (prog.notSpeedSuitable) {
+                return { question: q, weight: 0, ef: prog.ef, excluded: 'too_hard' };
+            }
             
             // Speed mastered questions - SKIP entirely (weight 0)
             // You've proven you know this, no need to see it again in speed mode
@@ -13657,7 +13663,7 @@ const SpeedMode = {
             else weight = 0.5;                          // Strong
 
             return { question: q, weight, ef: prog.ef, mastered: false };
-        }).filter(item => item.weight > 0); // Remove mastered questions entirely
+        }).filter(item => item.weight > 0); // Remove mastered and unsuitable questions
 
         // Shuffle with weighting - prioritizes weak questions
         this.queue = [];
@@ -14008,13 +14014,23 @@ const SpeedMode = {
             // OR 2 fast correct answers (under 10s) = you know this cold
             const speedMastered = (reps >= 2 && ef >= 2.4) || fastCorrect >= 2;
             
-            all[qId] = { ...all[qId], fastCorrect, avgSpeed, speedMastered };
+            // Reset speed wrong count on correct answer
+            all[qId] = { ...all[qId], fastCorrect, avgSpeed, speedMastered, speedWrongCount: 0 };
         } else {
             // WRONG: Never lower mastery - just schedule for sooner review
             ef = p.ef; // Keep EF unchanged
             reps = p.reps; // Keep reps - don't punish for speed mode mistakes
             interval = 1; // Review soon
             // Don't reset fastCorrect - preserve speed achievements
+            
+            // Track wrong answers in speed mode - too many = not a speed question
+            const speedWrongCount = (p.speedWrongCount || 0) + 1;
+            
+            // If wrong 5+ times in speed mode, mark as "not suitable for speed mode"
+            // These questions need more time/thought - better for drill mode
+            const notSpeedSuitable = speedWrongCount >= 5;
+            
+            all[qId] = { ...all[qId], speedWrongCount, notSpeedSuitable };
         }
         
         const nextReview = Date.now() + interval * 86400000;
@@ -19414,7 +19430,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.27</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.28</div>
 
 </body>
 </html>
