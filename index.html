@@ -1951,12 +1951,37 @@ button:focus-visible {
 
 <!-- ========== AI TUTOR MODAL ========== -->
 <div class="modal-overlay" id="aiTutorModal" onclick="if(event.target===this)AITutor.closeModal()">
-    <div class="modal-content" style="max-width:600px;max-height:85vh;overflow-y:auto">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div class="modal-content" style="max-width:700px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--gray-200)">
             <h2 style="margin:0;display:flex;align-items:center;gap:10px"><span style="font-size:28px">🤖</span> AI Study Coach</h2>
-            <button onclick="AITutor.closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--gray-500)">×</button>
+            <div style="display:flex;gap:8px;align-items:center">
+                <button onclick="AITutor.switchTab('chat')" id="aiTabChat" class="ai-tab active" style="padding:6px 12px;border-radius:6px;border:1px solid var(--gray-300);background:var(--blue);color:#fff;cursor:pointer;font-size:13px">💬 Chat</button>
+                <button onclick="AITutor.switchTab('stats')" id="aiTabStats" class="ai-tab" style="padding:6px 12px;border-radius:6px;border:1px solid var(--gray-300);background:#fff;color:var(--gray-700);cursor:pointer;font-size:13px">📊 Stats</button>
+                <button onclick="AITutor.closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--gray-500);margin-left:8px">×</button>
+            </div>
         </div>
-        <div id="aiTutorContent"></div>
+        
+        <!-- Chat Tab -->
+        <div id="aiTutorChatTab" style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+            <div id="aiTutorChatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:300px;max-height:50vh"></div>
+            <div style="padding:12px;border-top:1px solid var(--gray-200);background:var(--gray-50)">
+                <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap" id="aiQuickQuestions">
+                    <button onclick="AITutor.askQuestion('What should I study next?')" class="ai-quick-btn" style="padding:6px 10px;border-radius:16px;border:1px solid var(--blue);background:#fff;color:var(--blue);font-size:12px;cursor:pointer">What should I study next?</button>
+                    <button onclick="AITutor.askQuestion('How am I doing overall?')" class="ai-quick-btn" style="padding:6px 10px;border-radius:16px;border:1px solid var(--blue);background:#fff;color:var(--blue);font-size:12px;cursor:pointer">How am I doing?</button>
+                    <button onclick="AITutor.askQuestion('What are my weak areas?')" class="ai-quick-btn" style="padding:6px 10px;border-radius:16px;border:1px solid var(--blue);background:#fff;color:var(--blue);font-size:12px;cursor:pointer">My weak areas?</button>
+                    <button onclick="AITutor.askQuestion('Am I ready for the exam?')" class="ai-quick-btn" style="padding:6px 10px;border-radius:16px;border:1px solid var(--blue);background:#fff;color:var(--blue);font-size:12px;cursor:pointer">Am I exam ready?</button>
+                </div>
+                <div style="display:flex;gap:8px">
+                    <input type="text" id="aiTutorInput" placeholder="Ask your study coach anything..." style="flex:1;padding:12px;border:1px solid var(--gray-300);border-radius:8px;font-size:14px" onkeydown="if(event.key==='Enter')AITutor.sendMessage()">
+                    <button onclick="AITutor.sendMessage()" style="background:var(--blue);color:#fff;border:none;padding:12px 20px;border-radius:8px;cursor:pointer;font-weight:bold">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Tab (hidden by default) -->
+        <div id="aiTutorStatsTab" style="flex:1;overflow-y:auto;padding:16px;display:none">
+            <div id="aiTutorContent"></div>
+        </div>
     </div>
 </div>
 
@@ -11159,13 +11184,360 @@ const Home = {
 // AI TUTOR - Analyzes stats and provides personalized recommendations
 // =====================================================================
 const AITutor = {
+    chatHistory: [],
+    currentTab: 'chat',
+    
     openModal() {
         document.getElementById('aiTutorModal').classList.add('active');
-        this.renderFullAnalysis();
+        this.switchTab('chat');
+        if (this.chatHistory.length === 0) {
+            this.addBotMessage(this.getGreeting());
+        }
     },
     
     closeModal() {
         document.getElementById('aiTutorModal').classList.remove('active');
+    },
+    
+    switchTab(tab) {
+        this.currentTab = tab;
+        const chatTab = document.getElementById('aiTutorChatTab');
+        const statsTab = document.getElementById('aiTutorStatsTab');
+        const chatBtn = document.getElementById('aiTabChat');
+        const statsBtn = document.getElementById('aiTabStats');
+        
+        if (tab === 'chat') {
+            chatTab.style.display = 'flex';
+            statsTab.style.display = 'none';
+            chatBtn.style.background = 'var(--blue)';
+            chatBtn.style.color = '#fff';
+            statsBtn.style.background = '#fff';
+            statsBtn.style.color = 'var(--gray-700)';
+        } else {
+            chatTab.style.display = 'none';
+            statsTab.style.display = 'block';
+            statsBtn.style.background = 'var(--blue)';
+            statsBtn.style.color = '#fff';
+            chatBtn.style.background = '#fff';
+            chatBtn.style.color = 'var(--gray-700)';
+            this.renderFullAnalysis();
+        }
+    },
+    
+    getGreeting() {
+        const analysis = this.analyzeStats();
+        const hour = new Date().getHours();
+        let greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+        
+        if (analysis.questionsToday === 0) {
+            return `${greeting}! 👋 Ready to study? I can help you figure out what to focus on. Ask me anything or tap a quick question below!`;
+        } else if (analysis.goalProgress >= 100) {
+            return `${greeting}! 🎉 You've hit your daily goal - nice work! Want to keep going or review what you've learned?`;
+        } else {
+            return `${greeting}! 📚 You're ${analysis.goalProgress}% to your daily goal. How can I help you today?`;
+        }
+    },
+    
+    addBotMessage(text) {
+        this.chatHistory.push({ role: 'bot', text });
+        this.renderChat();
+    },
+    
+    addUserMessage(text) {
+        this.chatHistory.push({ role: 'user', text });
+        this.renderChat();
+    },
+    
+    renderChat() {
+        const container = document.getElementById('aiTutorChatMessages');
+        if (!container) return;
+        
+        container.innerHTML = this.chatHistory.map(msg => {
+            if (msg.role === 'bot') {
+                return `<div style="display:flex;gap:10px;align-items:flex-start">
+                    <span style="font-size:24px;flex-shrink:0">🤖</span>
+                    <div style="background:var(--gray-100);padding:12px 16px;border-radius:12px;border-top-left-radius:4px;max-width:85%;font-size:14px;line-height:1.5">${msg.text}</div>
+                </div>`;
+            } else {
+                return `<div style="display:flex;gap:10px;align-items:flex-start;justify-content:flex-end">
+                    <div style="background:var(--blue);color:#fff;padding:12px 16px;border-radius:12px;border-top-right-radius:4px;max-width:85%;font-size:14px;line-height:1.5">${escapeHtml(msg.text)}</div>
+                </div>`;
+            }
+        }).join('');
+        
+        container.scrollTop = container.scrollHeight;
+    },
+    
+    sendMessage() {
+        const input = document.getElementById('aiTutorInput');
+        const text = input.value.trim();
+        if (!text) return;
+        
+        input.value = '';
+        this.askQuestion(text);
+    },
+    
+    askQuestion(question) {
+        this.addUserMessage(question);
+        
+        // Generate response based on question
+        const response = this.generateResponse(question);
+        
+        // Slight delay for natural feel
+        setTimeout(() => {
+            this.addBotMessage(response);
+        }, 300);
+    },
+    
+    generateResponse(question) {
+        const analysis = this.analyzeStats();
+        const q = question.toLowerCase();
+        
+        // What should I study / what's next
+        if (q.includes('study next') || q.includes('what should i') || q.includes('focus on') || q.includes('what to do')) {
+            return this.getStudyRecommendation(analysis);
+        }
+        
+        // How am I doing / overall progress
+        if (q.includes('how am i') || q.includes('doing overall') || q.includes('my progress') || q.includes('how\'s my')) {
+            return this.getOverallAssessment(analysis);
+        }
+        
+        // Weak areas
+        if (q.includes('weak') || q.includes('struggling') || q.includes('bad at') || q.includes('need help')) {
+            return this.getWeakAreasResponse(analysis);
+        }
+        
+        // Strong areas / strengths
+        if (q.includes('strong') || q.includes('good at') || q.includes('best') || q.includes('strength')) {
+            return this.getStrengthsResponse(analysis);
+        }
+        
+        // Exam ready / ready for test
+        if (q.includes('exam') || q.includes('ready') || q.includes('test') || q.includes('pass')) {
+            return this.getExamReadinessResponse(analysis);
+        }
+        
+        // Streak / consistency
+        if (q.includes('streak') || q.includes('consistent') || q.includes('daily')) {
+            return this.getStreakResponse(analysis);
+        }
+        
+        // Time / how long / study time
+        if (q.includes('time') || q.includes('how long') || q.includes('hours') || q.includes('minutes')) {
+            return this.getTimeResponse(analysis);
+        }
+        
+        // Goal / target
+        if (q.includes('goal') || q.includes('target')) {
+            return this.getGoalResponse(analysis);
+        }
+        
+        // Mastery / mastered
+        if (q.includes('master') || q.includes('learned') || q.includes('know')) {
+            return this.getMasteryResponse(analysis);
+        }
+        
+        // Tips / advice / help
+        if (q.includes('tip') || q.includes('advice') || q.includes('help') || q.includes('suggest')) {
+            return this.getTipsResponse(analysis);
+        }
+        
+        // Default - general helpful response
+        return this.getDefaultResponse(analysis);
+    },
+    
+    getStudyRecommendation(a) {
+        if (a.weakCats.length > 0) {
+            const weakest = a.weakCats[0];
+            const pct = Math.round((weakest[1].correct / weakest[1].total) * 100);
+            return `Based on your data, I'd focus on <strong>${escapeHtml(weakest[0])}</strong> - you're at ${pct}% accuracy there. 
+            
+Try a focused drill session on that category. Once you get it above 70%, move to the next weak area.
+
+${a.struggling > 0 ? `You also have ${a.struggling} questions marked as "struggling" - those will show up more in drill mode to help you master them.` : ''}`;
+        }
+        
+        if (a.masteryPct < 50) {
+            return `You've mastered ${a.masteryPct}% of questions so far. I'd recommend doing more <strong>Drill Mode</strong> sessions to build that foundation.
+
+The spaced repetition system will automatically show you questions you need to review. Aim for 70%+ mastery before taking practice exams.`;
+        }
+        
+        return `You're doing well! Your mastery is at ${a.masteryPct}%. 
+
+I'd suggest taking a <strong>Practice Test</strong> to see how you perform under exam conditions. That'll reveal any gaps in your knowledge.`;
+    },
+    
+    getOverallAssessment(a) {
+        let assessment = '';
+        
+        if (a.avgRecentScore !== null) {
+            if (a.avgRecentScore >= 80) {
+                assessment = `📈 <strong>Looking great!</strong> Your recent test average is ${a.avgRecentScore}%.`;
+            } else if (a.avgRecentScore >= 70) {
+                assessment = `📊 <strong>On track!</strong> Your recent test average is ${a.avgRecentScore}% - passing range.`;
+            } else {
+                assessment = `📉 <strong>Needs work.</strong> Your recent test average is ${a.avgRecentScore}% - below passing.`;
+            }
+        }
+        
+        assessment += `\n\n<strong>Key Stats:</strong>
+• Mastery: ${a.masteryPct}% of questions
+• Streak: ${a.streak} days
+• Today: ${a.questionsToday}/${a.dailyGoal} questions (${a.goalProgress}%)
+• Study time today: ${a.todayMins} minutes`;
+        
+        if (a.weakCats.length > 0) {
+            assessment += `\n\n⚠️ You have ${a.weakCats.length} weak categories that need attention.`;
+        }
+        
+        return assessment;
+    },
+    
+    getWeakAreasResponse(a) {
+        if (a.weakCats.length === 0) {
+            return `🎉 Great news - you don't have any categories below 60% accuracy! 
+
+Keep practicing to maintain your skills. Consider taking a practice test to challenge yourself.`;
+        }
+        
+        const weakList = a.weakCats.slice(0, 5).map(([cat, d]) => {
+            const pct = Math.round((d.correct / d.total) * 100);
+            return `• <strong>${escapeHtml(cat)}</strong>: ${pct}% (${d.correct}/${d.total})`;
+        }).join('\n');
+        
+        return `🔴 <strong>Areas needing work:</strong>\n${weakList}
+
+<strong>My recommendation:</strong> Start with the lowest one and drill it until you're above 70%. The spaced repetition will help you retain what you learn.`;
+    },
+    
+    getStrengthsResponse(a) {
+        if (a.strongCats.length === 0) {
+            return `You don't have any categories above 80% yet, but that's okay - you're still building your foundation!
+
+Keep practicing and you'll get there. Focus on consistency over perfection.`;
+        }
+        
+        const strongList = a.strongCats.slice(0, 5).map(([cat, d]) => {
+            const pct = Math.round((d.correct / d.total) * 100);
+            return `• <strong>${escapeHtml(cat)}</strong>: ${pct}%`;
+        }).join('\n');
+        
+        return `🟢 <strong>Your strengths:</strong>\n${strongList}
+
+Nice work on these! You can maintain them with occasional review, but focus your energy on weaker areas now.`;
+    },
+    
+    getExamReadinessResponse(a) {
+        let ready = true;
+        let reasons = [];
+        
+        if (a.masteryPct < 60) {
+            ready = false;
+            reasons.push(`Mastery is only ${a.masteryPct}% (aim for 70%+)`);
+        }
+        if (a.weakCats.length > 3) {
+            ready = false;
+            reasons.push(`${a.weakCats.length} weak categories need work`);
+        }
+        if (a.avgRecentScore !== null && a.avgRecentScore < 70) {
+            ready = false;
+            reasons.push(`Recent test average is ${a.avgRecentScore}% (need 70%+)`);
+        }
+        if (a.testsCompleted < 3) {
+            ready = false;
+            reasons.push(`Only ${a.testsCompleted} practice tests completed`);
+        }
+        
+        if (ready) {
+            return `✅ <strong>You look ready!</strong>
+
+Your mastery is at ${a.masteryPct}%, you've completed ${a.testsCompleted} practice tests, and your recent scores are solid.
+
+I'd recommend one more full practice test to confirm, then you're good to go!`;
+        } else {
+            return `⚠️ <strong>Not quite ready yet.</strong>
+
+Here's what to work on:
+${reasons.map(r => '• ' + r).join('\n')}
+
+Keep drilling and take more practice tests. You'll get there!`;
+        }
+    },
+    
+    getStreakResponse(a) {
+        if (a.streak === 0) {
+            return `You don't have an active streak yet. Study today to start one!
+
+Consistency is key - even 10-15 minutes daily is better than cramming once a week.`;
+        } else if (a.streak < 7) {
+            return `🔥 You're on a <strong>${a.streak}-day streak!</strong>
+
+Keep it going! Studies show that consistent daily practice leads to better retention than sporadic long sessions.`;
+        } else {
+            return `🔥🔥 <strong>Amazing ${a.streak}-day streak!</strong>
+
+You're building great habits! This consistency will really pay off on exam day.`;
+        }
+    },
+    
+    getTimeResponse(a) {
+        return `⏱️ <strong>Study Time Stats:</strong>
+
+• Today: ${a.todayMins} minutes
+• Average daily: ${a.avgDailyMins} minutes
+• Total all-time: ${a.totalMins} minutes
+
+${a.todayMins < 15 ? 'Try to get at least 15-30 minutes of focused study today!' : 'Good job putting in the time!'}`;
+    },
+    
+    getGoalResponse(a) {
+        return `🎯 <strong>Daily Goal Progress:</strong>
+
+You've completed ${a.questionsToday} of ${a.dailyGoal} questions today (${a.goalProgress}%).
+
+${a.goalProgress >= 100 ? '✅ Goal achieved! Want to keep going?' : `${a.dailyGoal - a.questionsToday} more to hit your goal!`}
+
+You can adjust your daily goal in Settings if ${a.dailyGoal} feels too easy or too hard.`;
+    },
+    
+    getMasteryResponse(a) {
+        return `📚 <strong>Mastery Progress:</strong>
+
+• Questions seen: ${a.totalQuestions}
+• Mastered (high confidence): ${a.mastered} (${a.masteryPct}%)
+• Struggling (need review): ${a.struggling}
+
+${a.masteryPct >= 70 ? 'Great mastery level! You\'re retaining information well.' : 'Keep drilling to increase your mastery. The spaced repetition system will help!'}`;
+    },
+    
+    getTipsResponse(a) {
+        const tips = [
+            'Use Drill Mode daily - spaced repetition is proven to boost retention.',
+            'Take practice tests under exam conditions (timed, no distractions).',
+            'Focus on weak areas first - that\'s where you\'ll gain the most points.',
+            'Review wrong answers carefully - understand WHY you got them wrong.',
+            'Consistency beats intensity - 20 min/day > 3 hours once a week.',
+            'Use Speed Mode to build quick recall for facts you already know.',
+            'Take breaks! Your brain consolidates learning during rest.'
+        ];
+        
+        const randomTips = tips.sort(() => Math.random() - 0.5).slice(0, 3);
+        
+        return `💡 <strong>Study Tips:</strong>\n\n${randomTips.map((t, i) => `${i + 1}. ${t}`).join('\n\n')}`;
+    },
+    
+    getDefaultResponse(a) {
+        return `I'm here to help with your studying! You can ask me things like:
+
+• "What should I study next?"
+• "How am I doing overall?"
+• "What are my weak areas?"
+• "Am I ready for the exam?"
+• "Give me some study tips"
+
+Or just tell me what's on your mind and I'll do my best to help! 📚`;
     },
     
     // Analyze all user data and generate insights
