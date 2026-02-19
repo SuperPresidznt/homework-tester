@@ -3231,167 +3231,80 @@ const Gamification = {
             spaceship:  { name: 'Spaceship',    price: 50000, icon: '🚀', desc: 'To infinity!', tier: 7 }
         },
         businesses: {
-            // BALANCED ECONOMICS: Each business should take ~50-100 cycles to pay off
-            // Cycle = 1 batch of product. Profit margin ~20-40% of revenue
-            // Lemonade: Sells 5 cups @ $2 = $10 revenue, costs $6 = $4 profit per batch
+            // SIMPLIFIED BUSINESS SYSTEM v2
+            // - Single "supplies" resource per business (cost per cycle)
+            // - Level = income multiplier, Machines = speed, Manager = automation
+            // - Prestige system for permanent bonuses
+            // - Study boost: answering questions adds progress
             lemonade: { 
                 name: 'Lemonade Stand', price: 100, icon: '🍋', desc: 'A humble beginning',
-                baseIncome: 0.5, cycleTime: 120, managerCost: 800,
-                ingredients: { lemons: 5, sugar: 2, cups: 5 },
-                ingredientCosts: { lemons: 0.50, sugar: 0.25, cups: 0.10 },
-                baseCustomers: 5, adBoost: 1.5,
-                processSteps: ['🍋 Squeeze lemons', '🧊 Add ice', '🥤 Pour & serve'],
+                baseIncome: 2, cycleTime: 60, managerCost: 500, supplyCost: 1,
                 theme: { bg: '#92400e', accent: '#f59e0b', dark: '#451a03' },
                 flavorText: 'When life gives you lemons...',
-                upgrades: {
-                    iceMachine: { name: 'Ice Machine', cost: 75, bonus: '+10% speed', effect: 'speed', value: 0.1 },
-                    umbrella: { name: 'Umbrella Stand', cost: 100, bonus: '+15% customers', effect: 'customers', value: 0.15 },
-                    signage: { name: 'Neon Sign', cost: 150, bonus: '+20% income', effect: 'income', value: 0.2 }
-                }
+                milestones: [100, 500, 2000, 10000] // Total profit milestones
             },
-            // Paper Route: Deliver 20 papers @ $0.50 tip = $10, costs $4 = $6 profit
             newspaper: { 
-                name: 'Paper Route', price: 200, icon: '📰', desc: 'Deliver the news',
-                baseIncome: 1, cycleTime: 180, managerCost: 1500,
-                ingredients: { papers: 20 },
-                ingredientCosts: { papers: 0.20 },
-                baseCustomers: 10, adBoost: 1.3,
-                processSteps: ['📦 Bundle papers', '🚲 Load bike', '🏠 Deliver route'],
+                name: 'Paper Route', price: 250, icon: '📰', desc: 'Deliver the news',
+                baseIncome: 4, cycleTime: 90, managerCost: 1000, supplyCost: 2,
                 theme: { bg: '#374151', accent: '#9ca3af', dark: '#1f2937' },
                 flavorText: 'Extra! Extra! Read all about it!',
-                upgrades: {
-                    bike: { name: 'Better Bike', cost: 150, bonus: '+15% speed', effect: 'speed', value: 0.15 },
-                    bag: { name: 'Bigger Bag', cost: 200, bonus: '+20% capacity', effect: 'capacity', value: 0.2 },
-                    route: { name: 'Premium Route', cost: 300, bonus: '+25% income', effect: 'income', value: 0.25 }
-                }
+                milestones: [200, 1000, 5000, 25000]
             },
-            // Car Wash: Wash 3 cars @ $15 = $45, costs $12 = $33 profit (but slower)
             carwash: { 
-                name: 'Car Wash', price: 800, icon: '🚿', desc: 'Sparkle and shine',
-                baseIncome: 2, cycleTime: 240, managerCost: 6000,
-                ingredients: { soap: 3, water: 10, wax: 1 },
-                ingredientCosts: { soap: 1.50, water: 0.10, wax: 3.00 },
-                baseCustomers: 8, adBoost: 1.4,
-                processSteps: ['🧽 Pre-wash', '🧴 Soap & scrub', '💨 Rinse & dry', '✨ Wax & polish'],
+                name: 'Car Wash', price: 600, icon: '🚿', desc: 'Sparkle and shine',
+                baseIncome: 8, cycleTime: 120, managerCost: 3000, supplyCost: 4,
                 theme: { bg: '#1e40af', accent: '#60a5fa', dark: '#1e3a8a' },
                 flavorText: 'Making cars sparkle since day one!',
-                upgrades: {
-                    vacuum: { name: 'Vacuum Station', cost: 500, bonus: '+$2/cycle', effect: 'flat', value: 2 },
-                    dryer: { name: 'Air Dryer', cost: 700, bonus: '+20% speed', effect: 'speed', value: 0.2 },
-                    detailing: { name: 'Detail Bay', cost: 1200, bonus: '+40% income', effect: 'income', value: 0.4 }
-                }
+                milestones: [500, 2500, 12000, 60000]
             },
-            // Bakery: Batch of goods sells for $60, costs $25 = $35 profit
             bakery: { 
-                name: 'Bakery', price: 2500, icon: '🥐', desc: 'Fresh baked goods',
-                baseIncome: 4, cycleTime: 360, managerCost: 18000,
-                ingredients: { flour: 5, eggs: 6, butter: 2, sugar: 3 },
-                ingredientCosts: { flour: 1.00, eggs: 0.50, butter: 2.00, sugar: 0.75 },
-                baseCustomers: 12, adBoost: 1.5,
-                processSteps: ['📝 Take orders', '🥣 Mix dough', '🔥 Bake goods', '🎀 Package & sell'],
+                name: 'Bakery', price: 2000, icon: '🥐', desc: 'Fresh baked goods',
+                baseIncome: 15, cycleTime: 180, managerCost: 10000, supplyCost: 8,
                 theme: { bg: '#9a3412', accent: '#fb923c', dark: '#431407' },
                 flavorText: 'The smell of fresh bread fills the air...',
-                upgrades: {
-                    oven: { name: 'Double Oven', cost: 1500, bonus: '+25% speed', effect: 'speed', value: 0.25 },
-                    display: { name: 'Glass Display', cost: 2000, bonus: '+20% customers', effect: 'customers', value: 0.2 },
-                    recipes: { name: 'Secret Recipes', cost: 3000, bonus: '+35% income', effect: 'income', value: 0.35 }
-                }
+                milestones: [1500, 8000, 40000, 200000]
             },
-            // Pizzeria: 5 pizzas @ $20 = $100, costs $40 = $60 profit
             pizzeria: { 
-                name: 'Pizzeria', price: 6000, icon: '🍕', desc: 'Slice of heaven',
-                baseIncome: 7, cycleTime: 480, managerCost: 45000,
-                ingredients: { dough: 5, cheese: 8, sauce: 5, toppings: 5 },
-                ingredientCosts: { dough: 1.50, cheese: 2.00, sauce: 1.00, toppings: 1.50 },
-                baseCustomers: 15, adBoost: 1.6,
-                processSteps: ['📞 Take order', '🫓 Toss dough', '🧀 Add toppings', '🔥 Fire oven', '📦 Box & deliver'],
+                name: 'Pizzeria', price: 5000, icon: '🍕', desc: 'Slice of heaven',
+                baseIncome: 30, cycleTime: 240, managerCost: 25000, supplyCost: 15,
                 theme: { bg: '#7f1d1d', accent: '#f87171', dark: '#450a0a' },
                 flavorText: 'Authentic Italian flavors!',
-                upgrades: {
-                    woodOven: { name: 'Wood Fire Oven', cost: 4000, bonus: '+30% quality', effect: 'income', value: 0.3 },
-                    delivery: { name: 'Delivery Fleet', cost: 5000, bonus: '+40% customers', effect: 'customers', value: 0.4 },
-                    franchise: { name: 'Franchise Rights', cost: 10000, bonus: '+50% income', effect: 'income', value: 0.5 }
-                }
+                milestones: [4000, 20000, 100000, 500000]
             },
-            // Arcade: Hourly revenue $150, costs $50 = $100 profit
             arcade: { 
-                name: 'Arcade', price: 15000, icon: '🕹️', desc: 'Fun and games',
-                baseIncome: 12, cycleTime: 600, managerCost: 100000,
-                ingredients: { tokens: 100, prizes: 15, electricity: 1 },
-                ingredientCosts: { tokens: 0.05, prizes: 2.00, electricity: 10.00 },
-                baseCustomers: 20, adBoost: 1.4,
-                processSteps: ['🎮 Power up machines', '🪙 Sell tokens', '🎯 Run games', '🎁 Award prizes'],
+                name: 'Arcade', price: 12000, icon: '🕹️', desc: 'Fun and games',
+                baseIncome: 60, cycleTime: 300, managerCost: 60000, supplyCost: 30,
                 theme: { bg: '#581c87', accent: '#c084fc', dark: '#3b0764' },
                 flavorText: 'Insert coin to continue...',
-                upgrades: {
-                    vr: { name: 'VR Zone', cost: 10000, bonus: '+35% income', effect: 'income', value: 0.35 },
-                    snacks: { name: 'Snack Bar', cost: 8000, bonus: '+$15/cycle', effect: 'flat', value: 15 },
-                    tournament: { name: 'Tournament Setup', cost: 12000, bonus: '+50% customers', effect: 'customers', value: 0.5 }
-                }
+                milestones: [10000, 50000, 250000, 1000000]
             },
-            // Gym: Daily memberships $300, costs $80 = $220 profit
             gym: { 
-                name: 'Gym', price: 40000, icon: '🏋️', desc: 'Fitness empire',
-                baseIncome: 25, cycleTime: 720, managerCost: 300000,
-                ingredients: { towels: 30, supplements: 10, utilities: 1 },
-                ingredientCosts: { towels: 0.50, supplements: 4.00, utilities: 25.00 },
-                baseCustomers: 25, adBoost: 1.3,
-                processSteps: ['🚿 Open facility', '💪 Train members', '🥤 Sell supplements', '🧹 Clean up'],
+                name: 'Gym', price: 30000, icon: '🏋️', desc: 'Fitness empire',
+                baseIncome: 120, cycleTime: 360, managerCost: 150000, supplyCost: 60,
                 theme: { bg: '#065f46', accent: '#34d399', dark: '#022c22' },
                 flavorText: 'No pain, no gain!',
-                upgrades: {
-                    sauna: { name: 'Sauna Room', cost: 25000, bonus: '+25% retention', effect: 'customers', value: 0.25 },
-                    classes: { name: 'Group Classes', cost: 30000, bonus: '+40% income', effect: 'income', value: 0.4 },
-                    pool: { name: 'Swimming Pool', cost: 50000, bonus: '+60% value', effect: 'income', value: 0.6 }
-                }
+                milestones: [25000, 125000, 600000, 3000000]
             },
-            // Hotel: Nightly revenue $800, costs $250 = $550 profit
             hotel: { 
-                name: 'Hotel', price: 100000, icon: '🏨', desc: '5-star service',
-                baseIncome: 50, cycleTime: 900, managerCost: 750000,
-                ingredients: { linens: 20, toiletries: 40, food: 30, staff: 1 },
-                ingredientCosts: { linens: 2.00, toiletries: 1.00, food: 3.00, staff: 50.00 },
-                baseCustomers: 30, adBoost: 1.5,
-                processSteps: ['🛎️ Check-in guests', '🛏️ Prepare rooms', '🍽️ Room service', '🧹 Housekeeping', '👋 Check-out'],
+                name: 'Hotel', price: 80000, icon: '🏨', desc: '5-star service',
+                baseIncome: 250, cycleTime: 480, managerCost: 400000, supplyCost: 125,
                 theme: { bg: '#854d0e', accent: '#fbbf24', dark: '#422006' },
                 flavorText: 'Where luxury meets comfort.',
-                upgrades: {
-                    spa: { name: 'Spa & Wellness', cost: 75000, bonus: '+45% income', effect: 'income', value: 0.45 },
-                    restaurant: { name: '5-Star Restaurant', cost: 90000, bonus: '+$80/cycle', effect: 'flat', value: 80 },
-                    penthouse: { name: 'Penthouse Suite', cost: 150000, bonus: '+80% premium', effect: 'income', value: 0.8 }
-                }
+                milestones: [70000, 350000, 1500000, 8000000]
             },
-            // Tech Startup: Sprint revenue $3000, costs $800 = $2200 profit
             techStartup: { 
-                name: 'Tech Startup', price: 300000, icon: '💻', desc: 'Disrupt the market',
-                baseIncome: 150, cycleTime: 1800, managerCost: 2500000,
-                ingredients: { servers: 5, coffee: 100, devTools: 10, cloud: 1 },
-                ingredientCosts: { servers: 50.00, coffee: 1.00, devTools: 25.00, cloud: 200.00 },
-                baseCustomers: 50, adBoost: 2.0,
-                processSteps: ['☕ Morning standup', '💻 Sprint coding', '🐛 Bug fixes', '🚀 Deploy release', '📊 Analyze metrics'],
+                name: 'Tech Startup', price: 200000, icon: '💻', desc: 'Disrupt the market',
+                baseIncome: 500, cycleTime: 600, managerCost: 1000000, supplyCost: 250,
                 theme: { bg: '#166534', accent: '#4ade80', dark: '#052e16' },
                 flavorText: 'Move fast and ship things!',
-                upgrades: {
-                    ai: { name: 'AI Integration', cost: 200000, bonus: '+50% efficiency', effect: 'speed', value: 0.5 },
-                    funding: { name: 'Series A Funding', cost: 350000, bonus: '+100% scale', effect: 'income', value: 1.0 },
-                    ipo: { name: 'IPO Prep', cost: 600000, bonus: '+200% valuation', effect: 'income', value: 2.0 }
-                }
+                milestones: [180000, 900000, 4500000, 20000000]
             },
-            // Space Port: Launch revenue $50000, costs $25000 = $25000 profit (high risk/reward)
             spacePort: { 
-                name: 'Space Port', price: 2000000, icon: '🛸', desc: 'To the stars!',
-                baseIncome: 500, cycleTime: 7200, managerCost: 15000000,
-                ingredients: { fuel: 200, parts: 50, permits: 10, crew: 1 },
-                ingredientCosts: { fuel: 50.00, parts: 100.00, permits: 500.00, crew: 2000.00 },
-                baseCustomers: 10, adBoost: 3.0,
-                processSteps: ['🔧 Pre-flight check', '⛽ Fuel rockets', '👨‍🚀 Board passengers', '🚀 Launch!', '🌍 Return & land'],
+                name: 'Space Port', price: 1000000, icon: '🛸', desc: 'To the stars!',
+                baseIncome: 2000, cycleTime: 900, managerCost: 5000000, supplyCost: 1000,
                 theme: { bg: '#0f172a', accent: '#6366f1', dark: '#1e1b4b' },
                 flavorText: 'The final frontier awaits...',
-                upgrades: {
-                    orbital: { name: 'Orbital Station', cost: 1500000, bonus: '+100% capacity', effect: 'customers', value: 1.0 },
-                    mars: { name: 'Mars Route', cost: 4000000, bonus: '+300% income', effect: 'income', value: 3.0 },
-                    colony: { name: 'Moon Colony', cost: 8000000, bonus: '+500% empire', effect: 'income', value: 5.0 }
-                }
+                milestones: [900000, 4500000, 20000000, 100000000]
             }
         },
         plotExpansion: { name: 'Garden Plot', price: 100, icon: '🟫', desc: 'Unlock 1 additional garden plot' }
@@ -7398,16 +7311,15 @@ const House = {
 };
 
 // =====================================================================
-// IDLE BUSINESS SYSTEM - Enhanced with ingredients, machines, ads, study bonus
+// IDLE BUSINESS SYSTEM v2 - Simplified with Prestige & Study Integration
 // =====================================================================
 const Business = {
     _tickInterval: null,
     _currentBusiness: null,
     
     init() {
-        // Start passive ticking every 5 seconds for managed businesses
         if (!this._tickInterval) {
-            this._tickInterval = setInterval(() => this.tick(), 5000);
+            this._tickInterval = setInterval(() => this.tick(), 1000);
         }
     },
     
@@ -7417,28 +7329,20 @@ const Business = {
         showScreen('business');
     },
     
-    // Called when user answers a question correctly - small business boost
+    // Called when user answers a question correctly - adds progress to all businesses
     onCorrectAnswer() {
         const state = Gamification.getState();
-        const biz = state.businesses || {};
-        const now = Date.now();
+        const biz = state.businesses || { owned: {} };
         
-        // Add 1% multiplier, stacks up to 1.1x max, lasts 2 minutes
-        // Study is the MAIN income driver - this is just a tiny bonus
-        biz.studyMultiplier = Math.min(1.1, (biz.studyMultiplier || 1.0) + 0.01);
-        biz.studyBoostExpires = now + 2 * 60 * 1000; // 2 minutes
+        // Each correct answer adds 5% progress to all owned businesses
+        for (const [id, data] of Object.entries(biz.owned || {})) {
+            if (data.level > 0) {
+                data.progress = Math.min(100, (data.progress || 0) + 5);
+            }
+        }
         
         state.businesses = biz;
         Gamification.saveState(state);
-    },
-    
-    getStudyMultiplier(state) {
-        const biz = state.businesses || {};
-        const now = Date.now();
-        if (biz.studyBoostExpires && biz.studyBoostExpires > now) {
-            return biz.studyMultiplier || 1.0;
-        }
-        return 1.0;
     },
 
     tick() {
@@ -7448,72 +7352,35 @@ const Business = {
         
         if (!biz.lastTick) biz.lastTick = now;
         const elapsed = (now - biz.lastTick) / 1000;
-        if (elapsed < 1) return; // Don't tick too fast
-        
-        const studyMult = this.getStudyMultiplier(state);
+        if (elapsed < 0.5) return;
         
         for (const [id, data] of Object.entries(biz.owned || {})) {
             const bizData = Gamification.SHOP.businesses[id];
-            if (!bizData) continue;
+            if (!bizData || !data.level) continue;
             
-            // Initialize inventory and balance if needed
-            if (!data.inventory) {
-                data.inventory = {};
-                for (const ing of Object.keys(bizData.ingredients || {})) {
-                    data.inventory[ing] = 10;
-                }
-            }
-            if (data.balance === undefined) data.balance = 0;
-            if (!data.upgrades) data.upgrades = {};
+            // Calculate speed multiplier from machines
+            const speedMult = 1 + (data.machines || 0) * 0.25;
+            const cycleTime = bizData.cycleTime / speedMult;
             
-            // Calculate upgrade bonuses
-            let speedBonus = 0, incomeBonus = 0, flatBonus = 0;
-            for (const [upId, upData] of Object.entries(bizData.upgrades || {})) {
-                if (data.upgrades[upId]) {
-                    if (upData.effect === 'speed') speedBonus += upData.value;
-                    if (upData.effect === 'income') incomeBonus += upData.value;
-                    if (upData.effect === 'flat') flatBonus += upData.value;
-                }
-            }
+            // Calculate income: base × level × prestige bonus
+            const prestigeBonus = 1 + (data.prestige || 0) * 0.5;
+            const profit = (bizData.baseIncome * data.level * prestigeBonus) - bizData.supplyCost;
             
-            const machineSpeed = 1 + (data.machines || 0) * 0.2;
-            const totalSpeedMult = machineSpeed * (1 + speedBonus);
-            const cycleTime = bizData.cycleTime / totalSpeedMult;
-            const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
-            const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult * (1 + incomeBonus) + flatBonus;
-            
-            // Manager auto-buys ingredients (business balance first, then wallet)
+            // Manager = automatic progress
             if (data.hasManager) {
-                this.managerAutoBuy(data, bizData, state);
-            }
-            
-            const hasIngredients = this.hasIngredientsFor(data, bizData);
-            
-            // Batch production: produce multiple items at once based on level/machines
-            const batchSize = this.getBatchSize(data);
-            const batchEfficiency = this.getBatchEfficiency(data);
-            
-            if (data.hasManager && hasIngredients) {
-                const cycles = Math.floor(elapsed / cycleTime);
-                if (cycles > 0) {
-                    const actualCycles = this.consumeIngredients(data, bizData, cycles);
-                    if (actualCycles > 0) {
-                        const ingredientCost = this.getIngredientCost(bizData, actualCycles);
-                        // Profit scales with batch size and efficiency
-                        const profit = Math.max(0, actualCycles * baseIncome * batchSize * batchEfficiency - ingredientCost);
-                        // Profit goes to business balance, not player coins
-                        data.balance = (data.balance || 0) + Math.floor(profit);
-                        biz.totalEarned = (biz.totalEarned || 0) + Math.floor(profit);
-                    }
-                    data.progress = ((elapsed % cycleTime) / cycleTime) * 100;
-                } else {
-                    data.progress = Math.min(100, (data.progress || 0) + (elapsed / cycleTime) * 100);
+                const progressGain = (elapsed / cycleTime) * 100;
+                data.progress = (data.progress || 0) + progressGain;
+                
+                // Complete cycles and earn money
+                while (data.progress >= 100) {
+                    data.progress -= 100;
+                    const earned = Math.max(1, Math.floor(profit));
+                    state.coins = (state.coins || 0) + earned;
+                    data.totalProfit = (data.totalProfit || 0) + earned;
+                    biz.totalEarned = (biz.totalEarned || 0) + earned;
+                    this.checkMilestones(id, data, bizData);
                 }
-            } else if (hasIngredients) {
-                // Manual: just update progress
-                data.progress = Math.min(100, (data.progress || 0) + (elapsed / cycleTime) * 100);
             }
-            // No ingredients = no progress (manager waits for funds)
         }
         
         biz.lastTick = now;
@@ -7521,215 +7388,83 @@ const Business = {
         Gamification.saveState(state);
     },
     
-    // Manager auto-buys ingredients when stock is low
-    // Priority: business balance first, then player wallet as fallback
-    managerAutoBuy(data, bizData, state) {
-        if (!bizData.ingredients || !data.hasManager) return;
+    // Check and award milestone rewards
+    checkMilestones(bizId, data, bizData) {
+        if (!bizData.milestones) return;
+        const reached = data.milestonesReached || 0;
+        const totalProfit = data.totalProfit || 0;
         
-        for (const [ing, needed] of Object.entries(bizData.ingredients)) {
-            const have = data.inventory?.[ing] || 0;
-            // Buy if less than 5 cycles worth
-            if (have < needed * 5) {
-                const buyAmount = needed * 10; // Buy 10 cycles worth
-                const cost = Math.ceil(bizData.ingredientCosts[ing] * buyAmount * 1.2);
-                
-                // Try business balance first
-                if ((data.balance || 0) >= cost) {
-                    data.balance -= cost;
-                    data.inventory[ing] = (data.inventory[ing] || 0) + buyAmount;
-                }
-                // NO fallback to player wallet - businesses must be self-sustaining
-                // If business balance is low, manager waits for profits
+        for (let i = reached; i < bizData.milestones.length; i++) {
+            if (totalProfit >= bizData.milestones[i]) {
+                data.milestonesReached = i + 1;
+                // Milestone rewards: coins + XP
+                const reward = Math.floor(bizData.milestones[i] * 0.1);
+                const state = Gamification.getState();
+                state.coins = (state.coins || 0) + reward;
+                Gamification.addXP(reward, `${bizData.name} milestone!`);
             }
         }
     },
     
-    hasIngredientsFor(data, bizData) {
-        if (!bizData.ingredients) return true;
-        for (const [ing, needed] of Object.entries(bizData.ingredients)) {
-            if ((data.inventory?.[ing] || 0) < needed) return false;
-        }
-        return true;
+    // Get profit per cycle for a business
+    getProfit(data, bizData) {
+        const prestigeBonus = 1 + (data.prestige || 0) * 0.5;
+        return Math.max(1, Math.floor((bizData.baseIncome * (data.level || 1) * prestigeBonus) - bizData.supplyCost));
     },
     
-    consumeIngredients(data, bizData, maxCycles) {
-        if (!bizData.ingredients) return maxCycles;
-        let possible = maxCycles;
-        for (const [ing, needed] of Object.entries(bizData.ingredients)) {
-            const have = data.inventory?.[ing] || 0;
-            possible = Math.min(possible, Math.floor(have / needed));
-        }
-        if (possible > 0) {
-            for (const [ing, needed] of Object.entries(bizData.ingredients)) {
-                data.inventory[ing] -= possible * needed;
-            }
-        }
-        return possible;
+    // Get cycle time with machine bonus
+    getCycleTime(data, bizData) {
+        const speedMult = 1 + (data.machines || 0) * 0.25;
+        return bizData.cycleTime / speedMult;
     },
     
-    getIngredientCost(bizData, cycles) {
-        if (!bizData.ingredientCosts) return 0;
+    getIncomePerSecond(state) {
+        const biz = state.businesses || { owned: {} };
         let total = 0;
-        for (const [ing, cost] of Object.entries(bizData.ingredientCosts)) {
-            total += cost * (bizData.ingredients[ing] || 0) * cycles;
+        
+        for (const [id, data] of Object.entries(biz.owned || {})) {
+            const bizData = Gamification.SHOP.businesses[id];
+            if (!bizData || !data.hasManager || !data.level) continue;
+            
+            const profit = this.getProfit(data, bizData);
+            const cycleTime = this.getCycleTime(data, bizData);
+            total += profit / cycleTime;
         }
         return total;
     },
     
-    // Batch size starts at 1 and scales VERY slowly with level and machines
-    // Heavily reduced to keep passive income minimal
-    getBatchSize(data) {
-        const level = data.level || 1;
-        const machines = data.machines || 0;
-        // Base batch = 1 + level/10, machines add +0.2 each, cap at 2
-        return Math.min(2, 1 + Math.floor(level / 10) + machines * 0.2);
-    },
-    
-    // Get batch multiplier for display (how much more efficient batches are)
-    getBatchEfficiency(data) {
-        const batchSize = this.getBatchSize(data);
-        // Minimal efficiency bonus - 1% per item over 1, capped at 1.05
-        return Math.min(1.05, 1 + (batchSize - 1) * 0.01);
-    },
-
-    // Work timer state
-    _workTimer: null,
-    _workProgress: 0,
-    _workBusinessId: null,
-    _workStartTime: null,
-    
-    // Manual work - starts a timer-based work session (like idle games)
-    // Each work cycle takes time based on business type
-    startWork(businessId) {
+    // Manual work - instant 10% progress
+    work(businessId) {
         const state = Gamification.getState();
         const biz = state.businesses || { owned: {} };
         const data = biz.owned[businessId];
         if (!data) return;
         
-        const bizData = Gamification.SHOP.businesses[businessId];
-        if (!this.hasIngredientsFor(data, bizData)) {
-            alert('Not enough ingredients! Buy supplies first.');
-            return;
-        }
-        
-        // Already working on this business
-        if (this._workTimer && this._workBusinessId === businessId) {
-            return;
-        }
-        
-        // Cancel any existing work
-        this.cancelWork();
-        
-        // Work time scales with business tier (lemonade = 15s, higher tiers = longer)
-        // But upgrades and machines reduce this
-        const baseWorkTime = Math.max(10, bizData.cycleTime * 0.5); // Half of cycle time, min 10s
-        const machineSpeed = 1 + (data.machines || 0) * 0.2;
-        const workTime = baseWorkTime / machineSpeed;
-        
-        this._workBusinessId = businessId;
-        this._workStartTime = Date.now();
-        this._workDuration = workTime * 1000; // Convert to ms
-        this._workProgress = 0;
-        
-        // Update progress every 100ms
-        this._workTimer = setInterval(() => {
-            const elapsed = Date.now() - this._workStartTime;
-            this._workProgress = Math.min(100, (elapsed / this._workDuration) * 100);
-            
-            // Update the work button UI
-            this._updateWorkUI(businessId);
-            
-            if (this._workProgress >= 100) {
-                this.completeWork(businessId);
-            }
-        }, 100);
-        
-        SoundFX.play('click');
-        this._updateWorkUI(businessId);
-    },
-    
-    cancelWork() {
-        if (this._workTimer) {
-            clearInterval(this._workTimer);
-            this._workTimer = null;
-        }
-        this._workBusinessId = null;
-        this._workProgress = 0;
-    },
-    
-    completeWork(businessId) {
-        this.cancelWork();
-        
-        const state = Gamification.getState();
-        const biz = state.businesses || { owned: {} };
-        const data = biz.owned[businessId];
-        if (!data) return;
-        
-        // Add 10% to production progress (need 10 work cycles to complete)
         data.progress = Math.min(100, (data.progress || 0) + 10);
         state.businesses = biz;
         Gamification.saveState(state);
-        SoundFX.play('coin');
+        SoundFX.play('click');
         
         if (this._currentBusiness === businessId) {
             this.renderBusinessDetail(businessId);
         }
     },
     
-    _updateWorkUI(businessId) {
-        const btn = document.getElementById('workBtn-' + businessId);
-        if (!btn) return;
-        
-        if (this._workTimer && this._workBusinessId === businessId) {
-            const timeLeft = Math.ceil((this._workDuration - (Date.now() - this._workStartTime)) / 1000);
-            btn.innerHTML = `⏳ Working... ${Math.floor(this._workProgress)}% (${timeLeft}s)`;
-            btn.disabled = true;
-            btn.style.background = `linear-gradient(90deg, var(--green) ${this._workProgress}%, var(--gray-600) ${this._workProgress}%)`;
-        } else {
-            const bizData = Gamification.SHOP.businesses[businessId];
-            const theme = bizData?.theme || { accent: '#f59e0b' };
-            btn.innerHTML = '👆 Work (+10%)';
-            btn.disabled = false;
-            btn.style.background = theme.accent;
-        }
-    },
-    
-    // Legacy work function for backwards compatibility
-    work(businessId) {
-        this.startWork(businessId);
-    },
-
+    // Collect completed cycle
     collect(businessId) {
         const state = Gamification.getState();
-        const biz = state.businesses || { owned: {}, totalEarned: 0 };
+        const biz = state.businesses || { owned: {} };
         const data = biz.owned[businessId];
-        if (!data || data.progress < 100) return;
-        
         const bizData = Gamification.SHOP.businesses[businessId];
-        const now = Date.now();
-        const studyMult = this.getStudyMultiplier(state);
-        const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
+        if (!data || !bizData || data.progress < 100) return;
         
-        // Batch production: produce multiple items at once based on level/machines
-        const batchSize = this.getBatchSize(data);
-        const batchEfficiency = this.getBatchEfficiency(data);
-        const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult * batchEfficiency;
-        
-        // Consume ingredients for batch (1 cycle = 1 batch of batchSize items)
-        if (!this.hasIngredientsFor(data, bizData)) {
-            alert('Not enough ingredients!');
-            return;
-        }
-        this.consumeIngredients(data, bizData, 1);
-        
-        const ingredientCost = this.getIngredientCost(bizData, 1);
-        // Profit scales with batch size
-        const profit = Math.max(1, Math.floor((baseIncome * batchSize) - ingredientCost));
-        
-        // Manual collect goes to business balance (you can withdraw later)
-        data.balance = (data.balance || 0) + profit;
-        biz.totalEarned = (biz.totalEarned || 0) + profit;
         data.progress = 0;
+        const profit = this.getProfit(data, bizData);
+        state.coins = (state.coins || 0) + profit;
+        data.totalProfit = (data.totalProfit || 0) + profit;
+        biz.totalEarned = (biz.totalEarned || 0) + profit;
+        
+        this.checkMilestones(businessId, data, bizData);
         
         state.businesses = biz;
         Gamification.saveState(state);
@@ -7737,47 +7472,7 @@ const Business = {
         
         if (this._currentBusiness === businessId) {
             this.renderBusinessDetail(businessId);
-        } else {
-            this.render();
         }
-    },
-    
-    // Deposit coins from player wallet to business account
-    deposit(businessId, amount) {
-        const state = Gamification.getState();
-        const biz = state.businesses || { owned: {} };
-        const data = biz.owned[businessId];
-        if (!data) return;
-        
-        amount = Math.min(amount, state.coins || 0);
-        if (amount <= 0) return;
-        
-        state.coins -= amount;
-        data.balance = (data.balance || 0) + amount;
-        
-        state.businesses = biz;
-        Gamification.saveState(state);
-        SoundFX.play('coin');
-        this.renderBusinessDetail(businessId);
-    },
-    
-    // Withdraw coins from business account to player wallet
-    withdraw(businessId, amount) {
-        const state = Gamification.getState();
-        const biz = state.businesses || { owned: {} };
-        const data = biz.owned[businessId];
-        if (!data) return;
-        
-        amount = Math.min(amount, data.balance || 0);
-        if (amount <= 0) return;
-        
-        data.balance -= amount;
-        state.coins = (state.coins || 0) + amount;
-        
-        state.businesses = biz;
-        Gamification.saveState(state);
-        SoundFX.play('coin');
-        this.renderBusinessDetail(businessId);
     },
 
     buy(businessId) {
@@ -7793,15 +7488,9 @@ const Business = {
         if (!Gamification.spendCoins(price)) return;
         
         if (!biz.owned[businessId]) {
-            // Initialize new business with starter inventory
-            const inventory = {};
-            for (const ing of Object.keys(bizData.ingredients || {})) {
-                inventory[ing] = 10;
-            }
             biz.owned[businessId] = { 
                 level: 1, hasManager: false, progress: 0,
-                inventory, machines: 0, adActive: false, adExpires: null,
-                balance: 20 // Start with some working capital
+                machines: 0, prestige: 0, totalProfit: 0, milestonesReached: 0
             };
         } else {
             biz.owned[businessId].level++;
@@ -7836,61 +7525,6 @@ const Business = {
         }
     },
     
-    // Buy ingredient using player wallet (with bulk discounts)
-    buyIngredient(businessId, ingredient, amount) {
-        const bizData = Gamification.SHOP.businesses[businessId];
-        if (!bizData || !bizData.ingredientCosts) return;
-        
-        // Bulk discounts: 10 = 20% markup, 50 = 10% markup, 100 = no markup
-        let markup = 1.2;
-        if (amount >= 100) markup = 1.0;
-        else if (amount >= 50) markup = 1.1;
-        
-        const cost = Math.ceil(bizData.ingredientCosts[ingredient] * amount * markup);
-        const state = Gamification.getState();
-        
-        if (!Gamification.spendCoins(cost)) return;
-        
-        const biz = state.businesses || { owned: {} };
-        const data = biz.owned[businessId];
-        if (!data.inventory) data.inventory = {};
-        data.inventory[ingredient] = (data.inventory[ingredient] || 0) + amount;
-        
-        state.businesses = biz;
-        Gamification.saveState(state);
-        SoundFX.play('purchase');
-        this.renderBusinessDetail(businessId);
-    },
-    
-    // Buy ingredient using business funds (with bulk discounts)
-    buyIngredientFromBiz(businessId, ingredient, amount) {
-        const bizData = Gamification.SHOP.businesses[businessId];
-        if (!bizData || !bizData.ingredientCosts) return;
-        
-        const state = Gamification.getState();
-        const biz = state.businesses || { owned: {} };
-        const data = biz.owned[businessId];
-        if (!data) return;
-        
-        // Bulk discounts: 10 = 20% markup, 50 = 10% markup, 100 = no markup
-        let markup = 1.2;
-        if (amount >= 100) markup = 1.0;
-        else if (amount >= 50) markup = 1.1;
-        
-        const cost = Math.ceil(bizData.ingredientCosts[ingredient] * amount * markup);
-        
-        if ((data.balance || 0) < cost) return;
-        
-        data.balance -= cost;
-        if (!data.inventory) data.inventory = {};
-        data.inventory[ingredient] = (data.inventory[ingredient] || 0) + amount;
-        
-        state.businesses = biz;
-        Gamification.saveState(state);
-        SoundFX.play('purchase');
-        this.renderBusinessDetail(businessId);
-    },
-    
     buyMachine(businessId) {
         const bizData = Gamification.SHOP.businesses[businessId];
         if (!bizData) return;
@@ -7901,7 +7535,9 @@ const Business = {
         if (!data) return;
         
         const machineCount = data.machines || 0;
-        const price = Math.floor(bizData.price * 0.5 * Math.pow(1.5, machineCount));
+        if (machineCount >= 5) return; // Max 5 machines
+        
+        const price = Math.floor(bizData.price * 0.5 * Math.pow(2, machineCount));
         
         if (!Gamification.spendCoins(price)) return;
         
@@ -7912,7 +7548,8 @@ const Business = {
         this.renderBusinessDetail(businessId);
     },
     
-    buyAd(businessId) {
+    // PRESTIGE: Reset business for permanent +50% income bonus
+    prestige(businessId) {
         const bizData = Gamification.SHOP.businesses[businessId];
         if (!bizData) return;
         
@@ -7921,37 +7558,28 @@ const Business = {
         const data = biz.owned[businessId];
         if (!data) return;
         
-        const adCost = Math.floor(bizData.price * 0.1);
-        if (!Gamification.spendCoins(adCost)) return;
+        // Require level 10+ and 10x purchase price in total profit
+        const minProfit = bizData.price * 10;
+        if (data.level < 10 || (data.totalProfit || 0) < minProfit) {
+            return;
+        }
         
-        data.adActive = true;
-        data.adExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        // Reset but keep prestige bonus
+        const newPrestige = (data.prestige || 0) + 1;
+        biz.owned[businessId] = {
+            level: 1, hasManager: false, progress: 0,
+            machines: 0, prestige: newPrestige, totalProfit: 0, 
+            milestonesReached: data.milestonesReached || 0
+        };
+        
+        // Prestige reward: coins based on prestige level
+        const reward = bizData.price * newPrestige * 2;
+        state.coins = (state.coins || 0) + reward;
         
         state.businesses = biz;
         Gamification.saveState(state);
-        SoundFX.play('purchase');
+        SoundFX.play('levelup');
         this.renderBusinessDetail(businessId);
-    },
-
-    getIncomePerSecond(state) {
-        const biz = state.businesses || { owned: {} };
-        const studyMult = this.getStudyMultiplier(state);
-        const now = Date.now();
-        let total = 0;
-        
-        for (const [id, data] of Object.entries(biz.owned || {})) {
-            const bizData = Gamification.SHOP.businesses[id];
-            if (!bizData || !data.hasManager) continue;
-            if (!this.hasIngredientsFor(data, bizData)) continue;
-            
-            const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
-            const cycleTime = bizData.cycleTime / (1 + (data.machines || 0) * 0.2);
-            const income = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
-            const ingredientCost = this.getIngredientCost(bizData, 1);
-            const profit = Math.max(0, income - ingredientCost);
-            total += profit / cycleTime;
-        }
-        return total;
     },
     
     openBusiness(businessId) {
@@ -7970,283 +7598,168 @@ const Business = {
         const data = biz.owned[businessId];
         const bizData = Gamification.SHOP.businesses[businessId];
         const coins = state.coins || 0;
-        const now = Date.now();
         
         if (!data || !bizData) {
             this.render();
             return;
         }
         
-        // Calculate upgrade bonuses
-        const ownedUpgrades = data.upgrades || {};
-        let speedBonus = 0, incomeBonus = 0, flatBonus = 0, customerBonus = 0;
-        for (const [upId, upData] of Object.entries(bizData.upgrades || {})) {
-            if (ownedUpgrades[upId]) {
-                if (upData.effect === 'speed') speedBonus += upData.value;
-                if (upData.effect === 'income') incomeBonus += upData.value;
-                if (upData.effect === 'flat') flatBonus += upData.value;
-                if (upData.effect === 'customers') customerBonus += upData.value;
-            }
-        }
-        
-        const studyMult = this.getStudyMultiplier(state);
-        const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
-        const machineSpeed = 1 + (data.machines || 0) * 0.2;
-        const totalSpeedMult = machineSpeed * (1 + speedBonus);
-        const cycleTime = bizData.cycleTime / totalSpeedMult;
-        const batchSize = this.getBatchSize(data);
-        const batchEfficiency = this.getBatchEfficiency(data);
-        const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult * (1 + incomeBonus) + flatBonus;
-        const ingredientCost = this.getIngredientCost(bizData, 1);
-        // Profit per batch (scales with batch size and efficiency)
-        const profit = Math.max(0, (baseIncome * batchSize * batchEfficiency) - ingredientCost);
-        
-        const balance = data.balance || 0;
-        const lowFunds = data.hasManager && balance < 50;
-        const theme = bizData.theme || { bg: '#1f2937', accent: '#3b82f6', dark: '#1e3a8a' };
+        const theme = bizData.theme;
         const progress = data.progress || 0;
-        const currentStep = Math.min(Math.floor(progress / (100 / (bizData.processSteps?.length || 1))), (bizData.processSteps?.length || 1) - 1);
+        const profit = this.getProfit(data, bizData);
+        const cycleTime = this.getCycleTime(data, bizData);
+        const prestigeBonus = (data.prestige || 0) * 50;
+        
+        // Milestone progress
+        const milestones = bizData.milestones || [];
+        const reached = data.milestonesReached || 0;
+        const totalProfit = data.totalProfit || 0;
+        const nextMilestone = milestones[reached] || null;
+        const milestoneProgress = nextMilestone ? Math.min(100, (totalProfit / nextMilestone) * 100) : 100;
+        
+        // Prestige requirements
+        const canPrestige = data.level >= 10 && totalProfit >= bizData.price * 10;
         
         let html = `
-            <!-- Themed Header -->
+            <!-- Header -->
             <div style="background:linear-gradient(135deg,${theme.bg},${theme.dark});padding:20px;border-radius:16px;margin-bottom:16px;border:2px solid ${theme.accent}">
                 <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
                     <button class="shop-buy-btn" onclick="Business.closeBusiness()" style="padding:8px 12px;background:rgba(0,0,0,0.3)">← Back</button>
-                    <span style="font-size:48px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3))">${bizData.icon}</span>
+                    <span style="font-size:48px">${bizData.icon}</span>
                     <div style="flex:1">
-                        <h2 style="margin:0;color:${theme.accent};text-shadow:0 2px 4px rgba(0,0,0,0.3)">${bizData.name}</h2>
-                        <div style="color:rgba(255,255,255,0.7);font-size:12px">Level ${data.level} • Batch: ${batchSize} items${batchSize > 1 ? ` (+${Math.round((batchEfficiency - 1) * 100)}% efficiency)` : ''}</div>
-                        <div style="color:rgba(255,255,255,0.5);font-size:11px">${bizData.flavorText || bizData.desc}</div>
+                        <h2 style="margin:0;color:${theme.accent}">${bizData.name}</h2>
+                        <div style="color:rgba(255,255,255,0.7);font-size:13px">
+                            Level ${data.level} ${data.prestige > 0 ? `<span style="color:gold">⭐×${data.prestige}</span>` : ''}
+                            ${data.hasManager ? '👔 Manager' : ''}
+                        </div>
+                        <div style="color:rgba(255,255,255,0.5);font-size:11px">${bizData.flavorText}</div>
                     </div>
                     <div style="text-align:right">
-                        <div style="font-size:11px;color:rgba(255,255,255,0.6)">Your Wallet</div>
-                        <div style="font-size:20px;font-weight:bold">👛 ${coins.toLocaleString()}</div>
+                        <div style="font-size:11px;color:rgba(255,255,255,0.6)">Your Coins</div>
+                        <div style="font-size:20px;font-weight:bold">🪙 ${coins.toLocaleString()}</div>
                     </div>
                 </div>
             </div>
             
-            <!-- Business Account Panel -->
-            <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a87);padding:16px;border-radius:12px;margin-bottom:16px;${lowFunds ? 'border:2px solid var(--red)' : ''}">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-                    <div>
-                        <div style="font-size:12px;color:rgba(255,255,255,0.7)">Business Account</div>
-                        <div style="font-size:28px;font-weight:bold;color:white">🏦 ${balance.toLocaleString()}</div>
-                        ${lowFunds ? '<div style="font-size:11px;color:var(--red)">⚠️ Low funds - manager waiting</div>' : ''}
-                        ${data.hasManager ? '<div style="font-size:11px;color:rgba(255,255,255,0.6)">Manager auto-buys supplies from here</div>' : ''}
-                    </div>
-                    <div style="display:flex;gap:8px;flex-wrap:wrap">
-                        <button class="shop-buy-btn" onclick="Business.deposit('${businessId}',50)" ${coins < 50 ? 'disabled' : ''} style="background:#059669">
-                            ➕ Deposit 50
-                        </button>
-                        <button class="shop-buy-btn" onclick="Business.deposit('${businessId}',${coins})" ${coins < 1 ? 'disabled' : ''} style="background:#059669">
-                            ➕ All (${coins})
-                        </button>
-                        <button class="shop-buy-btn" onclick="Business.withdraw('${businessId}',50)" ${balance < 50 ? 'disabled' : ''} style="background:#dc2626">
-                            ➖ Withdraw 50
-                        </button>
-                        <button class="shop-buy-btn" onclick="Business.withdraw('${businessId}',${balance})" ${balance < 1 ? 'disabled' : ''} style="background:#dc2626">
-                            ➖ All (${balance})
-                        </button>
-                    </div>
+            <!-- Production -->
+            <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:20px;border-radius:12px;margin-bottom:16px;border:1px solid ${theme.accent}40">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                    <h3 style="margin:0">⚙️ Production</h3>
+                    <div style="font-size:14px;color:var(--green)">+🪙${profit}/cycle</div>
                 </div>
-            </div>
-            
-            <!-- Process Steps Visualization -->
-            <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;margin-bottom:16px;border:1px solid ${theme.accent}40">
-                <h3 style="margin-top:0">⚙️ Production Process</h3>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px">
-                    ${(bizData.processSteps || ['Work']).map((step, i) => `
-                        <div style="padding:8px 12px;border-radius:8px;font-size:12px;
-                            background:${i < currentStep ? theme.accent : i === currentStep ? 'linear-gradient(135deg,' + theme.accent + ',' + theme.dark + ')' : 'rgba(0,0,0,0.3)'};
-                            color:${i <= currentStep ? 'white' : 'var(--gray-500)'};
-                            border:2px solid ${i === currentStep ? 'white' : 'transparent'};
-                            ${i === currentStep ? 'animation:pulse 1s infinite;box-shadow:0 0 12px ' + theme.accent : ''}">
-                            ${step}
-                        </div>
-                    `).join('<span style="color:var(--gray-500)">→</span>')}
-                </div>
-                <div style="background:rgba(0,0,0,0.3);border-radius:8px;height:28px;overflow:hidden;position:relative">
-                    <div style="background:linear-gradient(90deg,${theme.accent},${theme.dark});height:100%;width:${progress}%;transition:width 0.3s"></div>
+                
+                <!-- Progress Bar -->
+                <div style="background:rgba(0,0,0,0.3);border-radius:8px;height:32px;overflow:hidden;position:relative;margin-bottom:12px">
+                    <div style="background:linear-gradient(90deg,${theme.accent},${theme.bg});height:100%;width:${progress}%;transition:width 0.3s"></div>
                     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,0.5)">${Math.floor(progress)}%</div>
                 </div>
-                <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
+                
+                <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
                     ${!data.hasManager ? `
-                        <button id="workBtn-${businessId}" class="shop-buy-btn" onclick="Business.work('${businessId}')" style="background:${theme.accent}">
+                        <button class="shop-buy-btn" onclick="Business.work('${businessId}')" style="background:${theme.accent};padding:12px 24px">
                             👆 Work (+10%)
                         </button>
-                    ` : '<span style="color:var(--gray-500);font-size:12px">👔 Manager running automatically</span>'}
+                    ` : `<span style="color:var(--gray-500);font-size:12px">👔 Manager running automatically</span>`}
                     ${progress >= 100 ? `
-                        <button class="shop-buy-btn" onclick="Business.collect('${businessId}')" style="background:var(--green);animation:pulse 1s infinite">
-                            💰 Collect 🪙${profit.toFixed(0)}
+                        <button class="shop-buy-btn" onclick="Business.collect('${businessId}')" style="background:var(--green);animation:pulse 1s infinite;padding:12px 24px">
+                            💰 Collect 🪙${profit}
                         </button>
                     ` : ''}
                 </div>
+                
+                <div style="display:flex;justify-content:space-around;margin-top:16px;font-size:12px;color:var(--gray-400)">
+                    <div>⏱️ ${cycleTime.toFixed(1)}s/cycle</div>
+                    <div>🔧 ${data.machines || 0}/5 machines</div>
+                    <div>💵 ${totalProfit.toLocaleString()} total earned</div>
+                </div>
             </div>
             
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
-                <!-- Stats Panel -->
+            <!-- Upgrades Grid -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">
+                <!-- Level Up -->
                 <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:1px solid ${theme.accent}40">
-                    <h3 style="margin-top:0">📊 Stats</h3>
-                    <div style="font-size:13px;line-height:1.9">
-                        <div>💰 Profit/cycle: <b style="color:var(--green)">🪙${profit.toFixed(1)}</b></div>
-                        <div>⏱️ Cycle time: <b>${cycleTime.toFixed(1)}s</b> ${speedBonus > 0 ? `<span style="color:${theme.accent}">(+${Math.round(speedBonus*100)}% from upgrades)</span>` : ''}</div>
-                        <div>🔧 Machines: <b>${data.machines || 0}</b> (+${((data.machines || 0) * 20)}% speed)</div>
-                        <div>📢 Ad boost: <b style="color:${adMult > 1 ? 'var(--green)' : 'var(--gray-500)'}">${adMult > 1 ? `${adMult}x (${Math.ceil((data.adExpires - now)/60000)}m left)` : 'None'}</b></div>
-                        <div>📚 Study bonus: <b style="color:${studyMult > 1 ? 'var(--blue)' : 'var(--gray-500)'}">${studyMult > 1 ? `${studyMult.toFixed(2)}x` : 'None'}</b></div>
-                        <div>👔 Manager: <b style="color:${data.hasManager ? 'var(--green)' : 'var(--red)'}">${data.hasManager ? 'Yes (Auto)' : 'No'}</b></div>
-                        ${incomeBonus > 0 ? `<div>📈 Income bonus: <b style="color:${theme.accent}">+${Math.round(incomeBonus*100)}%</b></div>` : ''}
-                    </div>
+                    <h4 style="margin:0 0 8px 0;color:${theme.accent}">📈 Level Up</h4>
+                    <p style="font-size:11px;color:var(--gray-500);margin:0 0 8px 0">+${bizData.baseIncome} income per level</p>
+                    <button class="shop-buy-btn" onclick="Business.buy('${businessId}')" 
+                        ${coins < Math.floor(bizData.price * Math.pow(1.15, data.level)) ? 'disabled' : ''} 
+                        style="width:100%;background:${theme.accent}">
+                        Lv${data.level + 1} — 🪙${Math.floor(bizData.price * Math.pow(1.15, data.level)).toLocaleString()}
+                    </button>
                 </div>
                 
-                <!-- Business Supply Shop -->
-                <div style="background:linear-gradient(135deg,${theme.dark},#1a1a2e);padding:16px;border-radius:12px;border:2px solid ${theme.accent};grid-column:span 2">
-                    <h3 style="margin-top:0;color:${theme.accent}">🛒 ${bizData.name} Supply Shop</h3>
-                    <p style="font-size:11px;color:var(--gray-500);margin:-8px 0 12px 0">Buy supplies using business funds (🏦) or your wallet (👛)</p>
-                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">`;
-        
-        for (const [ing, needed] of Object.entries(bizData.ingredients || {})) {
-            const have = data.inventory?.[ing] || 0;
-            const unitCost = bizData.ingredientCosts[ing];
-            const cost10 = Math.ceil(unitCost * 10 * 1.2);
-            const cost50 = Math.ceil(unitCost * 50 * 1.1); // 10% discount for bulk
-            const cost100 = Math.ceil(unitCost * 100 * 1.0); // 20% discount for bulk
-            const isLow = have < needed * 3;
-            const cyclesLeft = Math.floor(have / needed);
+                <!-- Machines -->
+                <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:1px solid ${theme.accent}40">
+                    <h4 style="margin:0 0 8px 0;color:${theme.accent}">🔧 Machines (${data.machines || 0}/5)</h4>
+                    <p style="font-size:11px;color:var(--gray-500);margin:0 0 8px 0">+25% speed each</p>
+                    ${(data.machines || 0) < 5 ? `
+                        <button class="shop-buy-btn" onclick="Business.buyMachine('${businessId}')" 
+                            ${coins < Math.floor(bizData.price * 0.5 * Math.pow(2, data.machines || 0)) ? 'disabled' : ''} 
+                            style="width:100%;background:#7c3aed">
+                            Buy — 🪙${Math.floor(bizData.price * 0.5 * Math.pow(2, data.machines || 0)).toLocaleString()}
+                        </button>
+                    ` : '<div style="text-align:center;color:var(--green)">✅ Maxed!</div>'}
+                </div>
+                
+                <!-- Manager -->
+                <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:1px solid ${theme.accent}40">
+                    <h4 style="margin:0 0 8px 0;color:${theme.accent}">👔 Manager</h4>
+                    <p style="font-size:11px;color:var(--gray-500);margin:0 0 8px 0">Auto-runs business 24/7</p>
+                    ${!data.hasManager ? `
+                        <button class="shop-buy-btn" onclick="Business.hireManager('${businessId}')" 
+                            ${coins < bizData.managerCost ? 'disabled' : ''} 
+                            style="width:100%;background:#0ea5e9">
+                            Hire — 🪙${bizData.managerCost.toLocaleString()}
+                        </button>
+                    ` : '<div style="text-align:center;color:var(--green)">✅ Hired!</div>'}
+                </div>
+                
+                <!-- Prestige -->
+                <div style="background:linear-gradient(135deg,${canPrestige ? '#854d0e' : theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:2px solid ${canPrestige ? 'gold' : theme.accent + '40'}">
+                    <h4 style="margin:0 0 8px 0;color:${canPrestige ? 'gold' : theme.accent}">⭐ Prestige ${data.prestige || 0}</h4>
+                    <p style="font-size:11px;color:var(--gray-500);margin:0 0 8px 0">
+                        ${canPrestige ? 'Reset for +50% permanent bonus!' : `Need Lv10 & 🪙${(bizData.price * 10).toLocaleString()} profit`}
+                    </p>
+                    ${prestigeBonus > 0 ? `<div style="font-size:12px;color:gold;margin-bottom:8px">Current: +${prestigeBonus}% income</div>` : ''}
+                    <button class="shop-buy-btn" onclick="Business.prestige('${businessId}')" 
+                        ${!canPrestige ? 'disabled' : ''} 
+                        style="width:100%;background:${canPrestige ? 'gold' : 'var(--gray-600)'};color:${canPrestige ? '#000' : '#fff'}">
+                        ${canPrestige ? '⭐ Prestige Now!' : `${data.level}/10 Lv • ${Math.floor((totalProfit / (bizData.price * 10)) * 100)}%`}
+                    </button>
+                </div>
+            </div>
             
-            html += `
-                <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:12px;${isLow ? 'border:2px solid var(--red)' : ''}">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-                        <div>
-                            <div style="font-weight:bold;text-transform:capitalize">${ing}</div>
-                            <div style="font-size:11px;color:var(--gray-500)">Need ${needed}/cycle • ${cyclesLeft} cycles left</div>
+            <!-- Milestones -->
+            <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:1px solid ${theme.accent}40">
+                <h4 style="margin:0 0 12px 0;color:${theme.accent}">🏆 Milestones</h4>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                    ${milestones.map((m, i) => {
+                        const done = i < reached;
+                        const current = i === reached;
+                        return `<div style="padding:8px 12px;border-radius:8px;font-size:12px;
+                            background:${done ? 'var(--green)' : current ? theme.accent : 'rgba(0,0,0,0.3)'};
+                            color:${done || current ? 'white' : 'var(--gray-500)'};
+                            border:2px solid ${current ? 'white' : 'transparent'}">
+                            ${done ? '✅' : '🎯'} 🪙${m.toLocaleString()}
+                        </div>`;
+                    }).join('')}
+                </div>
+                ${nextMilestone ? `
+                    <div style="margin-top:12px">
+                        <div style="font-size:11px;color:var(--gray-500);margin-bottom:4px">Progress to next: 🪙${totalProfit.toLocaleString()} / ${nextMilestone.toLocaleString()}</div>
+                        <div style="background:rgba(0,0,0,0.3);border-radius:4px;height:8px;overflow:hidden">
+                            <div style="background:${theme.accent};height:100%;width:${milestoneProgress}%"></div>
                         </div>
-                        <div style="font-size:20px;font-weight:bold;color:${isLow ? 'var(--red)' : 'var(--green)'}">${have}</div>
                     </div>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px">
-                        <button class="shop-buy-btn" onclick="Business.buyIngredientFromBiz('${businessId}','${ing}',10)" 
-                            style="padding:6px 4px;font-size:10px;background:${theme.accent}" ${balance < cost10 ? 'disabled' : ''}>
-                            +10<br>🏦${cost10}
-                        </button>
-                        <button class="shop-buy-btn" onclick="Business.buyIngredientFromBiz('${businessId}','${ing}',50)" 
-                            style="padding:6px 4px;font-size:10px;background:${theme.accent}" ${balance < cost50 ? 'disabled' : ''}>
-                            +50<br>🏦${cost50}
-                        </button>
-                        <button class="shop-buy-btn" onclick="Business.buyIngredientFromBiz('${businessId}','${ing}',100)" 
-                            style="padding:6px 4px;font-size:10px;background:${theme.accent}" ${balance < cost100 ? 'disabled' : ''}>
-                            +100<br>🏦${cost100}
-                        </button>
-                    </div>
-                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
-                        <button class="shop-buy-btn" onclick="Business.buyIngredient('${businessId}','${ing}',10)" 
-                            style="padding:6px 4px;font-size:10px;background:#6b7280" ${coins < cost10 ? 'disabled' : ''}>
-                            +10<br>👛${cost10}
-                        </button>
-                        <button class="shop-buy-btn" onclick="Business.buyIngredient('${businessId}','${ing}',50)" 
-                            style="padding:6px 4px;font-size:10px;background:#6b7280" ${coins < cost50 ? 'disabled' : ''}>
-                            +50<br>👛${cost50}
-                        </button>
-                        <button class="shop-buy-btn" onclick="Business.buyIngredient('${businessId}','${ing}',100)" 
-                            style="padding:6px 4px;font-size:10px;background:#6b7280" ${coins < cost100 ? 'disabled' : ''}>
-                            +100<br>👛${cost100}
-                        </button>
-                    </div>
-                </div>`;
-        }
-        
-        html += `
-                    </div>
-                </div>
-                
-                <!-- General Upgrades Panel -->
-                <div style="background:var(--gray-800);padding:16px;border-radius:12px">
-                    <h3 style="margin-top:0">⬆️ General Upgrades</h3>
-                    <div style="display:grid;gap:8px">`;
-        
-        // Upgrade level
-        const upgradePrice = Math.floor(bizData.price * Math.pow(1.15, data.level));
-        html += `
-            <button class="shop-buy-btn" onclick="Business.buy('${businessId}')" ${coins < upgradePrice ? 'disabled' : ''} style="width:100%">
-                📈 Upgrade to Lv${data.level + 1} (🪙${upgradePrice.toLocaleString()})
-            </button>`;
-        
-        // Buy machine
-        const machinePrice = Math.floor(bizData.price * 0.5 * Math.pow(1.5, data.machines || 0));
-        html += `
-            <button class="shop-buy-btn" onclick="Business.buyMachine('${businessId}')" ${coins < machinePrice ? 'disabled' : ''} style="width:100%;background:#7c3aed">
-                🔧 Buy Machine (🪙${machinePrice.toLocaleString()})
-            </button>`;
-        
-        // Hire manager
-        if (!data.hasManager) {
-            html += `
-                <button class="shop-buy-btn" onclick="Business.hireManager('${businessId}')" ${coins < bizData.managerCost ? 'disabled' : ''} style="width:100%;background:#0ea5e9">
-                    👔 Hire Manager (🪙${bizData.managerCost.toLocaleString()})
-                </button>`;
-        }
-        
-        // Buy ad
-        const adCost = Math.floor(bizData.price * 0.1);
-        const adActive = data.adActive && data.adExpires > now;
-        html += `
-            <button class="shop-buy-btn" onclick="Business.buyAd('${businessId}')" ${adActive || coins < adCost ? 'disabled' : ''} style="width:100%;background:#f59e0b">
-                📢 ${adActive ? `Ad Active (${Math.ceil((data.adExpires - now)/60000)}m)` : `Run Ad 10min (🪙${adCost.toLocaleString()})`}
-            </button>`;
-        
-        html += `
-                    </div>
-                </div>
-                
-                <!-- Business-Specific Upgrades Panel -->
-                <div style="background:linear-gradient(135deg,${theme.bg},${theme.dark});padding:16px;border-radius:12px;border:2px solid ${theme.accent}">
-                    <h3 style="margin-top:0;color:${theme.accent}">🏪 ${bizData.name} Upgrades</h3>
-                    <div style="display:grid;gap:8px">`;
-        
-        // Business-specific upgrades
-        for (const [upId, upData] of Object.entries(bizData.upgrades || {})) {
-            const owned = ownedUpgrades[upId];
-            html += `
-                <button class="shop-buy-btn" onclick="Business.buyUpgrade('${businessId}','${upId}')" 
-                    ${owned || coins < upData.cost ? 'disabled' : ''} 
-                    style="width:100%;background:${owned ? 'var(--gray-600)' : theme.accent};text-align:left;padding:10px 12px">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div>
-                            <div style="font-weight:bold">${upData.name}</div>
-                            <div style="font-size:11px;opacity:0.8">${upData.bonus}</div>
-                        </div>
-                        <div style="font-size:12px">${owned ? '✅ Owned' : `🪙${upData.cost.toLocaleString()}`}</div>
-                    </div>
-                </button>`;
-        }
-        
-        html += `
-                    </div>
-                </div>
-            </div>`;
+                ` : '<div style="margin-top:8px;color:var(--green);font-size:12px">🎉 All milestones complete!</div>'}
+            </div>
+            
+            <!-- Study Tip -->
+            <div style="margin-top:16px;padding:12px;background:rgba(59,130,246,0.1);border-radius:8px;border:1px solid var(--blue);text-align:center">
+                <div style="font-size:13px;color:var(--blue)">💡 <b>Tip:</b> Answer questions to add +5% progress to all businesses!</div>
+            </div>
+        `;
         
         document.getElementById('businessContent').innerHTML = html;
-    },
-    
-    // Buy a business-specific upgrade
-    buyUpgrade(businessId, upgradeId) {
-        const bizData = Gamification.SHOP.businesses[businessId];
-        const upData = bizData?.upgrades?.[upgradeId];
-        if (!upData) return;
-        
-        const state = Gamification.getState();
-        const biz = state.businesses || { owned: {} };
-        const data = biz.owned[businessId];
-        if (!data) return;
-        
-        if (!data.upgrades) data.upgrades = {};
-        if (data.upgrades[upgradeId]) return; // Already owned
-        
-        if (!Gamification.spendCoins(upData.cost)) return;
-        
-        data.upgrades[upgradeId] = true;
-        state.businesses = biz;
-        Gamification.saveState(state);
-        SoundFX.play('purchase');
-        this.renderBusinessDetail(businessId);
     },
 
     render() {
@@ -8257,22 +7770,21 @@ const Business = {
         document.getElementById('businessCoins').innerHTML = '&#x1FA99; ' + coins.toLocaleString();
         
         const incomePerSec = this.getIncomePerSecond(state);
-        const studyMult = this.getStudyMultiplier(state);
         
         let html = `<div style="text-align:center;padding:12px;background:linear-gradient(135deg,#059669,#10b981);border-radius:12px;margin-bottom:16px;color:white">
             <div style="font-size:24px">💰 ${biz.totalEarned?.toLocaleString() || 0}</div>
             <div style="font-size:12px;opacity:0.8">Total Earned from Businesses</div>
             ${incomePerSec > 0 ? `<div style="margin-top:4px;font-size:14px">📈 +${incomePerSec.toFixed(2)}/sec (automated)</div>` : ''}
-            ${studyMult > 1 ? `<div style="margin-top:4px;font-size:12px;background:rgba(255,255,255,0.2);padding:4px 8px;border-radius:4px;display:inline-block">📚 Study Boost: ${studyMult.toFixed(2)}x</div>` : ''}
         </div>`;
         
-        html += '<h3>🏪 Your Businesses</h3><p style="color:var(--gray-500);font-size:12px;margin-top:-8px">Click a business to manage it • Answer questions for +5% income boost!</p><div class="shop-grid">';
+        html += '<h3>🏪 Your Businesses</h3><p style="color:var(--gray-500);font-size:12px;margin-top:-8px">Click a business to manage it • Answer questions for +5% progress!</p><div class="shop-grid">';
         
         for (const [id, bizData] of Object.entries(Gamification.SHOP.businesses)) {
             const owned = biz.owned[id];
             const level = owned?.level || 0;
             const hasManager = owned?.hasManager || false;
             const progress = owned?.progress || 0;
+            const prestige = owned?.prestige || 0;
             const price = Math.floor(bizData.price * Math.pow(1.15, level));
             const canAfford = coins >= price;
             
@@ -8282,19 +7794,7 @@ const Business = {
                 <div class="shop-item-desc">${bizData.desc}</div>`;
             
             if (level > 0) {
-                const hasIng = this.hasIngredientsFor(owned, bizData);
-                const bal = owned?.balance || 0;
-                const lowFunds = hasManager && bal < 50;
-                
-                html += `<div style="font-size:12px;color:var(--green)">Level ${level} ${hasManager ? '👔' : ''}</div>`;
-                html += `<div style="font-size:11px;color:${lowFunds ? 'var(--red)' : 'var(--blue)'}">🏦 ${bal.toLocaleString()}</div>`;
-                
-                if (!hasIng) {
-                    html += `<div style="font-size:11px;color:var(--red)">⚠️ Low supplies</div>`;
-                }
-                if (lowFunds) {
-                    html += `<div style="font-size:11px;color:var(--red)">⚠️ Low funds</div>`;
-                }
+                html += `<div style="font-size:12px;color:var(--green)">Level ${level} ${hasManager ? '👔' : ''} ${prestige > 0 ? `<span style="color:gold">⭐${prestige}</span>` : ''}</div>`;
                 
                 // Progress bar
                 html += `<div style="background:rgba(0,0,0,0.1);border-radius:4px;height:12px;margin:8px 0;overflow:hidden">
@@ -19914,7 +19414,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.26</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.27</div>
 
 </body>
 </html>
