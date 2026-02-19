@@ -3329,10 +3329,15 @@ const Gamification = {
                     }
                     st.activePetIdx = 0;
                 } else {
-                    // Clean up duplicate pets by name
+                    // Clean up duplicate pets by name AND remove unused default Buddy pets
                     const seenNames = new Set();
+                    const hasRealPet = st.pets.some(p => p && p.name !== 'Buddy');
                     st.pets = st.pets.filter(p => {
                         if (!p || !p.name) return false;
+                        // Remove default Buddy if user has other real pets and Buddy is unused
+                        if (hasRealPet && p.name === 'Buddy' && p.species === 'bird' && (p.totalXpFed || 0) < 100) {
+                            return false;
+                        }
                         const key = p.name.toLowerCase();
                         if (seenNames.has(key)) return false;
                         seenNames.add(key);
@@ -6657,7 +6662,18 @@ const Shop = {
         const sp = Gamification.PET_SPECIES[speciesId];
         if (!sp) return;
         const state = Gamification.getState();
-        const pets = state.pets || [];
+        let pets = state.pets || [];
+        
+        // Remove default "Buddy" pet if it exists and has minimal interaction
+        // This prevents the default pet from cluttering the pet list
+        pets = pets.filter(p => {
+            if (p.name === 'Buddy' && p.species === 'bird' && (p.totalXpFed || 0) < 100) {
+                return false; // Remove unused default pet
+            }
+            return true;
+        });
+        state.pets = pets;
+        
         if (pets.length >= 4) return;
         // Allow buying same species again (removed species restriction)
         if (state.level < sp.unlockLevel) return;
@@ -6687,6 +6703,8 @@ const Shop = {
             lifespan: 30 + Math.floor(Math.random() * 15) // 30-45 days lifespan
         };
         state.pets.push(newPet);
+        state.activePetIdx = state.pets.length - 1; // Make new pet active
+        state.studyBuddy = newPet;
         Gamification.saveState(state);
         SoundFX.play('purchase');
         this.render();
@@ -17650,7 +17668,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.05</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.06</div>
 
 </body>
 </html>
