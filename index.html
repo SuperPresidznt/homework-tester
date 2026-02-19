@@ -12228,37 +12228,43 @@ const SpeedMode = {
 
             // Base coins by difficulty (harder = more reward)
             const difficulty = q.difficulty || 2;
-            const difficultyMultiplier = difficulty === 3 ? 3 : difficulty === 1 ? 1 : 2; // Hard=3x, Medium=2x, Easy=1x
-            const baseCoins = 5 * difficultyMultiplier;
+            const difficultyBonus = difficulty === 3 ? 20 : difficulty === 1 ? 5 : 10; // Hard=20, Medium=10, Easy=5
+            const baseCoins = 10 + difficultyBonus; // Guaranteed 15-30 coins per correct
 
             // Calculate speed multiplier based on time remaining
             let speedMultiplier = 1;
-            if (timeRatio >= 0.8) speedMultiplier = 4;      // Super fast (80%+ time left)
-            else if (timeRatio >= 0.6) speedMultiplier = 3; // Fast (60%+ time left)
-            else if (timeRatio >= 0.4) speedMultiplier = 2; // Good (40%+ time left)
+            if (timeRatio >= 0.8) speedMultiplier = 3;      // Super fast (80%+ time left)
+            else if (timeRatio >= 0.6) speedMultiplier = 2; // Fast (60%+ time left)
+            else if (timeRatio >= 0.4) speedMultiplier = 1.5; // Good (40%+ time left)
             else speedMultiplier = 1;                        // Normal
 
-            // Streak bonus
-            if (this.streak >= 10) speedMultiplier += 2;
-            else if (this.streak >= 5) speedMultiplier += 1;
+            // Streak bonus (additive, not multiplicative for more consistent rewards)
+            let streakBonus = 0;
+            if (this.streak >= 10) streakBonus = 15;
+            else if (this.streak >= 5) streakBonus = 8;
+            else if (this.streak >= 3) streakBonus = 3;
 
-            const earnedCoins = baseCoins * speedMultiplier;
-            const multiplier = difficultyMultiplier * speedMultiplier;
+            const earnedCoins = Math.round(baseCoins * speedMultiplier) + streakBonus;
+            const scoreGain = Math.round(50 + (100 * timeRatio) + (difficulty * 25) + (this.streak * 5));
             this.coins += earnedCoins;
-            this.score += Math.round(100 * timeRatio * multiplier);
+            this.score += scoreGain;
 
             // Award actual coins
             Gamification.awardCoins(earnedCoins);
             Gamification.incrementCombo();
             SoundFX.play('correct');
 
-            // Show feedback
-            this.showFeedback(`+${earnedCoins} 🪙`, 'var(--green)', multiplier);
+            // Show feedback with difficulty label
+            const diffLabel = difficulty === 3 ? 'HARD' : difficulty === 1 ? 'Easy' : 'Med';
+            this.showFeedback(`+${earnedCoins} 🪙`, 'var(--green)', speedMultiplier, diffLabel);
         } else {
-            this.streak = 0;
+            // Wrong answer: small penalty but keep some streak momentum
+            this.streak = Math.max(0, this.streak - 2); // Lose 2 streak instead of full reset
             Gamification.resetCombo();
             SoundFX.play('incorrect');
-            this.showFeedback('Miss!', 'var(--red)', 0);
+            // Still give participation points for trying
+            this.score += 10;
+            this.showFeedback('Miss! +10', 'var(--orange)', 0);
         }
 
         // Track question
@@ -12277,16 +12283,20 @@ const SpeedMode = {
         setTimeout(() => this.nextQuestion(), isCorrect ? 800 : 1500);
     },
 
-    showFeedback(text, color, multiplier) {
+    showFeedback(text, color, multiplier, diffLabel) {
         // Remove any existing feedback first
         document.querySelectorAll('.speed-feedback-overlay').forEach(el => el.remove());
         
         const feedback = document.createElement('div');
         feedback.className = 'speed-feedback-overlay';
-        feedback.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:bold;color:${color};text-shadow:2px 2px 4px rgba(0,0,0,.3);z-index:9999;animation:speedFeedback 0.8s ease-out forwards;pointer-events:none`;
+        feedback.style.cssText = `position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:bold;color:${color};text-shadow:2px 2px 4px rgba(0,0,0,.3);z-index:9999;animation:speedFeedback 0.8s ease-out forwards;pointer-events:none;text-align:center`;
         feedback.textContent = text;
+        if (diffLabel) {
+            const diffColor = diffLabel === 'HARD' ? '#dc2626' : diffLabel === 'Easy' ? '#22c55e' : '#f59e0b';
+            feedback.innerHTML += `<div style="font-size:16px;color:${diffColor};margin-top:4px">${diffLabel} Question</div>`;
+        }
         if (multiplier > 1) {
-            feedback.innerHTML += `<div style="font-size:24px">${multiplier}x MULTIPLIER!</div>`;
+            feedback.innerHTML += `<div style="font-size:24px">${multiplier}x SPEED!</div>`;
         }
         document.body.appendChild(feedback);
         setTimeout(() => feedback.remove(), 800);
@@ -17622,7 +17632,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.02</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.03</div>
 
 </body>
 </html>
