@@ -3078,10 +3078,10 @@ const Gamification = {
             basicBed:    { name: 'Pet Bed',       price: 50,   icon: '🛏️', desc: 'Slows happiness decay 10%', comfortBonus: 0.10 },
             cozyBed:     { name: 'Cozy Bed',      price: 150,  icon: '🛋️', desc: 'Slows happiness decay 20%', comfortBonus: 0.20 },
             luxuryBed:   { name: 'Luxury Bed',    price: 400,  icon: '👑', desc: 'Slows happiness decay 35%', comfortBonus: 0.35 },
-            foodBowl:    { name: 'Food Bowl',     price: 75,   icon: '🥣', desc: 'Auto-feed when away (holds 3 meals)', capacity: 3, type: 'food' },
-            waterBowl:   { name: 'Water Bowl',    price: 60,   icon: '🫗', desc: 'Auto-hydrate when away (holds 5 drinks)', capacity: 5, type: 'water' },
-            largeFoodBowl:  { name: 'Large Food Bowl',  price: 200, icon: '🍲', desc: 'Auto-feed (holds 8 meals)', capacity: 8, type: 'food' },
-            largeWaterBowl: { name: 'Large Water Bowl', price: 150, icon: '🪣', desc: 'Auto-hydrate (holds 12 drinks)', capacity: 12, type: 'water' },
+            foodBowl:    { name: 'Food Bowl',     price: 75,   icon: '🥣', desc: 'Auto-feed when away (holds 5 meals)', capacity: 5, type: 'food' },
+            waterBowl:   { name: 'Water Bowl',    price: 60,   icon: '🫗', desc: 'Auto-hydrate when away (holds 10 drinks)', capacity: 10, type: 'water' },
+            largeFoodBowl:  { name: 'Large Food Bowl',  price: 200, icon: '🍲', desc: 'Auto-feed (holds 12 meals)', capacity: 12, type: 'food' },
+            largeWaterBowl: { name: 'Large Water Bowl', price: 150, icon: '🪣', desc: 'Auto-hydrate (holds 25 drinks)', capacity: 25, type: 'water' },
             petHouse:    { name: 'Pet House',     price: 300,  icon: '🏠', desc: 'Slows all decay 25%, +comfort', comfortBonus: 0.25, allDecay: true },
             deluxePetHouse: { name: 'Deluxe Pet House', price: 800, icon: '🏰', desc: 'Slows all decay 40%, max comfort', comfortBonus: 0.40, allDecay: true },
             toyBox:      { name: 'Toy Box',       price: 100,  icon: '🧸', desc: '+5 happiness per study session', happinessBonus: 5 },
@@ -9040,10 +9040,10 @@ const PetModal = {
                     <div class="pet-meter"><span>😊 Happiness</span><div class="pet-meter-bar"><div class="pet-meter-fill happiness" style="width:${happiness}%"></div></div><span>${Math.round(happiness)}%</span></div>
                     ${progressInfo}
                 </div>
-                <h4>💧 Water</h4>
+                <h4>💧 Water ${petCare.waterBowl?.capacity > 0 ? `<span style="font-size:11px;color:var(--gray-500)">(Bowl: ${Math.round(petCare.waterBowl.level || 0)}/${petCare.waterBowl.capacity})</span>` : ''}</h4>
                 <div style="display:flex;gap:8px;margin-bottom:12px">
-                    <button class="pet-food-btn" onclick="PetModal.giveWater()" style="flex:1" ${hydration >= 100 ? 'disabled' : ''}>💧 Give Water (+25% hydration)</button>
-                    ${petCare.waterBowl?.capacity > 0 ? `<button class="pet-food-btn" onclick="Shop.fillWaterBowl();PetModal.show()" style="flex:1" ${(petCare.waterBowl.level || 0) >= petCare.waterBowl.capacity ? 'disabled' : ''}>🫗 Fill Bowl ${Math.round(petCare.waterBowl.level || 0)}/${petCare.waterBowl.capacity}</button>` : ''}
+                    ${petCare.waterBowl?.capacity > 0 ? `<button class="pet-food-btn" onclick="PetModal.giveWater()" style="flex:1" ${hydration >= 100 || (petCare.waterBowl.level || 0) <= 0 ? 'disabled' : ''}>💧 Give Water (+15%)</button>
+                    <button class="pet-food-btn" onclick="Shop.fillWaterBowl();PetModal.show()" style="flex:1" ${(petCare.waterBowl.level || 0) >= petCare.waterBowl.capacity ? 'disabled' : ''}>🫗 Refill Bowl</button>` : `<span style="color:var(--gray-500);font-size:12px">Buy a Water Bowl from the shop to hydrate your pet!</span>`}
                 </div>
                 ${petCare.foodBowl?.capacity > 0 ? `
                 <div style="display:flex;gap:8px;margin-bottom:12px">
@@ -9168,9 +9168,18 @@ const PetModal = {
         const buddy = state.studyBuddy;
         if (!buddy || buddy.dead) return;
         
-        // Water is free - just hydrate the pet
+        // Water requires water bowl with water in it
+        const petCare = state.petCare || {};
+        if (!petCare.waterBowl || petCare.waterBowl.level <= 0) {
+            Gamification.showAchievementToast({ icon: '💧', name: 'No Water!', desc: 'Fill your water bowl first', xp: 0 });
+            return;
+        }
+        
+        // Use 1 drink from water bowl
+        petCare.waterBowl.level = Math.max(0, (petCare.waterBowl.level || 0) - 1);
+        
         const oldHydration = buddy.hydration ?? 100;
-        buddy.hydration = Math.min(100, oldHydration + 25);
+        buddy.hydration = Math.min(100, oldHydration + 15);
         buddy.lastInteraction = Date.now();
         
         // Hydrating can heal sickness
@@ -17713,7 +17722,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.08</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.09</div>
 
 </body>
 </html>
