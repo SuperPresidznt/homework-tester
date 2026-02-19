@@ -12879,69 +12879,59 @@ const SpeedMode = {
     MAX_TIME: 60,
 
     /**
-     * Get baseline time for a category from rolling last 10 attempts
-     * @param {string} category - The question category
+     * Get baseline time for a SPECIFIC QUESTION from its own history
+     * @param {string} questionId - The question ID
      * @returns {number|null} Average time in seconds, or null if no data
      */
-    getCategoryBaseline(category) {
+    getQuestionBaseline(questionId) {
         const trackerData = Store.get('questionTracker', {});
-        const times = [];
+        const qData = trackerData[questionId];
         
-        // Collect times from questions in this category
-        Object.entries(trackerData).forEach(([qId, qData]) => {
-            if (!qData.history) return;
-            // Use question's stored category or check each attempt
-            const qCategory = qData.category || 'General';
-            
-            qData.history.forEach(attempt => {
-                // Check if this attempt matches the category (from attempt or question)
-                const attemptCategory = attempt.category || qCategory;
-                // Support both timeMs (new) and time (old) fields
-                const timeMs = attempt.timeMs || attempt.time || 0;
-                
-                if (attemptCategory === category && timeMs > 0) {
-                    times.push({ time: timeMs, date: attempt.date });
-                }
-            });
-        });
+        if (!qData || !qData.history || qData.history.length === 0) return null;
+        
+        // Get times from this specific question's history
+        const times = qData.history
+            .map(attempt => attempt.timeMs || attempt.time || 0)
+            .filter(t => t > 0);
         
         if (times.length === 0) return null;
         
-        // Sort by date (most recent first) and take last 10
-        times.sort((a, b) => new Date(b.date) - new Date(a.date));
-        const recent = times.slice(0, 10);
-        
-        // Calculate average time in seconds
-        const avgMs = recent.reduce((sum, t) => sum + t.time, 0) / recent.length;
+        // Use last 5 attempts for this specific question
+        const recent = times.slice(-5);
+        const avgMs = recent.reduce((sum, t) => sum + t, 0) / recent.length;
         return Math.round(avgMs / 1000);
     },
 
     /**
-     * Calculate adaptive time limit based on category baseline and difficulty
-     * @param {string} category - The question category
+     * Calculate time limit based on question's OWN history + difficulty
+     * Each question earns its own time limit based on YOUR performance on THAT question
+     * @param {string} questionId - The question ID
      * @param {number} difficulty - 1=easy, 2=medium, 3=hard
-     * @returns {number} Time limit in seconds
+     * @returns {object} { time: seconds, isAdaptive: boolean, baseline: number|null }
      */
-    getAdaptiveTimeLimit(category, difficulty) {
-        const baseline = this.getCategoryBaseline(category);
+    getAdaptiveTimeLimit(questionId, difficulty) {
+        const baseline = this.getQuestionBaseline(questionId);
         
         if (!baseline) {
-            // No baseline data - use fallback time limits
-            if (difficulty === 1) return this.TIME_LIMITS.easy;
-            if (difficulty === 3) return this.TIME_LIMITS.hard;
-            return this.TIME_LIMITS.medium;
+            // Never seen this question - use generous default by difficulty
+            const defaultTime = difficulty === 1 ? this.TIME_LIMITS.easy 
+                              : difficulty === 3 ? this.TIME_LIMITS.hard 
+                              : this.TIME_LIMITS.medium;
+            return { time: defaultTime, isAdaptive: false, baseline: null };
         }
         
-        // Apply difficulty modifier to baseline
-        let modifier;
-        if (difficulty === 1) modifier = this.DIFFICULTY_MODIFIERS.easy;      // -10%
-        else if (difficulty === 3) modifier = this.DIFFICULTY_MODIFIERS.hard; // -35%
-        else modifier = this.DIFFICULTY_MODIFIERS.medium;                      // -20%
+        // You've answered this before - give you your average time + buffer
+        // Easy: +20% buffer, Medium: +10% buffer, Hard: no buffer (you know it)
+        let buffer;
+        if (difficulty === 1) buffer = 1.2;      // Easy: generous
+        else if (difficulty === 3) buffer = 1.0; // Hard: tight
+        else buffer = 1.1;                        // Medium: slight buffer
         
-        const adjustedTime = Math.round(baseline * (1 - modifier));
+        const adjustedTime = Math.round(baseline * buffer);
         
         // Clamp to min/max bounds
-        return Math.max(this.MIN_TIME, Math.min(this.MAX_TIME, adjustedTime));
+        const finalTime = Math.max(this.MIN_TIME, Math.min(this.MAX_TIME, adjustedTime));
+        return { time: finalTime, isAdaptive: true, baseline };
     },
 
     start(bankId) {
@@ -13034,13 +13024,14 @@ const SpeedMode = {
         this.current = this.queue.shift();
         this.selectedOption = null;
 
-        // Determine time based on category baseline and difficulty
+        // Determine time based on THIS QUESTION's history and difficulty
         const q = this.current.question;
         const difficulty = q.difficulty || 2;
-        const category = q.category || 'General';
         
-        // Use adaptive timing based on your historical performance
-        this.maxTime = this.getAdaptiveTimeLimit(category, difficulty);
+        // Use adaptive timing based on YOUR history with THIS SPECIFIC QUESTION
+        const timing = this.getAdaptiveTimeLimit(q.id, difficulty);
+        this.maxTime = timing.time;
+        this.currentTiming = timing; // Store for display
 
         this.timeRemaining = this.maxTime;
         this.renderQuestion();
@@ -13055,11 +13046,10 @@ const SpeedMode = {
         const diffColor = difficulty === 1 ? 'var(--green)' : difficulty === 3 ? 'var(--red)' : 'var(--orange)';
         const diffMultiplier = difficulty === 3 ? '3x' : difficulty === 1 ? '1x' : '2x';
         
-        // Check if using adaptive timing
-        const baseline = this.getCategoryBaseline(category);
-        const isAdaptive = baseline !== null;
-        const timingLabel = isAdaptive ? `⚡${this.maxTime}s` : `${this.maxTime}s`;
-        const timingTitle = isAdaptive ? `Based on your avg ${baseline}s in ${category}` : 'Default timing';
+        // Check if using adaptive timing (per-question based)
+        const timing = this.currentTiming || { isAdaptive: false };
+        const timingLabel = timing.isAdaptive ? `⚡${this.maxTime}s` : `${this.maxTime}s`;
+        const timingTitle = timing.isAdaptive ? `Based on your avg ${timing.baseline}s on this question` : 'First time seeing this question';
 
         const optionsHtml = q.options.map((opt, i) => `
             <button class="speed-option drill-option" onclick="SpeedMode.selectOption(${i})" data-idx="${i}">
