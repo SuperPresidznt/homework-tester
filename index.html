@@ -3418,7 +3418,15 @@ const Gamification = {
                 hunger: 100, happiness: 100, hydration: 100, lastDecayCheck: null,
                 careMinutes: 0, lastCareCheck: null, studyMinutes: 0,
                 sick: false, lastInteraction: null,
-                accessories: [], totalMealsEaten: 0
+                accessories: [], totalMealsEaten: 0,
+                // Per-pet housing/care items
+                petCare: {
+                    foodBowl: { level: 0, capacity: 0 },
+                    waterBowl: { level: 0, capacity: 0 },
+                    comfortBonus: 0,
+                    allDecayReduction: 0,
+                    housing: {} // owned housing items for this pet
+                }
             },
             pets: [],
             activePetIdx: 0,
@@ -3449,12 +3457,6 @@ const Gamification = {
                 lastTick: null,
                 studyMultiplier: 1.0,  // Bonus from answering questions
                 studyBoostExpires: null
-            },
-            petCare: {
-                foodBowl: { level: 0, capacity: 0 },
-                waterBowl: { level: 0, capacity: 0 },
-                comfortBonus: 0,
-                allDecayReduction: 0
             },
             graveyard: [],
             retiredNames: [],
@@ -6645,31 +6647,38 @@ const Shop = {
     },
 
     applyPetHousingEffects(state, id, item) {
-        state.petCare = state.petCare || { foodBowl: { level: 0, capacity: 0 }, waterBowl: { level: 0, capacity: 0 }, comfortBonus: 0, allDecayReduction: 0 };
+        // Apply to active pet's petCare, not global
+        const pet = state.studyBuddy;
+        if (!pet) return;
+        
+        pet.petCare = pet.petCare || { foodBowl: { level: 0, capacity: 0 }, waterBowl: { level: 0, capacity: 0 }, comfortBonus: 0, allDecayReduction: 0, housing: {} };
+        pet.petCare.housing = pet.petCare.housing || {};
+        pet.petCare.housing[id] = (pet.petCare.housing[id] || 0) + 1;
         
         // Food/water bowls
         if (item.type === 'food') {
-            state.petCare.foodBowl.capacity = Math.max(state.petCare.foodBowl.capacity, item.capacity);
+            pet.petCare.foodBowl.capacity = Math.max(pet.petCare.foodBowl.capacity, item.capacity);
         } else if (item.type === 'water') {
-            state.petCare.waterBowl.capacity = Math.max(state.petCare.waterBowl.capacity, item.capacity);
+            pet.petCare.waterBowl.capacity = Math.max(pet.petCare.waterBowl.capacity, item.capacity);
         }
         
         // Comfort bonus (beds, houses)
         if (item.comfortBonus) {
-            state.petCare.comfortBonus = Math.min(0.5, state.petCare.comfortBonus + item.comfortBonus);
+            pet.petCare.comfortBonus = Math.min(0.5, pet.petCare.comfortBonus + item.comfortBonus);
         }
         
         // All decay reduction (pet houses)
         if (item.allDecay && item.comfortBonus) {
-            state.petCare.allDecayReduction = Math.min(0.5, state.petCare.allDecayReduction + item.comfortBonus);
+            pet.petCare.allDecayReduction = Math.min(0.5, pet.petCare.allDecayReduction + item.comfortBonus);
         }
     },
 
     fillFoodBowl() {
         const state = Gamification.getState();
-        if (!state.petCare?.foodBowl?.capacity) return;
-        const capacity = state.petCare.foodBowl.capacity;
-        const current = state.petCare.foodBowl.level || 0;
+        const pet = state.studyBuddy;
+        if (!pet?.petCare?.foodBowl?.capacity) return;
+        const capacity = pet.petCare.foodBowl.capacity;
+        const current = pet.petCare.foodBowl.level || 0;
         const needed = capacity - current;
         if (needed <= 0) return;
         
@@ -6678,7 +6687,7 @@ const Shop = {
         const toUse = Math.min(available, needed);
         if (toUse > 0) {
             state.inventory.petFood.kibble -= toUse;
-            state.petCare.foodBowl.level = current + toUse;
+            pet.petCare.foodBowl.level = current + toUse;
             Gamification.saveState(state);
             this.render();
         }
@@ -6686,14 +6695,15 @@ const Shop = {
 
     fillWaterBowl() {
         const state = Gamification.getState();
-        if (!state.petCare?.waterBowl?.capacity) return;
-        const capacity = state.petCare.waterBowl.capacity;
-        const current = state.petCare.waterBowl.level || 0;
+        const pet = state.studyBuddy;
+        if (!pet?.petCare?.waterBowl?.capacity) return;
+        const capacity = pet.petCare.waterBowl.capacity;
+        const current = pet.petCare.waterBowl.level || 0;
         const needed = capacity - current;
         if (needed <= 0) return;
         
         // Water is free to fill
-        state.petCare.waterBowl.level = capacity;
+        pet.petCare.waterBowl.level = capacity;
         Gamification.saveState(state);
         this.render();
     },
@@ -6870,10 +6880,11 @@ const Shop = {
             html += '</div>';
         }
         
-        // Show pet care status
-        const petCare = state.petCare || {};
+        // Show pet care status for active pet
+        const activePet = state.studyBuddy;
+        const petCare = activePet?.petCare || {};
         if (petCare.foodBowl?.capacity > 0 || petCare.waterBowl?.capacity > 0) {
-            html += '<h3>🏠 Pet Care Station</h3><div class="shop-grid">';
+            html += `<h3>🏠 ${activePet.name}'s Care Station</h3><div class="shop-grid">`;
             if (petCare.foodBowl?.capacity > 0) {
                 const foodLevel = petCare.foodBowl.level || 0;
                 const foodCap = petCare.foodBowl.capacity;
@@ -9654,11 +9665,6 @@ const Garden = {
         const timeScale = Math.max(1, Gamification.PET_DECAY_TIMESCALE || 1);
         const pets = state.pets || [state.studyBuddy];
         const petCount = pets.length;
-        
-        // Get pet care bonuses
-        const petCare = state.petCare || { foodBowl: { level: 0, capacity: 0 }, waterBowl: { level: 0, capacity: 0 }, comfortBonus: 0, allDecayReduction: 0 };
-        const comfortReduction = petCare.comfortBonus || 0;
-        const allDecayReduction = petCare.allDecayReduction || 0;
 
         let anyChanged = false;
         let petsToRemove = [];
@@ -9666,6 +9672,11 @@ const Garden = {
         
         pets.forEach((pet, idx) => {
             if (pet.dead) return; // Skip dead pets
+            
+            // Get per-pet care bonuses (each pet has own bowls/housing)
+            const petCare = pet.petCare || { foodBowl: { level: 0, capacity: 0 }, waterBowl: { level: 0, capacity: 0 }, comfortBonus: 0, allDecayReduction: 0 };
+            const comfortReduction = petCare.comfortBonus || 0;
+            const allDecayReduction = petCare.allDecayReduction || 0;
             
             const baseline = pet.lastDecayCheck ?? lastActiveTs;
             const rawHours = (now - baseline) / (1000 * 60 * 60);
@@ -9689,7 +9700,7 @@ const Garden = {
                 if (Math.abs(pet.foodDecayMod - 1.0) < 0.01) pet.foodDecayMod = 1.0;
             }
             
-            // Apply comfort and decay reduction from pet housing
+            // Apply comfort and decay reduction from this pet's housing
             const hungerReduction = 1 - allDecayReduction;
             const happyReduction = 1 - Math.max(comfortReduction, allDecayReduction);
 
@@ -9698,8 +9709,8 @@ const Garden = {
             let hungerDecay = scaledHours * 4 * decayRate * hungerReduction;
             let happyDecay = scaledHours * 2.5 * decayRate * happyReduction;
             
-            // Auto-feed from food bowl while away
-            if (petCare.foodBowl.level > 0 && pet.hunger < 50) {
+            // Auto-feed from this pet's food bowl while away
+            if (petCare.foodBowl && petCare.foodBowl.level > 0 && pet.hunger < 50) {
                 const mealsNeeded = Math.ceil((50 - pet.hunger) / 10);
                 const mealsUsed = Math.min(mealsNeeded, petCare.foodBowl.level);
                 if (mealsUsed > 0) {
@@ -9711,8 +9722,8 @@ const Garden = {
             // Hydration decay (FASTER than hunger - pets get thirsty quicker)
             let hydrationDecay = scaledHours * 6 * decayRate * hungerReduction;
             
-            // Auto-hydrate from water bowl
-            if (petCare.waterBowl.level > 0 && pet.hydration < 50) {
+            // Auto-hydrate from this pet's water bowl
+            if (petCare.waterBowl && petCare.waterBowl.level > 0 && pet.hydration < 50) {
                 const drinksNeeded = Math.ceil((50 - (pet.hydration ?? 100)) / 15);
                 const drinksUsed = Math.min(drinksNeeded, petCare.waterBowl.level);
                 if (drinksUsed > 0) {
@@ -19818,7 +19829,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.20</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.21</div>
 
 </body>
 </html>
