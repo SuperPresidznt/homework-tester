@@ -15392,84 +15392,80 @@ const Progress = {
     },
 
     // Big weighted predicted grade - quick snapshot of likely test performance
-    // Uses time-decay weighting: newer attempts count more than older ones
+    // Uses CATEGORY weighting: each category contributes equally to final grade (like a real class)
     renderPredictedGrade() {
         const drillProgress = Store.get('drillProgress', {});
         const trackerData = Store.get('questionTracker', {});
         const catAccuracy = QuestionTracker.getCategoryAccuracy();
         
-        // Get all question data for time-weighted scoring
-        let totalQuestions = 0;
-        let weightedCorrect = 0;
-        let weightedTotal = 0;
         let categoryBreakdown = [];
-        let recentWeightedCorrect = 0; // Last 7 days
-        let recentWeightedTotal = 0;
+        let totalQuestions = 0;
         
+        // Build category breakdown - each category gets equal weight in final grade
+        const validCategories = [];
+        Object.entries(catAccuracy).forEach(([cat, data]) => {
+            if (data.total >= 2) { // Need at least 2 attempts to count
+                const pct = Math.round((data.correct / data.total) * 100);
+                categoryBreakdown.push({ cat, pct, total: data.total, correct: data.correct });
+                validCategories.push({ cat, pct, total: data.total });
+                totalQuestions += data.total;
+            }
+        });
+        
+        // CATEGORY-WEIGHTED SCORE: Each category contributes equally
+        // This is how real classes work - each unit/chapter has equal weight
+        let predictedScore = 0;
+        if (validCategories.length > 0) {
+            const categorySum = validCategories.reduce((sum, c) => sum + c.pct, 0);
+            predictedScore = Math.round(categorySum / validCategories.length);
+        }
+        
+        // Calculate recent trend from tracker data
         const now = Date.now();
         const dayMs = 24 * 60 * 60 * 1000;
         const weekAgo = now - (7 * dayMs);
-        const monthAgo = now - (30 * dayMs);
+        let recentCorrect = 0, recentTotal = 0;
+        let olderCorrect = 0, olderTotal = 0;
         
-        // Calculate time-weighted score from question tracker
-        // Newer data weighs more: last 7 days = 3x, last 30 days = 2x, older = 1x
         Object.entries(trackerData).forEach(([qId, data]) => {
             if (data.history && data.history.length > 0) {
-                totalQuestions++;
-                
-                // Process each attempt with time-decay weighting
                 data.history.forEach(attempt => {
                     const ts = attempt.timestamp || 0;
-                    let weight = 1; // Base weight for old data
-                    
                     if (ts > weekAgo) {
-                        weight = 3; // Recent (last 7 days) = 3x weight
-                        recentWeightedTotal += weight;
-                        if (attempt.correct) recentWeightedCorrect += weight;
-                    } else if (ts > monthAgo) {
-                        weight = 2; // Last 30 days = 2x weight
+                        recentTotal++;
+                        if (attempt.correct) recentCorrect++;
+                    } else {
+                        olderTotal++;
+                        if (attempt.correct) olderCorrect++;
                     }
-                    // Older than 30 days = 1x weight
-                    
-                    weightedTotal += weight;
-                    if (attempt.correct) weightedCorrect += weight;
                 });
             }
         });
         
-        // Build category breakdown with time-weighted accuracy
-        Object.entries(catAccuracy).forEach(([cat, data]) => {
-            if (data.total >= 2) {
-                const pct = Math.round((data.correct / data.total) * 100);
-                categoryBreakdown.push({ cat, pct, total: data.total, correct: data.correct });
-            }
-        });
+        // Calculate trend (recent 7 days vs older)
+        let recentScore = recentTotal >= 5 ? Math.round((recentCorrect / recentTotal) * 100) : null;
+        let olderScore = olderTotal >= 5 ? Math.round((olderCorrect / olderTotal) * 100) : null;
+        let trendDirection = null;
+        let trendAmount = 0;
+        if (recentScore !== null && olderScore !== null) {
+            trendAmount = recentScore - olderScore;
+            if (trendAmount > 3) trendDirection = 'up';
+            else if (trendAmount < -3) trendDirection = 'down';
+        }
         
         // Calculate mastery bonus (questions you've truly mastered boost confidence)
         const mastered = Object.values(drillProgress).filter(d => d.ef >= 2.5 && d.reps >= 3).length;
         const struggling = Object.values(drillProgress).filter(d => d.ef < 2.0).length;
-        const masteryBonus = totalQuestions > 0 ? (mastered / totalQuestions) * 5 : 0; // Up to +5%
-        const strugglePenalty = totalQuestions > 0 ? (struggling / totalQuestions) * 5 : 0; // Up to -5%
-        
-        // Base predicted score from time-weighted accuracy
-        let predictedScore = weightedTotal > 0 ? Math.round((weightedCorrect / weightedTotal) * 100) : 0;
-        
-        // Calculate recent trend (last 7 days vs overall)
-        let recentScore = recentWeightedTotal > 0 ? Math.round((recentWeightedCorrect / recentWeightedTotal) * 100) : null;
-        let trendDirection = null;
-        let trendAmount = 0;
-        if (recentScore !== null && recentWeightedTotal >= 10) { // Need at least 10 weighted attempts for trend
-            trendAmount = recentScore - predictedScore;
-            if (trendAmount > 3) trendDirection = 'up';
-            else if (trendAmount < -3) trendDirection = 'down';
-        }
+        const totalTracked = Object.keys(drillProgress).length;
+        const masteryBonus = totalTracked > 0 ? (mastered / totalTracked) * 5 : 0; // Up to +5%
+        const strugglePenalty = totalTracked > 0 ? (struggling / totalTracked) * 5 : 0; // Up to -5%
         
         // Apply mastery adjustments
         predictedScore = Math.round(predictedScore + masteryBonus - strugglePenalty);
         predictedScore = Math.max(0, Math.min(100, predictedScore));
         
         // If no data, return empty
-        if (weightedTotal === 0 && categoryBreakdown.length === 0) return '';
+        if (totalQuestions === 0 && categoryBreakdown.length === 0) return '';
         
         // Determine grade letter and color
         let grade, gradeColor, gradeEmoji, confidence;
@@ -15479,10 +15475,10 @@ const Progress = {
         else if (predictedScore >= 60) { grade = 'D'; gradeColor = '#f97316'; gradeEmoji = '⚠️'; }
         else { grade = 'F'; gradeColor = '#ef4444'; gradeEmoji = '🔴'; }
         
-        // Confidence level based on data quantity
-        if (weightedTotal >= 100) confidence = 'High';
-        else if (weightedTotal >= 50) confidence = 'Medium';
-        else if (weightedTotal >= 20) confidence = 'Low';
+        // Confidence level based on category coverage and data quantity
+        if (validCategories.length >= 5 && totalQuestions >= 50) confidence = 'High';
+        else if (validCategories.length >= 3 && totalQuestions >= 25) confidence = 'Medium';
+        else if (validCategories.length >= 2 && totalQuestions >= 10) confidence = 'Low';
         else confidence = 'Very Low';
         
         // Find weakest and strongest categories
@@ -15513,8 +15509,8 @@ const Progress = {
                                 <span style="font-size:14px;font-weight:bold">${trendAmount > 0 ? '+' : ''}${trendAmount}%</span>
                             </div>` : ''}
                         </div>
-                        <div style="font-size:14px;color:var(--gray-600)">Time-Weighted Score ${gradeEmoji}</div>
-                        <div style="font-size:11px;color:var(--gray-500);margin-top:2px">Recent data weighs 3x more</div>
+                        <div style="font-size:14px;color:var(--gray-600)">Category-Weighted Score ${gradeEmoji}</div>
+                        <div style="font-size:11px;color:var(--gray-500);margin-top:2px">${validCategories.length} categories averaged equally</div>
                         <div style="margin-top:12px;padding:10px;background:${passStatus ? '#dcfce7' : '#fef2f2'};border-radius:8px;display:inline-block">
                             <span style="font-weight:bold;color:${passStatus ? '#16a34a' : '#dc2626'}">
                                 ${passStatus ? '✅ PASSING' : '❌ NOT PASSING'}
@@ -15529,7 +15525,7 @@ const Progress = {
                     <div style="text-align:center;min-width:120px">
                         <div style="font-size:13px;color:var(--gray-500);margin-bottom:4px">Confidence</div>
                         <div style="font-size:18px;font-weight:bold;color:var(--navy)">${confidence}</div>
-                        <div style="font-size:11px;color:var(--gray-500)">${Math.round(weightedTotal / 3)} raw attempts</div>
+                        <div style="font-size:11px;color:var(--gray-500)">${totalQuestions} attempts across ${validCategories.length} categories</div>
                     </div>
                 </div>
                 
