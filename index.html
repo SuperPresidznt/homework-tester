@@ -3155,70 +3155,151 @@ const Gamification = {
                 baseIncome: 2, cycleTime: 10, managerCost: 200,
                 ingredients: { lemons: 2, sugar: 1, water: 1 },
                 ingredientCosts: { lemons: 1, sugar: 0.5, water: 0.1 },
-                baseCustomers: 5, adBoost: 1.5
+                baseCustomers: 5, adBoost: 1.5,
+                // Unique process steps for this business
+                processSteps: ['🍋 Squeeze lemons', '🧊 Add ice', '🥤 Pour & serve'],
+                theme: { bg: '#fef3c7', accent: '#f59e0b', dark: '#92400e' },
+                flavorText: 'When life gives you lemons...',
+                upgrades: {
+                    iceMachine: { name: 'Ice Machine', cost: 100, bonus: '+10% speed', effect: 'speed', value: 0.1 },
+                    umbrella: { name: 'Umbrella Stand', cost: 150, bonus: '+15% customers', effect: 'customers', value: 0.15 },
+                    signage: { name: 'Neon Sign', cost: 200, bonus: '+20% income', effect: 'income', value: 0.2 }
+                }
             },
             newspaper: { 
                 name: 'Paper Route', price: 150, icon: '📰', desc: 'Deliver the news',
                 baseIncome: 5, cycleTime: 15, managerCost: 500,
                 ingredients: { papers: 10 },
                 ingredientCosts: { papers: 0.2 },
-                baseCustomers: 10, adBoost: 1.3
+                baseCustomers: 10, adBoost: 1.3,
+                processSteps: ['📦 Bundle papers', '🚲 Load bike', '🏠 Deliver route'],
+                theme: { bg: '#f3f4f6', accent: '#6b7280', dark: '#1f2937' },
+                flavorText: 'Extra! Extra! Read all about it!',
+                upgrades: {
+                    bike: { name: 'Better Bike', cost: 300, bonus: '+15% speed', effect: 'speed', value: 0.15 },
+                    bag: { name: 'Bigger Bag', cost: 250, bonus: '+20% capacity', effect: 'capacity', value: 0.2 },
+                    route: { name: 'Premium Route', cost: 400, bonus: '+25% income', effect: 'income', value: 0.25 }
+                }
             },
             carwash: { 
                 name: 'Car Wash', price: 500, icon: '🚿', desc: 'Sparkle and shine',
                 baseIncome: 12, cycleTime: 20, managerCost: 1500,
                 ingredients: { soap: 2, water: 5, wax: 1 },
                 ingredientCosts: { soap: 1, water: 0.1, wax: 2 },
-                baseCustomers: 8, adBoost: 1.4
+                baseCustomers: 8, adBoost: 1.4,
+                processSteps: ['🧽 Pre-wash', '🧴 Soap & scrub', '💨 Rinse & dry', '✨ Wax & polish'],
+                theme: { bg: '#dbeafe', accent: '#3b82f6', dark: '#1e40af' },
+                flavorText: 'Making cars sparkle since day one!',
+                upgrades: {
+                    vacuum: { name: 'Vacuum Station', cost: 800, bonus: '+$3/car', effect: 'flat', value: 3 },
+                    dryer: { name: 'Air Dryer', cost: 1000, bonus: '+20% speed', effect: 'speed', value: 0.2 },
+                    detailing: { name: 'Detail Bay', cost: 1500, bonus: '+40% income', effect: 'income', value: 0.4 }
+                }
             },
             bakery: { 
                 name: 'Bakery', price: 1500, icon: '🥐', desc: 'Fresh baked goods',
                 baseIncome: 25, cycleTime: 30, managerCost: 4000,
                 ingredients: { flour: 3, eggs: 2, butter: 1, sugar: 1 },
                 ingredientCosts: { flour: 0.5, eggs: 0.3, butter: 1, sugar: 0.5 },
-                baseCustomers: 12, adBoost: 1.5
+                baseCustomers: 12, adBoost: 1.5,
+                processSteps: ['📝 Take orders', '🥣 Mix dough', '🔥 Bake goods', '🎀 Package & sell'],
+                theme: { bg: '#fef2f2', accent: '#f97316', dark: '#9a3412' },
+                flavorText: 'The smell of fresh bread fills the air...',
+                upgrades: {
+                    oven: { name: 'Double Oven', cost: 2000, bonus: '+25% speed', effect: 'speed', value: 0.25 },
+                    display: { name: 'Glass Display', cost: 2500, bonus: '+20% customers', effect: 'customers', value: 0.2 },
+                    recipes: { name: 'Secret Recipes', cost: 3000, bonus: '+35% income', effect: 'income', value: 0.35 }
+                }
             },
             pizzeria: { 
                 name: 'Pizzeria', price: 4000, icon: '🍕', desc: 'Slice of heaven',
                 baseIncome: 50, cycleTime: 45, managerCost: 10000,
                 ingredients: { dough: 2, cheese: 3, sauce: 2, toppings: 2 },
                 ingredientCosts: { dough: 1, cheese: 2, sauce: 1, toppings: 1.5 },
-                baseCustomers: 15, adBoost: 1.6
+                baseCustomers: 15, adBoost: 1.6,
+                processSteps: ['📞 Take order', '🫓 Toss dough', '🧀 Add toppings', '🔥 Fire oven', '📦 Box & deliver'],
+                theme: { bg: '#fef2f2', accent: '#dc2626', dark: '#7f1d1d' },
+                flavorText: 'Authentic Italian flavors!',
+                upgrades: {
+                    woodOven: { name: 'Wood Fire Oven', cost: 6000, bonus: '+30% quality', effect: 'income', value: 0.3 },
+                    delivery: { name: 'Delivery Fleet', cost: 8000, bonus: '+40% customers', effect: 'customers', value: 0.4 },
+                    franchise: { name: 'Franchise Rights', cost: 15000, bonus: '+50% income', effect: 'income', value: 0.5 }
+                }
             },
             arcade: { 
                 name: 'Arcade', price: 10000, icon: '🕹️', desc: 'Fun and games',
                 baseIncome: 100, cycleTime: 60, managerCost: 25000,
                 ingredients: { tokens: 50, prizes: 10 },
                 ingredientCosts: { tokens: 0.1, prizes: 2 },
-                baseCustomers: 20, adBoost: 1.4
+                baseCustomers: 20, adBoost: 1.4,
+                processSteps: ['🎮 Power up machines', '🪙 Sell tokens', '🎯 Run games', '🎁 Award prizes'],
+                theme: { bg: '#fdf4ff', accent: '#a855f7', dark: '#581c87' },
+                flavorText: 'Insert coin to continue...',
+                upgrades: {
+                    vr: { name: 'VR Zone', cost: 15000, bonus: '+35% income', effect: 'income', value: 0.35 },
+                    snacks: { name: 'Snack Bar', cost: 12000, bonus: '+$20/cycle', effect: 'flat', value: 20 },
+                    tournament: { name: 'Tournament Setup', cost: 20000, bonus: '+50% customers', effect: 'customers', value: 0.5 }
+                }
             },
             gym: { 
                 name: 'Gym', price: 25000, icon: '🏋️', desc: 'Fitness empire',
                 baseIncome: 200, cycleTime: 90, managerCost: 60000,
                 ingredients: { towels: 20, supplements: 5 },
                 ingredientCosts: { towels: 0.5, supplements: 3 },
-                baseCustomers: 25, adBoost: 1.3
+                baseCustomers: 25, adBoost: 1.3,
+                processSteps: ['🚿 Open facility', '💪 Train members', '🥤 Sell supplements', '🧹 Clean up'],
+                theme: { bg: '#ecfdf5', accent: '#10b981', dark: '#065f46' },
+                flavorText: 'No pain, no gain!',
+                upgrades: {
+                    sauna: { name: 'Sauna Room', cost: 30000, bonus: '+25% retention', effect: 'customers', value: 0.25 },
+                    classes: { name: 'Group Classes', cost: 35000, bonus: '+40% income', effect: 'income', value: 0.4 },
+                    pool: { name: 'Swimming Pool', cost: 50000, bonus: '+60% value', effect: 'income', value: 0.6 }
+                }
             },
             hotel: { 
                 name: 'Hotel', price: 75000, icon: '🏨', desc: '5-star service',
                 baseIncome: 500, cycleTime: 120, managerCost: 180000,
                 ingredients: { linens: 10, toiletries: 20, food: 15 },
                 ingredientCosts: { linens: 2, toiletries: 1, food: 3 },
-                baseCustomers: 30, adBoost: 1.5
+                baseCustomers: 30, adBoost: 1.5,
+                processSteps: ['🛎️ Check-in guests', '🛏️ Prepare rooms', '🍽️ Room service', '🧹 Housekeeping', '👋 Check-out'],
+                theme: { bg: '#fffbeb', accent: '#eab308', dark: '#854d0e' },
+                flavorText: 'Where luxury meets comfort.',
+                upgrades: {
+                    spa: { name: 'Spa & Wellness', cost: 100000, bonus: '+45% income', effect: 'income', value: 0.45 },
+                    restaurant: { name: '5-Star Restaurant', cost: 120000, bonus: '+$100/cycle', effect: 'flat', value: 100 },
+                    penthouse: { name: 'Penthouse Suite', cost: 200000, bonus: '+80% premium', effect: 'income', value: 0.8 }
+                }
             },
             techStartup: { 
                 name: 'Tech Startup', price: 200000, icon: '💻', desc: 'Disrupt the market',
                 baseIncome: 1500, cycleTime: 180, managerCost: 500000,
                 ingredients: { servers: 2, coffee: 50, devTools: 5 },
                 ingredientCosts: { servers: 100, coffee: 0.5, devTools: 20 },
-                baseCustomers: 50, adBoost: 2.0
+                baseCustomers: 50, adBoost: 2.0,
+                processSteps: ['☕ Morning standup', '💻 Sprint coding', '🐛 Bug fixes', '🚀 Deploy release', '📊 Analyze metrics'],
+                theme: { bg: '#f0fdf4', accent: '#22c55e', dark: '#166534' },
+                flavorText: 'Move fast and ship things!',
+                upgrades: {
+                    ai: { name: 'AI Integration', cost: 300000, bonus: '+50% efficiency', effect: 'speed', value: 0.5 },
+                    funding: { name: 'Series A Funding', cost: 400000, bonus: '+100% scale', effect: 'income', value: 1.0 },
+                    ipo: { name: 'IPO Prep', cost: 750000, bonus: '+200% valuation', effect: 'income', value: 2.0 }
+                }
             },
             spacePort: { 
                 name: 'Space Port', price: 1000000, icon: '🛸', desc: 'To the stars!',
                 baseIncome: 5000, cycleTime: 300, managerCost: 2500000,
                 ingredients: { fuel: 100, parts: 20, permits: 5 },
                 ingredientCosts: { fuel: 10, parts: 50, permits: 100 },
-                baseCustomers: 10, adBoost: 3.0
+                baseCustomers: 10, adBoost: 3.0,
+                processSteps: ['🔧 Pre-flight check', '⛽ Fuel rockets', '👨‍🚀 Board passengers', '🚀 Launch!', '🌍 Return & land'],
+                theme: { bg: '#0f172a', accent: '#6366f1', dark: '#1e1b4b' },
+                flavorText: 'The final frontier awaits...',
+                upgrades: {
+                    orbital: { name: 'Orbital Station', cost: 2000000, bonus: '+100% capacity', effect: 'customers', value: 1.0 },
+                    mars: { name: 'Mars Route', cost: 5000000, bonus: '+300% income', effect: 'income', value: 3.0 },
+                    colony: { name: 'Moon Colony', cost: 10000000, bonus: '+500% empire', effect: 'income', value: 5.0 }
+                }
             }
         },
         plotExpansion: { name: 'Garden Plot', price: 100, icon: '🟫', desc: 'Unlock 1 additional garden plot' }
@@ -7275,10 +7356,23 @@ const Business = {
                 }
             }
             if (data.balance === undefined) data.balance = 0;
+            if (!data.upgrades) data.upgrades = {};
             
-            const cycleTime = bizData.cycleTime / (1 + (data.machines || 0) * 0.2);
+            // Calculate upgrade bonuses
+            let speedBonus = 0, incomeBonus = 0, flatBonus = 0;
+            for (const [upId, upData] of Object.entries(bizData.upgrades || {})) {
+                if (data.upgrades[upId]) {
+                    if (upData.effect === 'speed') speedBonus += upData.value;
+                    if (upData.effect === 'income') incomeBonus += upData.value;
+                    if (upData.effect === 'flat') flatBonus += upData.value;
+                }
+            }
+            
+            const machineSpeed = 1 + (data.machines || 0) * 0.2;
+            const totalSpeedMult = machineSpeed * (1 + speedBonus);
+            const cycleTime = bizData.cycleTime / totalSpeedMult;
             const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
-            const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
+            const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult * (1 + incomeBonus) + flatBonus;
             
             // Manager auto-buys ingredients from business balance if low
             if (data.hasManager) {
@@ -7630,25 +7724,48 @@ const Business = {
             return;
         }
         
+        // Calculate upgrade bonuses
+        const ownedUpgrades = data.upgrades || {};
+        let speedBonus = 0, incomeBonus = 0, flatBonus = 0, customerBonus = 0;
+        for (const [upId, upData] of Object.entries(bizData.upgrades || {})) {
+            if (ownedUpgrades[upId]) {
+                if (upData.effect === 'speed') speedBonus += upData.value;
+                if (upData.effect === 'income') incomeBonus += upData.value;
+                if (upData.effect === 'flat') flatBonus += upData.value;
+                if (upData.effect === 'customers') customerBonus += upData.value;
+            }
+        }
+        
         const studyMult = this.getStudyMultiplier(state);
         const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
-        const cycleTime = bizData.cycleTime / (1 + (data.machines || 0) * 0.2);
-        const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
+        const machineSpeed = 1 + (data.machines || 0) * 0.2;
+        const totalSpeedMult = machineSpeed * (1 + speedBonus);
+        const cycleTime = bizData.cycleTime / totalSpeedMult;
+        const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult * (1 + incomeBonus) + flatBonus;
         const ingredientCost = this.getIngredientCost(bizData, 1);
         const profit = Math.max(0, baseIncome - ingredientCost);
         
         const balance = data.balance || 0;
         const lowFunds = data.hasManager && balance < 50;
+        const theme = bizData.theme || { bg: '#1f2937', accent: '#3b82f6', dark: '#1e3a8a' };
+        const progress = data.progress || 0;
+        const currentStep = Math.min(Math.floor(progress / (100 / (bizData.processSteps?.length || 1))), (bizData.processSteps?.length || 1) - 1);
         
         let html = `
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-                <button class="shop-buy-btn" onclick="Business.closeBusiness()" style="padding:8px 12px">← Back</button>
-                <span style="font-size:32px">${bizData.icon}</span>
-                <div>
-                    <h2 style="margin:0">${bizData.name}</h2>
-                    <div style="color:var(--gray-500)">Level ${data.level}</div>
+            <!-- Themed Header -->
+            <div style="background:linear-gradient(135deg,${theme.bg},${theme.dark});padding:20px;border-radius:16px;margin-bottom:16px;border:2px solid ${theme.accent}">
+                <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+                    <button class="shop-buy-btn" onclick="Business.closeBusiness()" style="padding:8px 12px;background:rgba(0,0,0,0.3)">← Back</button>
+                    <span style="font-size:48px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.3))">${bizData.icon}</span>
+                    <div style="flex:1">
+                        <h2 style="margin:0;color:${theme.accent};text-shadow:0 2px 4px rgba(0,0,0,0.3)">${bizData.name}</h2>
+                        <div style="color:rgba(255,255,255,0.7);font-size:12px">Level ${data.level} • ${bizData.flavorText || bizData.desc}</div>
+                    </div>
+                    <div style="text-align:right">
+                        <div style="font-size:11px;color:rgba(255,255,255,0.6)">Your Wallet</div>
+                        <div style="font-size:20px;font-weight:bold">👛 ${coins.toLocaleString()}</div>
+                    </div>
                 </div>
-                <span style="margin-left:auto;font-size:18px">👛 ${coins.toLocaleString()}</span>
             </div>
             
             <!-- Business Account Panel -->
@@ -7677,39 +7794,51 @@ const Business = {
                 </div>
             </div>
             
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+            <!-- Process Steps Visualization -->
+            <div style="background:var(--gray-800);padding:16px;border-radius:12px;margin-bottom:16px">
+                <h3 style="margin-top:0">⚙️ Production Process</h3>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px">
+                    ${(bizData.processSteps || ['Work']).map((step, i) => `
+                        <div style="padding:8px 12px;border-radius:8px;font-size:12px;
+                            background:${i < currentStep ? theme.accent : i === currentStep ? 'linear-gradient(135deg,' + theme.accent + ',' + theme.dark + ')' : 'rgba(0,0,0,0.3)'};
+                            color:${i <= currentStep ? 'white' : 'var(--gray-500)'};
+                            border:2px solid ${i === currentStep ? 'white' : 'transparent'};
+                            ${i === currentStep ? 'animation:pulse 1s infinite;box-shadow:0 0 12px ' + theme.accent : ''}">
+                            ${step}
+                        </div>
+                    `).join('<span style="color:var(--gray-500)">→</span>')}
+                </div>
+                <div style="background:rgba(0,0,0,0.3);border-radius:8px;height:28px;overflow:hidden;position:relative">
+                    <div style="background:linear-gradient(90deg,${theme.accent},${theme.dark});height:100%;width:${progress}%;transition:width 0.3s"></div>
+                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-weight:bold;text-shadow:0 1px 2px rgba(0,0,0,0.5)">${Math.floor(progress)}%</div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:12px;justify-content:center">
+                    ${!data.hasManager ? `
+                        <button class="shop-buy-btn" onclick="Business.work('${businessId}')" style="background:${theme.accent}">
+                            👆 Work (+10%)
+                        </button>
+                    ` : '<span style="color:var(--gray-500);font-size:12px">👔 Manager running automatically</span>'}
+                    ${progress >= 100 ? `
+                        <button class="shop-buy-btn" onclick="Business.collect('${businessId}')" style="background:var(--green);animation:pulse 1s infinite">
+                            💰 Collect 🪙${profit.toFixed(0)}
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
                 <!-- Stats Panel -->
                 <div style="background:var(--gray-800);padding:16px;border-radius:12px">
                     <h3 style="margin-top:0">📊 Stats</h3>
-                    <div style="font-size:14px;line-height:1.8">
+                    <div style="font-size:13px;line-height:1.9">
                         <div>💰 Profit/cycle: <b style="color:var(--green)">🪙${profit.toFixed(1)}</b></div>
-                        <div>⏱️ Cycle time: <b>${cycleTime.toFixed(1)}s</b></div>
+                        <div>⏱️ Cycle time: <b>${cycleTime.toFixed(1)}s</b> ${speedBonus > 0 ? `<span style="color:${theme.accent}">(+${Math.round(speedBonus*100)}% from upgrades)</span>` : ''}</div>
                         <div>🔧 Machines: <b>${data.machines || 0}</b> (+${((data.machines || 0) * 20)}% speed)</div>
                         <div>📢 Ad boost: <b style="color:${adMult > 1 ? 'var(--green)' : 'var(--gray-500)'}">${adMult > 1 ? `${adMult}x (${Math.ceil((data.adExpires - now)/60000)}m left)` : 'None'}</b></div>
                         <div>📚 Study bonus: <b style="color:${studyMult > 1 ? 'var(--blue)' : 'var(--gray-500)'}">${studyMult > 1 ? `${studyMult.toFixed(2)}x` : 'None'}</b></div>
                         <div>👔 Manager: <b style="color:${data.hasManager ? 'var(--green)' : 'var(--red)'}">${data.hasManager ? 'Yes (Auto)' : 'No'}</b></div>
+                        ${incomeBonus > 0 ? `<div>📈 Income bonus: <b style="color:${theme.accent}">+${Math.round(incomeBonus*100)}%</b></div>` : ''}
                     </div>
-                </div>
-                
-                <!-- Progress Panel -->
-                <div style="background:var(--gray-800);padding:16px;border-radius:12px">
-                    <h3 style="margin-top:0">🏭 Production</h3>
-                    <div style="background:rgba(0,0,0,0.2);border-radius:8px;height:24px;margin:12px 0;overflow:hidden">
-                        <div style="background:linear-gradient(90deg,var(--blue),var(--green));height:100%;width:${data.progress || 0}%;transition:width 0.3s"></div>
-                    </div>
-                    <div style="text-align:center;margin-bottom:12px">${Math.floor(data.progress || 0)}%</div>
-                    
-                    ${!data.hasManager ? `
-                        <button class="shop-buy-btn" onclick="Business.work('${businessId}')" style="width:100%;margin-bottom:8px;background:var(--blue)">
-                            👆 Work (+10%)
-                        </button>
-                    ` : ''}
-                    
-                    ${data.progress >= 100 ? `
-                        <button class="shop-buy-btn" onclick="Business.collect('${businessId}')" style="width:100%;background:var(--green)">
-                            💰 Collect 🪙${profit.toFixed(0)}
-                        </button>
-                    ` : ''}
                 </div>
                 
                 <!-- Inventory Panel -->
@@ -7734,9 +7863,9 @@ const Business = {
                     </div>
                 </div>
                 
-                <!-- Upgrades Panel -->
+                <!-- General Upgrades Panel -->
                 <div style="background:var(--gray-800);padding:16px;border-radius:12px">
-                    <h3 style="margin-top:0">⬆️ Upgrades</h3>
+                    <h3 style="margin-top:0">⬆️ General Upgrades</h3>
                     <div style="display:grid;gap:8px">`;
         
         // Upgrade level
@@ -7772,9 +7901,58 @@ const Business = {
         html += `
                     </div>
                 </div>
+                
+                <!-- Business-Specific Upgrades Panel -->
+                <div style="background:linear-gradient(135deg,${theme.bg},${theme.dark});padding:16px;border-radius:12px;border:2px solid ${theme.accent}">
+                    <h3 style="margin-top:0;color:${theme.accent}">🏪 ${bizData.name} Upgrades</h3>
+                    <div style="display:grid;gap:8px">`;
+        
+        // Business-specific upgrades
+        for (const [upId, upData] of Object.entries(bizData.upgrades || {})) {
+            const owned = ownedUpgrades[upId];
+            html += `
+                <button class="shop-buy-btn" onclick="Business.buyUpgrade('${businessId}','${upId}')" 
+                    ${owned || coins < upData.cost ? 'disabled' : ''} 
+                    style="width:100%;background:${owned ? 'var(--gray-600)' : theme.accent};text-align:left;padding:10px 12px">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <div>
+                            <div style="font-weight:bold">${upData.name}</div>
+                            <div style="font-size:11px;opacity:0.8">${upData.bonus}</div>
+                        </div>
+                        <div style="font-size:12px">${owned ? '✅ Owned' : `🪙${upData.cost.toLocaleString()}`}</div>
+                    </div>
+                </button>`;
+        }
+        
+        html += `
+                    </div>
+                </div>
             </div>`;
         
         document.getElementById('businessContent').innerHTML = html;
+    },
+    
+    // Buy a business-specific upgrade
+    buyUpgrade(businessId, upgradeId) {
+        const bizData = Gamification.SHOP.businesses[businessId];
+        const upData = bizData?.upgrades?.[upgradeId];
+        if (!upData) return;
+        
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        if (!data.upgrades) data.upgrades = {};
+        if (data.upgrades[upgradeId]) return; // Already owned
+        
+        if (!Gamification.spendCoins(upData.cost)) return;
+        
+        data.upgrades[upgradeId] = true;
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.renderBusinessDetail(businessId);
     },
 
     render() {
@@ -18273,7 +18451,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.14</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.15</div>
 
 </body>
 </html>
