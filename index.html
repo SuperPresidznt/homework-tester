@@ -10848,6 +10848,12 @@ const StudyAnalytics = {
             byDayOfWeek[date.getDay()] += mins;
         });
         
+        // Add current session time to today
+        if (Session.startTime && Session.activeSeconds > 0) {
+            const today = new Date();
+            byDayOfWeek[today.getDay()] += Math.round(Session.activeSeconds / 60);
+        }
+        
         const maxMins = Math.max(...byDayOfWeek, 1);
         return days.map((day, i) => ({
             day,
@@ -19812,7 +19818,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.19</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.20</div>
 
 </body>
 </html>
