@@ -3150,16 +3150,76 @@ const Gamification = {
             spaceship:  { name: 'Spaceship',    price: 50000, icon: '🚀', desc: 'To infinity!', tier: 7 }
         },
         businesses: {
-            lemonade:   { name: 'Lemonade Stand',  price: 50,    icon: '🍋', desc: 'A humble beginning', baseIncome: 0.1, cycleTime: 60, managerCost: 100 },
-            newspaper:  { name: 'Paper Route',     price: 150,   icon: '📰', desc: 'Deliver the news', baseIncome: 0.3, cycleTime: 120, managerCost: 300 },
-            carwash:    { name: 'Car Wash',        price: 500,   icon: '🚿', desc: 'Sparkle and shine', baseIncome: 1, cycleTime: 180, managerCost: 1000 },
-            bakery:     { name: 'Bakery',          price: 1500,  icon: '🥐', desc: 'Fresh baked goods', baseIncome: 3, cycleTime: 300, managerCost: 3000 },
-            pizzeria:   { name: 'Pizzeria',        price: 4000,  icon: '🍕', desc: 'Slice of heaven', baseIncome: 8, cycleTime: 600, managerCost: 8000 },
-            arcade:     { name: 'Arcade',          price: 10000, icon: '🕹️', desc: 'Fun and games', baseIncome: 20, cycleTime: 900, managerCost: 20000 },
-            gym:        { name: 'Gym',             price: 25000, icon: '🏋️', desc: 'Fitness empire', baseIncome: 50, cycleTime: 1200, managerCost: 50000 },
-            hotel:      { name: 'Hotel',           price: 75000, icon: '🏨', desc: '5-star service', baseIncome: 150, cycleTime: 1800, managerCost: 150000 },
-            techStartup:{ name: 'Tech Startup',    price: 200000,icon: '💻', desc: 'Disrupt the market', baseIncome: 500, cycleTime: 3600, managerCost: 400000 },
-            spacePort:  { name: 'Space Port',      price: 1000000,icon: '🛸', desc: 'To the stars!', baseIncome: 2500, cycleTime: 7200, managerCost: 2000000 }
+            lemonade: { 
+                name: 'Lemonade Stand', price: 50, icon: '🍋', desc: 'A humble beginning',
+                baseIncome: 2, cycleTime: 10, managerCost: 200,
+                ingredients: { lemons: 2, sugar: 1, water: 1 },
+                ingredientCosts: { lemons: 1, sugar: 0.5, water: 0.1 },
+                baseCustomers: 5, adBoost: 1.5
+            },
+            newspaper: { 
+                name: 'Paper Route', price: 150, icon: '📰', desc: 'Deliver the news',
+                baseIncome: 5, cycleTime: 15, managerCost: 500,
+                ingredients: { papers: 10 },
+                ingredientCosts: { papers: 0.2 },
+                baseCustomers: 10, adBoost: 1.3
+            },
+            carwash: { 
+                name: 'Car Wash', price: 500, icon: '🚿', desc: 'Sparkle and shine',
+                baseIncome: 12, cycleTime: 20, managerCost: 1500,
+                ingredients: { soap: 2, water: 5, wax: 1 },
+                ingredientCosts: { soap: 1, water: 0.1, wax: 2 },
+                baseCustomers: 8, adBoost: 1.4
+            },
+            bakery: { 
+                name: 'Bakery', price: 1500, icon: '🥐', desc: 'Fresh baked goods',
+                baseIncome: 25, cycleTime: 30, managerCost: 4000,
+                ingredients: { flour: 3, eggs: 2, butter: 1, sugar: 1 },
+                ingredientCosts: { flour: 0.5, eggs: 0.3, butter: 1, sugar: 0.5 },
+                baseCustomers: 12, adBoost: 1.5
+            },
+            pizzeria: { 
+                name: 'Pizzeria', price: 4000, icon: '🍕', desc: 'Slice of heaven',
+                baseIncome: 50, cycleTime: 45, managerCost: 10000,
+                ingredients: { dough: 2, cheese: 3, sauce: 2, toppings: 2 },
+                ingredientCosts: { dough: 1, cheese: 2, sauce: 1, toppings: 1.5 },
+                baseCustomers: 15, adBoost: 1.6
+            },
+            arcade: { 
+                name: 'Arcade', price: 10000, icon: '🕹️', desc: 'Fun and games',
+                baseIncome: 100, cycleTime: 60, managerCost: 25000,
+                ingredients: { tokens: 50, prizes: 10 },
+                ingredientCosts: { tokens: 0.1, prizes: 2 },
+                baseCustomers: 20, adBoost: 1.4
+            },
+            gym: { 
+                name: 'Gym', price: 25000, icon: '🏋️', desc: 'Fitness empire',
+                baseIncome: 200, cycleTime: 90, managerCost: 60000,
+                ingredients: { towels: 20, supplements: 5 },
+                ingredientCosts: { towels: 0.5, supplements: 3 },
+                baseCustomers: 25, adBoost: 1.3
+            },
+            hotel: { 
+                name: 'Hotel', price: 75000, icon: '🏨', desc: '5-star service',
+                baseIncome: 500, cycleTime: 120, managerCost: 180000,
+                ingredients: { linens: 10, toiletries: 20, food: 15 },
+                ingredientCosts: { linens: 2, toiletries: 1, food: 3 },
+                baseCustomers: 30, adBoost: 1.5
+            },
+            techStartup: { 
+                name: 'Tech Startup', price: 200000, icon: '💻', desc: 'Disrupt the market',
+                baseIncome: 1500, cycleTime: 180, managerCost: 500000,
+                ingredients: { servers: 2, coffee: 50, devTools: 5 },
+                ingredientCosts: { servers: 100, coffee: 0.5, devTools: 20 },
+                baseCustomers: 50, adBoost: 2.0
+            },
+            spacePort: { 
+                name: 'Space Port', price: 1000000, icon: '🛸', desc: 'To the stars!',
+                baseIncome: 5000, cycleTime: 300, managerCost: 2500000,
+                ingredients: { fuel: 100, parts: 20, permits: 5 },
+                ingredientCosts: { fuel: 10, parts: 50, permits: 100 },
+                baseCustomers: 10, adBoost: 3.0
+            }
         },
         plotExpansion: { name: 'Garden Plot', price: 100, icon: '🟫', desc: 'Unlock 1 additional garden plot' }
     },
@@ -3211,9 +3271,11 @@ const Gamification = {
             },
             housing: { current: null, owned: [], conditions: {}, lastDecayCheck: null, laborers: 0 },
             businesses: {
-                owned: {},          // { businessId: { level: 1, hasManager: false, progress: 0, lastCollect: null } }
+                owned: {},          // { businessId: { level: 1, hasManager: false, progress: 0, inventory: {}, adActive: false, adExpires: null, machines: 0 } }
                 totalEarned: 0,
-                lastTick: null
+                lastTick: null,
+                studyMultiplier: 1.0,  // Bonus from answering questions
+                studyBoostExpires: null
             },
             petCare: {
                 foodBowl: { level: 0, capacity: 0 },
@@ -3604,6 +3666,9 @@ const Gamification = {
     // Increment combo
     incrementCombo() {
         if (!this.isEnabled()) return;
+        
+        // Trigger business study boost on correct answer
+        Business.onCorrectAnswer();
 
         const state = this.getState();
         state.combo.current++;
@@ -7145,13 +7210,46 @@ const House = {
 };
 
 // =====================================================================
-// IDLE BUSINESS SYSTEM
+// IDLE BUSINESS SYSTEM - Enhanced with ingredients, machines, ads, study bonus
 // =====================================================================
 const Business = {
+    _tickInterval: null,
+    _currentBusiness: null,
+    
+    init() {
+        // Start passive ticking every 5 seconds for managed businesses
+        if (!this._tickInterval) {
+            this._tickInterval = setInterval(() => this.tick(), 5000);
+        }
+    },
+    
     show() {
-        this.tick(); // Update before showing
+        this.tick();
         this.render();
         showScreen('business');
+    },
+    
+    // Called when user answers a question correctly - small business boost
+    onCorrectAnswer() {
+        const state = Gamification.getState();
+        const biz = state.businesses || {};
+        const now = Date.now();
+        
+        // Add 5% multiplier, stacks up to 2x, lasts 5 minutes
+        biz.studyMultiplier = Math.min(2.0, (biz.studyMultiplier || 1.0) + 0.05);
+        biz.studyBoostExpires = now + 5 * 60 * 1000; // 5 minutes
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+    },
+    
+    getStudyMultiplier(state) {
+        const biz = state.businesses || {};
+        const now = Date.now();
+        if (biz.studyBoostExpires && biz.studyBoostExpires > now) {
+            return biz.studyMultiplier || 1.0;
+        }
+        return 1.0;
     },
 
     tick() {
@@ -7160,31 +7258,51 @@ const Business = {
         const now = Date.now();
         
         if (!biz.lastTick) biz.lastTick = now;
-        const elapsed = (now - biz.lastTick) / 1000; // seconds
+        const elapsed = (now - biz.lastTick) / 1000;
+        if (elapsed < 1) return; // Don't tick too fast
         
+        const studyMult = this.getStudyMultiplier(state);
         let totalCollected = 0;
         
         for (const [id, data] of Object.entries(biz.owned || {})) {
             const bizData = Gamification.SHOP.businesses[id];
             if (!bizData) continue;
             
-            const cycleTime = bizData.cycleTime;
-            const income = bizData.baseIncome * (data.level || 1);
+            // Initialize inventory if needed
+            if (!data.inventory) {
+                data.inventory = {};
+                for (const ing of Object.keys(bizData.ingredients || {})) {
+                    data.inventory[ing] = 10; // Start with some stock
+                }
+            }
             
-            if (data.hasManager) {
-                // Auto-collect: calculate cycles completed while away
+            const cycleTime = bizData.cycleTime / (1 + (data.machines || 0) * 0.2); // Machines speed up
+            const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
+            const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
+            
+            // Check if has ingredients for a cycle
+            const hasIngredients = this.hasIngredientsFor(data, bizData);
+            
+            if (data.hasManager && hasIngredients) {
+                // Auto-run with manager
                 const cycles = Math.floor(elapsed / cycleTime);
                 if (cycles > 0) {
-                    const earned = cycles * income;
-                    totalCollected += earned;
+                    // Consume ingredients and earn
+                    const actualCycles = this.consumeIngredients(data, bizData, cycles);
+                    if (actualCycles > 0) {
+                        const ingredientCost = this.getIngredientCost(bizData, actualCycles);
+                        const profit = Math.max(0, actualCycles * baseIncome - ingredientCost);
+                        totalCollected += profit;
+                    }
                     data.progress = ((elapsed % cycleTime) / cycleTime) * 100;
                 } else {
                     data.progress = Math.min(100, (data.progress || 0) + (elapsed / cycleTime) * 100);
                 }
-            } else {
+            } else if (hasIngredients) {
                 // Manual: just update progress
                 data.progress = Math.min(100, (data.progress || 0) + (elapsed / cycleTime) * 100);
             }
+            // No ingredients = no progress
         }
         
         if (totalCollected > 0) {
@@ -7196,6 +7314,64 @@ const Business = {
         state.businesses = biz;
         Gamification.saveState(state);
     },
+    
+    hasIngredientsFor(data, bizData) {
+        if (!bizData.ingredients) return true;
+        for (const [ing, needed] of Object.entries(bizData.ingredients)) {
+            if ((data.inventory?.[ing] || 0) < needed) return false;
+        }
+        return true;
+    },
+    
+    consumeIngredients(data, bizData, maxCycles) {
+        if (!bizData.ingredients) return maxCycles;
+        let possible = maxCycles;
+        for (const [ing, needed] of Object.entries(bizData.ingredients)) {
+            const have = data.inventory?.[ing] || 0;
+            possible = Math.min(possible, Math.floor(have / needed));
+        }
+        if (possible > 0) {
+            for (const [ing, needed] of Object.entries(bizData.ingredients)) {
+                data.inventory[ing] -= possible * needed;
+            }
+        }
+        return possible;
+    },
+    
+    getIngredientCost(bizData, cycles) {
+        if (!bizData.ingredientCosts) return 0;
+        let total = 0;
+        for (const [ing, cost] of Object.entries(bizData.ingredientCosts)) {
+            total += cost * (bizData.ingredients[ing] || 0) * cycles;
+        }
+        return total;
+    },
+
+    // Manual work - click to progress without manager
+    work(businessId) {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        const bizData = Gamification.SHOP.businesses[businessId];
+        if (!this.hasIngredientsFor(data, bizData)) {
+            alert('Not enough ingredients! Buy supplies first.');
+            return;
+        }
+        
+        // Each click = 10% progress
+        data.progress = Math.min(100, (data.progress || 0) + 10);
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('click');
+        
+        if (this._currentBusiness === businessId) {
+            this.renderBusinessDetail(businessId);
+        } else {
+            this.render();
+        }
+    },
 
     collect(businessId) {
         const state = Gamification.getState();
@@ -7204,16 +7380,34 @@ const Business = {
         if (!data || data.progress < 100) return;
         
         const bizData = Gamification.SHOP.businesses[businessId];
-        const income = Math.floor(bizData.baseIncome * (data.level || 1));
+        const now = Date.now();
+        const studyMult = this.getStudyMultiplier(state);
+        const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
+        const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
         
-        state.coins = (state.coins || 0) + income;
-        biz.totalEarned = (biz.totalEarned || 0) + income;
+        // Consume ingredients for 1 cycle
+        if (!this.hasIngredientsFor(data, bizData)) {
+            alert('Not enough ingredients!');
+            return;
+        }
+        this.consumeIngredients(data, bizData, 1);
+        
+        const ingredientCost = this.getIngredientCost(bizData, 1);
+        const profit = Math.max(1, Math.floor(baseIncome - ingredientCost));
+        
+        state.coins = (state.coins || 0) + profit;
+        biz.totalEarned = (biz.totalEarned || 0) + profit;
         data.progress = 0;
         
         state.businesses = biz;
         Gamification.saveState(state);
         SoundFX.play('coin');
-        this.render();
+        
+        if (this._currentBusiness === businessId) {
+            this.renderBusinessDetail(businessId);
+        } else {
+            this.render();
+        }
     },
 
     buy(businessId) {
@@ -7223,14 +7417,21 @@ const Business = {
         const state = Gamification.getState();
         const biz = state.businesses || { owned: {}, totalEarned: 0 };
         
-        // Calculate price (increases with level)
         const currentLevel = biz.owned[businessId]?.level || 0;
         const price = Math.floor(bizData.price * Math.pow(1.15, currentLevel));
         
         if (!Gamification.spendCoins(price)) return;
         
         if (!biz.owned[businessId]) {
-            biz.owned[businessId] = { level: 1, hasManager: false, progress: 0 };
+            // Initialize new business with starter inventory
+            const inventory = {};
+            for (const ing of Object.keys(bizData.ingredients || {})) {
+                inventory[ing] = 10;
+            }
+            biz.owned[businessId] = { 
+                level: 1, hasManager: false, progress: 0,
+                inventory, machines: 0, adActive: false, adExpires: null
+            };
         } else {
             biz.owned[businessId].level++;
         }
@@ -7256,19 +7457,236 @@ const Business = {
         state.businesses = biz;
         Gamification.saveState(state);
         SoundFX.play('purchase');
-        this.render();
+        
+        if (this._currentBusiness === businessId) {
+            this.renderBusinessDetail(businessId);
+        } else {
+            this.render();
+        }
+    },
+    
+    buyIngredient(businessId, ingredient, amount) {
+        const bizData = Gamification.SHOP.businesses[businessId];
+        if (!bizData || !bizData.ingredientCosts) return;
+        
+        const cost = Math.ceil(bizData.ingredientCosts[ingredient] * amount * 1.2); // 20% markup
+        const state = Gamification.getState();
+        
+        if (!Gamification.spendCoins(cost)) return;
+        
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data.inventory) data.inventory = {};
+        data.inventory[ingredient] = (data.inventory[ingredient] || 0) + amount;
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.renderBusinessDetail(businessId);
+    },
+    
+    buyMachine(businessId) {
+        const bizData = Gamification.SHOP.businesses[businessId];
+        if (!bizData) return;
+        
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        const machineCount = data.machines || 0;
+        const price = Math.floor(bizData.price * 0.5 * Math.pow(1.5, machineCount));
+        
+        if (!Gamification.spendCoins(price)) return;
+        
+        data.machines = machineCount + 1;
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.renderBusinessDetail(businessId);
+    },
+    
+    buyAd(businessId) {
+        const bizData = Gamification.SHOP.businesses[businessId];
+        if (!bizData) return;
+        
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        const adCost = Math.floor(bizData.price * 0.1);
+        if (!Gamification.spendCoins(adCost)) return;
+        
+        data.adActive = true;
+        data.adExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.renderBusinessDetail(businessId);
     },
 
     getIncomePerSecond(state) {
         const biz = state.businesses || { owned: {} };
+        const studyMult = this.getStudyMultiplier(state);
+        const now = Date.now();
         let total = 0;
+        
         for (const [id, data] of Object.entries(biz.owned || {})) {
             const bizData = Gamification.SHOP.businesses[id];
             if (!bizData || !data.hasManager) continue;
-            const income = bizData.baseIncome * (data.level || 1);
-            total += income / bizData.cycleTime;
+            if (!this.hasIngredientsFor(data, bizData)) continue;
+            
+            const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
+            const cycleTime = bizData.cycleTime / (1 + (data.machines || 0) * 0.2);
+            const income = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
+            const ingredientCost = this.getIngredientCost(bizData, 1);
+            const profit = Math.max(0, income - ingredientCost);
+            total += profit / cycleTime;
         }
         return total;
+    },
+    
+    openBusiness(businessId) {
+        this._currentBusiness = businessId;
+        this.renderBusinessDetail(businessId);
+    },
+    
+    closeBusiness() {
+        this._currentBusiness = null;
+        this.render();
+    },
+    
+    renderBusinessDetail(businessId) {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        const bizData = Gamification.SHOP.businesses[businessId];
+        const coins = state.coins || 0;
+        const now = Date.now();
+        
+        if (!data || !bizData) {
+            this.render();
+            return;
+        }
+        
+        const studyMult = this.getStudyMultiplier(state);
+        const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
+        const cycleTime = bizData.cycleTime / (1 + (data.machines || 0) * 0.2);
+        const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
+        const ingredientCost = this.getIngredientCost(bizData, 1);
+        const profit = Math.max(0, baseIncome - ingredientCost);
+        
+        let html = `
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                <button class="shop-buy-btn" onclick="Business.closeBusiness()" style="padding:8px 12px">← Back</button>
+                <span style="font-size:32px">${bizData.icon}</span>
+                <div>
+                    <h2 style="margin:0">${bizData.name}</h2>
+                    <div style="color:var(--gray-500)">Level ${data.level}</div>
+                </div>
+                <span style="margin-left:auto;font-size:18px">🪙 ${coins.toLocaleString()}</span>
+            </div>
+            
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+                <!-- Stats Panel -->
+                <div style="background:var(--gray-800);padding:16px;border-radius:12px">
+                    <h3 style="margin-top:0">📊 Stats</h3>
+                    <div style="font-size:14px;line-height:1.8">
+                        <div>💰 Profit/cycle: <b style="color:var(--green)">🪙${profit.toFixed(1)}</b></div>
+                        <div>⏱️ Cycle time: <b>${cycleTime.toFixed(1)}s</b></div>
+                        <div>🔧 Machines: <b>${data.machines || 0}</b> (+${((data.machines || 0) * 20)}% speed)</div>
+                        <div>📢 Ad boost: <b style="color:${adMult > 1 ? 'var(--green)' : 'var(--gray-500)'}">${adMult > 1 ? `${adMult}x (${Math.ceil((data.adExpires - now)/60000)}m left)` : 'None'}</b></div>
+                        <div>📚 Study bonus: <b style="color:${studyMult > 1 ? 'var(--blue)' : 'var(--gray-500)'}">${studyMult > 1 ? `${studyMult.toFixed(2)}x` : 'None'}</b></div>
+                        <div>👔 Manager: <b style="color:${data.hasManager ? 'var(--green)' : 'var(--red)'}">${data.hasManager ? 'Yes (Auto)' : 'No'}</b></div>
+                    </div>
+                </div>
+                
+                <!-- Progress Panel -->
+                <div style="background:var(--gray-800);padding:16px;border-radius:12px">
+                    <h3 style="margin-top:0">🏭 Production</h3>
+                    <div style="background:rgba(0,0,0,0.2);border-radius:8px;height:24px;margin:12px 0;overflow:hidden">
+                        <div style="background:linear-gradient(90deg,var(--blue),var(--green));height:100%;width:${data.progress || 0}%;transition:width 0.3s"></div>
+                    </div>
+                    <div style="text-align:center;margin-bottom:12px">${Math.floor(data.progress || 0)}%</div>
+                    
+                    ${!data.hasManager ? `
+                        <button class="shop-buy-btn" onclick="Business.work('${businessId}')" style="width:100%;margin-bottom:8px;background:var(--blue)">
+                            👆 Work (+10%)
+                        </button>
+                    ` : ''}
+                    
+                    ${data.progress >= 100 ? `
+                        <button class="shop-buy-btn" onclick="Business.collect('${businessId}')" style="width:100%;background:var(--green)">
+                            💰 Collect 🪙${profit.toFixed(0)}
+                        </button>
+                    ` : ''}
+                </div>
+                
+                <!-- Inventory Panel -->
+                <div style="background:var(--gray-800);padding:16px;border-radius:12px">
+                    <h3 style="margin-top:0">📦 Inventory</h3>
+                    <div style="display:grid;gap:8px">`;
+        
+        for (const [ing, needed] of Object.entries(bizData.ingredients || {})) {
+            const have = data.inventory?.[ing] || 0;
+            const cost = Math.ceil(bizData.ingredientCosts[ing] * 10 * 1.2);
+            const isLow = have < needed * 3;
+            html += `
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;${isLow ? 'border:1px solid var(--red)' : ''}">
+                    <span>${ing}: <b style="color:${isLow ? 'var(--red)' : 'var(--green)'}">${have}</b> <span style="color:var(--gray-500)">(need ${needed}/cycle)</span></span>
+                    <button class="shop-buy-btn" onclick="Business.buyIngredient('${businessId}','${ing}',10)" style="padding:4px 8px;font-size:11px" ${coins < cost ? 'disabled' : ''}>
+                        +10 (🪙${cost})
+                    </button>
+                </div>`;
+        }
+        
+        html += `
+                    </div>
+                </div>
+                
+                <!-- Upgrades Panel -->
+                <div style="background:var(--gray-800);padding:16px;border-radius:12px">
+                    <h3 style="margin-top:0">⬆️ Upgrades</h3>
+                    <div style="display:grid;gap:8px">`;
+        
+        // Upgrade level
+        const upgradePrice = Math.floor(bizData.price * Math.pow(1.15, data.level));
+        html += `
+            <button class="shop-buy-btn" onclick="Business.buy('${businessId}')" ${coins < upgradePrice ? 'disabled' : ''} style="width:100%">
+                📈 Upgrade to Lv${data.level + 1} (🪙${upgradePrice.toLocaleString()})
+            </button>`;
+        
+        // Buy machine
+        const machinePrice = Math.floor(bizData.price * 0.5 * Math.pow(1.5, data.machines || 0));
+        html += `
+            <button class="shop-buy-btn" onclick="Business.buyMachine('${businessId}')" ${coins < machinePrice ? 'disabled' : ''} style="width:100%;background:#7c3aed">
+                🔧 Buy Machine (🪙${machinePrice.toLocaleString()})
+            </button>`;
+        
+        // Hire manager
+        if (!data.hasManager) {
+            html += `
+                <button class="shop-buy-btn" onclick="Business.hireManager('${businessId}')" ${coins < bizData.managerCost ? 'disabled' : ''} style="width:100%;background:#0ea5e9">
+                    👔 Hire Manager (🪙${bizData.managerCost.toLocaleString()})
+                </button>`;
+        }
+        
+        // Buy ad
+        const adCost = Math.floor(bizData.price * 0.1);
+        const adActive = data.adActive && data.adExpires > now;
+        html += `
+            <button class="shop-buy-btn" onclick="Business.buyAd('${businessId}')" ${adActive || coins < adCost ? 'disabled' : ''} style="width:100%;background:#f59e0b">
+                📢 ${adActive ? `Ad Active (${Math.ceil((data.adExpires - now)/60000)}m)` : `Run Ad 10min (🪙${adCost.toLocaleString()})`}
+            </button>`;
+        
+        html += `
+                    </div>
+                </div>
+            </div>`;
+        
+        document.getElementById('businessContent').innerHTML = html;
     },
 
     render() {
@@ -7279,14 +7697,16 @@ const Business = {
         document.getElementById('businessCoins').innerHTML = '&#x1FA99; ' + coins.toLocaleString();
         
         const incomePerSec = this.getIncomePerSecond(state);
+        const studyMult = this.getStudyMultiplier(state);
         
         let html = `<div style="text-align:center;padding:12px;background:linear-gradient(135deg,#059669,#10b981);border-radius:12px;margin-bottom:16px;color:white">
             <div style="font-size:24px">💰 ${biz.totalEarned?.toLocaleString() || 0}</div>
             <div style="font-size:12px;opacity:0.8">Total Earned from Businesses</div>
             ${incomePerSec > 0 ? `<div style="margin-top:4px;font-size:14px">📈 +${incomePerSec.toFixed(2)}/sec (automated)</div>` : ''}
+            ${studyMult > 1 ? `<div style="margin-top:4px;font-size:12px;background:rgba(255,255,255,0.2);padding:4px 8px;border-radius:4px;display:inline-block">📚 Study Boost: ${studyMult.toFixed(2)}x</div>` : ''}
         </div>`;
         
-        html += '<h3>🏪 Your Businesses</h3><div class="shop-grid">';
+        html += '<h3>🏪 Your Businesses</h3><p style="color:var(--gray-500);font-size:12px;margin-top:-8px">Click a business to manage it • Answer questions for +5% income boost!</p><div class="shop-grid">';
         
         for (const [id, bizData] of Object.entries(Gamification.SHOP.businesses)) {
             const owned = biz.owned[id];
@@ -7294,42 +7714,29 @@ const Business = {
             const hasManager = owned?.hasManager || false;
             const progress = owned?.progress || 0;
             const price = Math.floor(bizData.price * Math.pow(1.15, level));
-            const income = bizData.baseIncome * Math.max(1, level);
             const canAfford = coins >= price;
-            const canAffordManager = coins >= bizData.managerCost;
             
-            html += `<div class="shop-item" style="position:relative">
+            html += `<div class="shop-item" style="position:relative;cursor:${level > 0 ? 'pointer' : 'default'}" ${level > 0 ? `onclick="Business.openBusiness('${id}')"` : ''}>
                 <div class="shop-item-icon">${bizData.icon}</div>
                 <div class="shop-item-name">${bizData.name}</div>
                 <div class="shop-item-desc">${bizData.desc}</div>`;
             
             if (level > 0) {
-                html += `<div style="font-size:12px;color:var(--green)">Level ${level} • 🪙${income.toFixed(1)}/${bizData.cycleTime}s</div>`;
+                const hasIng = this.hasIngredientsFor(owned, bizData);
+                html += `<div style="font-size:12px;color:var(--green)">Level ${level} ${hasManager ? '👔' : ''}</div>`;
+                
+                if (!hasIng) {
+                    html += `<div style="font-size:11px;color:var(--red)">⚠️ Low supplies</div>`;
+                }
                 
                 // Progress bar
                 html += `<div style="background:rgba(0,0,0,0.1);border-radius:4px;height:12px;margin:8px 0;overflow:hidden">
                     <div style="background:${progress >= 100 ? 'var(--green)' : 'var(--blue)'};height:100%;width:${progress}%;transition:width 0.3s"></div>
                 </div>`;
                 
-                if (progress >= 100 && !hasManager) {
-                    html += `<button class="shop-buy-btn" style="background:var(--green)" onclick="Business.collect('${id}')">Collect 🪙${income.toFixed(0)}</button>`;
-                } else if (hasManager) {
-                    html += `<div style="font-size:11px;color:var(--green)">👔 Manager (Auto)</div>`;
-                }
-                
-                // Upgrade button
-                html += `<button class="shop-buy-btn" onclick="Business.buy('${id}')" ${!canAfford ? 'disabled' : ''} style="margin-top:4px">
-                    Upgrade &#x1FA99;${price.toLocaleString()}
-                </button>`;
-                
-                // Hire manager
-                if (!hasManager) {
-                    html += `<button class="shop-buy-btn" onclick="Business.hireManager('${id}')" ${!canAffordManager ? 'disabled' : ''} style="margin-top:4px;background:#7c3aed">
-                        👔 Manager &#x1FA99;${bizData.managerCost.toLocaleString()}
-                    </button>`;
-                }
+                html += `<div style="font-size:11px;color:var(--gray-500)">Click to manage →</div>`;
             } else {
-                html += `<button class="shop-buy-btn" onclick="Business.buy('${id}')" ${!canAfford ? 'disabled' : ''}>
+                html += `<button class="shop-buy-btn" onclick="event.stopPropagation();Business.buy('${id}')" ${!canAfford ? 'disabled' : ''}>
                     Buy &#x1FA99;${price.toLocaleString()}
                 </button>`;
             }
@@ -7342,6 +7749,9 @@ const Business = {
         document.getElementById('businessContent').innerHTML = html;
     }
 };
+
+// Initialize business ticking on load
+document.addEventListener('DOMContentLoaded', () => Business.init());
 
 // =====================================================================
 // BATTLE SYSTEM (PVE Story Campaign)
@@ -17768,7 +18178,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.12</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.13</div>
 
 </body>
 </html>
