@@ -3271,7 +3271,7 @@ const Gamification = {
             },
             housing: { current: null, owned: [], conditions: {}, lastDecayCheck: null, laborers: 0 },
             businesses: {
-                owned: {},          // { businessId: { level: 1, hasManager: false, progress: 0, inventory: {}, adActive: false, adExpires: null, machines: 0 } }
+                owned: {},          // { businessId: { level: 1, hasManager: false, progress: 0, inventory: {}, adActive: false, adExpires: null, machines: 0, balance: 0 } }
                 totalEarned: 0,
                 lastTick: null,
                 studyMultiplier: 1.0,  // Bonus from answering questions
@@ -7262,37 +7262,41 @@ const Business = {
         if (elapsed < 1) return; // Don't tick too fast
         
         const studyMult = this.getStudyMultiplier(state);
-        let totalCollected = 0;
         
         for (const [id, data] of Object.entries(biz.owned || {})) {
             const bizData = Gamification.SHOP.businesses[id];
             if (!bizData) continue;
             
-            // Initialize inventory if needed
+            // Initialize inventory and balance if needed
             if (!data.inventory) {
                 data.inventory = {};
                 for (const ing of Object.keys(bizData.ingredients || {})) {
-                    data.inventory[ing] = 10; // Start with some stock
+                    data.inventory[ing] = 10;
                 }
             }
+            if (data.balance === undefined) data.balance = 0;
             
-            const cycleTime = bizData.cycleTime / (1 + (data.machines || 0) * 0.2); // Machines speed up
+            const cycleTime = bizData.cycleTime / (1 + (data.machines || 0) * 0.2);
             const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
             const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult;
             
-            // Check if has ingredients for a cycle
+            // Manager auto-buys ingredients from business balance if low
+            if (data.hasManager) {
+                this.managerAutoBuy(data, bizData);
+            }
+            
             const hasIngredients = this.hasIngredientsFor(data, bizData);
             
             if (data.hasManager && hasIngredients) {
-                // Auto-run with manager
                 const cycles = Math.floor(elapsed / cycleTime);
                 if (cycles > 0) {
-                    // Consume ingredients and earn
                     const actualCycles = this.consumeIngredients(data, bizData, cycles);
                     if (actualCycles > 0) {
                         const ingredientCost = this.getIngredientCost(bizData, actualCycles);
                         const profit = Math.max(0, actualCycles * baseIncome - ingredientCost);
-                        totalCollected += profit;
+                        // Profit goes to business balance, not player coins
+                        data.balance = (data.balance || 0) + Math.floor(profit);
+                        biz.totalEarned = (biz.totalEarned || 0) + Math.floor(profit);
                     }
                     data.progress = ((elapsed % cycleTime) / cycleTime) * 100;
                 } else {
@@ -7302,17 +7306,32 @@ const Business = {
                 // Manual: just update progress
                 data.progress = Math.min(100, (data.progress || 0) + (elapsed / cycleTime) * 100);
             }
-            // No ingredients = no progress
-        }
-        
-        if (totalCollected > 0) {
-            state.coins = (state.coins || 0) + Math.floor(totalCollected);
-            biz.totalEarned = (biz.totalEarned || 0) + Math.floor(totalCollected);
+            // No ingredients = no progress (manager waits for funds)
         }
         
         biz.lastTick = now;
         state.businesses = biz;
         Gamification.saveState(state);
+    },
+    
+    // Manager auto-buys ingredients when stock is low, using business balance
+    managerAutoBuy(data, bizData) {
+        if (!bizData.ingredients || !data.hasManager) return;
+        
+        for (const [ing, needed] of Object.entries(bizData.ingredients)) {
+            const have = data.inventory?.[ing] || 0;
+            // Buy if less than 5 cycles worth
+            if (have < needed * 5) {
+                const buyAmount = needed * 10; // Buy 10 cycles worth
+                const cost = Math.ceil(bizData.ingredientCosts[ing] * buyAmount * 1.2);
+                
+                if ((data.balance || 0) >= cost) {
+                    data.balance -= cost;
+                    data.inventory[ing] = (data.inventory[ing] || 0) + buyAmount;
+                }
+                // If not enough balance, manager waits (doesn't buy)
+            }
+        }
     },
     
     hasIngredientsFor(data, bizData) {
@@ -7395,7 +7414,8 @@ const Business = {
         const ingredientCost = this.getIngredientCost(bizData, 1);
         const profit = Math.max(1, Math.floor(baseIncome - ingredientCost));
         
-        state.coins = (state.coins || 0) + profit;
+        // Manual collect goes to business balance (you can withdraw later)
+        data.balance = (data.balance || 0) + profit;
         biz.totalEarned = (biz.totalEarned || 0) + profit;
         data.progress = 0;
         
@@ -7408,6 +7428,44 @@ const Business = {
         } else {
             this.render();
         }
+    },
+    
+    // Deposit coins from player wallet to business account
+    deposit(businessId, amount) {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        amount = Math.min(amount, state.coins || 0);
+        if (amount <= 0) return;
+        
+        state.coins -= amount;
+        data.balance = (data.balance || 0) + amount;
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('coin');
+        this.renderBusinessDetail(businessId);
+    },
+    
+    // Withdraw coins from business account to player wallet
+    withdraw(businessId, amount) {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        amount = Math.min(amount, data.balance || 0);
+        if (amount <= 0) return;
+        
+        data.balance -= amount;
+        state.coins = (state.coins || 0) + amount;
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('coin');
+        this.renderBusinessDetail(businessId);
     },
 
     buy(businessId) {
@@ -7430,7 +7488,8 @@ const Business = {
             }
             biz.owned[businessId] = { 
                 level: 1, hasManager: false, progress: 0,
-                inventory, machines: 0, adActive: false, adExpires: null
+                inventory, machines: 0, adActive: false, adExpires: null,
+                balance: 20 // Start with some working capital
             };
         } else {
             biz.owned[businessId].level++;
@@ -7578,6 +7637,9 @@ const Business = {
         const ingredientCost = this.getIngredientCost(bizData, 1);
         const profit = Math.max(0, baseIncome - ingredientCost);
         
+        const balance = data.balance || 0;
+        const lowFunds = data.hasManager && balance < 50;
+        
         let html = `
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
                 <button class="shop-buy-btn" onclick="Business.closeBusiness()" style="padding:8px 12px">← Back</button>
@@ -7586,7 +7648,33 @@ const Business = {
                     <h2 style="margin:0">${bizData.name}</h2>
                     <div style="color:var(--gray-500)">Level ${data.level}</div>
                 </div>
-                <span style="margin-left:auto;font-size:18px">🪙 ${coins.toLocaleString()}</span>
+                <span style="margin-left:auto;font-size:18px">👛 ${coins.toLocaleString()}</span>
+            </div>
+            
+            <!-- Business Account Panel -->
+            <div style="background:linear-gradient(135deg,#1e3a5f,#2d5a87);padding:16px;border-radius:12px;margin-bottom:16px;${lowFunds ? 'border:2px solid var(--red)' : ''}">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+                    <div>
+                        <div style="font-size:12px;color:rgba(255,255,255,0.7)">Business Account</div>
+                        <div style="font-size:28px;font-weight:bold;color:white">🏦 ${balance.toLocaleString()}</div>
+                        ${lowFunds ? '<div style="font-size:11px;color:var(--red)">⚠️ Low funds - manager waiting</div>' : ''}
+                        ${data.hasManager ? '<div style="font-size:11px;color:rgba(255,255,255,0.6)">Manager auto-buys supplies from here</div>' : ''}
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="shop-buy-btn" onclick="Business.deposit('${businessId}',50)" ${coins < 50 ? 'disabled' : ''} style="background:#059669">
+                            ➕ Deposit 50
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.deposit('${businessId}',${coins})" ${coins < 1 ? 'disabled' : ''} style="background:#059669">
+                            ➕ All (${coins})
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.withdraw('${businessId}',50)" ${balance < 50 ? 'disabled' : ''} style="background:#dc2626">
+                            ➖ Withdraw 50
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.withdraw('${businessId}',${balance})" ${balance < 1 ? 'disabled' : ''} style="background:#dc2626">
+                            ➖ All (${balance})
+                        </button>
+                    </div>
+                </div>
             </div>
             
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
@@ -7723,10 +7811,17 @@ const Business = {
             
             if (level > 0) {
                 const hasIng = this.hasIngredientsFor(owned, bizData);
+                const bal = owned?.balance || 0;
+                const lowFunds = hasManager && bal < 50;
+                
                 html += `<div style="font-size:12px;color:var(--green)">Level ${level} ${hasManager ? '👔' : ''}</div>`;
+                html += `<div style="font-size:11px;color:${lowFunds ? 'var(--red)' : 'var(--blue)'}">🏦 ${bal.toLocaleString()}</div>`;
                 
                 if (!hasIng) {
                     html += `<div style="font-size:11px;color:var(--red)">⚠️ Low supplies</div>`;
+                }
+                if (lowFunds) {
+                    html += `<div style="font-size:11px;color:var(--red)">⚠️ Low funds</div>`;
                 }
                 
                 // Progress bar
@@ -18178,7 +18273,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.13</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.14</div>
 
 </body>
 </html>
