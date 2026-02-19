@@ -8734,8 +8734,8 @@ const Garden = {
                 }
             }
             
-            // Hydration decay (similar rate to hunger)
-            let hydrationDecay = scaledHours * 3.5 * decayRate * hungerReduction;
+            // Hydration decay (FASTER than hunger - pets get thirsty quicker)
+            let hydrationDecay = scaledHours * 6 * decayRate * hungerReduction;
             
             // Auto-hydrate from water bowl
             if (petCare.waterBowl.level > 0 && pet.hydration < 50) {
@@ -17713,7 +17713,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.07</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.08</div>
 
 </body>
 </html>
