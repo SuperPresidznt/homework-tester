@@ -14960,7 +14960,7 @@ const Progress = {
             const gamStats = this.renderGamificationStats();
             console.log('[Progress] renderGamificationStats returned:', gamStats ? gamStats.length + ' chars' : 'empty');
             
-            const allContent = this.renderInsights() + gamStats + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderStudyTimeVsScore() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
+            const allContent = this.renderPredictedGrade() + this.renderInsights() + gamStats + this.renderOverallStats() + this.renderScoreTrend() + this.renderAccuracyOverTime() + this.renderStudyTimeVsScore() + this.renderTestHistory() + this.renderMostMissed() + this.renderCategoryAccuracy() + this.renderCategoryTimeBreakdown() + this.renderCategoryPerformance() + this.renderMasteryProgress() + this.renderStudyTime();
             
             console.log('[Progress] Total content length:', allContent.length);
             
@@ -14985,6 +14985,150 @@ const Progress = {
             console.error('[Progress] Error rendering:', err);
             content.innerHTML = `<div style="padding:20px;color:red">Error loading metrics: ${err.message}</div>`;
         }
+    },
+
+    // Big weighted predicted grade - quick snapshot of likely test performance
+    renderPredictedGrade() {
+        const drillProgress = Store.get('drillProgress', {});
+        const trackerData = Store.get('questionTracker', {});
+        const catAccuracy = QuestionTracker.getCategoryAccuracy();
+        
+        // Get all question data for weighting
+        let totalQuestions = 0;
+        let weightedCorrect = 0;
+        let weightedTotal = 0;
+        let categoryBreakdown = [];
+        
+        // Calculate weighted score from question tracker (most accurate source)
+        Object.entries(trackerData).forEach(([qId, data]) => {
+            if (data.history && data.history.length > 0) {
+                totalQuestions++;
+                // Weight recent attempts more heavily
+                const recentAttempts = data.history.slice(-5);
+                const correctCount = recentAttempts.filter(a => a.correct).length;
+                const weight = recentAttempts.length;
+                weightedCorrect += correctCount;
+                weightedTotal += weight;
+            }
+        });
+        
+        // Also factor in category accuracy with question counts as weights
+        Object.entries(catAccuracy).forEach(([cat, data]) => {
+            if (data.total >= 2) {
+                const pct = Math.round((data.correct / data.total) * 100);
+                categoryBreakdown.push({ cat, pct, total: data.total, correct: data.correct });
+            }
+        });
+        
+        // Calculate mastery bonus (questions you've truly mastered boost confidence)
+        const mastered = Object.values(drillProgress).filter(d => d.ef >= 2.5 && d.reps >= 3).length;
+        const struggling = Object.values(drillProgress).filter(d => d.ef < 2.0).length;
+        const masteryBonus = totalQuestions > 0 ? (mastered / totalQuestions) * 5 : 0; // Up to +5%
+        const strugglePenalty = totalQuestions > 0 ? (struggling / totalQuestions) * 5 : 0; // Up to -5%
+        
+        // Base predicted score from weighted accuracy
+        let predictedScore = weightedTotal > 0 ? Math.round((weightedCorrect / weightedTotal) * 100) : 0;
+        
+        // Apply mastery adjustments
+        predictedScore = Math.round(predictedScore + masteryBonus - strugglePenalty);
+        predictedScore = Math.max(0, Math.min(100, predictedScore));
+        
+        // If no data, return empty
+        if (weightedTotal === 0 && categoryBreakdown.length === 0) return '';
+        
+        // Determine grade letter and color
+        let grade, gradeColor, gradeEmoji, confidence;
+        if (predictedScore >= 90) { grade = 'A'; gradeColor = '#22c55e'; gradeEmoji = '🌟'; }
+        else if (predictedScore >= 80) { grade = 'B'; gradeColor = '#3b82f6'; gradeEmoji = '✅'; }
+        else if (predictedScore >= 70) { grade = 'C'; gradeColor = '#f59e0b'; gradeEmoji = '📊'; }
+        else if (predictedScore >= 60) { grade = 'D'; gradeColor = '#f97316'; gradeEmoji = '⚠️'; }
+        else { grade = 'F'; gradeColor = '#ef4444'; gradeEmoji = '🔴'; }
+        
+        // Confidence level based on data quantity
+        if (weightedTotal >= 100) confidence = 'High';
+        else if (weightedTotal >= 50) confidence = 'Medium';
+        else if (weightedTotal >= 20) confidence = 'Low';
+        else confidence = 'Very Low';
+        
+        // Find weakest and strongest categories
+        categoryBreakdown.sort((a, b) => a.pct - b.pct);
+        const weakest = categoryBreakdown.slice(0, 3);
+        const strongest = categoryBreakdown.slice(-3).reverse();
+        
+        // Pass/Fail indicator (assuming 70% passing)
+        const passingScore = 70;
+        const passStatus = predictedScore >= passingScore;
+        const pointsFromPass = predictedScore - passingScore;
+        
+        return `
+            <div class="progress-section" style="background:linear-gradient(135deg,${gradeColor}15,${gradeColor}05);border:2px solid ${gradeColor};padding:24px;margin-bottom:24px">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px">
+                    <!-- Main Grade Display -->
+                    <div style="text-align:center;min-width:150px">
+                        <div style="font-size:72px;font-weight:bold;color:${gradeColor};line-height:1">${grade}</div>
+                        <div style="font-size:14px;color:var(--gray-600);margin-top:4px">Predicted Grade</div>
+                    </div>
+                    
+                    <!-- Score & Details -->
+                    <div style="flex:1;min-width:200px">
+                        <div style="font-size:48px;font-weight:bold;color:var(--navy)">${predictedScore}%</div>
+                        <div style="font-size:14px;color:var(--gray-600)">Weighted Score ${gradeEmoji}</div>
+                        <div style="margin-top:12px;padding:10px;background:${passStatus ? '#dcfce7' : '#fef2f2'};border-radius:8px;display:inline-block">
+                            <span style="font-weight:bold;color:${passStatus ? '#16a34a' : '#dc2626'}">
+                                ${passStatus ? '✅ PASSING' : '❌ NOT PASSING'}
+                            </span>
+                            <span style="color:var(--gray-600);margin-left:8px;font-size:13px">
+                                (${pointsFromPass >= 0 ? '+' : ''}${pointsFromPass} from 70%)
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Confidence Meter -->
+                    <div style="text-align:center;min-width:120px">
+                        <div style="font-size:13px;color:var(--gray-500);margin-bottom:4px">Confidence</div>
+                        <div style="font-size:18px;font-weight:bold;color:var(--navy)">${confidence}</div>
+                        <div style="font-size:11px;color:var(--gray-500)">${weightedTotal} attempts</div>
+                    </div>
+                </div>
+                
+                <!-- Progress Bar to 100% -->
+                <div style="margin-top:20px">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-600);margin-bottom:4px">
+                        <span>0%</span>
+                        <span style="color:${passStatus ? 'var(--green)' : 'var(--red)'};font-weight:bold">Pass: 70%</span>
+                        <span>100%</span>
+                    </div>
+                    <div style="background:var(--gray-200);border-radius:8px;height:24px;position:relative;overflow:hidden">
+                        <div style="position:absolute;left:70%;top:0;bottom:0;width:2px;background:var(--gray-400);z-index:1"></div>
+                        <div style="background:linear-gradient(90deg,${gradeColor},${gradeColor}cc);height:100%;width:${predictedScore}%;border-radius:8px;transition:width 0.5s"></div>
+                    </div>
+                </div>
+                
+                <!-- Quick Category Summary -->
+                ${categoryBreakdown.length > 0 ? `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px">
+                    ${weakest.length > 0 ? `
+                    <div style="background:rgba(239,68,68,0.1);padding:12px;border-radius:8px">
+                        <div style="font-size:12px;font-weight:bold;color:var(--red);margin-bottom:8px">🔴 Focus Areas</div>
+                        ${weakest.map(c => `<div style="font-size:13px;display:flex;justify-content:space-between;margin-bottom:4px">
+                            <span style="color:var(--gray-700)">${escapeHtml(c.cat)}</span>
+                            <span style="font-weight:bold;color:var(--red)">${c.pct}%</span>
+                        </div>`).join('')}
+                    </div>` : ''}
+                    ${strongest.length > 0 ? `
+                    <div style="background:rgba(34,197,94,0.1);padding:12px;border-radius:8px">
+                        <div style="font-size:12px;font-weight:bold;color:var(--green);margin-bottom:8px">🟢 Strengths</div>
+                        ${strongest.map(c => `<div style="font-size:13px;display:flex;justify-content:space-between;margin-bottom:4px">
+                            <span style="color:var(--gray-700)">${escapeHtml(c.cat)}</span>
+                            <span style="font-weight:bold;color:var(--green)">${c.pct}%</span>
+                        </div>`).join('')}
+                    </div>` : ''}
+                </div>` : ''}
+                
+                <div style="margin-top:16px;font-size:11px;color:var(--gray-500);text-align:center">
+                    📊 Based on ${totalQuestions} unique questions • ${mastered} mastered • ${struggling} struggling
+                </div>
+            </div>`;
     },
 
     // Intelligent correlation detection - only shows strong correlations
