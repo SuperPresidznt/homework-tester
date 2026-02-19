@@ -12104,20 +12104,29 @@ const SpeedMode = {
         const drillProgress = Store.get('drillProgress', {});
         const now = Date.now();
 
-        // Weight questions by weakness (lower EF = higher weight)
+        // Filter and weight questions - speed mastered questions show up much less
         const weighted = this.bank.questions.map(q => {
             const prog = drillProgress[q.id] || { ef: 2.5, reps: 0 };
-            // Weight: new questions = 3, weak (low EF) = 2-3, mastered = 1
+            
+            // Speed mastered questions (3+ correct in speed mode) have very low weight
+            if (prog.speedMastered) {
+                // 10% chance to appear - keeps variety but mostly filters out
+                return { question: q, weight: 0.1, ef: prog.ef, mastered: true };
+            }
+            
+            // Weight: new questions = 3, weak (low EF) = 2-3, learning = 1.5, strong = 0.5
             let weight = 1;
-            if (prog.reps === 0) weight = 3;
-            else if (prog.ef < 2.0) weight = 3;
-            else if (prog.ef < 2.5) weight = 2;
+            if (prog.reps === 0) weight = 3;           // Never seen
+            else if (prog.ef < 1.8) weight = 3;        // Very weak
+            else if (prog.ef < 2.2) weight = 2;        // Weak
+            else if (prog.ef < 2.5) weight = 1.5;      // Learning
+            else if (prog.reps >= 3) weight = 0.3;     // Strong - rarely show
             else weight = 1;
 
-            return { question: q, weight, ef: prog.ef };
+            return { question: q, weight, ef: prog.ef, mastered: false };
         });
 
-        // Shuffle with weighting
+        // Shuffle with weighting - prioritizes weak questions
         this.queue = [];
         const pool = [...weighted];
         while (pool.length > 0 && this.queue.length < 50) {
@@ -12412,44 +12421,41 @@ const SpeedMode = {
     },
 
     // Update drill progress (SM-2) based on speed + correctness
-    // Speed Mode is the ONLY mode with gentle penalty for wrong answers
-    // because time pressure means you might know it but couldn't answer fast enough
+    // Speed Mode gives BIGGER mastery boosts for correct answers (net positive)
+    // Wrong answers have minimal impact - time pressure is forgiving
     updateDrillProgress(qId, isCorrect, timeRatio) {
         const all = Store.get('drillProgress', {});
         const p = all[qId] || { ef: 2.5, interval: 0, reps: 0, nextReview: 0 };
         
-        // Calculate quality based on speed + correctness
-        // Correct: 5 (fast), 4 (medium), 3 (slow)
-        // Wrong: 2 (GENTLE penalty - Speed Mode only! Time pressure = forgiving)
-        let quality;
+        let ef, interval, reps;
+        
         if (isCorrect) {
-            if (timeRatio >= 0.6) quality = 5;      // Fast (60%+ time left)
-            else if (timeRatio >= 0.3) quality = 4; // Medium
-            else quality = 3;                        // Slow but correct
-        } else {
-            quality = 2; // Wrong - gentle penalty (Speed Mode only - time pressure)
-        }
-        
-        // SM-2 algorithm
-        let ef = p.ef + (0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02));
-        if (ef < 1.3) ef = 1.3;
-        if (ef > 3.0) ef = 3.0; // Cap at 3.0
-        
-        let interval, reps;
-        if (quality < 3) {
-            // Wrong answer - reduce reps but don't fully reset
-            reps = Math.max(0, p.reps - 1);
-            interval = 1;
-        } else {
-            // Correct answer
+            // CORRECT: Big mastery boost - question shows up much less
+            // Fast answers = even bigger boost
+            const speedBonus = timeRatio >= 0.6 ? 0.2 : timeRatio >= 0.3 ? 0.1 : 0;
+            ef = Math.min(3.0, p.ef + 0.15 + speedBonus); // Bigger EF increase than normal
+            
+            // Accelerated rep progression - questions disappear faster
             reps = p.reps + 1;
-            if (reps === 1) interval = 1;
-            else if (reps === 2) interval = 3; // Shorter than drill (6 days) since speed mode is faster paced
-            else interval = Math.round(p.interval * ef);
+            if (reps === 1) interval = 2;       // 2 days (vs 1 in drill)
+            else if (reps === 2) interval = 5;  // 5 days (vs 3 in drill)
+            else if (reps === 3) interval = 10; // 10 days - question is "learned"
+            else interval = Math.min(60, Math.round(p.interval * ef * 1.2)); // Faster scaling
+            
+            // Mark as "speed mastered" after 3 correct in speed mode
+            if (reps >= 3 && ef >= 2.5) {
+                all[qId].speedMastered = true;
+            }
+        } else {
+            // WRONG: Minimal penalty - time pressure is forgiving
+            // Don't reduce EF much, just schedule for sooner review
+            ef = Math.max(1.3, p.ef - 0.05); // Tiny EF reduction
+            reps = p.reps; // Keep reps - don't punish for speed mode mistakes
+            interval = Math.max(1, Math.floor(p.interval / 2)); // Review sooner but not immediately
         }
         
         const nextReview = Date.now() + interval * 86400000;
-        all[qId] = { ef, interval, reps, nextReview };
+        all[qId] = { ...all[qId], ef, interval, reps, nextReview };
         Store.set('drillProgress', all);
     }
 };
@@ -17632,7 +17638,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.03</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.04</div>
 
 </body>
 </html>
