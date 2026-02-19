@@ -10103,6 +10103,11 @@ function showScreen(name, showSubheader, showFooter) {
         LearnMode.trackTimeSpent();
     }
     
+    // Stop SpeedMode timer when leaving speed screen
+    if (name !== 'speed' && typeof SpeedMode !== 'undefined' && SpeedMode.timerInterval) {
+        SpeedMode.stopTimer();
+    }
+    
     // End session timer when returning home
     if (name === 'home') {
         Session.end();
@@ -17617,7 +17622,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.01</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.02</div>
 
 </body>
 </html>
