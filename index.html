@@ -7374,9 +7374,9 @@ const Business = {
             const adMult = (data.adActive && data.adExpires > now) ? bizData.adBoost : 1;
             const baseIncome = bizData.baseIncome * (data.level || 1) * adMult * studyMult * (1 + incomeBonus) + flatBonus;
             
-            // Manager auto-buys ingredients from business balance if low
+            // Manager auto-buys ingredients (business balance first, then wallet)
             if (data.hasManager) {
-                this.managerAutoBuy(data, bizData);
+                this.managerAutoBuy(data, bizData, state);
             }
             
             const hasIngredients = this.hasIngredientsFor(data, bizData);
@@ -7408,8 +7408,9 @@ const Business = {
         Gamification.saveState(state);
     },
     
-    // Manager auto-buys ingredients when stock is low, using business balance
-    managerAutoBuy(data, bizData) {
+    // Manager auto-buys ingredients when stock is low
+    // Priority: business balance first, then player wallet as fallback
+    managerAutoBuy(data, bizData, state) {
         if (!bizData.ingredients || !data.hasManager) return;
         
         for (const [ing, needed] of Object.entries(bizData.ingredients)) {
@@ -7419,11 +7420,17 @@ const Business = {
                 const buyAmount = needed * 10; // Buy 10 cycles worth
                 const cost = Math.ceil(bizData.ingredientCosts[ing] * buyAmount * 1.2);
                 
+                // Try business balance first
                 if ((data.balance || 0) >= cost) {
                     data.balance -= cost;
                     data.inventory[ing] = (data.inventory[ing] || 0) + buyAmount;
                 }
-                // If not enough balance, manager waits (doesn't buy)
+                // Fallback to player wallet if business balance is low
+                else if ((state.coins || 0) >= cost) {
+                    state.coins -= cost;
+                    data.inventory[ing] = (data.inventory[ing] || 0) + buyAmount;
+                }
+                // If neither has enough, manager waits
             }
         }
     },
