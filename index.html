@@ -7381,6 +7381,9 @@ const Business = {
             const bizData = Gamification.SHOP.businesses[id];
             if (!bizData || !data.level) continue;
             
+            // Initialize balance if needed (dual-wallet system)
+            if (data.balance === undefined) data.balance = 0;
+            
             // Calculate speed multiplier from machines
             const speedMult = 1 + (data.machines || 0) * 0.25;
             const cycleTime = bizData.cycleTime / speedMult;
@@ -7393,11 +7396,11 @@ const Business = {
                 const progressGain = (elapsed / cycleTime) * 100;
                 data.progress = (data.progress || 0) + progressGain;
                 
-                // Complete cycles and earn money
+                // Complete cycles and earn money → goes to BUSINESS BALANCE
                 while (data.progress >= 100) {
                     data.progress -= 100;
                     const earned = Math.max(1, Math.floor(profit));
-                    state.coins = (state.coins || 0) + earned;
+                    data.balance = (data.balance || 0) + earned; // Business wallet
                     data.totalProfit = (data.totalProfit || 0) + earned;
                     biz.totalEarned = (biz.totalEarned || 0) + earned;
                     this.checkMilestones(id, data, bizData);
@@ -7492,7 +7495,7 @@ const Business = {
         }
     },
     
-    // Collect completed cycle
+    // Collect completed cycle → goes to BUSINESS BALANCE
     collect(businessId) {
         const state = Gamification.getState();
         const biz = state.businesses || { owned: {} };
@@ -7502,11 +7505,55 @@ const Business = {
         
         data.progress = 0;
         const profit = this.getProfit(data, bizData);
-        state.coins = (state.coins || 0) + profit;
+        data.balance = (data.balance || 0) + profit; // Business wallet, not player
         data.totalProfit = (data.totalProfit || 0) + profit;
         biz.totalEarned = (biz.totalEarned || 0) + profit;
         
         this.checkMilestones(businessId, data, bizData);
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('coin');
+        
+        if (this._currentBusiness === businessId) {
+            this.renderBusinessDetail(businessId);
+        }
+    },
+    
+    // DUAL WALLET: Deposit coins from player wallet to business account
+    deposit(businessId, amount) {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        amount = Math.min(amount, state.coins || 0);
+        if (amount <= 0) return;
+        
+        state.coins = (state.coins || 0) - amount;
+        data.balance = (data.balance || 0) + amount;
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('coin');
+        
+        if (this._currentBusiness === businessId) {
+            this.renderBusinessDetail(businessId);
+        }
+    },
+    
+    // DUAL WALLET: Withdraw coins from business account to player wallet
+    withdraw(businessId, amount) {
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        amount = Math.min(amount, data.balance || 0);
+        if (amount <= 0) return;
+        
+        data.balance = (data.balance || 0) - amount;
+        state.coins = (state.coins || 0) + amount;
         
         state.businesses = biz;
         Gamification.saveState(state);
@@ -7532,7 +7579,8 @@ const Business = {
         if (!biz.owned[businessId]) {
             biz.owned[businessId] = { 
                 level: 1, hasManager: false, progress: 0,
-                machines: 0, prestige: 0, totalProfit: 0, milestonesReached: 0
+                machines: 0, prestige: 0, totalProfit: 0, milestonesReached: 0,
+                balance: 0 // Business wallet (dual-wallet system)
             };
         } else {
             biz.owned[businessId].level++;
@@ -7677,10 +7725,35 @@ const Business = {
                         <div style="color:rgba(255,255,255,0.5);font-size:11px">${bizData.flavorText}</div>
                     </div>
                     <div style="text-align:right">
-                        <div style="font-size:11px;color:rgba(255,255,255,0.6)">Your Coins</div>
-                        <div style="font-size:20px;font-weight:bold">🪙 ${coins.toLocaleString()}</div>
+                        <div style="font-size:11px;color:rgba(255,255,255,0.6)">Your Wallet</div>
+                        <div style="font-size:16px;font-weight:bold">🪙 ${coins.toLocaleString()}</div>
                     </div>
                 </div>
+            </div>
+            
+            <!-- DUAL WALLET: Business Balance -->
+            <div style="background:linear-gradient(135deg,#065f46,#047857);padding:16px;border-radius:12px;margin-bottom:16px;border:2px solid #10b981">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+                    <div>
+                        <div style="font-size:12px;color:rgba(255,255,255,0.7)">💼 Business Account</div>
+                        <div style="font-size:28px;font-weight:bold;color:#10b981">🪙 ${(data.balance || 0).toLocaleString()}</div>
+                    </div>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <button class="shop-buy-btn" onclick="Business.deposit('${businessId}', 100)" ${coins < 100 ? 'disabled' : ''} style="background:#059669;padding:8px 12px;font-size:12px">
+                            ➡️ +100
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.deposit('${businessId}', ${Math.floor(coins/2)})" ${coins < 2 ? 'disabled' : ''} style="background:#059669;padding:8px 12px;font-size:12px">
+                            ➡️ Half
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.withdraw('${businessId}', 100)" ${(data.balance || 0) < 100 ? 'disabled' : ''} style="background:#dc2626;padding:8px 12px;font-size:12px">
+                            ⬅️ -100
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.withdraw('${businessId}', ${data.balance || 0})" ${(data.balance || 0) < 1 ? 'disabled' : ''} style="background:#dc2626;padding:8px 12px;font-size:12px">
+                            ⬅️ All
+                        </button>
+                    </div>
+                </div>
+                <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-top:8px">Profits go here • Withdraw to your wallet anytime</div>
             </div>
             
             <!-- Production -->
@@ -7717,88 +7790,58 @@ const Business = {
                 </div>
             </div>
             
-            <!-- Upgrades Grid -->
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:16px">
-                <!-- Level Up -->
-                <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:1px solid ${theme.accent}40">
-                    <h4 style="margin:0 0 8px 0;color:${theme.accent}">📈 Level Up</h4>
-                    <p style="font-size:11px;color:var(--gray-500);margin:0 0 8px 0">+${bizData.baseIncome} income per level</p>
-                    <button class="shop-buy-btn" onclick="Business.buy('${businessId}')" 
-                        ${coins < Math.floor(bizData.price * Math.pow(1.15, data.level)) ? 'disabled' : ''} 
-                        style="width:100%;background:${theme.accent}">
-                        Lv${data.level + 1} — 🪙${Math.floor(bizData.price * Math.pow(1.15, data.level)).toLocaleString()}
+            <!-- Compact Upgrades Row -->
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+                <button class="shop-buy-btn" onclick="Business.buy('${businessId}')" 
+                    ${coins < Math.floor(bizData.price * Math.pow(1.15, data.level)) ? 'disabled' : ''} 
+                    style="flex:1;min-width:120px;background:${theme.accent};padding:12px">
+                    📈 Lv${data.level + 1} — 🪙${Math.floor(bizData.price * Math.pow(1.15, data.level)).toLocaleString()}
+                </button>
+                ${(data.machines || 0) < 5 ? `
+                    <button class="shop-buy-btn" onclick="Business.buyMachine('${businessId}')" 
+                        ${coins < Math.floor(bizData.price * 0.5 * Math.pow(2, data.machines || 0)) ? 'disabled' : ''} 
+                        style="flex:1;min-width:120px;background:#7c3aed;padding:12px">
+                        🔧 Machine ${(data.machines||0)+1}/5 — 🪙${Math.floor(bizData.price * 0.5 * Math.pow(2, data.machines || 0)).toLocaleString()}
                     </button>
-                </div>
-                
-                <!-- Machines -->
-                <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:1px solid ${theme.accent}40">
-                    <h4 style="margin:0 0 8px 0;color:${theme.accent}">🔧 Machines (${data.machines || 0}/5)</h4>
-                    <p style="font-size:11px;color:var(--gray-500);margin:0 0 8px 0">+25% speed each</p>
-                    ${(data.machines || 0) < 5 ? `
-                        <button class="shop-buy-btn" onclick="Business.buyMachine('${businessId}')" 
-                            ${coins < Math.floor(bizData.price * 0.5 * Math.pow(2, data.machines || 0)) ? 'disabled' : ''} 
-                            style="width:100%;background:#7c3aed">
-                            Buy — 🪙${Math.floor(bizData.price * 0.5 * Math.pow(2, data.machines || 0)).toLocaleString()}
-                        </button>
-                    ` : '<div style="text-align:center;color:var(--green)">✅ Maxed!</div>'}
-                </div>
-                
-                <!-- Manager -->
-                <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:1px solid ${theme.accent}40">
-                    <h4 style="margin:0 0 8px 0;color:${theme.accent}">👔 Manager</h4>
-                    <p style="font-size:11px;color:var(--gray-500);margin:0 0 8px 0">Auto-runs business 24/7</p>
-                    ${!data.hasManager ? `
-                        <button class="shop-buy-btn" onclick="Business.hireManager('${businessId}')" 
-                            ${coins < bizData.managerCost ? 'disabled' : ''} 
-                            style="width:100%;background:#0ea5e9">
-                            Hire — 🪙${bizData.managerCost.toLocaleString()}
-                        </button>
-                    ` : '<div style="text-align:center;color:var(--green)">✅ Hired!</div>'}
-                </div>
-                
-                <!-- Prestige -->
-                <div style="background:linear-gradient(135deg,${canPrestige ? '#854d0e' : theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:2px solid ${canPrestige ? 'gold' : theme.accent + '40'}">
-                    <h4 style="margin:0 0 8px 0;color:${canPrestige ? 'gold' : theme.accent}">⭐ Prestige ${data.prestige || 0}</h4>
-                    <p style="font-size:11px;color:var(--gray-500);margin:0 0 8px 0">
-                        ${canPrestige ? 'Reset for +50% permanent bonus!' : `Need Lv10 & 🪙${(bizData.price * 10).toLocaleString()} profit`}
-                    </p>
-                    ${prestigeBonus > 0 ? `<div style="font-size:12px;color:gold;margin-bottom:8px">Current: +${prestigeBonus}% income</div>` : ''}
-                    <button class="shop-buy-btn" onclick="Business.prestige('${businessId}')" 
-                        ${!canPrestige ? 'disabled' : ''} 
-                        style="width:100%;background:${canPrestige ? 'gold' : 'var(--gray-600)'};color:${canPrestige ? '#000' : '#fff'}">
-                        ${canPrestige ? '⭐ Prestige Now!' : `${data.level}/10 Lv • ${Math.floor((totalProfit / (bizData.price * 10)) * 100)}%`}
+                ` : '<div style="flex:1;min-width:120px;padding:12px;text-align:center;background:rgba(0,0,0,0.2);border-radius:8px;color:var(--green)">🔧 5/5 ✅</div>'}
+                ${!data.hasManager ? `
+                    <button class="shop-buy-btn" onclick="Business.hireManager('${businessId}')" 
+                        ${coins < bizData.managerCost ? 'disabled' : ''} 
+                        style="flex:1;min-width:120px;background:#0ea5e9;padding:12px">
+                        👔 Manager — 🪙${bizData.managerCost.toLocaleString()}
                     </button>
-                </div>
+                ` : '<div style="flex:1;min-width:120px;padding:12px;text-align:center;background:rgba(0,0,0,0.2);border-radius:8px;color:var(--green)">👔 Hired ✅</div>'}
             </div>
             
-            <!-- Milestones -->
+            <!-- Prestige + Milestones Combined -->
             <div style="background:linear-gradient(135deg,${theme.dark},rgba(0,0,0,0.5));padding:16px;border-radius:12px;border:1px solid ${theme.accent}40">
-                <h4 style="margin:0 0 12px 0;color:${theme.accent}">🏆 Milestones</h4>
-                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+                    <div>
+                        <span style="color:${theme.accent};font-weight:bold">🏆 Milestones</span>
+                        <span style="color:var(--gray-500);font-size:12px;margin-left:8px">${reached}/${milestones.length}</span>
+                    </div>
+                    ${canPrestige ? `
+                        <button class="shop-buy-btn" onclick="Business.prestige('${businessId}')" style="background:gold;color:#000;padding:8px 16px;animation:pulse 1s infinite">
+                            ⭐ Prestige! +50% forever
+                        </button>
+                    ` : `<span style="font-size:11px;color:var(--gray-500)">⭐ Prestige: ${data.level}/10 Lv${prestigeBonus > 0 ? ` (+${prestigeBonus}%)` : ''}</span>`}
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
                     ${milestones.map((m, i) => {
                         const done = i < reached;
                         const current = i === reached;
-                        return `<div style="padding:8px 12px;border-radius:8px;font-size:12px;
+                        return `<div style="padding:6px 10px;border-radius:6px;font-size:11px;
                             background:${done ? 'var(--green)' : current ? theme.accent : 'rgba(0,0,0,0.3)'};
-                            color:${done || current ? 'white' : 'var(--gray-500)'};
-                            border:2px solid ${current ? 'white' : 'transparent'}">
-                            ${done ? '✅' : '🎯'} 🪙${m.toLocaleString()}
+                            color:${done || current ? 'white' : 'var(--gray-500)'}">
+                            ${done ? '✅' : ''} 🪙${m >= 1000 ? (m/1000).toFixed(0)+'k' : m}
                         </div>`;
                     }).join('')}
                 </div>
                 ${nextMilestone ? `
-                    <div style="margin-top:12px">
-                        <div style="font-size:11px;color:var(--gray-500);margin-bottom:4px">Progress to next: 🪙${totalProfit.toLocaleString()} / ${nextMilestone.toLocaleString()}</div>
-                        <div style="background:rgba(0,0,0,0.3);border-radius:4px;height:8px;overflow:hidden">
-                            <div style="background:${theme.accent};height:100%;width:${milestoneProgress}%"></div>
-                        </div>
+                    <div style="margin-top:10px;background:rgba(0,0,0,0.3);border-radius:4px;height:6px;overflow:hidden">
+                        <div style="background:${theme.accent};height:100%;width:${milestoneProgress}%"></div>
                     </div>
-                ` : '<div style="margin-top:8px;color:var(--green);font-size:12px">🎉 All milestones complete!</div>'}
-            </div>
-            
-            <!-- Study Tip -->
-            <div style="margin-top:16px;padding:12px;background:rgba(59,130,246,0.1);border-radius:8px;border:1px solid var(--blue);text-align:center">
-                <div style="font-size:13px;color:var(--blue)">💡 <b>Tip:</b> Answer questions to add +5% progress to all businesses!</div>
+                ` : ''}
             </div>
         `;
         
@@ -7837,14 +7880,16 @@ const Business = {
                 <div class="shop-item-desc">${bizData.desc}</div>`;
             
             if (level > 0) {
-                html += `<div style="font-size:12px;color:var(--green)">Level ${level} ${hasManager ? '👔' : ''} ${prestige > 0 ? `<span style="color:gold">⭐${prestige}</span>` : ''}</div>`;
+                const balance = owned?.balance || 0;
+                html += `<div style="font-size:12px;color:var(--green)">Lv${level} ${hasManager ? '👔' : ''} ${prestige > 0 ? `<span style="color:gold">⭐${prestige}</span>` : ''}</div>`;
                 
                 // Progress bar
-                html += `<div style="background:rgba(0,0,0,0.1);border-radius:4px;height:12px;margin:8px 0;overflow:hidden">
+                html += `<div style="background:rgba(0,0,0,0.1);border-radius:4px;height:10px;margin:6px 0;overflow:hidden">
                     <div style="background:${progress >= 100 ? 'var(--green)' : 'var(--blue)'};height:100%;width:${progress}%;transition:width 0.3s"></div>
                 </div>`;
                 
-                html += `<div style="font-size:11px;color:var(--gray-500)">Click to manage →</div>`;
+                // Show business balance
+                html += `<div style="font-size:11px;color:#10b981;font-weight:bold">💼 🪙${balance.toLocaleString()}</div>`;
             } else {
                 html += `<button class="shop-buy-btn" onclick="event.stopPropagation();Business.buy('${id}')" ${!canAfford ? 'disabled' : ''}>
                     Buy &#x1FA99;${price.toLocaleString()}
