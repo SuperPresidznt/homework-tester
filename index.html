@@ -8907,6 +8907,9 @@ const Garden = {
 
     _promptWaterPurchase() {
         if (this._waterPromptEl) return;
+        // Only show prompt if garden page is visible
+        const gardenScene = document.getElementById('gardenScene');
+        if (!gardenScene || gardenScene.offsetParent === null) return;
         const prompt = document.createElement('div');
         prompt.className = 'garden-water-prompt';
         prompt.innerHTML = `
@@ -17722,7 +17725,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.09</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.10</div>
 
 </body>
 </html>
