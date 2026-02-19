@@ -6590,6 +6590,14 @@ const Shop = {
             } else if (id === 'evoStone') {
                 // Evolution stone: add to inventory (not auto-used)
                 state.inventory.gardenItems.evoStone = (state.inventory.gardenItems.evoStone || 0) + 1;
+            } else if (id === 'rainCloud') {
+                // Rain Cloud: activate auto-water for 1 hour
+                state.garden = state.garden || {};
+                state.garden.rainCloudUntil = Date.now() + 60 * 60 * 1000; // 1 hour
+                Gamification.showAchievementToast({ icon: '🌧️', name: 'Rain Cloud Active!', desc: 'Auto-watering all plants for 1 hour', xp: 0 });
+            } else if (id === 'superFertilizer') {
+                // Super Fertilizer: add to inventory
+                state.inventory.gardenItems.superFertilizer = (state.inventory.gardenItems.superFertilizer || 0) + 1;
             } else {
                 state.inventory.gardenItems[id] = (state.inventory.gardenItems[id] || 0) + 1;
             }
@@ -9334,6 +9342,7 @@ const Garden = {
         const pct = Math.floor((gp / needed) * 100);
         const inv = state.inventory.gardenItems;
         const hasFert = inv.fertilizer > 0 && !plot.fertilized;
+        const hasSuperFert = (inv.superFertilizer || 0) > 0 && !plot.fertilized;
         const hasDust = inv.magicDust > 0 && plot.currentStage < seed.stages - 1;
 
         const overlay = document.createElement('div');
@@ -9357,6 +9366,10 @@ const Garden = {
                     <span class="plot-info-action-icon">\u{1F9EA}</span>
                     <div><div class="plot-info-action-label">Fertilizer${hasFert ? ` (x${inv.fertilizer})` : ''}</div><div class="plot-info-action-desc">2x growth for next 10 questions</div></div>
                 </button>
+                <button class="plot-info-action" onclick="Garden.applySuperFertilizer(${plotIdx})" ${hasSuperFert ? '' : 'disabled'}>
+                    <span class="plot-info-action-icon">\u{1F48A}</span>
+                    <div><div class="plot-info-action-label">Super Fertilizer${hasSuperFert ? ` (x${inv.superFertilizer})` : ''}</div><div class="plot-info-action-desc">3x growth for next 10 questions</div></div>
+                </button>
                 <button class="plot-info-action" onclick="Garden.applyMagicDust(${plotIdx})" ${hasDust ? '' : 'disabled'}>
                     <span class="plot-info-action-icon">\u2728</span>
                     <div><div class="plot-info-action-label">Magic Dust${hasDust ? ` (x${inv.magicDust})` : ''}</div><div class="plot-info-action-desc">Instantly advance +1 stage</div></div>
@@ -9374,6 +9387,20 @@ const Garden = {
         state.inventory.gardenItems.fertilizer--;
         plot.fertilized = true;
         plot.fertilizedRemaining = 10;
+        plot.fertilizerMultiplier = 2; // 2x growth
+        Gamification.saveState(state);
+        this.render();
+    },
+
+    applySuperFertilizer(plotIdx) {
+        this.dismissModal();
+        const state = Gamification.getState();
+        const plot = state.garden.plots[plotIdx];
+        if (!plot || plot.fertilized || (state.inventory.gardenItems.superFertilizer || 0) <= 0) return;
+        state.inventory.gardenItems.superFertilizer--;
+        plot.fertilized = true;
+        plot.fertilizedRemaining = 10;
+        plot.fertilizerMultiplier = 3; // 3x growth
         Gamification.saveState(state);
         this.render();
     },
@@ -9483,14 +9510,20 @@ const Garden = {
         }
 
         // Decay water slightly per question (affected by weather)
-        const weather = this.getCurrentWeather(state);
-        const weatherData = this.WEATHER_TYPES[weather];
-        const waterDecay = Math.ceil(1 * (weatherData?.waterDecay || 1));
-        state.garden.waterLevel = Math.max(0, (state.garden.waterLevel || 100) - waterDecay);
-        
-        // Stormy weather adds free water
-        if (weather === 'stormy') {
-            state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 3);
+        // Rain cloud prevents water decay
+        const rainCloudActive = state.garden.rainCloudUntil && Date.now() < state.garden.rainCloudUntil;
+        if (rainCloudActive) {
+            state.garden.waterLevel = 100;
+        } else {
+            const weather = this.getCurrentWeather(state);
+            const weatherData = this.WEATHER_TYPES[weather];
+            const waterDecay = Math.ceil(1 * (weatherData?.waterDecay || 1));
+            state.garden.waterLevel = Math.max(0, (state.garden.waterLevel || 100) - waterDecay);
+            
+            // Stormy weather adds free water
+            if (weather === 'stormy') {
+                state.garden.waterLevel = Math.min(100, (state.garden.waterLevel || 0) + 3);
+            }
         }
 
         const plots = state.garden.plots || [];
@@ -9507,9 +9540,12 @@ const Garden = {
             let gp = Math.ceil(points * growthBonus);
             
             if (plot.fertilized && plot.fertilizedRemaining > 0) {
-                gp *= 2;
+                gp *= (plot.fertilizerMultiplier || 2); // Use stored multiplier (2x or 3x)
                 plot.fertilizedRemaining--;
-                if (plot.fertilizedRemaining <= 0) plot.fertilized = false;
+                if (plot.fertilizedRemaining <= 0) {
+                    plot.fertilized = false;
+                    delete plot.fertilizerMultiplier;
+                }
             }
 
             plot.growthPoints = (plot.growthPoints || 0) + gp;
@@ -9571,6 +9607,16 @@ const Garden = {
     decayWater() {
         const state = Gamification.getState();
         const now = Date.now();
+        
+        // Rain cloud prevents water decay
+        const rainCloudActive = state.garden.rainCloudUntil && now < state.garden.rainCloudUntil;
+        if (rainCloudActive) {
+            state.garden.waterLevel = 100;
+            state.garden.lastWaterDecay = now;
+            Gamification.saveState(state);
+            return;
+        }
+        
         const last = state.garden.lastWaterDecay || now;
         const hoursPassed = (now - last) / (1000 * 60 * 60);
 
@@ -9630,10 +9676,13 @@ const Garden = {
             let gp = gpBonus * growthBonus;
             
             if (plot.fertilized && plot.fertilizedRemaining > 0) {
-                gp *= 2;
+                gp *= (plot.fertilizerMultiplier || 2); // Use stored multiplier (2x or 3x)
                 const fertDrain = Math.max(1, Math.round(gpBonus));
                 plot.fertilizedRemaining = Math.max(0, (plot.fertilizedRemaining || 0) - fertDrain);
-                if (plot.fertilizedRemaining === 0) plot.fertilized = false;
+                if (plot.fertilizedRemaining === 0) {
+                    plot.fertilized = false;
+                    delete plot.fertilizerMultiplier;
+                }
             }
 
             plot.growthPoints = (plot.growthPoints || 0) + gp;
@@ -9854,20 +9903,33 @@ const Garden = {
         const text = meter.querySelector('.water-meter-text');
         const level = Math.max(0, Math.min(100, Math.round(state.garden.waterLevel || 0)));
         if (fill) fill.style.width = level + '%';
+        
+        // Check for active rain cloud
+        const rainCloudActive = state.garden.rainCloudUntil && Date.now() < state.garden.rainCloudUntil;
+        const rainTimeLeft = rainCloudActive ? Math.ceil((state.garden.rainCloudUntil - Date.now()) / 60000) : 0;
+        
         let status = 'Hydrated';
         let statusClass = '';
-        if (level <= 10) {
+        if (rainCloudActive) {
+            status = `🌧️ ${rainTimeLeft}m`;
+            statusClass = 'rain-active';
+        } else if (level <= 10) {
             status = 'Critical';
             statusClass = 'critical';
         } else if (level <= 30) {
             status = 'Low';
             statusClass = 'low';
         }
-        meter.classList.toggle('pulse', statusClass !== '');
+        meter.classList.toggle('pulse', statusClass === 'critical' || statusClass === 'low');
+        meter.classList.toggle('rain-cloud-active', rainCloudActive);
         if (text) {
-            text.textContent = level + '% ' + status;
-            text.classList.remove('low', 'critical');
+            text.textContent = rainCloudActive ? `100% ${status}` : level + '% ' + status;
+            text.classList.remove('low', 'critical', 'rain-active');
             if (statusClass) text.classList.add(statusClass);
+        }
+        // Keep water at 100% while rain cloud is active
+        if (rainCloudActive && level < 100) {
+            state.garden.waterLevel = 100;
         }
     },
 
@@ -19857,7 +19919,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.23</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.24</div>
 
 </body>
 </html>
