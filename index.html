@@ -6588,20 +6588,8 @@ const Shop = {
             if (id === 'healthPotion' || id === 'shieldCharm' || id === 'powerBerry') {
                 state.inventory.battleItems[id] = (state.inventory.battleItems[id] || 0) + 1;
             } else if (id === 'evoStone') {
-                // Evolution stone: apply care minutes directly
-                state.studyBuddy.careMinutes = (state.studyBuddy.careMinutes || 0) + 60;
-                // Re-check evolution
-                for (let i = Gamification.BUDDY_STAGES.length - 1; i >= 0; i--) {
-                    const req = Gamification.BUDDY_STAGES[i];
-                    if (state.studyBuddy.totalXpFed >= req.xpNeeded && (state.studyBuddy.careMinutes || 0) >= req.careNeeded) {
-                        if (state.studyBuddy.stage < req.stage) {
-                            state.studyBuddy.stage = req.stage;
-                            Gamification.showAchievementToast({ icon: Gamification.getSpeciesEmoji(state.studyBuddy.species, req.stage), name: state.studyBuddy.name + ' evolved!', desc: 'Now a ' + Gamification.getSpeciesStageName(state.studyBuddy.species, req.stage), xp: 0 });
-                        }
-                        break;
-                    }
-                }
-                Gamification.updateBuddyWidget();
+                // Evolution stone: add to inventory (not auto-used)
+                state.inventory.gardenItems.evoStone = (state.inventory.gardenItems.evoStone || 0) + 1;
             } else {
                 state.inventory.gardenItems[id] = (state.inventory.gardenItems[id] || 0) + 1;
             }
@@ -10039,6 +10027,10 @@ const PetModal = {
                     <button class="pet-food-btn" onclick="Shop.fillFoodBowl();PetModal.show()" style="flex:1" ${(petCare.foodBowl.level || 0) >= petCare.foodBowl.capacity ? 'disabled' : ''}>🥣 Fill Food Bowl ${petCare.foodBowl.level || 0}/${petCare.foodBowl.capacity}</button>
                 </div>
                 ` : ''}
+                <h4>🪨 Evolution Stone</h4>
+                <div style="display:flex;gap:8px;margin-bottom:12px">
+                    <button class="pet-food-btn" onclick="PetModal.useEvoStone()" style="flex:1" ${(state.inventory.gardenItems?.evoStone || 0) <= 0 ? 'disabled' : ''}>🪨 Use Evolution Stone (+60 care mins) <span class="pet-food-count">x${state.inventory.gardenItems?.evoStone || 0}</span></button>
+                </div>
                 <h4>🍖 Feed</h4>
                 ${foodHtml}
                 <h4>Accessories</h4>
@@ -10087,6 +10079,41 @@ const PetModal = {
         state.studyBuddy.name = name.trim().slice(0, 20);
         Gamification.saveState(state);
         Gamification.updateBuddyWidget();
+        this.show(); // Re-render modal
+    },
+
+    useEvoStone() {
+        const state = Gamification.getState();
+        const evoCount = state.inventory.gardenItems?.evoStone || 0;
+        if (evoCount <= 0) return;
+        
+        // Consume one evolution stone
+        state.inventory.gardenItems.evoStone = evoCount - 1;
+        
+        // Apply +60 care minutes to the ACTIVE pet
+        const buddy = state.studyBuddy;
+        buddy.careMinutes = (buddy.careMinutes || 0) + 60;
+        
+        // Check evolution
+        for (let i = Gamification.BUDDY_STAGES.length - 1; i >= 0; i--) {
+            const req = Gamification.BUDDY_STAGES[i];
+            if (buddy.totalXpFed >= req.xpNeeded && (buddy.careMinutes || 0) >= req.careNeeded) {
+                if (buddy.stage < req.stage) {
+                    buddy.stage = req.stage;
+                    Gamification.showAchievementToast({
+                        icon: Gamification.getSpeciesEmoji(buddy.species, req.stage),
+                        name: buddy.name + ' evolved!',
+                        desc: 'Now a ' + Gamification.getSpeciesStageName(buddy.species, req.stage),
+                        xp: 0
+                    });
+                }
+                break;
+            }
+        }
+        
+        Gamification.saveState(state);
+        Gamification.updateBuddyWidget();
+        SoundFX.play('levelup');
         this.show(); // Re-render modal
     },
 
@@ -19830,7 +19857,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.22</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.23</div>
 
 </body>
 </html>
