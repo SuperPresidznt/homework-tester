@@ -7618,17 +7618,52 @@ const Business = {
         }
     },
     
+    // Buy ingredient using player wallet (with bulk discounts)
     buyIngredient(businessId, ingredient, amount) {
         const bizData = Gamification.SHOP.businesses[businessId];
         if (!bizData || !bizData.ingredientCosts) return;
         
-        const cost = Math.ceil(bizData.ingredientCosts[ingredient] * amount * 1.2); // 20% markup
+        // Bulk discounts: 10 = 20% markup, 50 = 10% markup, 100 = no markup
+        let markup = 1.2;
+        if (amount >= 100) markup = 1.0;
+        else if (amount >= 50) markup = 1.1;
+        
+        const cost = Math.ceil(bizData.ingredientCosts[ingredient] * amount * markup);
         const state = Gamification.getState();
         
         if (!Gamification.spendCoins(cost)) return;
         
         const biz = state.businesses || { owned: {} };
         const data = biz.owned[businessId];
+        if (!data.inventory) data.inventory = {};
+        data.inventory[ingredient] = (data.inventory[ingredient] || 0) + amount;
+        
+        state.businesses = biz;
+        Gamification.saveState(state);
+        SoundFX.play('purchase');
+        this.renderBusinessDetail(businessId);
+    },
+    
+    // Buy ingredient using business funds (with bulk discounts)
+    buyIngredientFromBiz(businessId, ingredient, amount) {
+        const bizData = Gamification.SHOP.businesses[businessId];
+        if (!bizData || !bizData.ingredientCosts) return;
+        
+        const state = Gamification.getState();
+        const biz = state.businesses || { owned: {} };
+        const data = biz.owned[businessId];
+        if (!data) return;
+        
+        // Bulk discounts: 10 = 20% markup, 50 = 10% markup, 100 = no markup
+        let markup = 1.2;
+        if (amount >= 100) markup = 1.0;
+        else if (amount >= 50) markup = 1.1;
+        
+        const cost = Math.ceil(bizData.ingredientCosts[ingredient] * amount * markup);
+        
+        if ((data.balance || 0) < cost) return;
+        
+        data.balance -= cost;
         if (!data.inventory) data.inventory = {};
         data.inventory[ingredient] = (data.inventory[ingredient] || 0) + amount;
         
@@ -7841,21 +7876,58 @@ const Business = {
                     </div>
                 </div>
                 
-                <!-- Inventory Panel -->
-                <div style="background:var(--gray-800);padding:16px;border-radius:12px">
-                    <h3 style="margin-top:0">📦 Inventory</h3>
-                    <div style="display:grid;gap:8px">`;
+                <!-- Business Supply Shop -->
+                <div style="background:linear-gradient(135deg,${theme.dark},#1a1a2e);padding:16px;border-radius:12px;border:2px solid ${theme.accent};grid-column:span 2">
+                    <h3 style="margin-top:0;color:${theme.accent}">🛒 ${bizData.name} Supply Shop</h3>
+                    <p style="font-size:11px;color:var(--gray-500);margin:-8px 0 12px 0">Buy supplies using business funds (🏦) or your wallet (👛)</p>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">`;
         
         for (const [ing, needed] of Object.entries(bizData.ingredients || {})) {
             const have = data.inventory?.[ing] || 0;
-            const cost = Math.ceil(bizData.ingredientCosts[ing] * 10 * 1.2);
+            const unitCost = bizData.ingredientCosts[ing];
+            const cost10 = Math.ceil(unitCost * 10 * 1.2);
+            const cost50 = Math.ceil(unitCost * 50 * 1.1); // 10% discount for bulk
+            const cost100 = Math.ceil(unitCost * 100 * 1.0); // 20% discount for bulk
             const isLow = have < needed * 3;
+            const cyclesLeft = Math.floor(have / needed);
+            
             html += `
-                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;background:rgba(0,0,0,0.2);border-radius:6px;${isLow ? 'border:1px solid var(--red)' : ''}">
-                    <span>${ing}: <b style="color:${isLow ? 'var(--red)' : 'var(--green)'}">${have}</b> <span style="color:var(--gray-500)">(need ${needed}/cycle)</span></span>
-                    <button class="shop-buy-btn" onclick="Business.buyIngredient('${businessId}','${ing}',10)" style="padding:4px 8px;font-size:11px" ${coins < cost ? 'disabled' : ''}>
-                        +10 (🪙${cost})
-                    </button>
+                <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:12px;${isLow ? 'border:2px solid var(--red)' : ''}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                        <div>
+                            <div style="font-weight:bold;text-transform:capitalize">${ing}</div>
+                            <div style="font-size:11px;color:var(--gray-500)">Need ${needed}/cycle • ${cyclesLeft} cycles left</div>
+                        </div>
+                        <div style="font-size:20px;font-weight:bold;color:${isLow ? 'var(--red)' : 'var(--green)'}">${have}</div>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px">
+                        <button class="shop-buy-btn" onclick="Business.buyIngredientFromBiz('${businessId}','${ing}',10)" 
+                            style="padding:6px 4px;font-size:10px;background:${theme.accent}" ${balance < cost10 ? 'disabled' : ''}>
+                            +10<br>🏦${cost10}
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.buyIngredientFromBiz('${businessId}','${ing}',50)" 
+                            style="padding:6px 4px;font-size:10px;background:${theme.accent}" ${balance < cost50 ? 'disabled' : ''}>
+                            +50<br>🏦${cost50}
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.buyIngredientFromBiz('${businessId}','${ing}',100)" 
+                            style="padding:6px 4px;font-size:10px;background:${theme.accent}" ${balance < cost100 ? 'disabled' : ''}>
+                            +100<br>🏦${cost100}
+                        </button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+                        <button class="shop-buy-btn" onclick="Business.buyIngredient('${businessId}','${ing}',10)" 
+                            style="padding:6px 4px;font-size:10px;background:#6b7280" ${coins < cost10 ? 'disabled' : ''}>
+                            +10<br>👛${cost10}
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.buyIngredient('${businessId}','${ing}',50)" 
+                            style="padding:6px 4px;font-size:10px;background:#6b7280" ${coins < cost50 ? 'disabled' : ''}>
+                            +50<br>👛${cost50}
+                        </button>
+                        <button class="shop-buy-btn" onclick="Business.buyIngredient('${businessId}','${ing}',100)" 
+                            style="padding:6px 4px;font-size:10px;background:#6b7280" ${coins < cost100 ? 'disabled' : ''}>
+                            +100<br>👛${cost100}
+                        </button>
+                    </div>
                 </div>`;
         }
         
@@ -18451,7 +18523,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.15</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.16</div>
 
 </body>
 </html>
