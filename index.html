@@ -3236,7 +3236,7 @@ const Gamification = {
             // Lemonade: Sells 5 cups @ $2 = $10 revenue, costs $6 = $4 profit per batch
             lemonade: { 
                 name: 'Lemonade Stand', price: 100, icon: '🍋', desc: 'A humble beginning',
-                baseIncome: 1, cycleTime: 60, managerCost: 500,
+                baseIncome: 0.5, cycleTime: 120, managerCost: 800,
                 ingredients: { lemons: 5, sugar: 2, cups: 5 },
                 ingredientCosts: { lemons: 0.50, sugar: 0.25, cups: 0.10 },
                 baseCustomers: 5, adBoost: 1.5,
@@ -3252,7 +3252,7 @@ const Gamification = {
             // Paper Route: Deliver 20 papers @ $0.50 tip = $10, costs $4 = $6 profit
             newspaper: { 
                 name: 'Paper Route', price: 200, icon: '📰', desc: 'Deliver the news',
-                baseIncome: 2, cycleTime: 90, managerCost: 1000,
+                baseIncome: 1, cycleTime: 180, managerCost: 1500,
                 ingredients: { papers: 20 },
                 ingredientCosts: { papers: 0.20 },
                 baseCustomers: 10, adBoost: 1.3,
@@ -3268,7 +3268,7 @@ const Gamification = {
             // Car Wash: Wash 3 cars @ $15 = $45, costs $12 = $33 profit (but slower)
             carwash: { 
                 name: 'Car Wash', price: 800, icon: '🚿', desc: 'Sparkle and shine',
-                baseIncome: 4, cycleTime: 120, managerCost: 4000,
+                baseIncome: 2, cycleTime: 240, managerCost: 6000,
                 ingredients: { soap: 3, water: 10, wax: 1 },
                 ingredientCosts: { soap: 1.50, water: 0.10, wax: 3.00 },
                 baseCustomers: 8, adBoost: 1.4,
@@ -3284,7 +3284,7 @@ const Gamification = {
             // Bakery: Batch of goods sells for $60, costs $25 = $35 profit
             bakery: { 
                 name: 'Bakery', price: 2500, icon: '🥐', desc: 'Fresh baked goods',
-                baseIncome: 8, cycleTime: 180, managerCost: 12000,
+                baseIncome: 4, cycleTime: 360, managerCost: 18000,
                 ingredients: { flour: 5, eggs: 6, butter: 2, sugar: 3 },
                 ingredientCosts: { flour: 1.00, eggs: 0.50, butter: 2.00, sugar: 0.75 },
                 baseCustomers: 12, adBoost: 1.5,
@@ -3300,7 +3300,7 @@ const Gamification = {
             // Pizzeria: 5 pizzas @ $20 = $100, costs $40 = $60 profit
             pizzeria: { 
                 name: 'Pizzeria', price: 6000, icon: '🍕', desc: 'Slice of heaven',
-                baseIncome: 15, cycleTime: 240, managerCost: 30000,
+                baseIncome: 7, cycleTime: 480, managerCost: 45000,
                 ingredients: { dough: 5, cheese: 8, sauce: 5, toppings: 5 },
                 ingredientCosts: { dough: 1.50, cheese: 2.00, sauce: 1.00, toppings: 1.50 },
                 baseCustomers: 15, adBoost: 1.6,
@@ -3316,7 +3316,7 @@ const Gamification = {
             // Arcade: Hourly revenue $150, costs $50 = $100 profit
             arcade: { 
                 name: 'Arcade', price: 15000, icon: '🕹️', desc: 'Fun and games',
-                baseIncome: 25, cycleTime: 300, managerCost: 75000,
+                baseIncome: 12, cycleTime: 600, managerCost: 100000,
                 ingredients: { tokens: 100, prizes: 15, electricity: 1 },
                 ingredientCosts: { tokens: 0.05, prizes: 2.00, electricity: 10.00 },
                 baseCustomers: 20, adBoost: 1.4,
@@ -3332,7 +3332,7 @@ const Gamification = {
             // Gym: Daily memberships $300, costs $80 = $220 profit
             gym: { 
                 name: 'Gym', price: 40000, icon: '🏋️', desc: 'Fitness empire',
-                baseIncome: 50, cycleTime: 360, managerCost: 200000,
+                baseIncome: 25, cycleTime: 720, managerCost: 300000,
                 ingredients: { towels: 30, supplements: 10, utilities: 1 },
                 ingredientCosts: { towels: 0.50, supplements: 4.00, utilities: 25.00 },
                 baseCustomers: 25, adBoost: 1.3,
@@ -3348,7 +3348,7 @@ const Gamification = {
             // Hotel: Nightly revenue $800, costs $250 = $550 profit
             hotel: { 
                 name: 'Hotel', price: 100000, icon: '🏨', desc: '5-star service',
-                baseIncome: 100, cycleTime: 480, managerCost: 500000,
+                baseIncome: 50, cycleTime: 900, managerCost: 750000,
                 ingredients: { linens: 20, toiletries: 40, food: 30, staff: 1 },
                 ingredientCosts: { linens: 2.00, toiletries: 1.00, food: 3.00, staff: 50.00 },
                 baseCustomers: 30, adBoost: 1.5,
@@ -3364,7 +3364,7 @@ const Gamification = {
             // Tech Startup: Sprint revenue $3000, costs $800 = $2200 profit
             techStartup: { 
                 name: 'Tech Startup', price: 300000, icon: '💻', desc: 'Disrupt the market',
-                baseIncome: 400, cycleTime: 900, managerCost: 1500000,
+                baseIncome: 150, cycleTime: 1800, managerCost: 2500000,
                 ingredients: { servers: 5, coffee: 100, devTools: 10, cloud: 1 },
                 ingredientCosts: { servers: 50.00, coffee: 1.00, devTools: 25.00, cloud: 200.00 },
                 baseCustomers: 50, adBoost: 2.0,
@@ -3380,7 +3380,7 @@ const Gamification = {
             // Space Port: Launch revenue $50000, costs $25000 = $25000 profit (high risk/reward)
             spacePort: { 
                 name: 'Space Port', price: 2000000, icon: '🛸', desc: 'To the stars!',
-                baseIncome: 2000, cycleTime: 3600, managerCost: 10000000,
+                baseIncome: 500, cycleTime: 7200, managerCost: 15000000,
                 ingredients: { fuel: 200, parts: 50, permits: 10, crew: 1 },
                 ingredientCosts: { fuel: 50.00, parts: 100.00, permits: 500.00, crew: 2000.00 },
                 baseCustomers: 10, adBoost: 3.0,
@@ -7423,10 +7423,10 @@ const Business = {
         const biz = state.businesses || {};
         const now = Date.now();
         
-        // Add 2% multiplier, stacks up to 1.3x max, lasts 3 minutes
-        // Study is the MAIN income driver - this is just a small bonus
-        biz.studyMultiplier = Math.min(1.3, (biz.studyMultiplier || 1.0) + 0.02);
-        biz.studyBoostExpires = now + 3 * 60 * 1000; // 3 minutes
+        // Add 1% multiplier, stacks up to 1.1x max, lasts 2 minutes
+        // Study is the MAIN income driver - this is just a tiny bonus
+        biz.studyMultiplier = Math.min(1.1, (biz.studyMultiplier || 1.0) + 0.01);
+        biz.studyBoostExpires = now + 2 * 60 * 1000; // 2 minutes
         
         state.businesses = biz;
         Gamification.saveState(state);
@@ -7538,12 +7538,8 @@ const Business = {
                     data.balance -= cost;
                     data.inventory[ing] = (data.inventory[ing] || 0) + buyAmount;
                 }
-                // Fallback to player wallet if business balance is low
-                else if ((state.coins || 0) >= cost) {
-                    state.coins -= cost;
-                    data.inventory[ing] = (data.inventory[ing] || 0) + buyAmount;
-                }
-                // If neither has enough, manager waits
+                // NO fallback to player wallet - businesses must be self-sustaining
+                // If business balance is low, manager waits for profits
             }
         }
     },
@@ -7580,21 +7576,20 @@ const Business = {
         return total;
     },
     
-    // Batch size starts at 1 and scales slowly with level and machines
-    // Reduced scaling to keep passive income low
+    // Batch size starts at 1 and scales VERY slowly with level and machines
+    // Heavily reduced to keep passive income minimal
     getBatchSize(data) {
         const level = data.level || 1;
         const machines = data.machines || 0;
-        // Base batch = 1 + level/3, machines add +0.5 each, cap at 5
-        return Math.min(5, 1 + Math.floor(level / 3) + machines * 0.5);
+        // Base batch = 1 + level/10, machines add +0.2 each, cap at 2
+        return Math.min(2, 1 + Math.floor(level / 10) + machines * 0.2);
     },
     
     // Get batch multiplier for display (how much more efficient batches are)
     getBatchEfficiency(data) {
         const batchSize = this.getBatchSize(data);
-        // Larger batches are slightly more efficient (2% per item over 1, capped)
-        // Reduced to prevent runaway passive income
-        return Math.min(1.3, 1 + (batchSize - 1) * 0.02);
+        // Minimal efficiency bonus - 1% per item over 1, capped at 1.05
+        return Math.min(1.05, 1 + (batchSize - 1) * 0.01);
     },
 
     // Work timer state
@@ -19919,7 +19914,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.24</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.25</div>
 
 </body>
 </html>
