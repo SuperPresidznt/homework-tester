@@ -10945,9 +10945,9 @@ function showScreen(name, showSubheader, showFooter) {
         LearnMode.trackTimeSpent();
     }
     
-    // Stop SpeedMode timer when leaving speed screen
-    if (name !== 'speed' && typeof SpeedMode !== 'undefined' && SpeedMode.timerInterval) {
-        SpeedMode.stopTimer();
+    // Stop SpeedMode completely when leaving speed screen
+    if (name !== 'speed' && typeof SpeedMode !== 'undefined' && SpeedMode.isActive) {
+        SpeedMode.stop();
     }
     
     // End session timer when returning home
@@ -12865,6 +12865,7 @@ const SpeedMode = {
     timeRemaining: 0,
     maxTime: 30,
     selectedOption: null,
+    isActive: false, // Track if speed mode is currently running
 
     // Fallback time limits by difficulty (seconds) - used when no baseline exists
     TIME_LIMITS: { easy: 30, medium: 20, hard: 15 },
@@ -12960,6 +12961,7 @@ const SpeedMode = {
             return;
         }
 
+        this.isActive = true;
         showScreen('speed', false, false);
         this.updateDisplay();
         this.nextQuestion();
@@ -13016,6 +13018,9 @@ const SpeedMode = {
 
     nextQuestion() {
         this.stopTimer();
+        
+        // Don't continue if SpeedMode was stopped
+        if (!this.isActive) return;
 
         if (this.queue.length === 0) {
             this.buildQueue(); // Refill if empty
@@ -13200,6 +13205,12 @@ const SpeedMode = {
             this.timerInterval = null;
         }
     },
+    
+    // Fully stop SpeedMode (called when leaving screen)
+    stop() {
+        this.stopTimer();
+        this.isActive = false;
+    },
 
     timeUp() {
         this.stopTimer();
@@ -13252,6 +13263,7 @@ const SpeedMode = {
 
     end() {
         this.stopTimer();
+        this.isActive = false;
         Session.end();
         
         // Record speed session for analytics (treat as test with score as accuracy proxy)
