@@ -3302,8 +3302,31 @@ const Gamification = {
                 // Multi-pet sync: migrate and sync active pet
                 const st = this._state;
                 if (!st.studyBuddy.species) st.studyBuddy.species = 'bird';
+                
+                // Clean up graveyard - remove default "Buddy" pets that were never really used
+                if (st.graveyard && st.graveyard.length > 0) {
+                    const graveSeen = new Set();
+                    st.graveyard = st.graveyard.filter(g => {
+                        if (!g || !g.name) return false;
+                        // Filter out default "Buddy" pets with minimal interaction
+                        if (g.name === 'Buddy' && g.species === 'bird' && (g.totalXpFed || 0) < 100) {
+                            return false; // Remove unused default pet from graveyard
+                        }
+                        const key = g.name.toLowerCase();
+                        if (graveSeen.has(key)) return false;
+                        graveSeen.add(key);
+                        return true;
+                    });
+                }
+                
                 if (!st.pets || st.pets.length === 0) {
-                    st.pets = [st.studyBuddy];
+                    // Don't auto-create default pet if user has graveyard (had real pets before)
+                    if (st.graveyard && st.graveyard.length > 0) {
+                        st.pets = [];
+                        st.studyBuddy.dead = true;
+                    } else {
+                        st.pets = [st.studyBuddy];
+                    }
                     st.activePetIdx = 0;
                 } else {
                     // Clean up duplicate pets by name
@@ -3315,17 +3338,6 @@ const Gamification = {
                         seenNames.add(key);
                         return true;
                     });
-                    // Clean up graveyard duplicates too
-                    if (st.graveyard && st.graveyard.length > 0) {
-                        const graveSeen = new Set();
-                        st.graveyard = st.graveyard.filter(g => {
-                            if (!g || !g.name) return false;
-                            const key = g.name.toLowerCase();
-                            if (graveSeen.has(key)) return false;
-                            graveSeen.add(key);
-                            return true;
-                        });
-                    }
                     // Ensure activePetIdx is valid
                     if (st.activePetIdx >= st.pets.length) st.activePetIdx = 0;
                     // Load active pet into studyBuddy
@@ -17638,7 +17650,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.04</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.05</div>
 
 </body>
 </html>
