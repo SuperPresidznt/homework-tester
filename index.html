@@ -3175,155 +3175,166 @@ const Gamification = {
             spaceship:  { name: 'Spaceship',    price: 50000, icon: '🚀', desc: 'To infinity!', tier: 7 }
         },
         businesses: {
+            // BALANCED ECONOMICS: Each business should take ~50-100 cycles to pay off
+            // Cycle = 1 batch of product. Profit margin ~20-40% of revenue
+            // Lemonade: Sells 5 cups @ $2 = $10 revenue, costs $6 = $4 profit per batch
             lemonade: { 
-                name: 'Lemonade Stand', price: 50, icon: '🍋', desc: 'A humble beginning',
-                baseIncome: 2, cycleTime: 10, managerCost: 200,
-                ingredients: { lemons: 2, sugar: 1, water: 1 },
-                ingredientCosts: { lemons: 1, sugar: 0.5, water: 0.1 },
+                name: 'Lemonade Stand', price: 100, icon: '🍋', desc: 'A humble beginning',
+                baseIncome: 4, cycleTime: 30, managerCost: 300,
+                ingredients: { lemons: 5, sugar: 2, cups: 5 },
+                ingredientCosts: { lemons: 0.50, sugar: 0.25, cups: 0.10 },
                 baseCustomers: 5, adBoost: 1.5,
-                // Unique process steps for this business
                 processSteps: ['🍋 Squeeze lemons', '🧊 Add ice', '🥤 Pour & serve'],
                 theme: { bg: '#92400e', accent: '#f59e0b', dark: '#451a03' },
                 flavorText: 'When life gives you lemons...',
                 upgrades: {
-                    iceMachine: { name: 'Ice Machine', cost: 100, bonus: '+10% speed', effect: 'speed', value: 0.1 },
-                    umbrella: { name: 'Umbrella Stand', cost: 150, bonus: '+15% customers', effect: 'customers', value: 0.15 },
-                    signage: { name: 'Neon Sign', cost: 200, bonus: '+20% income', effect: 'income', value: 0.2 }
+                    iceMachine: { name: 'Ice Machine', cost: 75, bonus: '+10% speed', effect: 'speed', value: 0.1 },
+                    umbrella: { name: 'Umbrella Stand', cost: 100, bonus: '+15% customers', effect: 'customers', value: 0.15 },
+                    signage: { name: 'Neon Sign', cost: 150, bonus: '+20% income', effect: 'income', value: 0.2 }
                 }
             },
+            // Paper Route: Deliver 20 papers @ $0.50 tip = $10, costs $4 = $6 profit
             newspaper: { 
-                name: 'Paper Route', price: 150, icon: '📰', desc: 'Deliver the news',
-                baseIncome: 5, cycleTime: 15, managerCost: 500,
-                ingredients: { papers: 10 },
-                ingredientCosts: { papers: 0.2 },
+                name: 'Paper Route', price: 200, icon: '📰', desc: 'Deliver the news',
+                baseIncome: 6, cycleTime: 45, managerCost: 600,
+                ingredients: { papers: 20 },
+                ingredientCosts: { papers: 0.20 },
                 baseCustomers: 10, adBoost: 1.3,
                 processSteps: ['📦 Bundle papers', '🚲 Load bike', '🏠 Deliver route'],
                 theme: { bg: '#374151', accent: '#9ca3af', dark: '#1f2937' },
                 flavorText: 'Extra! Extra! Read all about it!',
                 upgrades: {
-                    bike: { name: 'Better Bike', cost: 300, bonus: '+15% speed', effect: 'speed', value: 0.15 },
-                    bag: { name: 'Bigger Bag', cost: 250, bonus: '+20% capacity', effect: 'capacity', value: 0.2 },
-                    route: { name: 'Premium Route', cost: 400, bonus: '+25% income', effect: 'income', value: 0.25 }
+                    bike: { name: 'Better Bike', cost: 150, bonus: '+15% speed', effect: 'speed', value: 0.15 },
+                    bag: { name: 'Bigger Bag', cost: 200, bonus: '+20% capacity', effect: 'capacity', value: 0.2 },
+                    route: { name: 'Premium Route', cost: 300, bonus: '+25% income', effect: 'income', value: 0.25 }
                 }
             },
+            // Car Wash: Wash 3 cars @ $15 = $45, costs $12 = $33 profit (but slower)
             carwash: { 
-                name: 'Car Wash', price: 500, icon: '🚿', desc: 'Sparkle and shine',
-                baseIncome: 12, cycleTime: 20, managerCost: 1500,
-                ingredients: { soap: 2, water: 5, wax: 1 },
-                ingredientCosts: { soap: 1, water: 0.1, wax: 2 },
+                name: 'Car Wash', price: 800, icon: '🚿', desc: 'Sparkle and shine',
+                baseIncome: 15, cycleTime: 60, managerCost: 2000,
+                ingredients: { soap: 3, water: 10, wax: 1 },
+                ingredientCosts: { soap: 1.50, water: 0.10, wax: 3.00 },
                 baseCustomers: 8, adBoost: 1.4,
                 processSteps: ['🧽 Pre-wash', '🧴 Soap & scrub', '💨 Rinse & dry', '✨ Wax & polish'],
                 theme: { bg: '#1e40af', accent: '#60a5fa', dark: '#1e3a8a' },
                 flavorText: 'Making cars sparkle since day one!',
                 upgrades: {
-                    vacuum: { name: 'Vacuum Station', cost: 800, bonus: '+$3/car', effect: 'flat', value: 3 },
-                    dryer: { name: 'Air Dryer', cost: 1000, bonus: '+20% speed', effect: 'speed', value: 0.2 },
-                    detailing: { name: 'Detail Bay', cost: 1500, bonus: '+40% income', effect: 'income', value: 0.4 }
+                    vacuum: { name: 'Vacuum Station', cost: 500, bonus: '+$2/cycle', effect: 'flat', value: 2 },
+                    dryer: { name: 'Air Dryer', cost: 700, bonus: '+20% speed', effect: 'speed', value: 0.2 },
+                    detailing: { name: 'Detail Bay', cost: 1200, bonus: '+40% income', effect: 'income', value: 0.4 }
                 }
             },
+            // Bakery: Batch of goods sells for $60, costs $25 = $35 profit
             bakery: { 
-                name: 'Bakery', price: 1500, icon: '🥐', desc: 'Fresh baked goods',
-                baseIncome: 25, cycleTime: 30, managerCost: 4000,
-                ingredients: { flour: 3, eggs: 2, butter: 1, sugar: 1 },
-                ingredientCosts: { flour: 0.5, eggs: 0.3, butter: 1, sugar: 0.5 },
+                name: 'Bakery', price: 2500, icon: '🥐', desc: 'Fresh baked goods',
+                baseIncome: 35, cycleTime: 90, managerCost: 6000,
+                ingredients: { flour: 5, eggs: 6, butter: 2, sugar: 3 },
+                ingredientCosts: { flour: 1.00, eggs: 0.50, butter: 2.00, sugar: 0.75 },
                 baseCustomers: 12, adBoost: 1.5,
                 processSteps: ['📝 Take orders', '🥣 Mix dough', '🔥 Bake goods', '🎀 Package & sell'],
                 theme: { bg: '#9a3412', accent: '#fb923c', dark: '#431407' },
                 flavorText: 'The smell of fresh bread fills the air...',
                 upgrades: {
-                    oven: { name: 'Double Oven', cost: 2000, bonus: '+25% speed', effect: 'speed', value: 0.25 },
-                    display: { name: 'Glass Display', cost: 2500, bonus: '+20% customers', effect: 'customers', value: 0.2 },
+                    oven: { name: 'Double Oven', cost: 1500, bonus: '+25% speed', effect: 'speed', value: 0.25 },
+                    display: { name: 'Glass Display', cost: 2000, bonus: '+20% customers', effect: 'customers', value: 0.2 },
                     recipes: { name: 'Secret Recipes', cost: 3000, bonus: '+35% income', effect: 'income', value: 0.35 }
                 }
             },
+            // Pizzeria: 5 pizzas @ $20 = $100, costs $40 = $60 profit
             pizzeria: { 
-                name: 'Pizzeria', price: 4000, icon: '🍕', desc: 'Slice of heaven',
-                baseIncome: 50, cycleTime: 45, managerCost: 10000,
-                ingredients: { dough: 2, cheese: 3, sauce: 2, toppings: 2 },
-                ingredientCosts: { dough: 1, cheese: 2, sauce: 1, toppings: 1.5 },
+                name: 'Pizzeria', price: 6000, icon: '🍕', desc: 'Slice of heaven',
+                baseIncome: 60, cycleTime: 120, managerCost: 15000,
+                ingredients: { dough: 5, cheese: 8, sauce: 5, toppings: 5 },
+                ingredientCosts: { dough: 1.50, cheese: 2.00, sauce: 1.00, toppings: 1.50 },
                 baseCustomers: 15, adBoost: 1.6,
                 processSteps: ['📞 Take order', '🫓 Toss dough', '🧀 Add toppings', '🔥 Fire oven', '📦 Box & deliver'],
                 theme: { bg: '#7f1d1d', accent: '#f87171', dark: '#450a0a' },
                 flavorText: 'Authentic Italian flavors!',
                 upgrades: {
-                    woodOven: { name: 'Wood Fire Oven', cost: 6000, bonus: '+30% quality', effect: 'income', value: 0.3 },
-                    delivery: { name: 'Delivery Fleet', cost: 8000, bonus: '+40% customers', effect: 'customers', value: 0.4 },
-                    franchise: { name: 'Franchise Rights', cost: 15000, bonus: '+50% income', effect: 'income', value: 0.5 }
+                    woodOven: { name: 'Wood Fire Oven', cost: 4000, bonus: '+30% quality', effect: 'income', value: 0.3 },
+                    delivery: { name: 'Delivery Fleet', cost: 5000, bonus: '+40% customers', effect: 'customers', value: 0.4 },
+                    franchise: { name: 'Franchise Rights', cost: 10000, bonus: '+50% income', effect: 'income', value: 0.5 }
                 }
             },
+            // Arcade: Hourly revenue $150, costs $50 = $100 profit
             arcade: { 
-                name: 'Arcade', price: 10000, icon: '🕹️', desc: 'Fun and games',
-                baseIncome: 100, cycleTime: 60, managerCost: 25000,
-                ingredients: { tokens: 50, prizes: 10 },
-                ingredientCosts: { tokens: 0.1, prizes: 2 },
+                name: 'Arcade', price: 15000, icon: '🕹️', desc: 'Fun and games',
+                baseIncome: 100, cycleTime: 180, managerCost: 35000,
+                ingredients: { tokens: 100, prizes: 15, electricity: 1 },
+                ingredientCosts: { tokens: 0.05, prizes: 2.00, electricity: 10.00 },
                 baseCustomers: 20, adBoost: 1.4,
                 processSteps: ['🎮 Power up machines', '🪙 Sell tokens', '🎯 Run games', '🎁 Award prizes'],
                 theme: { bg: '#581c87', accent: '#c084fc', dark: '#3b0764' },
                 flavorText: 'Insert coin to continue...',
                 upgrades: {
-                    vr: { name: 'VR Zone', cost: 15000, bonus: '+35% income', effect: 'income', value: 0.35 },
-                    snacks: { name: 'Snack Bar', cost: 12000, bonus: '+$20/cycle', effect: 'flat', value: 20 },
-                    tournament: { name: 'Tournament Setup', cost: 20000, bonus: '+50% customers', effect: 'customers', value: 0.5 }
+                    vr: { name: 'VR Zone', cost: 10000, bonus: '+35% income', effect: 'income', value: 0.35 },
+                    snacks: { name: 'Snack Bar', cost: 8000, bonus: '+$15/cycle', effect: 'flat', value: 15 },
+                    tournament: { name: 'Tournament Setup', cost: 12000, bonus: '+50% customers', effect: 'customers', value: 0.5 }
                 }
             },
+            // Gym: Daily memberships $300, costs $80 = $220 profit
             gym: { 
-                name: 'Gym', price: 25000, icon: '🏋️', desc: 'Fitness empire',
-                baseIncome: 200, cycleTime: 90, managerCost: 60000,
-                ingredients: { towels: 20, supplements: 5 },
-                ingredientCosts: { towels: 0.5, supplements: 3 },
+                name: 'Gym', price: 40000, icon: '🏋️', desc: 'Fitness empire',
+                baseIncome: 220, cycleTime: 240, managerCost: 100000,
+                ingredients: { towels: 30, supplements: 10, utilities: 1 },
+                ingredientCosts: { towels: 0.50, supplements: 4.00, utilities: 25.00 },
                 baseCustomers: 25, adBoost: 1.3,
                 processSteps: ['🚿 Open facility', '💪 Train members', '🥤 Sell supplements', '🧹 Clean up'],
                 theme: { bg: '#065f46', accent: '#34d399', dark: '#022c22' },
                 flavorText: 'No pain, no gain!',
                 upgrades: {
-                    sauna: { name: 'Sauna Room', cost: 30000, bonus: '+25% retention', effect: 'customers', value: 0.25 },
-                    classes: { name: 'Group Classes', cost: 35000, bonus: '+40% income', effect: 'income', value: 0.4 },
+                    sauna: { name: 'Sauna Room', cost: 25000, bonus: '+25% retention', effect: 'customers', value: 0.25 },
+                    classes: { name: 'Group Classes', cost: 30000, bonus: '+40% income', effect: 'income', value: 0.4 },
                     pool: { name: 'Swimming Pool', cost: 50000, bonus: '+60% value', effect: 'income', value: 0.6 }
                 }
             },
+            // Hotel: Nightly revenue $800, costs $250 = $550 profit
             hotel: { 
-                name: 'Hotel', price: 75000, icon: '🏨', desc: '5-star service',
-                baseIncome: 500, cycleTime: 120, managerCost: 180000,
-                ingredients: { linens: 10, toiletries: 20, food: 15 },
-                ingredientCosts: { linens: 2, toiletries: 1, food: 3 },
+                name: 'Hotel', price: 100000, icon: '🏨', desc: '5-star service',
+                baseIncome: 550, cycleTime: 300, managerCost: 250000,
+                ingredients: { linens: 20, toiletries: 40, food: 30, staff: 1 },
+                ingredientCosts: { linens: 2.00, toiletries: 1.00, food: 3.00, staff: 50.00 },
                 baseCustomers: 30, adBoost: 1.5,
                 processSteps: ['🛎️ Check-in guests', '🛏️ Prepare rooms', '🍽️ Room service', '🧹 Housekeeping', '👋 Check-out'],
                 theme: { bg: '#854d0e', accent: '#fbbf24', dark: '#422006' },
                 flavorText: 'Where luxury meets comfort.',
                 upgrades: {
-                    spa: { name: 'Spa & Wellness', cost: 100000, bonus: '+45% income', effect: 'income', value: 0.45 },
-                    restaurant: { name: '5-Star Restaurant', cost: 120000, bonus: '+$100/cycle', effect: 'flat', value: 100 },
-                    penthouse: { name: 'Penthouse Suite', cost: 200000, bonus: '+80% premium', effect: 'income', value: 0.8 }
+                    spa: { name: 'Spa & Wellness', cost: 75000, bonus: '+45% income', effect: 'income', value: 0.45 },
+                    restaurant: { name: '5-Star Restaurant', cost: 90000, bonus: '+$80/cycle', effect: 'flat', value: 80 },
+                    penthouse: { name: 'Penthouse Suite', cost: 150000, bonus: '+80% premium', effect: 'income', value: 0.8 }
                 }
             },
+            // Tech Startup: Sprint revenue $3000, costs $800 = $2200 profit
             techStartup: { 
-                name: 'Tech Startup', price: 200000, icon: '💻', desc: 'Disrupt the market',
-                baseIncome: 1500, cycleTime: 180, managerCost: 500000,
-                ingredients: { servers: 2, coffee: 50, devTools: 5 },
-                ingredientCosts: { servers: 100, coffee: 0.5, devTools: 20 },
+                name: 'Tech Startup', price: 300000, icon: '💻', desc: 'Disrupt the market',
+                baseIncome: 2200, cycleTime: 600, managerCost: 750000,
+                ingredients: { servers: 5, coffee: 100, devTools: 10, cloud: 1 },
+                ingredientCosts: { servers: 50.00, coffee: 1.00, devTools: 25.00, cloud: 200.00 },
                 baseCustomers: 50, adBoost: 2.0,
                 processSteps: ['☕ Morning standup', '💻 Sprint coding', '🐛 Bug fixes', '🚀 Deploy release', '📊 Analyze metrics'],
                 theme: { bg: '#166534', accent: '#4ade80', dark: '#052e16' },
                 flavorText: 'Move fast and ship things!',
                 upgrades: {
-                    ai: { name: 'AI Integration', cost: 300000, bonus: '+50% efficiency', effect: 'speed', value: 0.5 },
-                    funding: { name: 'Series A Funding', cost: 400000, bonus: '+100% scale', effect: 'income', value: 1.0 },
-                    ipo: { name: 'IPO Prep', cost: 750000, bonus: '+200% valuation', effect: 'income', value: 2.0 }
+                    ai: { name: 'AI Integration', cost: 200000, bonus: '+50% efficiency', effect: 'speed', value: 0.5 },
+                    funding: { name: 'Series A Funding', cost: 350000, bonus: '+100% scale', effect: 'income', value: 1.0 },
+                    ipo: { name: 'IPO Prep', cost: 600000, bonus: '+200% valuation', effect: 'income', value: 2.0 }
                 }
             },
+            // Space Port: Launch revenue $50000, costs $25000 = $25000 profit (high risk/reward)
             spacePort: { 
-                name: 'Space Port', price: 1000000, icon: '🛸', desc: 'To the stars!',
-                baseIncome: 5000, cycleTime: 300, managerCost: 2500000,
-                ingredients: { fuel: 100, parts: 20, permits: 5 },
-                ingredientCosts: { fuel: 10, parts: 50, permits: 100 },
+                name: 'Space Port', price: 2000000, icon: '🛸', desc: 'To the stars!',
+                baseIncome: 25000, cycleTime: 1800, managerCost: 5000000,
+                ingredients: { fuel: 200, parts: 50, permits: 10, crew: 1 },
+                ingredientCosts: { fuel: 50.00, parts: 100.00, permits: 500.00, crew: 2000.00 },
                 baseCustomers: 10, adBoost: 3.0,
                 processSteps: ['🔧 Pre-flight check', '⛽ Fuel rockets', '👨‍🚀 Board passengers', '🚀 Launch!', '🌍 Return & land'],
                 theme: { bg: '#0f172a', accent: '#6366f1', dark: '#1e1b4b' },
                 flavorText: 'The final frontier awaits...',
                 upgrades: {
-                    orbital: { name: 'Orbital Station', cost: 2000000, bonus: '+100% capacity', effect: 'customers', value: 1.0 },
-                    mars: { name: 'Mars Route', cost: 5000000, bonus: '+300% income', effect: 'income', value: 3.0 },
-                    colony: { name: 'Moon Colony', cost: 10000000, bonus: '+500% empire', effect: 'income', value: 5.0 }
+                    orbital: { name: 'Orbital Station', cost: 1500000, bonus: '+100% capacity', effect: 'customers', value: 1.0 },
+                    mars: { name: 'Mars Route', cost: 4000000, bonus: '+300% income', effect: 'income', value: 3.0 },
+                    colony: { name: 'Moon Colony', cost: 8000000, bonus: '+500% empire', effect: 'income', value: 5.0 }
                 }
             }
         },
