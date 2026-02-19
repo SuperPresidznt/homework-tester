@@ -1346,6 +1346,7 @@ button:focus-visible {
 .pet-meter-fill{height:100%;border-radius:5px;transition:width .3s}
 .pet-meter-fill.hunger{background:linear-gradient(90deg,#e74c3c,#e67e22)}
 .pet-meter-fill.happiness{background:linear-gradient(90deg,#f39c12,#ffd60a)}
+.pet-meter-fill.hydration{background:linear-gradient(90deg,#3b82f6,#06b6d4)}
 .pet-meter-fill.evolution{background:linear-gradient(90deg,#9b59b6,#3498db)}
 .pet-meter-fill.care{background:linear-gradient(90deg,#10b981,#06b6d4)}
 .pet-sick-banner{background:#fef3c7;border:1px solid #f59e0b;color:#92400e;padding:6px 10px;border-radius:8px;font-size:12px;text-align:center;margin:6px 0;animation:buddySick 2s ease-in-out infinite}
@@ -3181,7 +3182,7 @@ const Gamification = {
             categoryMastery: {},
             studyBuddy: {
                 name: 'Buddy', species: 'bird', stage: 1, totalXpFed: 0, mood: 'sleepy', lastFed: null,
-                hunger: 100, happiness: 100, lastDecayCheck: null,
+                hunger: 100, happiness: 100, hydration: 100, lastDecayCheck: null,
                 careMinutes: 0, lastCareCheck: null, studyMinutes: 0,
                 sick: false, lastInteraction: null,
                 accessories: [], totalMealsEaten: 0
@@ -8733,21 +8734,29 @@ const Garden = {
                 }
             }
             
-            // Auto-hydrate from water bowl (reduces happiness decay)
-            if (petCare.waterBowl.level > 0) {
-                happyDecay *= 0.5; // Water bowl halves happiness decay
-                petCare.waterBowl.level = Math.max(0, petCare.waterBowl.level - scaledHours * 0.5);
+            // Hydration decay (similar rate to hunger)
+            let hydrationDecay = scaledHours * 3.5 * decayRate * hungerReduction;
+            
+            // Auto-hydrate from water bowl
+            if (petCare.waterBowl.level > 0 && pet.hydration < 50) {
+                const drinksNeeded = Math.ceil((50 - (pet.hydration ?? 100)) / 15);
+                const drinksUsed = Math.min(drinksNeeded, petCare.waterBowl.level);
+                if (drinksUsed > 0) {
+                    pet.hydration = Math.min(100, (pet.hydration ?? 100) + drinksUsed * 15);
+                    petCare.waterBowl.level -= drinksUsed;
+                }
             }
 
             pet.hunger = Math.max(0, (pet.hunger ?? 100) - hungerDecay);
             pet.happiness = Math.max(0, (pet.happiness ?? 100) - happyDecay);
+            pet.hydration = Math.max(0, (pet.hydration ?? 100) - hydrationDecay);
 
             // Passive care minutes (1 per real hour)
             const passiveCare = Math.min(scaledHours, 24);
             pet.careMinutes = (pet.careMinutes || 0) + passiveCare;
 
-            // Sickness at both below 15
-            if (pet.hunger < 15 && pet.happiness < 15) pet.sick = true;
+            // Sickness at hunger, happiness, OR hydration below 15
+            if ((pet.hunger < 15 && pet.happiness < 15) || pet.hydration < 10) pet.sick = true;
             if (pet.sick) {
                 pet.hunger = Math.max(0, pet.hunger - scaledHours * 4 * decayRate * hungerReduction);
                 pet.happiness = Math.max(0, pet.happiness - scaledHours * 4 * decayRate * happyReduction);
@@ -8941,7 +8950,9 @@ const PetModal = {
 
         const hunger = buddy.hunger ?? 100;
         const happiness = buddy.happiness ?? 100;
+        const hydration = buddy.hydration ?? 100;
         const accessories = buddy.accessories || [];
+        const petCare = state.petCare || {};
 
         let progressInfo = '';
         if (nextStage) {
@@ -9024,11 +9035,22 @@ const PetModal = {
                 <div class="pet-modal-stage">${Gamification.getSpeciesStageName(buddy.species, buddy.stage)}${buddy.sick ? ' \ud83e\udd12' : ''} <span style="font-size:11px;color:var(--gray-500)">(${spInfo.name})</span></div>
                 ${sickBanner}
                 <div class="pet-meters">
-                    <div class="pet-meter"><span>Hunger</span><div class="pet-meter-bar"><div class="pet-meter-fill hunger" style="width:${hunger}%"></div></div><span>${Math.round(hunger)}%</span></div>
-                    <div class="pet-meter"><span>Happiness</span><div class="pet-meter-bar"><div class="pet-meter-fill happiness" style="width:${happiness}%"></div></div><span>${Math.round(happiness)}%</span></div>
+                    <div class="pet-meter"><span>🍖 Hunger</span><div class="pet-meter-bar"><div class="pet-meter-fill hunger" style="width:${hunger}%"></div></div><span>${Math.round(hunger)}%</span></div>
+                    <div class="pet-meter"><span>💧 Hydration</span><div class="pet-meter-bar"><div class="pet-meter-fill hydration" style="width:${hydration}%"></div></div><span>${Math.round(hydration)}%</span></div>
+                    <div class="pet-meter"><span>😊 Happiness</span><div class="pet-meter-bar"><div class="pet-meter-fill happiness" style="width:${happiness}%"></div></div><span>${Math.round(happiness)}%</span></div>
                     ${progressInfo}
                 </div>
-                <h4>Feed</h4>
+                <h4>💧 Water</h4>
+                <div style="display:flex;gap:8px;margin-bottom:12px">
+                    <button class="pet-food-btn" onclick="PetModal.giveWater()" style="flex:1" ${hydration >= 100 ? 'disabled' : ''}>💧 Give Water (+25% hydration)</button>
+                    ${petCare.waterBowl?.capacity > 0 ? `<button class="pet-food-btn" onclick="Shop.fillWaterBowl();PetModal.show()" style="flex:1" ${(petCare.waterBowl.level || 0) >= petCare.waterBowl.capacity ? 'disabled' : ''}>🫗 Fill Bowl ${Math.round(petCare.waterBowl.level || 0)}/${petCare.waterBowl.capacity}</button>` : ''}
+                </div>
+                ${petCare.foodBowl?.capacity > 0 ? `
+                <div style="display:flex;gap:8px;margin-bottom:12px">
+                    <button class="pet-food-btn" onclick="Shop.fillFoodBowl();PetModal.show()" style="flex:1" ${(petCare.foodBowl.level || 0) >= petCare.foodBowl.capacity ? 'disabled' : ''}>🥣 Fill Food Bowl ${petCare.foodBowl.level || 0}/${petCare.foodBowl.capacity}</button>
+                </div>
+                ` : ''}
+                <h4>🍖 Feed</h4>
                 ${foodHtml}
                 <h4>Accessories</h4>
                 ${accessoryHtml}
@@ -9124,7 +9146,7 @@ const PetModal = {
         }
 
         // Feeding can heal sickness
-        if (buddy.sick && buddy.hunger > 30 && buddy.happiness > 30) {
+        if (buddy.sick && buddy.hunger > 30 && buddy.happiness > 30 && (buddy.hydration ?? 100) > 30) {
             buddy.sick = false;
         }
 
@@ -9138,6 +9160,29 @@ const PetModal = {
         if (state.studyBuddy.totalMealsEaten >= 50) Gamification.unlockAchievement('happy_tummy');
         if (state.studyBuddy.stage >= 5) Gamification.unlockAchievement('best_friends');
 
+        this.show(); // Re-render
+    },
+
+    giveWater() {
+        const state = Gamification.getState();
+        const buddy = state.studyBuddy;
+        if (!buddy || buddy.dead) return;
+        
+        // Water is free - just hydrate the pet
+        const oldHydration = buddy.hydration ?? 100;
+        buddy.hydration = Math.min(100, oldHydration + 25);
+        buddy.lastInteraction = Date.now();
+        
+        // Hydrating can heal sickness
+        if (buddy.sick && buddy.hunger > 30 && buddy.happiness > 30 && buddy.hydration > 30) {
+            buddy.sick = false;
+        }
+        
+        Gamification.updateBuddyMood();
+        Gamification.saveState(state);
+        SoundFX.play('petFeed');
+        Gamification.updateBuddyWidget();
+        
         this.show(); // Re-render
     },
 
@@ -17668,7 +17713,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.06</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.07</div>
 
 </body>
 </html>
