@@ -1231,7 +1231,14 @@ button:focus-visible {
 .garden-pet-sprite{position:relative;display:inline-block}
 .garden-pet-emoji{font-size:44px;animation:petIdle 2s ease-in-out infinite;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
 @keyframes petIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-.pet-accessory{position:absolute;top:-10px;right:-10px;font-size:20px}
+/* Garden pet accessory positioning ON the pet */
+.pet-accessory{position:absolute;font-size:14px;z-index:10;filter:drop-shadow(1px 1px 1px rgba(0,0,0,0.4))}
+.pet-accessory.acc-hat{top:-6px;left:50%;transform:translateX(-50%)}
+.pet-accessory.acc-crown{top:-8px;left:50%;transform:translateX(-50%)}
+.pet-accessory.acc-scarf{bottom:8px;left:50%;transform:translateX(-50%)}
+.pet-accessory.acc-sunglasses{top:12px;left:50%;transform:translateX(-50%)}
+.pet-accessory.acc-cape{top:18px;right:-2px;font-size:16px}
+.pet-accessory.acc-bowtie{bottom:14px;left:50%;transform:translateX(-50%)}
 .garden-pet-name{font-weight:bold;font-size:11px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 .garden-pet-mood-bubble{position:absolute;top:-24px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.92);border-radius:10px;padding:2px 7px;font-size:11px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.15);pointer-events:none}
 .garden-pet-mood-bubble::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:8px;height:4px;background:rgba(255,255,255,.92);clip-path:polygon(0 0,100% 0,50% 100%)}
@@ -1335,9 +1342,16 @@ button:focus-visible {
 /* === PET MODAL === */
 .pet-modal-content{background:var(--white);border-radius:16px;padding:24px;max-width:400px;width:90%;margin:40px auto;position:relative;max-height:85vh;overflow-y:auto}
 .pet-modal-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:24px;color:var(--gray-500);cursor:pointer}
-.pet-modal-sprite{text-align:center;position:relative;display:inline-block;width:100%}
-.pet-modal-emoji{font-size:64px}
-.pet-modal-acc{position:absolute;top:0;right:calc(50% - 50px);font-size:24px}
+.pet-modal-sprite{text-align:center;position:relative;display:inline-block;width:100%;min-height:80px}
+.pet-modal-emoji{font-size:64px;position:relative;display:inline-block}
+/* Accessory positioning - each type has specific placement ON the pet */
+.pet-modal-acc{position:absolute;font-size:20px;z-index:10;filter:drop-shadow(1px 1px 1px rgba(0,0,0,0.3))}
+.pet-modal-acc.acc-hat{top:-8px;left:50%;transform:translateX(-50%)}
+.pet-modal-acc.acc-crown{top:-12px;left:50%;transform:translateX(-50%)}
+.pet-modal-acc.acc-scarf{bottom:5px;left:50%;transform:translateX(-50%)}
+.pet-modal-acc.acc-sunglasses{top:18px;left:50%;transform:translateX(-50%)}
+.pet-modal-acc.acc-cape{top:25px;right:-5px;font-size:24px}
+.pet-modal-acc.acc-bowtie{bottom:12px;left:50%;transform:translateX(-50%)}
 .pet-modal-name{text-align:center;font-size:20px;font-weight:bold;color:var(--navy);cursor:pointer;margin:8px 0 4px}
 .pet-modal-name:hover{text-decoration:underline}
 .pet-modal-stage{text-align:center;font-size:13px;color:var(--gray-600);margin-bottom:12px}
@@ -1398,7 +1412,15 @@ button:focus-visible {
     .study-buddy:hover:not(.dragging){transform:scale(1.05)}
 }
 .study-buddy.dragging{cursor:grabbing;box-shadow:0 6px 18px rgba(0,0,0,.25)}
-.buddy-sprite{font-size:36px;margin-bottom:4px}
+.buddy-sprite{font-size:36px;margin-bottom:4px;position:relative;display:inline-block}
+/* Buddy widget accessory positioning ON the pet */
+.buddy-acc{position:absolute;font-size:12px;z-index:10;filter:drop-shadow(1px 1px 1px rgba(0,0,0,0.3))}
+.buddy-acc.acc-hat{top:-4px;left:50%;transform:translateX(-50%)}
+.buddy-acc.acc-crown{top:-6px;left:50%;transform:translateX(-50%)}
+.buddy-acc.acc-scarf{bottom:2px;left:50%;transform:translateX(-50%)}
+.buddy-acc.acc-sunglasses{top:10px;left:50%;transform:translateX(-50%)}
+.buddy-acc.acc-cape{top:14px;right:-2px;font-size:14px}
+.buddy-acc.acc-bowtie{bottom:6px;left:50%;transform:translateX(-50%)}
 .buddy-name{font-size:12px;font-weight:bold;color:var(--navy)}
 .buddy-mood{font-size:10px;color:var(--gray-600)}
 .study-buddy.urgent{animation:buddyPulse 1.5s ease-in-out infinite;border-color:#ef4444}
@@ -4100,12 +4122,13 @@ const Gamification = {
         this._applyBuddyPosition(el, state.settings.buddyPosition);
         this._ensureBuddyDraggable(el);
 
-        const accessories = (buddy.accessories || []).map(a => {
+        const accessories = buddy.accessories || [];
+        const accHtml = accessories.map(a => {
             const item = this.SHOP?.cosmetics?.[a];
-            return item ? item.icon : '';
+            return item ? `<span class="buddy-acc acc-${a}">${item.icon}</span>` : '';
         }).join('');
-        document.getElementById('buddySprite').innerHTML = Sprites.petSprite(buddy.stage, this.getSpeciesEmoji(buddy.species, buddy.stage), 36);
-        document.getElementById('buddyName').textContent = buddy.name + (accessories ? ' ' + accessories : '');
+        document.getElementById('buddySprite').innerHTML = Sprites.petSprite(buddy.stage, this.getSpeciesEmoji(buddy.species, buddy.stage), 36) + accHtml;
+        document.getElementById('buddyName').textContent = buddy.name;
         const moodStr = buddy.mood || 'content';
         const moodDisplay = buddy.sick ? 'Sick \ud83e\udd12' : moodStr.charAt(0).toUpperCase() + moodStr.slice(1);
         document.getElementById('buddyMood').textContent = moodDisplay;
@@ -8764,7 +8787,7 @@ const Garden = {
                 <span class="garden-pet-emoji">${Sprites.petSprite(buddy.stage, Gamification.getSpeciesEmoji(buddy.species, buddy.stage), 44)}</span>
                 ${accessories.map(a => {
                     const item = Gamification.SHOP.cosmetics[a];
-                    return item ? `<span class="pet-accessory">${item.icon}</span>` : '';
+                    return item ? `<span class="pet-accessory acc-${a}">${item.icon}</span>` : '';
                 }).join('')}
             </div>
             <div class="garden-pet-name">${buddy.name}</div>
@@ -9583,7 +9606,7 @@ const PetModal = {
                 ${petSelectorHtml}
                 <div class="pet-modal-sprite">
                     <span class="pet-modal-emoji">${Sprites.petSprite(buddy.stage, Gamification.getSpeciesEmoji(buddy.species, buddy.stage), 64)}</span>
-                    ${accessories.map(a => { const it = Gamification.SHOP.cosmetics[a]; return it ? `<span class="pet-modal-acc">${it.icon}</span>` : ''; }).join('')}
+                    ${accessories.map(a => { const it = Gamification.SHOP.cosmetics[a]; return it ? `<span class="pet-modal-acc acc-${a}">${it.icon}</span>` : ''; }).join('')}
                 </div>
                 <div class="pet-modal-name" onclick="PetModal.rename()">${buddy.name} ✏️</div>
                 <div class="pet-modal-stage">${Gamification.getSpeciesStageName(buddy.species, buddy.stage)}${buddy.sick ? ' \ud83e\udd12' : ''} <span style="font-size:11px;color:var(--gray-500)">(${spInfo.name})</span></div>
