@@ -1931,7 +1931,32 @@ button:focus-visible {
                 </summary>
                 <div class="stats-row" id="homeStats"></div>
             </details>
+            
+            <!-- AI Tutor Card -->
+            <div class="ai-tutor-card" id="aiTutorCard" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:12px;padding:16px;margin-top:16px;color:#fff;cursor:pointer" onclick="AITutor.openModal()">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                    <span style="font-size:32px">🤖</span>
+                    <div>
+                        <div style="font-weight:bold;font-size:16px">AI Study Coach</div>
+                        <div style="font-size:12px;opacity:0.8">Tap for personalized advice</div>
+                    </div>
+                </div>
+                <div id="aiTutorQuickTip" style="font-size:13px;background:rgba(0,0,0,0.2);padding:10px;border-radius:8px">
+                    Loading recommendations...
+                </div>
+            </div>
         </div>
+    </div>
+</div>
+
+<!-- ========== AI TUTOR MODAL ========== -->
+<div class="modal-overlay" id="aiTutorModal" onclick="if(event.target===this)AITutor.closeModal()">
+    <div class="modal-content" style="max-width:600px;max-height:85vh;overflow-y:auto">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h2 style="margin:0;display:flex;align-items:center;gap:10px"><span style="font-size:28px">🤖</span> AI Study Coach</h2>
+            <button onclick="AITutor.closeModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:var(--gray-500)">×</button>
+        </div>
+        <div id="aiTutorContent"></div>
     </div>
 </div>
 
@@ -11010,6 +11035,7 @@ const Home = {
         this.updateMetaSummary();
         this.renderStats();
         this.renderBanks();
+        AITutor.renderQuickTip();
     },
 
     updateMetaSummary() {
@@ -11115,6 +11141,323 @@ const Home = {
                 <button class="btn-nav" style="background:var(--red);font-size:12px;padding:6px 14px" onclick="Drill.start('${escapeHtml(bank.bankId)}', [${weakQIds.join(',')}])">Drill Weak Areas</button>
             </div>
         </div>`;
+    }
+};
+
+// =====================================================================
+// AI TUTOR - Analyzes stats and provides personalized recommendations
+// =====================================================================
+const AITutor = {
+    openModal() {
+        document.getElementById('aiTutorModal').classList.add('active');
+        this.renderFullAnalysis();
+    },
+    
+    closeModal() {
+        document.getElementById('aiTutorModal').classList.remove('active');
+    },
+    
+    // Analyze all user data and generate insights
+    analyzeStats() {
+        const stats = DailyGoal.getStats();
+        const drillData = Store.get('drillProgress', {});
+        const tracker = Store.get('questionTracker', {});
+        const catAccuracy = QuestionTracker.getCategoryAccuracy();
+        
+        // Calculate key metrics
+        const totalQuestions = Object.keys(drillData).length;
+        const mastered = Object.values(drillData).filter(d => d.ef >= 2.5 && d.reps >= 3).length;
+        const masteryPct = totalQuestions > 0 ? Math.round((mastered / totalQuestions) * 100) : 0;
+        const struggling = Object.values(drillData).filter(d => d.ef < 2.0).length;
+        
+        // Find weak categories (< 60% accuracy with at least 3 attempts)
+        const weakCats = Object.entries(catAccuracy)
+            .filter(([_, d]) => d.total >= 3 && (d.correct / d.total) < 0.6)
+            .sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total));
+        
+        // Find strong categories (> 80% accuracy)
+        const strongCats = Object.entries(catAccuracy)
+            .filter(([_, d]) => d.total >= 3 && (d.correct / d.total) >= 0.8)
+            .sort((a, b) => (b[1].correct / b[1].total) - (a[1].correct / a[1].total));
+        
+        // Study time analysis
+        const todayMins = Session.getTodayMins();
+        const totalMins = stats.totalStudyMins || 0;
+        const avgDailyMins = stats.daysActive > 0 ? Math.round(totalMins / stats.daysActive) : 0;
+        
+        // Streak and consistency
+        const streak = stats.streak || 0;
+        const questionsToday = stats.questionsToday || 0;
+        const dailyGoal = stats.dailyGoal || 10;
+        const goalProgress = Math.min(100, Math.round((questionsToday / dailyGoal) * 100));
+        
+        // Recent performance trend
+        const recentTests = [];
+        BankManager.banks.forEach(bank => {
+            const history = Store.get('testHistory_' + bank.bankId, []);
+            recentTests.push(...history.slice(-5));
+        });
+        recentTests.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const last5Tests = recentTests.slice(0, 5);
+        const avgRecentScore = last5Tests.length > 0 
+            ? Math.round(last5Tests.reduce((s, t) => s + t.pct, 0) / last5Tests.length) 
+            : null;
+        
+        return {
+            totalQuestions, mastered, masteryPct, struggling,
+            weakCats, strongCats,
+            todayMins, totalMins, avgDailyMins,
+            streak, questionsToday, dailyGoal, goalProgress,
+            avgRecentScore, last5Tests,
+            testsCompleted: stats.testsCompleted || 0,
+            avgScore: stats.avgScore || 0
+        };
+    },
+    
+    // Generate the primary recommendation
+    getTopRecommendation(analysis) {
+        const { weakCats, goalProgress, streak, masteryPct, struggling, todayMins, questionsToday } = analysis;
+        
+        // Priority 1: Haven't studied today
+        if (questionsToday === 0) {
+            return {
+                icon: '🎯',
+                title: 'Start Your Day!',
+                text: streak > 0 
+                    ? `Keep your ${streak}-day streak alive! Try a quick drill session.`
+                    : 'Begin with a short drill to warm up your brain.',
+                action: 'Drill Mode',
+                actionFn: () => BankManager.banks[0] && Drill.start(BankManager.banks[0].bankId)
+            };
+        }
+        
+        // Priority 2: Goal not met
+        if (goalProgress < 100) {
+            const remaining = analysis.dailyGoal - analysis.questionsToday;
+            return {
+                icon: '📊',
+                title: `${remaining} more to hit your goal!`,
+                text: `You're ${goalProgress}% there. A quick ${Math.min(remaining, 10)}-question session will get you closer.`,
+                action: 'Quick Drill',
+                actionFn: () => BankManager.banks[0] && Drill.start(BankManager.banks[0].bankId)
+            };
+        }
+        
+        // Priority 3: Weak categories exist
+        if (weakCats.length > 0) {
+            const [cat, data] = weakCats[0];
+            const pct = Math.round((data.correct / data.total) * 100);
+            return {
+                icon: '🔴',
+                title: `Focus on: ${cat}`,
+                text: `Only ${pct}% accuracy here. Targeted practice will boost your score significantly.`,
+                action: 'Drill Weak Area',
+                actionFn: () => {
+                    const bank = BankManager.banks[0];
+                    if (bank) {
+                        const weakQIds = bank.questions.filter(q => (q.category || 'General') === cat).map(q => q.id);
+                        Drill.start(bank.bankId, weakQIds);
+                    }
+                }
+            };
+        }
+        
+        // Priority 4: Low mastery overall
+        if (masteryPct < 50) {
+            return {
+                icon: '📚',
+                title: 'Build Your Foundation',
+                text: `${masteryPct}% mastery. Regular drill sessions will lock in knowledge long-term.`,
+                action: 'Drill Mode',
+                actionFn: () => BankManager.banks[0] && Drill.start(BankManager.banks[0].bankId)
+            };
+        }
+        
+        // Priority 5: Ready for a test
+        if (masteryPct >= 70) {
+            return {
+                icon: '✅',
+                title: 'Ready for a Practice Test!',
+                text: `${masteryPct}% mastery - you're well prepared. Take a timed test to simulate the real exam.`,
+                action: 'Take Test',
+                actionFn: () => BankManager.banks[0] && App.start(BankManager.banks[0].bankId, 'test')
+            };
+        }
+        
+        // Default: Keep practicing
+        return {
+            icon: '💪',
+            title: 'Keep Up the Momentum!',
+            text: 'You\'re making great progress. Continue with drill mode to reinforce learning.',
+            action: 'Continue Drilling',
+            actionFn: () => BankManager.banks[0] && Drill.start(BankManager.banks[0].bankId)
+        };
+    },
+    
+    // Render quick tip on home screen
+    renderQuickTip() {
+        const el = document.getElementById('aiTutorQuickTip');
+        if (!el) return;
+        
+        const analysis = this.analyzeStats();
+        const rec = this.getTopRecommendation(analysis);
+        
+        el.innerHTML = `<strong>${rec.icon} ${rec.title}</strong><br><span style="opacity:0.9">${rec.text}</span>`;
+    },
+    
+    // Render full analysis in modal
+    renderFullAnalysis() {
+        const el = document.getElementById('aiTutorContent');
+        if (!el) return;
+        
+        const a = this.analyzeStats();
+        const topRec = this.getTopRecommendation(a);
+        
+        let html = `
+            <!-- Top Recommendation -->
+            <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;padding:20px;border-radius:12px;margin-bottom:20px">
+                <div style="font-size:24px;margin-bottom:8px">${topRec.icon} ${topRec.title}</div>
+                <p style="margin:0 0 16px 0;opacity:0.9">${topRec.text}</p>
+                <button onclick="AITutor.closeModal();(${topRec.actionFn.toString()})()" style="background:#fff;color:#6366f1;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer">
+                    ${topRec.action} →
+                </button>
+            </div>
+            
+            <!-- Stats Overview -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+                <div style="background:var(--gray-100);padding:16px;border-radius:8px;text-align:center">
+                    <div style="font-size:28px;font-weight:bold;color:var(--blue)">${a.masteryPct}%</div>
+                    <div style="font-size:12px;color:var(--gray-600)">Mastery</div>
+                </div>
+                <div style="background:var(--gray-100);padding:16px;border-radius:8px;text-align:center">
+                    <div style="font-size:28px;font-weight:bold;color:var(--green)">${a.streak}</div>
+                    <div style="font-size:12px;color:var(--gray-600)">Day Streak</div>
+                </div>
+                <div style="background:var(--gray-100);padding:16px;border-radius:8px;text-align:center">
+                    <div style="font-size:28px;font-weight:bold;color:var(--orange)">${Math.round(a.avgScore)}%</div>
+                    <div style="font-size:12px;color:var(--gray-600)">Avg Score</div>
+                </div>
+            </div>
+            
+            <!-- Today's Progress -->
+            <div style="background:var(--gray-100);padding:16px;border-radius:8px;margin-bottom:20px">
+                <h3 style="margin:0 0 12px 0;font-size:14px">📅 Today's Progress</h3>
+                <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+                    <span>Questions: ${a.questionsToday}/${a.dailyGoal}</span>
+                    <span style="font-weight:bold">${a.goalProgress}%</span>
+                </div>
+                <div style="background:var(--gray-300);border-radius:4px;height:8px;overflow:hidden">
+                    <div style="background:${a.goalProgress >= 100 ? 'var(--green)' : 'var(--blue)'};height:100%;width:${a.goalProgress}%"></div>
+                </div>
+                <div style="margin-top:8px;font-size:12px;color:var(--gray-600)">
+                    Study time today: ${Session.formatTime(a.todayMins)} • Total: ${Session.formatTime(a.totalMins)}
+                </div>
+            </div>`;
+        
+        // Weak Areas
+        if (a.weakCats.length > 0) {
+            html += `
+                <div style="background:#fef2f2;border:1px solid var(--red-light);padding:16px;border-radius:8px;margin-bottom:20px">
+                    <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--red)">🔴 Areas Needing Work</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px">
+                        ${a.weakCats.slice(0, 5).map(([cat, d]) => {
+                            const pct = Math.round((d.correct / d.total) * 100);
+                            return `<span style="background:var(--red-light);color:#fff;padding:6px 12px;border-radius:16px;font-size:12px">${escapeHtml(cat)} (${pct}%)</span>`;
+                        }).join('')}
+                    </div>
+                    <p style="margin:12px 0 0 0;font-size:13px;color:var(--gray-700)">
+                        💡 <strong>Tip:</strong> Focus 70% of your study time on weak areas. Use Drill Mode to target these specifically.
+                    </p>
+                </div>`;
+        }
+        
+        // Strong Areas
+        if (a.strongCats.length > 0) {
+            html += `
+                <div style="background:#f0fdf4;border:1px solid var(--green);padding:16px;border-radius:8px;margin-bottom:20px">
+                    <h3 style="margin:0 0 12px 0;font-size:14px;color:var(--green)">🟢 Your Strengths</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px">
+                        ${a.strongCats.slice(0, 5).map(([cat, d]) => {
+                            const pct = Math.round((d.correct / d.total) * 100);
+                            return `<span style="background:var(--green);color:#fff;padding:6px 12px;border-radius:16px;font-size:12px">${escapeHtml(cat)} (${pct}%)</span>`;
+                        }).join('')}
+                    </div>
+                </div>`;
+        }
+        
+        // Study Plan Suggestions
+        html += `
+            <div style="background:var(--gray-100);padding:16px;border-radius:8px;margin-bottom:20px">
+                <h3 style="margin:0 0 12px 0;font-size:14px">📋 Recommended Study Plan</h3>
+                <ol style="margin:0;padding-left:20px;font-size:13px;line-height:1.8">
+                    ${this.getStudyPlanSteps(a).map(step => `<li>${step}</li>`).join('')}
+                </ol>
+            </div>`;
+        
+        // Quick Actions
+        html += `
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+                <button class="btn-nav" style="background:var(--blue);padding:14px" onclick="AITutor.closeModal();BankManager.banks[0]&&Drill.start(BankManager.banks[0].bankId)">
+                    🎯 Start Drill
+                </button>
+                <button class="btn-nav" style="background:var(--green);padding:14px" onclick="AITutor.closeModal();BankManager.banks[0]&&App.start(BankManager.banks[0].bankId,'practice')">
+                    📝 Practice Mode
+                </button>
+                <button class="btn-nav" style="background:var(--orange);padding:14px" onclick="AITutor.closeModal();BankManager.banks[0]&&SpeedMode.start(BankManager.banks[0].bankId)">
+                    ⚡ Speed Mode
+                </button>
+                <button class="btn-nav" style="background:var(--red);padding:14px" onclick="AITutor.closeModal();BankManager.banks[0]&&App.start(BankManager.banks[0].bankId,'test')">
+                    📋 Take Test
+                </button>
+            </div>`;
+        
+        el.innerHTML = html;
+    },
+    
+    // Generate personalized study plan steps
+    getStudyPlanSteps(analysis) {
+        const steps = [];
+        const { weakCats, masteryPct, goalProgress, streak, avgRecentScore } = analysis;
+        
+        // Step 1: Based on current state
+        if (goalProgress < 100) {
+            steps.push(`Complete your daily goal (${analysis.questionsToday}/${analysis.dailyGoal} done)`);
+        } else {
+            steps.push('✅ Daily goal complete! Consider doing extra practice.');
+        }
+        
+        // Step 2: Weak area focus
+        if (weakCats.length > 0) {
+            const topWeak = weakCats[0][0];
+            steps.push(`Drill <strong>${escapeHtml(topWeak)}</strong> - your weakest category`);
+        } else {
+            steps.push('Review any flagged/bookmarked questions');
+        }
+        
+        // Step 3: Based on mastery
+        if (masteryPct < 50) {
+            steps.push('Focus on Drill Mode to build foundational knowledge');
+        } else if (masteryPct < 75) {
+            steps.push('Mix Drill and Practice modes to solidify understanding');
+        } else {
+            steps.push('Take timed practice tests to build exam stamina');
+        }
+        
+        // Step 4: Speed training
+        if (avgRecentScore && avgRecentScore >= 70) {
+            steps.push('Try Speed Mode to improve recall speed');
+        } else {
+            steps.push('Use Practice Mode with explanations to understand concepts');
+        }
+        
+        // Step 5: Consistency
+        if (streak < 7) {
+            steps.push(`Build a 7-day streak (currently ${streak} days)`);
+        } else {
+            steps.push(`Maintain your ${streak}-day streak - consistency is key!`);
+        }
+        
+        return steps;
     }
 };
 
