@@ -11187,11 +11187,15 @@ const Calculator = {
     history: [],
     isOpen: false,
     mode: 'deg', // deg or rad
+    isDragging: false,
+    dragOffset: { x: 0, y: 0 },
     
     open() {
         this.isOpen = true;
         this.render();
-        document.getElementById('calculatorModal').style.display = 'block';
+        const modal = document.getElementById('calculatorModal');
+        modal.style.display = 'block';
+        this.initDrag();
     },
     
     close() {
@@ -11201,6 +11205,52 @@ const Calculator = {
     
     toggle() {
         this.isOpen ? this.close() : this.open();
+    },
+    
+    initDrag() {
+        const modal = document.getElementById('calculatorModal');
+        const header = document.getElementById('calcDragHandle');
+        if (!header) return;
+        
+        header.onmousedown = (e) => {
+            e.preventDefault();
+            this.isDragging = true;
+            this.dragOffset.x = e.clientX - modal.offsetLeft;
+            this.dragOffset.y = e.clientY - modal.offsetTop;
+            document.onmousemove = (e) => this.drag(e);
+            document.onmouseup = () => this.stopDrag();
+        };
+        
+        header.ontouchstart = (e) => {
+            const touch = e.touches[0];
+            this.isDragging = true;
+            this.dragOffset.x = touch.clientX - modal.offsetLeft;
+            this.dragOffset.y = touch.clientY - modal.offsetTop;
+            document.ontouchmove = (e) => this.drag(e.touches[0]);
+            document.ontouchend = () => this.stopDrag();
+        };
+    },
+    
+    drag(e) {
+        if (!this.isDragging) return;
+        const modal = document.getElementById('calculatorModal');
+        let newX = e.clientX - this.dragOffset.x;
+        let newY = e.clientY - this.dragOffset.y;
+        // Keep within viewport
+        newX = Math.max(0, Math.min(newX, window.innerWidth - modal.offsetWidth));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - modal.offsetHeight));
+        modal.style.left = newX + 'px';
+        modal.style.top = newY + 'px';
+        modal.style.right = 'auto';
+        modal.style.bottom = 'auto';
+    },
+    
+    stopDrag() {
+        this.isDragging = false;
+        document.onmousemove = null;
+        document.onmouseup = null;
+        document.ontouchmove = null;
+        document.ontouchend = null;
     },
     
     input(val) {
@@ -11324,10 +11374,10 @@ const Calculator = {
         if (!modal) return;
         
         modal.innerHTML = `
-        <div style="background:linear-gradient(145deg,#1a1a2e,#16213e);border-radius:16px;padding:16px;max-width:360px;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:2px solid #0f3460;font-family:'Courier New',monospace">
-            <!-- Header -->
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-                <div style="color:#00d9ff;font-weight:bold;font-size:14px">📐 TI-84 Calculator</div>
+        <div style="background:linear-gradient(145deg,#1a1a2e,#16213e);border-radius:16px;padding:16px;max-width:360px;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:2px solid #0f3460;font-family:'Courier New',monospace">
+            <!-- Drag Handle Header -->
+            <div id="calcDragHandle" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;cursor:grab;padding:4px;margin:-4px -4px 12px -4px;border-radius:12px 12px 0 0;background:rgba(0,217,255,0.1)">
+                <div style="color:#00d9ff;font-weight:bold;font-size:14px;display:flex;align-items:center;gap:6px"><span style="opacity:0.5">⋮⋮</span> 📐 TI-84 Calculator</div>
                 <div style="display:flex;gap:8px;align-items:center">
                     <button onclick="Calculator.toggleMode()" style="background:${this.mode === 'deg' ? '#e94560' : '#0f3460'};color:white;border:none;padding:4px 8px;border-radius:4px;font-size:11px;cursor:pointer">${this.mode.toUpperCase()}</button>
                     <button onclick="Calculator.close()" style="background:#e94560;color:white;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
