@@ -1975,8 +1975,8 @@ button:focus-visible {
     </div>
 </div>
 
-<!-- ========== CALCULATOR MODAL ========== -->
-<div class="modal-overlay" id="calculatorModal" onclick="if(event.target===this)Calculator.close()" style="z-index:10001"></div>
+<!-- ========== CALCULATOR PANEL (Side Panel, Not Overlay) ========== -->
+<div id="calculatorModal" style="display:none;position:fixed;bottom:200px;right:20px;z-index:10001"></div>
 
 <!-- ========== AI TUTOR MODAL ========== -->
 <div class="modal-overlay" id="aiTutorModal" onclick="if(event.target===this)AITutor.closeModal()">
@@ -11191,12 +11191,12 @@ const Calculator = {
     open() {
         this.isOpen = true;
         this.render();
-        document.getElementById('calculatorModal').classList.add('active');
+        document.getElementById('calculatorModal').style.display = 'block';
     },
     
     close() {
         this.isOpen = false;
-        document.getElementById('calculatorModal').classList.remove('active');
+        document.getElementById('calculatorModal').style.display = 'none';
     },
     
     toggle() {
