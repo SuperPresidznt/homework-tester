@@ -1975,6 +1975,9 @@ button:focus-visible {
     </div>
 </div>
 
+<!-- ========== CALCULATOR MODAL ========== -->
+<div class="modal-overlay" id="calculatorModal" onclick="if(event.target===this)Calculator.close()" style="z-index:10001"></div>
+
 <!-- ========== AI TUTOR MODAL ========== -->
 <div class="modal-overlay" id="aiTutorModal" onclick="if(event.target===this)AITutor.closeModal()">
     <div class="modal-content" style="max-width:700px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column">
@@ -2546,6 +2549,9 @@ button:focus-visible {
         </div>
     </div>
 </div>
+
+<!-- CALCULATOR FAB -->
+<button class="chat-fab" id="calcFab" onclick="Calculator.toggle()" title="Scientific Calculator" aria-label="Open calculator" style="bottom:140px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #0f3460">📐</button>
 
 <!-- AI CHAT -->
 <button class="chat-fab" id="chatFab" onclick="Chat.toggle()" title="Ask AI about this question" aria-label="Open AI tutor chat" style="display:none">?</button>
@@ -11169,6 +11175,255 @@ const Home = {
                 <button class="btn-nav" style="background:var(--red);font-size:12px;padding:6px 14px" onclick="Drill.start('${escapeHtml(bank.bankId)}', [${weakQIds.join(',')}])">Drill Weak Areas</button>
             </div>
         </div>`;
+    }
+};
+
+// =====================================================================
+// TI-84 STYLE SCIENTIFIC CALCULATOR
+// =====================================================================
+const Calculator = {
+    display: '',
+    memory: 0,
+    history: [],
+    isOpen: false,
+    mode: 'deg', // deg or rad
+    
+    open() {
+        this.isOpen = true;
+        this.render();
+        document.getElementById('calculatorModal').classList.add('active');
+    },
+    
+    close() {
+        this.isOpen = false;
+        document.getElementById('calculatorModal').classList.remove('active');
+    },
+    
+    toggle() {
+        this.isOpen ? this.close() : this.open();
+    },
+    
+    input(val) {
+        this.display += val;
+        this.updateDisplay();
+    },
+    
+    clear() {
+        this.display = '';
+        this.updateDisplay();
+    },
+    
+    backspace() {
+        this.display = this.display.slice(0, -1);
+        this.updateDisplay();
+    },
+    
+    toggleMode() {
+        this.mode = this.mode === 'deg' ? 'rad' : 'deg';
+        this.render();
+    },
+    
+    // Convert degrees to radians if in degree mode
+    toRad(x) {
+        return this.mode === 'deg' ? x * Math.PI / 180 : x;
+    },
+    
+    // Convert radians to degrees if in degree mode
+    fromRad(x) {
+        return this.mode === 'deg' ? x * 180 / Math.PI : x;
+    },
+    
+    calculate() {
+        if (!this.display) return;
+        try {
+            // Replace math symbols with JS equivalents
+            let expr = this.display
+                .replace(/×/g, '*')
+                .replace(/÷/g, '/')
+                .replace(/\^/g, '**')
+                .replace(/π/g, 'Math.PI')
+                .replace(/e(?![x\d])/g, 'Math.E')
+                .replace(/√\(/g, 'Math.sqrt(')
+                .replace(/∛\(/g, 'Math.cbrt(')
+                .replace(/abs\(/g, 'Math.abs(')
+                .replace(/ln\(/g, 'Math.log(')
+                .replace(/log\(/g, 'Math.log10(')
+                .replace(/exp\(/g, 'Math.exp(')
+                .replace(/sin\(/g, `Math.sin(${this.mode === 'deg' ? 'Math.PI/180*' : ''}`)
+                .replace(/cos\(/g, `Math.cos(${this.mode === 'deg' ? 'Math.PI/180*' : ''}`)
+                .replace(/tan\(/g, `Math.tan(${this.mode === 'deg' ? 'Math.PI/180*' : ''}`)
+                .replace(/asin\(/g, `${this.mode === 'deg' ? '180/Math.PI*' : ''}Math.asin(`)
+                .replace(/acos\(/g, `${this.mode === 'deg' ? '180/Math.PI*' : ''}Math.acos(`)
+                .replace(/atan\(/g, `${this.mode === 'deg' ? '180/Math.PI*' : ''}Math.atan(`)
+                .replace(/sinh\(/g, 'Math.sinh(')
+                .replace(/cosh\(/g, 'Math.cosh(')
+                .replace(/tanh\(/g, 'Math.tanh(')
+                .replace(/floor\(/g, 'Math.floor(')
+                .replace(/ceil\(/g, 'Math.ceil(')
+                .replace(/round\(/g, 'Math.round(')
+                .replace(/(\d+)!/g, 'this.factorial($1)')
+                .replace(/nPr\((\d+),(\d+)\)/g, 'this.permutation($1,$2)')
+                .replace(/nCr\((\d+),(\d+)\)/g, 'this.combination($1,$2)');
+            
+            const result = eval(expr);
+            const rounded = Math.round(result * 1e10) / 1e10; // Avoid floating point weirdness
+            this.history.unshift({ expr: this.display, result: rounded });
+            if (this.history.length > 10) this.history.pop();
+            this.display = String(rounded);
+            this.updateDisplay();
+        } catch (e) {
+            this.display = 'Error';
+            this.updateDisplay();
+            setTimeout(() => { this.display = ''; this.updateDisplay(); }, 1500);
+        }
+    },
+    
+    factorial(n) {
+        if (n < 0) return NaN;
+        if (n === 0 || n === 1) return 1;
+        let result = 1;
+        for (let i = 2; i <= n; i++) result *= i;
+        return result;
+    },
+    
+    permutation(n, r) {
+        return this.factorial(n) / this.factorial(n - r);
+    },
+    
+    combination(n, r) {
+        return this.factorial(n) / (this.factorial(r) * this.factorial(n - r));
+    },
+    
+    memoryStore() {
+        this.memory = parseFloat(this.display) || 0;
+        SoundFX.play('click');
+    },
+    
+    memoryRecall() {
+        this.display += this.memory;
+        this.updateDisplay();
+    },
+    
+    memoryClear() {
+        this.memory = 0;
+        SoundFX.play('click');
+    },
+    
+    memoryAdd() {
+        this.memory += parseFloat(this.display) || 0;
+        SoundFX.play('click');
+    },
+    
+    updateDisplay() {
+        const el = document.getElementById('calcDisplay');
+        if (el) el.textContent = this.display || '0';
+    },
+    
+    render() {
+        const modal = document.getElementById('calculatorModal');
+        if (!modal) return;
+        
+        modal.innerHTML = `
+        <div style="background:linear-gradient(145deg,#1a1a2e,#16213e);border-radius:16px;padding:16px;max-width:360px;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:2px solid #0f3460;font-family:'Courier New',monospace">
+            <!-- Header -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+                <div style="color:#00d9ff;font-weight:bold;font-size:14px">📐 TI-84 Calculator</div>
+                <div style="display:flex;gap:8px;align-items:center">
+                    <button onclick="Calculator.toggleMode()" style="background:${this.mode === 'deg' ? '#e94560' : '#0f3460'};color:white;border:none;padding:4px 8px;border-radius:4px;font-size:11px;cursor:pointer">${this.mode.toUpperCase()}</button>
+                    <button onclick="Calculator.close()" style="background:#e94560;color:white;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
+                </div>
+            </div>
+            
+            <!-- Display -->
+            <div style="background:#0a0a12;border:2px solid #0f3460;border-radius:8px;padding:12px;margin-bottom:12px;min-height:48px">
+                <div id="calcDisplay" style="color:#00ff88;font-size:24px;text-align:right;word-break:break-all;font-family:'Courier New',monospace">${this.display || '0'}</div>
+            </div>
+            
+            <!-- Memory Row -->
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:8px">
+                ${this._btn('MC', 'Calculator.memoryClear()', '#4a4a6a', '11px')}
+                ${this._btn('MR', 'Calculator.memoryRecall()', '#4a4a6a', '11px')}
+                ${this._btn('M+', 'Calculator.memoryAdd()', '#4a4a6a', '11px')}
+                ${this._btn('MS', 'Calculator.memoryStore()', '#4a4a6a', '11px')}
+                ${this._btn('⌫', 'Calculator.backspace()', '#e94560', '14px')}
+            </div>
+            
+            <!-- Scientific Functions Row 1 -->
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:4px">
+                ${this._btn('sin', "Calculator.input('sin(')", '#0f3460')}
+                ${this._btn('cos', "Calculator.input('cos(')", '#0f3460')}
+                ${this._btn('tan', "Calculator.input('tan(')", '#0f3460')}
+                ${this._btn('ln', "Calculator.input('ln(')", '#0f3460')}
+                ${this._btn('log', "Calculator.input('log(')", '#0f3460')}
+            </div>
+            
+            <!-- Scientific Functions Row 2 -->
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:4px">
+                ${this._btn('sin⁻¹', "Calculator.input('asin(')", '#0f3460', '10px')}
+                ${this._btn('cos⁻¹', "Calculator.input('acos(')", '#0f3460', '10px')}
+                ${this._btn('tan⁻¹', "Calculator.input('atan(')", '#0f3460', '10px')}
+                ${this._btn('eˣ', "Calculator.input('exp(')", '#0f3460')}
+                ${this._btn('10ˣ', "Calculator.input('10^')", '#0f3460')}
+            </div>
+            
+            <!-- Scientific Functions Row 3 -->
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-bottom:8px">
+                ${this._btn('√', "Calculator.input('√(')", '#0f3460')}
+                ${this._btn('∛', "Calculator.input('∛(')", '#0f3460')}
+                ${this._btn('x²', "Calculator.input('^2')", '#0f3460')}
+                ${this._btn('xʸ', "Calculator.input('^')", '#0f3460')}
+                ${this._btn('π', "Calculator.input('π')", '#0f3460')}
+            </div>
+            
+            <!-- Number Pad + Operations -->
+            <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px">
+                ${this._btn('(', "Calculator.input('(')", '#4a4a6a')}
+                ${this._btn(')', "Calculator.input(')')", '#4a4a6a')}
+                ${this._btn('e', "Calculator.input('e')", '#4a4a6a')}
+                ${this._btn('C', 'Calculator.clear()', '#e94560')}
+                ${this._btn('÷', "Calculator.input('÷')", '#e94560')}
+                
+                ${this._btn('7', "Calculator.input('7')", '#2a2a4a')}
+                ${this._btn('8', "Calculator.input('8')", '#2a2a4a')}
+                ${this._btn('9', "Calculator.input('9')", '#2a2a4a')}
+                ${this._btn('!', "Calculator.input('!')", '#4a4a6a')}
+                ${this._btn('×', "Calculator.input('×')", '#e94560')}
+                
+                ${this._btn('4', "Calculator.input('4')", '#2a2a4a')}
+                ${this._btn('5', "Calculator.input('5')", '#2a2a4a')}
+                ${this._btn('6', "Calculator.input('6')", '#2a2a4a')}
+                ${this._btn('abs', "Calculator.input('abs(')", '#4a4a6a', '10px')}
+                ${this._btn('−', "Calculator.input('-')", '#e94560')}
+                
+                ${this._btn('1', "Calculator.input('1')", '#2a2a4a')}
+                ${this._btn('2', "Calculator.input('2')", '#2a2a4a')}
+                ${this._btn('3', "Calculator.input('3')", '#2a2a4a')}
+                ${this._btn('%', "Calculator.input('/100')", '#4a4a6a')}
+                ${this._btn('+', "Calculator.input('+')", '#e94560')}
+                
+                ${this._btn('±', "Calculator.input('(-')", '#2a2a4a')}
+                ${this._btn('0', "Calculator.input('0')", '#2a2a4a')}
+                ${this._btn('.', "Calculator.input('.')", '#2a2a4a')}
+                ${this._btn(',', "Calculator.input(',')", '#4a4a6a')}
+                ${this._btn('=', 'Calculator.calculate()', '#00d9ff')}
+            </div>
+            
+            <!-- History -->
+            ${this.history.length > 0 ? `
+                <div style="margin-top:12px;max-height:80px;overflow-y:auto;background:#0a0a12;border-radius:6px;padding:8px">
+                    <div style="font-size:10px;color:#666;margin-bottom:4px">History</div>
+                    ${this.history.slice(0, 5).map(h => `
+                        <div style="font-size:11px;color:#888;cursor:pointer;padding:2px 0" onclick="Calculator.display='${h.result}';Calculator.updateDisplay()">
+                            ${h.expr} = <span style="color:#00ff88">${h.result}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+        </div>`;
+    },
+    
+    _btn(label, onclick, bg, fontSize = '13px') {
+        return `<button onclick="${onclick}" style="background:${bg};color:white;border:none;padding:10px 4px;border-radius:6px;font-size:${fontSize};cursor:pointer;font-family:'Courier New',monospace;transition:all 0.1s" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">${label}</button>`;
     }
 };
 
