@@ -1978,6 +1978,9 @@ button:focus-visible {
 <!-- ========== CALCULATOR PANEL (Side Panel, Not Overlay) ========== -->
 <div id="calculatorModal" style="display:none;position:fixed;bottom:200px;right:20px;z-index:10001"></div>
 
+<!-- ========== NOTEPAD PANEL (Side Panel, Draggable) ========== -->
+<div id="notepadModal" style="display:none;position:fixed;bottom:200px;left:20px;z-index:10001"></div>
+
 <!-- ========== AI TUTOR MODAL ========== -->
 <div class="modal-overlay" id="aiTutorModal" onclick="if(event.target===this)AITutor.closeModal()">
     <div class="modal-content" style="max-width:700px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column">
@@ -2549,6 +2552,9 @@ button:focus-visible {
         </div>
     </div>
 </div>
+
+<!-- NOTEPAD FAB -->
+<button class="chat-fab" id="notepadFab" onclick="Notepad.toggle()" title="Scratch Pad" aria-label="Open notepad" style="bottom:200px;background:linear-gradient(135deg,#2d2d2d,#1a1a1a);border:2px solid #ffc832">📝</button>
 
 <!-- CALCULATOR FAB -->
 <button class="chat-fab" id="calcFab" onclick="Calculator.toggle()" title="Scientific Calculator" aria-label="Open calculator" style="bottom:140px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #0f3460">📐</button>
@@ -7913,7 +7919,7 @@ const Business = {
 };
 
 // Initialize business ticking on load
-document.addEventListener('DOMContentLoaded', () => Business.init());
+document.addEventListener('DOMContentLoaded', () => { Business.init(); Notepad.init(); });
 
 // =====================================================================
 // BATTLE SYSTEM (PVE Story Campaign)
@@ -11474,6 +11480,137 @@ const Calculator = {
     
     _btn(label, onclick, bg, fontSize = '13px') {
         return `<button onclick="${onclick}" style="background:${bg};color:white;border:none;padding:10px 4px;border-radius:6px;font-size:${fontSize};cursor:pointer;font-family:'Courier New',monospace;transition:all 0.1s" onmousedown="this.style.transform='scale(0.95)'" onmouseup="this.style.transform='scale(1)'" onmouseleave="this.style.transform='scale(1)'">${label}</button>`;
+    }
+};
+
+// =====================================================================
+// DRAGGABLE NOTEPAD
+// =====================================================================
+const Notepad = {
+    content: '',
+    isOpen: false,
+    isDragging: false,
+    dragOffset: { x: 0, y: 0 },
+    
+    init() {
+        this.content = Store.get('notepadContent', '');
+    },
+    
+    open() {
+        this.isOpen = true;
+        this.render();
+        const modal = document.getElementById('notepadModal');
+        modal.style.display = 'block';
+        this.initDrag();
+    },
+    
+    close() {
+        this.isOpen = false;
+        document.getElementById('notepadModal').style.display = 'none';
+    },
+    
+    toggle() {
+        this.isOpen ? this.close() : this.open();
+    },
+    
+    save() {
+        const textarea = document.getElementById('notepadText');
+        if (textarea) {
+            this.content = textarea.value;
+            Store.set('notepadContent', this.content);
+        }
+    },
+    
+    clear() {
+        if (confirm('Clear all notes?')) {
+            this.content = '';
+            Store.set('notepadContent', '');
+            const textarea = document.getElementById('notepadText');
+            if (textarea) textarea.value = '';
+        }
+    },
+    
+    initDrag() {
+        const modal = document.getElementById('notepadModal');
+        const header = document.getElementById('notepadDragHandle');
+        if (!header) return;
+        
+        header.onmousedown = (e) => {
+            if (e.target.tagName === 'BUTTON') return;
+            e.preventDefault();
+            this.isDragging = true;
+            this.dragOffset.x = e.clientX - modal.offsetLeft;
+            this.dragOffset.y = e.clientY - modal.offsetTop;
+            document.onmousemove = (e) => this.drag(e);
+            document.onmouseup = () => this.stopDrag();
+        };
+        
+        header.ontouchstart = (e) => {
+            if (e.target.tagName === 'BUTTON') return;
+            const touch = e.touches[0];
+            this.isDragging = true;
+            this.dragOffset.x = touch.clientX - modal.offsetLeft;
+            this.dragOffset.y = touch.clientY - modal.offsetTop;
+            document.ontouchmove = (e) => this.drag(e.touches[0]);
+            document.ontouchend = () => this.stopDrag();
+        };
+    },
+    
+    drag(e) {
+        if (!this.isDragging) return;
+        const modal = document.getElementById('notepadModal');
+        let newX = e.clientX - this.dragOffset.x;
+        let newY = e.clientY - this.dragOffset.y;
+        newX = Math.max(0, Math.min(newX, window.innerWidth - modal.offsetWidth));
+        newY = Math.max(0, Math.min(newY, window.innerHeight - modal.offsetHeight));
+        modal.style.left = newX + 'px';
+        modal.style.top = newY + 'px';
+        modal.style.right = 'auto';
+        modal.style.bottom = 'auto';
+    },
+    
+    stopDrag() {
+        this.isDragging = false;
+        document.onmousemove = null;
+        document.onmouseup = null;
+        document.ontouchmove = null;
+        document.ontouchend = null;
+    },
+    
+    render() {
+        const modal = document.getElementById('notepadModal');
+        if (!modal) return;
+        
+        modal.innerHTML = `
+        <div style="background:linear-gradient(145deg,#2d2d2d,#1a1a1a);border-radius:12px;padding:12px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5);border:2px solid #444;font-family:system-ui,-apple-system,sans-serif">
+            <!-- Drag Handle Header -->
+            <div id="notepadDragHandle" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;cursor:grab;padding:4px;margin:-4px -4px 8px -4px;border-radius:8px 8px 0 0;background:rgba(255,200,50,0.15)">
+                <div style="color:#ffc832;font-weight:bold;font-size:13px;display:flex;align-items:center;gap:6px">
+                    <span style="opacity:0.5">⋮⋮</span> 📝 Scratch Pad
+                </div>
+                <div style="display:flex;gap:6px;align-items:center">
+                    <button onclick="Notepad.clear()" style="background:#666;color:white;border:none;padding:3px 8px;border-radius:4px;font-size:10px;cursor:pointer">Clear</button>
+                    <button onclick="Notepad.close()" style="background:#e94560;color:white;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px">×</button>
+                </div>
+            </div>
+            
+            <!-- Notepad Area -->
+            <textarea id="notepadText" 
+                placeholder="Jot down numbers, work out problems..."
+                oninput="Notepad.save()"
+                style="width:100%;height:200px;background:#1a1a1a;border:1px solid #444;border-radius:6px;padding:10px;color:#fff;font-family:'Courier New',monospace;font-size:14px;resize:vertical;box-sizing:border-box"
+            >${this.content}</textarea>
+            
+            <!-- Quick buttons -->
+            <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
+                <button onclick="document.getElementById('notepadText').value+='√';Notepad.save()" style="background:#444;color:white;border:none;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer">√</button>
+                <button onclick="document.getElementById('notepadText').value+='π';Notepad.save()" style="background:#444;color:white;border:none;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer">π</button>
+                <button onclick="document.getElementById('notepadText').value+='²';Notepad.save()" style="background:#444;color:white;border:none;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer">x²</button>
+                <button onclick="document.getElementById('notepadText').value+='÷';Notepad.save()" style="background:#444;color:white;border:none;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer">÷</button>
+                <button onclick="document.getElementById('notepadText').value+='×';Notepad.save()" style="background:#444;color:white;border:none;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer">×</button>
+                <button onclick="document.getElementById('notepadText').value+='±';Notepad.save()" style="background:#444;color:white;border:none;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer">±</button>
+            </div>
+        </div>`;
     }
 };
 
@@ -19883,7 +20020,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.29</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.32</div>
 
 </body>
 </html>
