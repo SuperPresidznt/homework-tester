@@ -9742,22 +9742,32 @@ const PetModal = {
 
     useEvoStone() {
         const state = Gamification.getState();
-        const evoCount = state.inventory.gardenItems?.evoStone || 0;
-        if (evoCount <= 0) return;
+        // Ensure gardenItems exists
+        if (!state.inventory.gardenItems) {
+            state.inventory.gardenItems = { water: 0, fertilizer: 0, magicDust: 0, evoStone: 0 };
+        }
+        const evoCount = state.inventory.gardenItems.evoStone || 0;
+        if (evoCount <= 0) {
+            Gamification.showAchievementToast({ icon: '🪨', name: 'No Evolution Stones', desc: 'Buy from shop or earn at levels 10, 15, 20', xp: 0 });
+            return;
+        }
         
         // Consume one evolution stone
         state.inventory.gardenItems.evoStone = evoCount - 1;
         
         // Apply +60 care minutes to the ACTIVE pet
         const buddy = state.studyBuddy;
-        buddy.careMinutes = (buddy.careMinutes || 0) + 60;
+        const oldCare = buddy.careMinutes || 0;
+        buddy.careMinutes = oldCare + 60;
         
         // Check evolution
+        let evolved = false;
         for (let i = Gamification.BUDDY_STAGES.length - 1; i >= 0; i--) {
             const req = Gamification.BUDDY_STAGES[i];
-            if (buddy.totalXpFed >= req.xpNeeded && (buddy.careMinutes || 0) >= req.careNeeded) {
+            if (buddy.totalXpFed >= req.xpNeeded && buddy.careMinutes >= req.careNeeded) {
                 if (buddy.stage < req.stage) {
                     buddy.stage = req.stage;
+                    evolved = true;
                     Gamification.showAchievementToast({
                         icon: Gamification.getSpeciesEmoji(buddy.species, req.stage),
                         name: buddy.name + ' evolved!',
@@ -9767,6 +9777,11 @@ const PetModal = {
                 }
                 break;
             }
+        }
+        
+        // Show feedback if no evolution
+        if (!evolved) {
+            Gamification.showAchievementToast({ icon: '🪨', name: 'Evolution Stone Used!', desc: '+60 care mins (' + buddy.careMinutes + ' total)', xp: 0 });
         }
         
         Gamification.saveState(state);
@@ -20020,7 +20035,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.32</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.33</div>
 
 </body>
 </html>
