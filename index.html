@@ -17901,6 +17901,20 @@ Current Session: ${comprehensiveStats.currentSession.correct}/${comprehensiveSta
 If the student asks for a summary, analysis, or graph, use this data. For graphs, you can describe what a chart would show or create ASCII art representations.`
         }
 
+        // Include scratch pad content if available
+        const scratchPadContent = document.getElementById('notepadText')?.value?.trim();
+        if (scratchPadContent) {
+            systemPrompt += `\n\n=== STUDENT'S SCRATCH PAD (their work-in-progress) ===
+${scratchPadContent}
+
+IMPORTANT: The student is showing you their work. Look at their calculations and:
+- Check if their math steps are correct so far
+- Point out any errors in their work WITHOUT giving the final answer
+- Encourage them when they're on the right track
+- If they ask "am I right?" about their work, evaluate their PROCESS not just give them the answer
+- Let them finish their own calculations - don't do the work for them`;
+        }
+
         if (ctx) {
             systemPrompt += `\n\nCurrent question (#${ctx.number}):\n"${ctx.text}"\n\nOptions:\n${ctx.options.map((o, i) => `${String.fromCharCode(65+i)}. ${o}`).join('\n')}`;
             
@@ -17910,12 +17924,20 @@ If the student asks for a summary, analysis, or graph, use this data. For graphs
                 if (ctx.explanation) systemPrompt += `\n\nExplanation: ${ctx.explanation}`;
             } else {
                 // User hasn't answered yet - DO NOT reveal the answer
-                systemPrompt += `\n\n⚠️ IMPORTANT: The student has NOT answered this question yet. DO NOT reveal the correct answer. Instead:
-- Help them understand the concepts needed to solve it
-- Guide them through the problem-solving process
-- Ask clarifying questions to help them think
-- Explain relevant formulas or methods WITHOUT giving away the answer
-- If they directly ask "what is the answer", say "Try working through it first - I can help guide you!"`;
+                systemPrompt += `\n\n⚠️ CRITICAL - STUDENT HAS NOT ANSWERED YET ⚠️
+DO NOT:
+- Tell them the correct answer letter (A, B, C, D)
+- Calculate the final numerical answer for them
+- Say things like "the answer is..." or "you should get..."
+- Complete their calculations - let THEM do the final step
+
+DO:
+- Check their scratch pad work for errors
+- Confirm if their approach/method is correct
+- Explain concepts and formulas they need
+- Say "you're on the right track" or "check that step again"
+- Ask "what did you get?" instead of telling them
+- If they ask for the answer directly, say "finish your calculation - what do you get?"`;
             }
             
             if (ctx.userAnswer !== undefined && ctx.userAnswer !== null) {
@@ -20035,7 +20057,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.33</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.34</div>
 
 </body>
 </html>
