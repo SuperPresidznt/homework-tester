@@ -13371,12 +13371,14 @@ const App = {
         if (!this.questions[this.currentQ]) return null;
         const q = this.questions[this.currentQ];
         const displayOptions = q._shuffledOptions || q.options;
+        // Use shuffled correct index if available, otherwise original
+        const shuffledCorrect = q._shuffledCorrect !== undefined ? q._shuffledCorrect : q.correctAnswer;
         return {
             number: this.currentQ + 1,
             text: q.text,
             options: displayOptions,
-            correctAnswer: q.correctAnswer,
-            correctText: q.options[q.correctAnswer],
+            correctAnswer: shuffledCorrect,
+            correctText: displayOptions[shuffledCorrect],
             explanation: q.explanation,
             userAnswer: this.answers[this.currentQ],
             userAnswerText: this.answers[this.currentQ] !== undefined ? displayOptions[this.answers[this.currentQ]] : null
@@ -13770,15 +13772,19 @@ const Drill = {
     getQuestionContext() {
         if (!this.current) return null;
         const q = this.current.question;
+        // Use shuffled options and correct index if available
+        const shuffleMap = this.currentShuffleMap;
+        const displayOptions = shuffleMap ? shuffleMap.map(i => q.options[i]) : q.options;
+        const shuffledCorrect = this.currentShuffledCorrect !== null ? this.currentShuffledCorrect : q.correctAnswer;
         return {
             number: q.id,
             text: q.text,
-            options: q.options,
-            correctAnswer: q.correctAnswer,
-            correctText: q.options[q.correctAnswer],
+            options: displayOptions,
+            correctAnswer: shuffledCorrect,
+            correctText: displayOptions[shuffledCorrect],
             explanation: q.explanation,
             userAnswer: this.selectedOption,
-            userAnswerText: this.selectedOption !== null ? q.options[this.selectedOption] : null
+            userAnswerText: this.selectedOption !== null ? displayOptions[this.selectedOption] : null
         };
     }
 };
@@ -15741,15 +15747,19 @@ IMPORTANT: correctAnswer is a 0-based index (0 for first option, 1 for second, e
         const q = this.currentQuestion;
         // Don't reveal answer if user hasn't checked yet
         const hideAnswer = !this.isChecked;
+        // Use shuffled options and correct index if available
+        const shuffleMap = this.currentShuffleMap;
+        const displayOptions = shuffleMap ? shuffleMap.map(i => q.options[i]) : q.options;
+        const shuffledCorrect = this.currentShuffledCorrect !== null ? this.currentShuffledCorrect : q.correctAnswer;
         return {
             number: 'AI-' + this.sessionStats.total,
             text: q.question,
-            options: q.options,
-            correctAnswer: hideAnswer ? null : q.correctAnswer,
-            correctText: hideAnswer ? null : q.options[q.correctAnswer],
+            options: displayOptions,
+            correctAnswer: hideAnswer ? null : shuffledCorrect,
+            correctText: hideAnswer ? null : displayOptions[shuffledCorrect],
             explanation: hideAnswer ? null : q.explanation,
             userAnswer: this.selectedOption,
-            userAnswerText: this.selectedOption !== null ? q.options[this.selectedOption] : null,
+            userAnswerText: this.selectedOption !== null ? displayOptions[this.selectedOption] : null,
             isAnswered: this.isChecked
         };
     },
@@ -20057,7 +20067,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.34</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.35</div>
 
 </body>
 </html>
