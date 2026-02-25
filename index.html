@@ -19658,17 +19658,63 @@ const QuestionTracker = {
     },
 
     // Get category accuracy from tracked data
+    // Uses RECENT-WEIGHTED scoring: recent attempts count more than old ones
+    // This ensures improvement is reflected in stats, not dragged down by old mistakes
     getCategoryAccuracy() {
         const data = this._getData();
+        const now = Date.now();
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        const twoWeeks = 14 * 24 * 60 * 60 * 1000;
+        
         const cats = {};
         for (const qId in data) {
             const d = data[qId];
             const cat = d.category || 'General';
-            if (!cats[cat]) cats[cat] = { correct: 0, total: 0, time: 0 };
-            cats[cat].correct += d.correct;
-            cats[cat].total += d.attempts;
+            if (!cats[cat]) cats[cat] = { 
+                correct: 0, total: 0, time: 0,
+                recentCorrect: 0, recentTotal: 0,  // Last 7 days (weight: 3x)
+                midCorrect: 0, midTotal: 0,        // 7-14 days ago (weight: 1.5x)
+                oldCorrect: 0, oldTotal: 0         // Older (weight: 1x)
+            };
+            
+            // Process history for time-weighted accuracy
+            if (d.history && d.history.length > 0) {
+                d.history.forEach(h => {
+                    const ts = h.date || 0;
+                    const age = now - ts;
+                    if (age <= oneWeek) {
+                        cats[cat].recentTotal++;
+                        if (h.correct) cats[cat].recentCorrect++;
+                    } else if (age <= twoWeeks) {
+                        cats[cat].midTotal++;
+                        if (h.correct) cats[cat].midCorrect++;
+                    } else {
+                        cats[cat].oldTotal++;
+                        if (h.correct) cats[cat].oldCorrect++;
+                    }
+                });
+            } else {
+                // Fallback for entries without history - treat as old data
+                cats[cat].oldCorrect += d.correct;
+                cats[cat].oldTotal += d.attempts;
+            }
+            
             cats[cat].time += d.totalTime;
         }
+        
+        // Calculate weighted totals: recent=3x, mid=1.5x, old=1x
+        for (const cat in cats) {
+            const c = cats[cat];
+            const weightedCorrect = (c.recentCorrect * 3) + (c.midCorrect * 1.5) + (c.oldCorrect * 1);
+            const weightedTotal = (c.recentTotal * 3) + (c.midTotal * 1.5) + (c.oldTotal * 1);
+            
+            // Store both raw and weighted
+            c.correct = weightedCorrect;
+            c.total = weightedTotal;
+            c.rawCorrect = c.recentCorrect + c.midCorrect + c.oldCorrect;
+            c.rawTotal = c.recentTotal + c.midTotal + c.oldTotal;
+        }
+        
         return cats;
     },
 
@@ -19738,21 +19784,60 @@ const QuestionTracker = {
         return { recentAcc, prevAcc, improving: recentAcc > prevAcc };
     },
 
-    // Get overall stats summary
+    // Get overall stats summary - uses recent-weighted accuracy
     getSummary() {
         const data = this._getData();
+        const now = Date.now();
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
+        const twoWeeks = 14 * 24 * 60 * 60 * 1000;
+        
         let totalAttempts = 0, totalCorrect = 0, totalTime = 0, questionsTracked = 0;
+        let recentCorrect = 0, recentTotal = 0;
+        let midCorrect = 0, midTotal = 0;
+        let oldCorrect = 0, oldTotal = 0;
+        
         for (const qId in data) {
             const d = data[qId];
             questionsTracked++;
-            totalAttempts += d.attempts;
-            totalCorrect += d.correct;
             totalTime += d.totalTime;
+            
+            // Process history for time-weighted accuracy
+            if (d.history && d.history.length > 0) {
+                d.history.forEach(h => {
+                    const ts = h.date || 0;
+                    const age = now - ts;
+                    if (age <= oneWeek) {
+                        recentTotal++;
+                        if (h.correct) recentCorrect++;
+                    } else if (age <= twoWeeks) {
+                        midTotal++;
+                        if (h.correct) midCorrect++;
+                    } else {
+                        oldTotal++;
+                        if (h.correct) oldCorrect++;
+                    }
+                });
+            } else {
+                // Fallback for entries without history
+                oldCorrect += d.correct;
+                oldTotal += d.attempts;
+            }
         }
+        
+        // Calculate weighted totals: recent=3x, mid=1.5x, old=1x
+        const weightedCorrect = (recentCorrect * 3) + (midCorrect * 1.5) + (oldCorrect * 1);
+        const weightedTotal = (recentTotal * 3) + (midTotal * 1.5) + (oldTotal * 1);
+        
+        totalAttempts = recentTotal + midTotal + oldTotal;
+        totalCorrect = recentCorrect + midCorrect + oldCorrect;
+        
         return {
             questionsTracked, totalAttempts, totalCorrect,
-            accuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
-            totalTime
+            accuracy: weightedTotal > 0 ? Math.round((weightedCorrect / weightedTotal) * 100) : 0,
+            rawAccuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
+            totalTime,
+            recentAccuracy: recentTotal > 0 ? Math.round((recentCorrect / recentTotal) * 100) : null,
+            recentTotal
         };
     },
 
@@ -20067,7 +20152,7 @@ window.addEventListener('beforeunload', () => { Session.end(); Gamification.save
 <canvas id="confettiCanvas"></canvas>
 
 <!-- Version Footer -->
-<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.35</div>
+<div style="text-align:center;padding:16px;font-size:11px;color:var(--gray-500);opacity:0.7">v3.36</div>
 
 </body>
 </html>
